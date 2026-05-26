@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+
+  /* shared badge */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 20px; padding: 0 8px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px; font-weight: 500; letter-spacing: .04em;
+    box-sizing: border-box;
+  }
+  .badge svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+  .b-ongoing,.b-twsp  { background: var(--color-blue-lt);  color: var(--color-blue-dk); }
+  .b-cfsp             { background: var(--color-teal-lt);  color: var(--color-teal-dk); }
+  .b-completed,.b-approved,.b-ontrack { background: var(--color-green-lt); color: var(--color-green-dk); }
+  .b-upcoming,.b-warning,.b-nc1 { background: var(--color-amber-lt); color: var(--color-amber-dk); }
+  .b-cancelled,.b-critical { background: var(--color-red-lt); color: var(--color-red-dk); }
+  .b-nc2 { background: var(--color-purple-lt); color: var(--color-purple-dk); }
+  .b-not-approved { background: var(--color-surface-alt); color: var(--color-text-muted); border: 1px solid var(--color-border); }
+
+  
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.lbl { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); margin-top: 6px; }
+.it { text-align: left; }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Urgency badges — driven by days remaining</div>
+<div class="row">
+  <div class="it"><span class="badge b-critical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.36 3.59l-8.1 13.53A1.91 1.91 0 0 0 3.9 20h16.2a1.91 1.91 0 0 0 1.64-2.87l-8.1-13.54a1.91 1.91 0 0 0-3.28 0z"/><path d="M12 16h.01"/></svg>3 DAYS</span><div class="lbl">≤ 6 · critical</div></div>
+  <div class="it"><span class="badge b-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>14 DAYS</span><div class="lbl">7–21 · warning</div></div>
+  <div class="it"><span class="badge b-ontrack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>28 DAYS</span><div class="lbl">&gt; 21 · on track</div></div>
+  <div class="it"><span class="badge b-cancelled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.36 3.59l-8.1 13.53A1.91 1.91 0 0 0 3.9 20h16.2a1.91 1.91 0 0 0 1.64-2.87l-8.1-13.54a1.91 1.91 0 0 0-3.28 0z"/><path d="M12 16h.01"/></svg>OVERDUE</span><div class="lbl">past deadline</div></div>
+</div></div></body></html>

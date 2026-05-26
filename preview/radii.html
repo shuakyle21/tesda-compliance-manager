@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+  
+.row { display:flex; gap: 14px; align-items: flex-end; }
+.it { text-align: center; }
+.box { width: 80px; height: 80px; background: var(--color-blue-lt); border: 1px solid var(--color-blue-border); }
+.lbl { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-primary); margin-top: 8px; }
+.sub { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Border radius — caps at 12px</div>
+<div class="row">
+  <div class="it"><div class="box" style="border-radius:3px"></div><div class="lbl">radius-sm</div><div class="sub">3px</div></div>
+  <div class="it"><div class="box" style="border-radius:6px"></div><div class="lbl">radius-md</div><div class="sub">6px</div></div>
+  <div class="it"><div class="box" style="border-radius:8px"></div><div class="lbl">radius-lg</div><div class="sub">8px</div></div>
+  <div class="it"><div class="box" style="border-radius:12px"></div><div class="lbl">radius-xl</div><div class="sub">12px</div></div>
+  <div class="it"><div class="box" style="border-radius:9999px"></div><div class="lbl">radius-full</div><div class="sub">avatars · pills</div></div>
+</div></div></body></html>

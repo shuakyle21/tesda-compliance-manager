@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .sw {
+    width: 124px; box-sizing: border-box;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden; background: var(--color-surface);
+  }
+  .sw .chip { height: 56px; }
+  .sw .meta { padding: 6px 8px 8px; }
+  .sw .name { font-family: var(--font-sans); font-size: 11px; font-weight: 500; color: var(--color-text-primary); }
+  .sw .hex  { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); margin-top: 2px;}
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 10px; }
+  
+.row { display: flex; gap: 12px; }
+.tier { flex:1; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); padding: 14px 16px; position: relative; overflow: hidden; }
+.tier::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.tier.critical::before { background: var(--color-red); }
+.tier.warning::before  { background: var(--color-amber); }
+.tier.ontrack::before  { background: var(--color-green); }
+.tier.complete::before { background: var(--color-border-strong); }
+.tt { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-muted); }
+.dd { font-family: var(--font-mono); font-size: 18px; font-weight: 600; margin-top: 4px; }
+.lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+.critical .dd { color: var(--color-red-dk); }
+.warning .dd  { color: var(--color-amber-dk); }
+.ontrack .dd  { color: var(--color-green-dk); }
+.complete .dd { color: var(--color-text-muted); }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Urgency tiers — driven by billing deadline</div>
+<div class="row">
+  <div class="tier critical"><div class="tt">Critical</div><div class="dd">≤ 6 days</div><div class="lbl">Red border, badge, deadline</div></div>
+  <div class="tier warning"><div class="tt">Warning</div><div class="dd">7–21 days</div><div class="lbl">Amber border, badge, deadline</div></div>
+  <div class="tier ontrack"><div class="tt">On track</div><div class="dd">&gt; 21 days</div><div class="lbl">Green border, badge, deadline</div></div>
+  <div class="tier complete"><div class="tt">Completed</div><div class="dd">Done</div><div class="lbl">Muted card state</div></div>
+</div></div></body></html>

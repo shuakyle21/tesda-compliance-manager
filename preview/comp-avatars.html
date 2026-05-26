@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+  
+.row { display: flex; gap: 18px; align-items: flex-end; }
+.it { text-align: center; }
+.av { border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-family: var(--font-sans); font-weight: 600; }
+.av.sm { width: 24px; height: 24px; font-size: 10px; }
+.av.md { width: 32px; height: 32px; font-size: 12px; }
+.lbl { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); margin-top: 6px; }
+.name { font-family: var(--font-sans); font-size: 11px; color: var(--color-text-primary); margin-top: 4px; }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Trainer avatars — deterministic from name hash</div>
+<div class="row">
+  <div class="it"><div class="av md" style="background:#B5D4F4;color:#0C447C">AG</div><div class="name">Archelyn Gagula</div><div class="lbl">blue-lt</div></div>
+  <div class="it"><div class="av md" style="background:#9FE1CB;color:#085041">JM</div><div class="name">Julius Maravilla</div><div class="lbl">teal-lt</div></div>
+  <div class="it"><div class="av md" style="background:#FBCB91;color:#7A3806">AP</div><div class="name">Agustin Pudadera III</div><div class="lbl">amber-lt</div></div>
+  <div class="it" style="margin-left:auto"><div class="av sm" style="background:#B5D4F4;color:#0C447C">AG</div><div class="name">sm · 24px</div><div class="lbl">in table rows</div></div>
+</div></div></body></html>

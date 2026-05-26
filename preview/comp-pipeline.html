@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+  
+.pipe { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; align-items: start; padding: 6px 0 0; position: relative; }
+.step { display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 6px; }
+.circle {
+  width: 22px; height: 22px; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  z-index: 2;
+  background: var(--color-surface); border: 1px solid var(--color-border-strong); color: var(--color-text-muted);
+}
+.done .circle { background: var(--color-green); border-color: var(--color-green); color: white; }
+.active .circle { background: var(--color-blue); border-color: var(--color-blue); color: white; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(24,95,165,0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(24,95,165,0); }
+}
+.line { position: absolute; top: 16px; left: 50%; right: -50%; height: 1px; background: var(--color-border); z-index: 1; }
+.step.done .line { background: var(--color-green); }
+.step:last-child .line { display: none; }
+.lbl { font-family: var(--font-sans); font-size: 10px; font-weight: 500; color: var(--color-text-primary); margin-top: 8px; text-align: center; letter-spacing: .02em; }
+.date { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); margin-top: 2px; font-weight: 500; }
+.step.pending .lbl, .step.pending .date { color: var(--color-text-muted); }
+.icn { width: 12px; height: 12px; }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Lifecycle pipeline — 6 stages</div>
+<div class="pipe">
+  <div class="step done"><div class="line"></div><div class="circle"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div class="lbl">AOU</div><div class="date">Apr 9</div></div>
+  <div class="step done"><div class="line"></div><div class="circle"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div class="lbl">NTP</div><div class="date">Apr 15</div></div>
+  <div class="step done"><div class="line"></div><div class="circle"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div class="lbl">TIP</div><div class="date">Apr 21</div></div>
+  <div class="step active"><div class="line"></div><div class="circle"><svg class="icn" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19"/></svg></div><div class="lbl">TRAINING</div><div class="date">Apr 21 – Jun 8</div></div>
+  <div class="step pending"><div class="line"></div><div class="circle">5</div><div class="lbl">ASSESS</div><div class="date">Pending</div></div>
+  <div class="step pending"><div class="circle">6</div><div class="lbl">BILLING</div><div class="date">By Jun 18</div></div>
+</div>
+</div></body></html>

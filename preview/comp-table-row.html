@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+
+  .table-wrap {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-family: var(--font-sans); table-layout: fixed; }
+  col.c-id { width: 56px; }
+  col.c-name { width: auto; }
+  col.c-prog { width: 80px; }
+  col.c-trn  { width: 130px; }
+  col.c-sch  { width: 54px; }
+  col.c-prg  { width: 110px; }
+  col.c-bill { width: 96px; }
+  col.c-bsrs { width: 66px; }
+
+  th {
+    background: var(--color-surface-alt);
+    font-size: 11px; font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase; letter-spacing: .04em;
+    text-align: left; padding: 0 12px;
+    height: 36px;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  th.num { text-align: right; }
+
+  td {
+    padding: 0 12px; height: 40px;
+    font-size: 12px; color: var(--color-text-primary);
+    border-bottom: 0.5px solid var(--color-border-faint);
+    vertical-align: middle;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tr.odd  td { background: var(--color-surface); }
+  tr.even td { background: var(--color-surface-alt); }
+  tr:hover td { background: var(--color-surface-raised); cursor: pointer; }
+
+  .id { font-family: var(--font-mono); color: var(--color-text-muted); }
+  .bn-name { font-weight: 500; display: block; }
+  .bn-qual { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); display: block; margin-top: 1px; }
+
+  /* trainer cell — use flex to keep avatar + name on one line, name truncates */
+  .trainer { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .av {
+    width: 22px; height: 22px; border-radius: 9999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-sans); font-size: 9px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .trainer .tname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .mono { font-family: var(--font-mono); color: var(--color-text-secondary); text-align: right; }
+
+  /* in-row progress */
+  .prog { display: flex; align-items: center; gap: 8px; }
+  .prog .track { flex: 1; min-width: 0; height: 4px; background: var(--color-surface-alt); border-radius: 9999px; overflow: hidden; }
+  .prog .track .fl { height: 100%; }
+  .prog .pct { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); width: 32px; text-align: right; flex-shrink: 0; }
+
+  /* Badge — no overflow ever */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 20px; padding: 0 8px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .04em; white-space: nowrap;
+    max-width: 100%; box-sizing: border-box;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grouptag">Data table row — 40px · alt zebra · sort-by-urgency default</div>
+
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col class="c-id"><col class="c-name"><col class="c-prog"><col class="c-trn">
+        <col class="c-sch"><col class="c-prg"><col class="c-bill"><col class="c-bsrs">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Batch · qualification</th>
+          <th>Program</th>
+          <th>Trainer</th>
+          <th class="num">Sch.</th>
+          <th>Progress</th>
+          <th>Billing</th>
+          <th>BSRS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td class="id">BAT-1</td>
+          <td><span class="bn-name">AKB Technical</span><span class="bn-qual">Cookery NC II</span></td>
+          <td><span class="badge" style="background:var(--color-blue-lt);color:var(--color-blue-dk)">TWSP</span></td>
+          <td>
+            <div class="trainer">
+              <span class="av" style="background:#B5D4F4;color:#0C447C">AG</span>
+              <span class="tname">Gagula</span>
+            </div>
+          </td>
+          <td class="mono">15</td>
+          <td>
+            <div class="prog">
+              <div class="track"><div class="fl" style="width:71%;background:var(--color-blue)"></div></div>
+              <span class="pct">71%</span>
+            </div>
+          </td>
+          <td><span class="badge" style="background:var(--color-red-lt);color:var(--color-red-dk)">3 DAYS</span></td>
+          <td><span class="badge" style="background:var(--color-green-lt);color:var(--color-green-dk)">YES</span></td>
+        </tr>
+        <tr class="even">
+          <td class="id">BAT-2</td>
+          <td><span class="bn-name">J3ed Farm</span><span class="bn-qual">Agri Crops NC I</span></td>
+          <td><span class="badge" style="background:var(--color-teal-lt);color:var(--color-teal-dk)">CFSP</span></td>
+          <td>
+            <div class="trainer">
+              <span class="av" style="background:#9FE1CB;color:#085041">JM</span>
+              <span class="tname">Maravilla</span>
+            </div>
+          </td>
+          <td class="mono">15</td>
+          <td>
+            <div class="prog">
+              <div class="track"><div class="fl" style="width:54%;background:var(--color-blue)"></div></div>
+              <span class="pct">54%</span>
+            </div>
+          </td>
+          <td><span class="badge" style="background:var(--color-amber-lt);color:var(--color-amber-dk)">14 DAYS</span></td>
+          <td><span class="badge" style="background:var(--color-surface-alt);color:var(--color-text-muted);border:1px solid var(--color-border)">NO</span></td>
+        </tr>
+        <tr class="odd">
+          <td class="id">BAT-3</td>
+          <td><span class="bn-name">Nenita Farm</span><span class="bn-qual">Animal Prod. NC II</span></td>
+          <td><span class="badge" style="background:var(--color-teal-lt);color:var(--color-teal-dk)">CFSP</span></td>
+          <td>
+            <div class="trainer">
+              <span class="av" style="background:#FBCB91;color:#7A3806">AP</span>
+              <span class="tname">Pudadera III</span>
+            </div>
+          </td>
+          <td class="mono">17</td>
+          <td>
+            <div class="prog">
+              <div class="track"><div class="fl" style="width:42%;background:var(--color-blue)"></div></div>
+              <span class="pct">42%</span>
+            </div>
+          </td>
+          <td><span class="badge" style="background:var(--color-green-lt);color:var(--color-green-dk)">28 DAYS</span></td>
+          <td><span class="badge" style="background:var(--color-green-lt);color:var(--color-green-dk)">YES</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

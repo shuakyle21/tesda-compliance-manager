@@ -1,0 +1,243 @@
+/* ================================================================
+   Training Compliance System — Design Tokens
+   TESDA TWSP & CFSP Batch Operations Dashboard · v1.0
+   ================================================================
+   The single source of truth for visual decisions.
+   All values come from the v1.0 design-system spec.
+*/
+
+/* ---- Fonts: IBM Plex Sans + IBM Plex Mono ------------------- */
+/* Loaded in HTML via Google Fonts; never substitute Inter/Geist/Roboto. */
+
+:root {
+
+  /* ============================================================
+     COLORS — Neutrals
+     ============================================================ */
+  --color-bg:             #F5F4F0;   /* page background — warm off-white  */
+  --color-surface:        #FFFFFF;   /* cards, panels, modals, dropdowns  */
+  --color-surface-alt:    #EEECEA;   /* alt rows, input bg, sidebar       */
+  --color-surface-raised: #FAF9F6;   /* card hover state                  */
+
+  --color-border:         #D8D6D0;   /* default borders                   */
+  --color-border-strong:  #B0AEA8;   /* section dividers, active input    */
+  --color-border-faint:   #E8E6E2;   /* subtle separators                 */
+
+  /* ============================================================
+     COLORS — Text
+     ============================================================ */
+  --color-text-primary:   #18180F;
+  --color-text-secondary: #5A5950;
+  --color-text-muted:     #97968E;
+  --color-text-disabled:  #C4C2BC;
+  --color-text-inverse:   #F5F4F0;
+
+  /* ============================================================
+     COLORS — Semantic (5-tier each: base / lt / dk / border / hover)
+     Every color carries one meaning. See spec §3.3.
+     ============================================================ */
+
+  /* Blue — TWSP / informational */
+  --color-blue:           #185FA5;
+  --color-blue-lt:        #E6F1FB;
+  --color-blue-dk:        #0C447C;
+  --color-blue-border:    #B5D0EE;
+  --color-blue-hover:     #D4E8F8;
+
+  /* Teal — CFSP */
+  --color-teal:           #0F6E56;
+  --color-teal-lt:        #E1F5EE;
+  --color-teal-dk:        #085041;
+  --color-teal-border:    #9FE1CB;
+  --color-teal-hover:     #C8EFE3;
+
+  /* Green — completed / approved / on-track */
+  --color-green:          #3B6D11;
+  --color-green-lt:       #EAF3DE;
+  --color-green-dk:       #27500A;
+  --color-green-border:   #B5D98A;
+  --color-green-hover:    #D5EBB8;
+
+  /* Amber — warning / 7–21 days / pending */
+  --color-amber:          #C7600F;
+  --color-amber-lt:       #FCE6CC;
+  --color-amber-dk:       #7A3806;
+  --color-amber-border:   #F2B673;
+  --color-amber-hover:    #F8D4A8;
+
+  /* Red — critical / <7 days / errors */
+  --color-red:            #C81F1F;
+  --color-red-lt:         #FCE4E4;
+  --color-red-dk:         #8B1414;
+  --color-red-border:     #ED9999;
+  --color-red-hover:      #F6C2C2;
+
+  /* Purple — NC level indicators */
+  --color-purple:         #534AB7;
+  --color-purple-lt:      #EEEDFE;
+  --color-purple-dk:      #3C3489;
+
+  /* ============================================================
+     TYPOGRAPHY
+     ============================================================ */
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Sizes — 1.2 minor third with manual tweaks in the 11–14 range */
+  --fs-2xs:  10px;   --lh-2xs: 14px;
+  --fs-xs:   11px;   --lh-xs:  15px;
+  --fs-sm:   12px;   --lh-sm:  17px;
+  --fs-base: 13px;   --lh-base:19px;
+  --fs-md:   14px;   --lh-md:  20px;
+  --fs-lg:   16px;   --lh-lg:  22px;
+  --fs-xl:   20px;   --lh-xl:  26px;
+  --fs-2xl:  24px;   --lh-2xl: 30px;
+  --fs-3xl:  32px;   --lh-3xl: 38px;
+
+  /* Weights */
+  --fw-300: 300;
+  --fw-400: 400;
+  --fw-500: 500;
+  --fw-600: 600;
+
+  /* ============================================================
+     SPACING — 4px base. Half-steps (2px) for micro only.
+     ============================================================ */
+  --space-0_5:  2px;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+
+  /* ============================================================
+     BORDER & RADIUS
+     ============================================================ */
+  --border-thin:    0.5px;
+  --border-base:    1px;
+  --border-strong:  2px;
+
+  --radius-sm:    3px;
+  --radius-md:    6px;
+  --radius-lg:    8px;
+  --radius-xl:   12px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+     SHADOWS — minimal; structure comes from borders, not elevation
+     ============================================================ */
+  --shadow-none: none;
+  --shadow-sm:   0 1px 2px rgba(15,14,11,0.06);
+  --shadow-md:   0 2px 6px rgba(15,14,11,0.08), 0 1px 2px rgba(15,14,11,0.04);
+  --shadow-lg:   0 4px 16px rgba(15,14,11,0.10), 0 2px 4px rgba(15,14,11,0.06);
+
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  --dur-fast:   100ms;
+  --dur-base:   150ms;
+  --dur-slow:   300ms;
+  --dur-chart:  400ms;
+  --dur-pulse: 2000ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter:    cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ============================================================
+     COMPONENT SIZING (from spec §4.4)
+     ============================================================ */
+  --h-table-row:    40px;
+  --h-input:        32px;
+  --h-button:       32px;
+  --h-button-sm:    26px;
+  --h-badge:        20px;
+  --h-tab:          36px;
+  --avatar-sm:      24px;
+  --avatar-md:      32px;
+  --bar-thick:      6px;
+  --bar-thin:       4px;
+}
+
+/* ================================================================
+   BASE
+   ================================================================ */
+html, body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ================================================================
+   SEMANTIC TYPE ROLES (spec §2.3)
+   ================================================================ */
+.t-page-title {
+  font-family: var(--font-sans);
+  font-size: var(--fs-xl); line-height: var(--lh-xl);
+  font-weight: var(--fw-600); color: var(--color-text-primary);
+}
+.t-section {
+  font-size: var(--fs-lg); line-height: var(--lh-lg);
+  font-weight: var(--fw-600); color: var(--color-text-primary);
+}
+.t-card-title {
+  font-size: var(--fs-md); line-height: var(--lh-md);
+  font-weight: var(--fw-500); color: var(--color-text-primary);
+}
+.t-body {
+  font-size: var(--fs-base); line-height: var(--lh-base);
+  font-weight: var(--fw-400); color: var(--color-text-secondary);
+}
+.t-label {
+  font-size: var(--fs-xs); line-height: var(--lh-xs);
+  font-weight: var(--fw-500); color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.t-table-head {
+  font-size: var(--fs-xs); line-height: var(--lh-xs);
+  font-weight: var(--fw-500); color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.t-cell {
+  font-size: var(--fs-sm); line-height: var(--lh-sm);
+  font-weight: var(--fw-400); color: var(--color-text-primary);
+}
+.t-badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs); line-height: 1;
+  font-weight: var(--fw-500); letter-spacing: 0.04em;
+}
+.t-metric-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xl); line-height: var(--lh-2xl);
+  font-weight: var(--fw-600); color: var(--color-text-primary);
+}
+.t-metric-label {
+  font-size: var(--fs-xs); line-height: var(--lh-xs);
+  font-weight: var(--fw-400); color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm); line-height: var(--lh-sm);
+  color: var(--color-text-secondary);
+}
+.t-remark {
+  font-size: var(--fs-sm); line-height: var(--lh-sm);
+  font-style: italic; color: var(--color-text-muted);
+}
+.t-hero {
+  font-family: var(--font-sans);
+  font-size: var(--fs-3xl); line-height: var(--lh-3xl);
+  font-weight: var(--fw-300); color: var(--color-text-primary);
+}

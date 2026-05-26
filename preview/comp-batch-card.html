@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+
+  /* Modern SaaS — no left accent. 1px perimeter border. Urgency is communicated by the badge & the colored deadline value. */
+  .b-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .b-head { padding: 14px 16px 10px; }
+  .b-tags { display: flex; gap: 6px; align-items: center; }
+  .b-id { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); }
+  .b-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-top: 8px; }
+  .b-sub   { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; font-family: var(--font-mono); }
+
+  .b-body {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    padding: 12px 16px 14px;
+    border-top: 1px solid var(--color-border-faint);
+  }
+  .b-col { padding-right: 16px; }
+  .b-col + .b-col { padding-left: 16px; border-left: 1px solid var(--color-border-faint); }
+
+  .lbl {
+    font-size: 10px; color: var(--color-text-muted);
+    text-transform: uppercase; letter-spacing: .04em; font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .val { font-size: 12px; color: var(--color-text-primary); }
+  .mono { font-family: var(--font-mono); color: var(--color-text-secondary); }
+  .field + .field { margin-top: 10px; }
+
+  .av {
+    width: 24px; height: 24px; border-radius: 9999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-sans); font-size: 10px; font-weight: 600;
+    background: #B5D4F4; color: #0C447C; vertical-align: middle; margin-right: 8px;
+  }
+
+  .track { height: 6px; background: var(--color-surface-alt); border-radius: 9999px; overflow: hidden; margin-top: 4px; }
+  .fill { height: 100%; background: var(--color-blue); border-radius: 9999px; }
+
+  .pipe { padding: 14px 16px 16px; border-top: 1px solid var(--color-border-faint); background: var(--color-surface-raised); }
+  .pipe .grid { display: grid; grid-template-columns: repeat(6, 1fr); }
+  .step { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .step .ln { position: absolute; top: 16px; left: 50%; right: -50%; height: 1px; background: var(--color-border); z-index: 1; }
+  .step.done .ln { background: var(--color-green); }
+  .step:last-child .ln { display: none; }
+  .step .c { width: 22px; height: 22px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 10px; font-weight: 600; border: 1px solid; z-index: 2; }
+  .step .c.done { background: var(--color-green); border-color: var(--color-green); color: white; }
+  .step .c.active { background: var(--color-blue); border-color: var(--color-blue); color: white; animation: pulse 2s ease-in-out infinite; }
+  .step .c.pending { background: var(--color-surface); border-color: var(--color-border-strong); color: var(--color-text-muted); }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(24,95,165,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(24,95,165,0); }
+  }
+  .step .stepl { margin-top: 8px; font-size: 10px; font-weight: 500; color: var(--color-text-primary); }
+  .step .stepd { margin-top: 2px; font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); font-weight: 500; text-align: center; }
+  .step.pending .stepl, .step.pending .stepd { color: var(--color-text-muted); }
+
+  .b-remark {
+    padding: 10px 16px; background: var(--color-surface-alt);
+    border-top: 1px solid var(--color-border-faint);
+    font-size: 12px; color: var(--color-text-secondary); font-style: italic;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .b-remark svg { color: var(--color-text-muted); flex-shrink: 0; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    height: 20px; padding: 0 8px;
+    border-radius: 6px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .04em; white-space: nowrap;
+  }
+  .badge svg { width: 12px; height: 12px; }
+
+  .billing-deadline { color: var(--color-red-dk); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grouptag">Batch card — primary data display · critical urgency variant</div>
+  <div class="b-card">
+    <div class="b-head">
+      <div class="b-tags">
+        <span class="badge" style="background:var(--color-blue-lt);color:var(--color-blue-dk)">TWSP</span>
+        <span class="badge" style="background:var(--color-purple-lt);color:var(--color-purple-dk)">NC II</span>
+        <span class="badge" style="background:var(--color-red-lt);color:var(--color-red-dk)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.36 3.59l-8.1 13.53A1.91 1.91 0 0 0 3.9 20h16.2a1.91 1.91 0 0 0 1.64-2.87l-8.1-13.54a1.91 1.91 0 0 0-3.28 0z"/><path d="M12 16h.01"/></svg>
+          3 DAYS
+        </span>
+        <span class="b-id">BAT-1</span>
+      </div>
+      <div class="b-title">AKB Technical Institute · Batch 1</div>
+      <div class="b-sub">Cookery NC II · 42-day program</div>
+    </div>
+
+    <div class="b-body">
+      <div class="b-col">
+        <div class="field"><div class="lbl">Trainer</div><div class="val"><span class="av">AG</span>Archelyn Gagula</div></div>
+        <div class="field"><div class="lbl">Scholars</div><div class="val"><span class="mono">15</span> enrolled · weekdays</div></div>
+        <div class="field"><div class="lbl">TIP</div><div class="val"><span class="badge" style="background:var(--color-green-lt);color:var(--color-green-dk)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg> Apr 21</span></div></div>
+      </div>
+
+      <div class="b-col">
+        <div class="field"><div class="lbl">Training window</div><div class="val mono">Apr 21 → Jun 8, 2026</div></div>
+        <div class="field">
+          <div class="lbl">Day 31 of 42 · 71.4%</div>
+          <div class="track"><div class="fill" style="width:71%"></div></div>
+        </div>
+      </div>
+
+      <div class="b-col">
+        <div class="field"><div class="lbl">NTP → Start lag</div><div class="val mono">7 days</div></div>
+        <div class="field"><div class="lbl">Billing deadline</div><div class="val mono billing-deadline">Jun 18, 2026</div></div>
+        <div class="field"><div class="lbl">BSRS</div><div class="val">
+          <span class="badge" style="background:var(--color-green-lt);color:var(--color-green-dk)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/><path d="M9 12l2 2l4 -4"/></svg>
+            APPROVED
+          </span>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="pipe">
+      <div class="grid">
+        <div class="step done"><div class="ln"></div><div class="c done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div class="stepl">AOU</div><div class="stepd">Apr 9</div></div>
+        <div class="step done"><div class="ln"></div><div class="c done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div class="stepl">NTP</div><div class="stepd">Apr 15</div></div>
+        <div class="step done"><div class="ln"></div><div class="c done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></div><div class="stepl">TIP</div><div class="stepd">Apr 21</div></div>
+        <div class="step"><div class="ln"></div><div class="c active"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19"/></svg></div><div class="stepl">TRAINING</div><div class="stepd">Apr 21 – Jun 8</div></div>
+        <div class="step pending"><div class="ln"></div><div class="c pending">5</div><div class="stepl">ASSESS</div><div class="stepd">Pending</div></div>
+        <div class="step pending"><div class="c pending">6</div><div class="stepl">BILLING</div><div class="stepd">By Jun 18</div></div>
+      </div>
+    </div>
+
+    <div class="b-remark">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+      Training ongoing — Day 31 of 42. Earliest billing deadline.
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+
+  /* Modern SaaS callout — full-perimeter tinted border, no left accent. */
+  .callout {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 11px 14px;
+    border: 1px solid;
+    border-radius: var(--radius-lg);
+    margin-bottom: 8px;
+    font-size: 13px; line-height: 19px;
+  }
+  .callout .icn { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout .body { flex: 1; }
+  .callout .ttl { font-weight: 500; }
+  .callout .dismiss { color: currentColor; opacity: .55; cursor: pointer; padding: 0; background: none; border: none; flex-shrink: 0; margin-top: 1px; }
+  .callout .dismiss:hover { opacity: 1; }
+
+  .c-info    { background: var(--color-blue-lt);  color: var(--color-blue-dk);  border-color: var(--color-blue-border); }
+  .c-success { background: var(--color-green-lt); color: var(--color-green-dk); border-color: var(--color-green-border); }
+  .c-warning { background: var(--color-amber-lt); color: var(--color-amber-dk); border-color: var(--color-amber-border); }
+  .c-error   { background: var(--color-red-lt);   color: var(--color-red-dk);   border-color: var(--color-red-border); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grouptag">Info callouts — info · success · warning · error</div>
+
+  <div class="callout c-info">
+    <svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+    <div class="body">3 batches synced from Notion at 14:02. Last refreshed 4 minutes ago.</div>
+    <button class="dismiss" aria-label="Dismiss">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="callout c-success">
+    <svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2l4 -4"/></svg>
+    <div class="body">BSRS approval received for BAT-2. Eligible for billing submission.</div>
+  </div>
+
+  <div class="callout c-warning">
+    <svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.36 3.59l-8.1 13.53A1.91 1.91 0 0 0 3.9 20h16.2a1.91 1.91 0 0 0 1.64-2.87l-8.1-13.54a1.91 1.91 0 0 0-3.28 0z"/><path d="M12 16h.01"/></svg>
+    <div class="body">BAT-1 billing deadline in 6 days. Confirm assessment scheduled.</div>
+  </div>
+
+  <div class="callout c-error">
+    <svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+    <div class="body">Could not save assessment date. Retry, or check Supabase connection.</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 20px 22px; box-sizing: border-box; }
+  
+.scale { display: flex; flex-direction: column; gap: 6px; }
+.row { display: flex; align-items: baseline; gap: 14px; }
+.tok  { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); width: 92px; }
+.size { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); width: 36px; text-align: right; }
+.spec { color: var(--color-text-primary); font-family: var(--font-sans); }
+
+</style>
+</head>
+<body><div class="card">
+<div class="scale">
+  <div class="row"><span class="tok">text-3xl</span><span class="size">32</span><span class="spec" style="font-size:32px;line-height:38px;font-weight:600;letter-spacing:-0.02em">Hero display</span></div>
+  <div class="row"><span class="tok">text-2xl</span><span class="size">24</span><span class="spec" style="font-size:24px;line-height:30px;font-weight:600;font-family:var(--font-mono)">71.4%</span></div>
+  <div class="row"><span class="tok">text-xl</span><span class="size">20</span><span class="spec" style="font-size:20px;line-height:26px;font-weight:600">Page heading</span></div>
+  <div class="row"><span class="tok">text-lg</span><span class="size">16</span><span class="spec" style="font-size:16px;line-height:22px;font-weight:600">Section heading</span></div>
+  <div class="row"><span class="tok">text-md</span><span class="size">14</span><span class="spec" style="font-size:14px;line-height:20px;font-weight:500">Card title</span></div>
+  <div class="row"><span class="tok">text-base</span><span class="size">13</span><span class="spec" style="font-size:13px;line-height:19px">Body text — card descriptions, form labels.</span></div>
+  <div class="row"><span class="tok">text-sm</span><span class="size">12</span><span class="spec" style="font-size:12px;line-height:17px;color:var(--color-text-secondary)">Table cell · sub-requirement</span></div>
+  <div class="row"><span class="tok">text-xs</span><span class="size">11</span><span class="spec" style="font-size:11px;line-height:15px;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.04em">BADGE · TABLE HEAD</span></div>
+  <div class="row"><span class="tok">text-2xs</span><span class="size">10</span><span class="spec" style="font-size:10px;line-height:14px;color:var(--color-text-muted)">Footnotes, version numbers</span></div>
+</div></div></body></html>

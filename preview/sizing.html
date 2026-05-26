@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+  
+.row { display:flex; gap: 18px; align-items: flex-end; }
+.it { text-align: center; }
+.box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); }
+.lbl { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); margin-top: 6px; }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Component sizing — compliance density</div>
+<div class="row">
+  <div class="it"><div class="box" style="width:84px;height:20px;border-radius:6px;background:var(--color-blue-lt);border-color:var(--color-blue-border);color:var(--color-blue-dk);font-weight:500">badge · 20</div><div class="lbl">badge · 20px</div></div>
+  <div class="it"><div class="box" style="width:32px;height:32px;border-radius:9999px;background:#B5D0EE;color:#0C447C;font-weight:600">AG</div><div class="lbl">avatar-md · 32</div></div>
+  <div class="it"><div class="box" style="width:100px;height:26px">btn · sm</div><div class="lbl">btn-sm · 26px</div></div>
+  <div class="it"><div class="box" style="width:120px;height:32px">btn · primary</div><div class="lbl">btn · 32px</div></div>
+  <div class="it"><div class="box" style="width:140px;height:32px;background:var(--color-surface-alt);justify-content:flex-start;padding-left:10px">input value</div><div class="lbl">input · 32px</div></div>
+  <div class="it"><div class="box" style="width:200px;height:40px;background:var(--color-surface-alt);justify-content:flex-start;padding-left:12px">table row</div><div class="lbl">row · 40px</div></div>
+</div></div></body></html>

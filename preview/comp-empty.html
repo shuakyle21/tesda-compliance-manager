@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+  
+.empty { display: flex; flex-direction: column; align-items: center; padding: 24px 0; gap: 8px; }
+.empty svg { width: 32px; height: 32px; color: var(--color-text-muted); }
+.h { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin-top: 6px; }
+.sub { font-size: 12px; color: var(--color-text-muted); max-width: 320px; text-align: center; }
+
+</style>
+</head>
+<body><div class="card">
+<div class="grouptag">Empty state</div>
+<div class="empty">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M17 17a7 7 0 0 0 -9.876 -9.876m-1.764 2.342a7 7 0 0 0 9.301 9.298"/></svg>
+  <div class="h">No batches found</div>
+  <div class="sub">Try adjusting your filters or search term.</div>
+</div></div></body></html>

@@ -1,0 +1,89 @@
+/*
+ * STEP 3 — Design Tokens in globals.css
+ *
+ * WHY THIS FILE IS CENTRAL:
+ * Tailwind v4 uses @import "tailwindcss" instead of a tailwind.config.js.
+ * The @theme block below is how you expose CSS variables to Tailwind's
+ * utility classes (e.g. `bg-[var(--color-bg)]` or theme-aware `bg-surface`).
+ *
+ * NEXT.JS / TAILWIND v4 DOCS:
+ * https://tailwindcss.com/docs/v4-beta#css-first-configuration
+ * https://nextjs.org/docs/app/building-your-application/styling/tailwind-css
+ * LEARN Ch 2 — CSS Styling: https://nextjs.org/learn/dashboard-app/css-styling
+ *
+ * PATTERN: All raw token values live in :root as CSS custom properties.
+ * The @theme block maps them to Tailwind utility names. This keeps the
+ * tokens usable in plain CSS *and* as Tailwind classes.
+ */
+
+@import "tailwindcss";
+
+/* =========================================================================
+   TODO 3a: Copy ALL tokens from colors_and_type.css into :root here.
+   LEARN Ch 2 — CSS Styling: https://nextjs.org/learn/dashboard-app/css-styling
+
+   Sections to copy:
+     - COLORS — Neutrals (bg, surface, surface-alt, surface-raised, borders)
+     - COLORS — Text (primary, secondary, muted, disabled, inverse)
+     - COLORS — Semantic (blue, teal, green, amber, red, purple — 5 tiers each)
+     - TYPOGRAPHY (font-family variables, --fs-*, --lh-*, --fw-*)
+     - SPACING (--space-*)
+     - BORDER & RADIUS (--border-*, --radius-*)
+     - SHADOWS (--shadow-*)
+     - MOTION (--dur-*, --ease-*)
+     - COMPONENT SIZING (--h-*, --avatar-*, --bar-*)
+
+   TIP: Do NOT delete or merge — copy the entire :root block verbatim from
+   colors_and_type.css. Then the @theme block below maps them to Tailwind.
+   ========================================================================= */
+:root {
+  /* TODO 3a: paste token block from colors_and_type.css here */
+}
+
+/* =========================================================================
+   TODO 3b: Map tokens to Tailwind v4 @theme utilities.
+   LEARN Ch 2 — CSS Styling: https://nextjs.org/learn/dashboard-app/css-styling
+
+   This block lets you write `bg-surface`, `text-primary`, `font-mono`
+   instead of `bg-[var(--color-surface)]` everywhere.
+
+   Examples of what to map:
+     --color-background → bg-bg
+     --color-surface    → bg-surface
+     --color-text-primary → text-primary
+     --font-sans        → font-sans (override the default)
+     --font-mono        → font-mono (override the default)
+     --shadow-sm        → shadow-sm (override Tailwind default)
+
+   IMPORTANT: The font variables here must match what next/font injects.
+   See app/layout.tsx where the CSS variable names are declared.
+   ========================================================================= */
+@theme inline {
+  /* TODO 3b: map color tokens */
+  /* --color-bg:      var(--color-bg); */
+
+  /* TODO 3b: map font tokens — these names must match layout.tsx */
+  --font-sans: var(--font-ibm-plex-sans);
+  --font-mono: var(--font-ibm-plex-mono);
+
+  /* TODO 3b: map shadow tokens */
+  /* --shadow-sm: var(--shadow-sm); */
+}
+
+/*
+ * NOTE: No dark mode block. The TCS spec does not define dark mode.
+ * The dashboard is an internal operations tool with no dark mode variant.
+ * Remove the prefers-color-scheme media query that was here by default.
+ */
+
+/* =========================================================================
+   TODO 3c: Copy the semantic type role classes from colors_and_type.css.
+
+   These are utility classes like .t-page-title, .t-metric-value, .t-mono,
+   .t-label, .t-badge etc. They encode the IBM Plex Mono / Sans split.
+
+   Copy the "SEMANTIC TYPE ROLES" section verbatim — these classes will be
+   used directly in JSX className strings.
+   ========================================================================= */
+
+/* TODO 3c: paste semantic type role classes here (.t-page-title, .t-metric-value, etc.) */

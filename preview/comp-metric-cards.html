@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; background: var(--color-bg); }
+  .card { padding: 18px 22px; box-sizing: border-box; }
+  .grouptag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 12px; }
+
+  .row { display: flex; gap: 12px; }
+  .m {
+    flex: 1; background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .m-lbl {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--color-text-muted);
+    text-transform: uppercase; letter-spacing: .04em;
+    font-weight: 500; font-family: var(--font-mono);
+  }
+  .m-val {
+    font-family: var(--font-mono); font-size: 24px; font-weight: 600;
+    color: var(--color-text-primary); margin-top: 6px; line-height: 1;
+  }
+  .m-sub {
+    font-size: 11px; color: var(--color-text-muted);
+    margin-top: 6px; font-family: var(--font-sans);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .ico { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* Warning variant: amber-tinted label icon + sub-label */
+  .m.warning .m-lbl { color: var(--color-amber); }
+  .m.warning .m-sub { color: var(--color-amber-dk); font-weight: 500; }
+
+  /* Critical variant: red-tinted label icon + sub-label */
+  .m.critical .m-lbl { color: var(--color-red); }
+  .m.critical .m-sub { color: var(--color-red-dk); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grouptag">Metric cards — neutral · warning · critical variants</div>
+
+  <div class="row">
+    <div class="m">
+      <div class="m-lbl">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/></svg>
+        TOTAL BATCHES
+      </div>
+      <div class="m-val">3</div>
+      <div class="m-sub">All training ongoing</div>
+    </div>
+
+    <div class="m">
+      <div class="m-lbl">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
+        TOTAL SCHOLARS
+      </div>
+      <div class="m-val">47</div>
+      <div class="m-sub">15 · 15 · 17 per batch</div>
+    </div>
+
+    <div class="m warning">
+      <div class="m-lbl">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.36 3.59l-8.1 13.53A1.91 1.91 0 0 0 3.9 20h16.2a1.91 1.91 0 0 0 1.64-2.87l-8.1-13.54a1.91 1.91 0 0 0-3.28 0z"/><path d="M12 16h.01"/></svg>
+        AVG PROGRESS
+      </div>
+      <div class="m-val">56%</div>
+      <div class="m-sub">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><polyline points="6 9 12 15 18 9"/></svg>
+        7 pts below plan
+      </div>
+    </div>
+
+    <div class="m critical">
+      <div class="m-lbl">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        EARLIEST BILLING
+      </div>
+      <div class="m-val">Jun 18</div>
+      <div class="m-sub">3 days remaining · BAT-1</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
