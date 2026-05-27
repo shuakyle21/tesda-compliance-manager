@@ -19,9 +19,9 @@ export type Profile = {
 };
 
 export function isProfileRole(role: string): role is ProfileRole {
-  return profileRoles.includes(role as ProfileRole);
+  return (profileRoles as readonly string[]).includes(role);
 }
 
-export function hasTenantMembership(profile: Profile, tenantId: string) {
+export function hasTenantMembership(profile: Profile, tenantId: string): boolean {
   return profile.tenantMemberships.some((membership) => membership.tenantId === tenantId);
 }
