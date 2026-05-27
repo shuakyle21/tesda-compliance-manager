@@ -28,6 +28,7 @@
 // import { MetricsRow } from '@/components/shell/MetricsRow';
 // import { DashboardTabs } from '@/components/shell/DashboardTabs';
 // import { getMockMetrics } from '@/lib/data/mock-batches';
+import { AuthHeader } from '@/components/shell/AuthHeader';
 
 export default async function DashboardLayout({
   children,
@@ -54,6 +55,8 @@ export default async function DashboardLayout({
           It does NOT receive props — it is display-only. */}
       <header className="h-12 bg-[var(--color-surface)] border-b border-[var(--color-border)] sticky top-0 z-10">
         {/* Topbar placeholder — see components/shell/Topbar.tsx */}
+        {/* Auth controls: replace with <UserButton> inside Topbar once it's built. */}
+        <AuthHeader />
       </header>
 
       {/* TODO 6d: Replace with <MetricsRow metrics={metrics} /> once built.

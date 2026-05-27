@@ -35,8 +35,6 @@ import type { Metadata } from "next";
 // next/font downloads only those variants, reducing the font payload.
 import { Geist, Geist_Mono } from "next/font/google"; // TODO 4a: replace these
 import { ClerkProvider } from '@clerk/nextjs';
-import { AuthHeader } from '@/components/shell/AuthHeader';
-
 const geistSans = Geist({          // TODO 4a: replace with ibmPlexSans
   variable: "--font-geist-sans",   // TODO 4a: change to --font-ibm-plex-sans
   subsets: ["latin"],
@@ -82,7 +80,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ClerkProvider>
-          <AuthHeader />
           {children}
         </ClerkProvider>
       </body>

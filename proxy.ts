@@ -20,16 +20,25 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
 ]);
 
+/**
+ * Matches every request except:
+ * - Next.js internal routes (_next/*)
+ * - Static assets (images, fonts, css, js bundles, icons, archives, manifests)
+ */
+const ASSET_SKIP_PATTERN =
+  '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)';
+
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
-    await auth.protect();
+    // Explicitly redirect to /sign-in so the destination is predictable
+    // regardless of the Clerk dashboard's "Sign-in URL" setting.
+    await auth.protect({ unauthenticatedUrl: '/sign-in' });
   }
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files.
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    ASSET_SKIP_PATTERN,
     // Always run for Clerk's auto-proxy path.
     '/__clerk/(.*)',
     // Always run for API routes.
