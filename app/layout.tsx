@@ -34,6 +34,8 @@ import type { Metadata } from "next";
 // TIP: Request only the weights you use — 300, 400, 500, 600 per the spec.
 // next/font downloads only those variants, reducing the font payload.
 import { Geist, Geist_Mono } from "next/font/google"; // TODO 4a: replace these
+import { ClerkProvider } from '@clerk/nextjs';
+import { AuthHeader } from '@/components/shell/AuthHeader';
 
 const geistSans = Geist({          // TODO 4a: replace with ibmPlexSans
   variable: "--font-geist-sans",   // TODO 4a: change to --font-ibm-plex-sans
@@ -78,7 +80,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ClerkProvider>
+          <AuthHeader />
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }
