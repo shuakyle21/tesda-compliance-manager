@@ -1,17 +1,20 @@
-import { SignIn } from '@clerk/nextjs';
+import { SignIn } from "@clerk/nextjs";
 
-/**
- * Sign-in page.
- *
- * The catch-all segment `[[...sign-in]]` lets Clerk handle every sub-path
- * needed for its hosted sign-in flow (e.g. /sign-in/factor-one, /sign-in/sso-callback).
- *
- * DOCS: https://clerk.com/docs/references/nextjs/custom-sign-in-or-up-page
- */
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ reason?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const message =
+    resolvedSearchParams?.reason === "auth-required"
+      ? "Please sign in to continue."
+      : null;
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg)]">
-      <SignIn />
-    </main>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--color-bg)] px-6">
+      {message ? <p className="text-sm text-[var(--color-text-secondary)]">{message}</p> : null}
+      <SignIn routing="path" path="/sign-in" redirectUrl="/" />
+    </div>
   );
 }
