@@ -1,0 +1,2 @@
+-- Seed data is currently inserted by the initial schema migration.
+-- Keep this file so `supabase db reset` has a valid configured seed path.
