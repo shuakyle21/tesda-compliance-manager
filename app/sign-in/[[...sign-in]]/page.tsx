@@ -13,7 +13,7 @@ export default async function SignInPage({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--color-bg)] px-6">
-      {message ? <p className="text-sm text-[var(--color-text-secondary)]">{message}</p> : null}
+      {message ? <p className="text-sm text--color-text-secondary">{message}</p> : null}
       <SignIn routing="path" path="/sign-in" redirectUrl="/" />
     </div>
   );
