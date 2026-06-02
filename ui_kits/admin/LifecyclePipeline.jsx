@@ -1,5 +1,5 @@
 /* global React, Icon */
-/* LifecyclePipeline — 6 fixed stages: AOU → NTP → TIP → Training → Assessment → Billing
+/* LifecyclePipeline — fixed stages: AOU → NTP → TIP → Training → ENTRE → Assessment → Billing
    Props: steps (array of { key, label, status: 'done'|'active'|'pending'|'overdue', date })
 */
 
@@ -20,6 +20,7 @@ function Step({ step, index, isLast }) {
   const isDone = step.status === 'done';
   const isActive = step.status === 'active';
   const isOverdue = step.status === 'overdue';
+  const isEntre = step.key === 'entre';
 
   let circleStyle = {
     background: 'var(--color-surface)',
@@ -29,6 +30,9 @@ function Step({ step, index, isLast }) {
   if (isDone)    circleStyle = { background: 'var(--color-green)', borderColor: 'var(--color-green)', color: 'white' };
   if (isActive)  circleStyle = { background: 'var(--color-blue)',  borderColor: 'var(--color-blue)',  color: 'white' };
   if (isOverdue) circleStyle = { background: 'var(--color-red)',   borderColor: 'var(--color-red)',   color: 'white' };
+  if (isEntre && !isDone && !isActive && !isOverdue) {
+    circleStyle = { background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)', color: 'var(--color-purple-dk)' };
+  }
 
   const lineColor = isDone ? 'var(--color-green)' : 'var(--color-border)';
 
@@ -51,23 +55,28 @@ function Step({ step, index, isLast }) {
         {isDone && <Icon name="check" size={12} />}
         {isActive && <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19" /></svg>}
         {isOverdue && <Icon name="alert-triangle" size={11} />}
-        {!isDone && !isActive && !isOverdue && (index + 1)}
+        {isEntre && !isDone && !isActive && !isOverdue && <Icon name="briefcase" size={11} />}
+        {!isDone && !isActive && !isOverdue && !isEntre && (index + 1)}
       </div>
       <div style={{
-        marginTop: 8, fontSize: 10, fontWeight: 500, textAlign: 'center',
-        color: (step.status === 'pending' ? 'var(--color-text-muted)' : 'var(--color-text-primary)'),
+        marginTop: 8, fontSize: stepsLabelSize(), fontWeight: isEntre ? 600 : 500, textAlign: 'center',
+        color: isEntre && !isDone && !isActive ? 'var(--color-purple)' : (step.status === 'pending' ? 'var(--color-text-muted)' : 'var(--color-text-primary)'),
         letterSpacing: '0.02em',
       }}>
         {step.label}
       </div>
       <div style={{
         marginTop: 2, fontFamily: 'var(--font-mono)', fontSize: 10,
-        color: 'var(--color-text-muted)', fontWeight: 500, textAlign: 'center',
+        color: isEntre && !isDone && !isActive ? 'var(--color-purple-dk)' : 'var(--color-text-muted)', fontWeight: 500, textAlign: 'center',
       }}>
         {step.date || (step.status === 'pending' ? 'Pending' : '')}
       </div>
     </div>
   );
+}
+
+function stepsLabelSize() {
+  return 10;
 }
 
 window.LifecyclePipeline = LifecyclePipeline;

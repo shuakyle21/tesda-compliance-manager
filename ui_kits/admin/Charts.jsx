@@ -14,12 +14,19 @@ const COLORS = {
 
 const BATCH_COLOR = ['amber', 'blue', 'green'];
 
-function HBar({ rows, max = 100, unit = '%' }) {
+function HBar({ rows, max = 100, unit = '%', onRowClick }) {
   // rows: [{ label, value, colorKey }]
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {rows.map((r, i) => (
-        <div key={i}>
+        <div
+          key={i}
+          onClick={() => onRowClick && onRowClick(r)}
+          style={{
+            cursor: onRowClick ? 'pointer' : 'default',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
           <div style={{
             display: 'flex', justifyContent: 'space-between',
             fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)',

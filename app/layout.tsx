@@ -34,16 +34,18 @@ import type { Metadata } from "next";
 //
 // TIP: Request only the weights you use — 300, 400, 500, 600 per the spec.
 // next/font downloads only those variants, reducing the font payload.
-import { Geist, Geist_Mono } from "next/font/google"; // TODO 4a: replace these
+import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 
-const geistSans = Geist({          // TODO 4a: replace with ibmPlexSans
-  variable: "--font-geist-sans",   // TODO 4a: change to --font-ibm-plex-sans
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ["300", "400", "500", "600"],
   subsets: ["latin"],
+  variable: "--font-ibm-plex-sans",
 });
 
-const geistMono = Geist_Mono({     // TODO 4a: replace with ibmPlexMono
-  variable: "--font-geist-mono",   // TODO 4a: change to --font-ibm-plex-mono
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["300", "400", "500"],
   subsets: ["latin"],
+  variable: "--font-ibm-plex-mono",
 });
 
 // ---------------------------------------------------------------------------
@@ -77,9 +79,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-[var(--color-bg)]">
         <ClerkProvider>{children}</ClerkProvider>
       </body>
     </html>

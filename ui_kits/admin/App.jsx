@@ -1,5 +1,5 @@
 /* global React, BATCHES, ACTIVITY,
-   Icon, StatusBadge, ProgressBar, MetricCard, BatchCard,
+   Icon, StatusBadge, ProgressBar, MetricCard, BatchCard, BatchModal,
    LifecyclePipeline, UrgencyIndicator, TrainerAvatar,
    DocumentLinkRow, InfoCallout, TabBar, EmptyState, Toast,
    HBar, VBar, StackedBar, ChartLegend, BATCH_COLOR
@@ -12,6 +12,7 @@ function App() {
   const [query, setQuery] = useState('');
   const [programFilter, setProgramFilter] = useState('all');
   const [toast, setToast] = useState(null);
+  const [selectedBatch, setSelectedBatch] = useState(null);
 
   const filtered = useMemo(() => {
     let xs = BATCHES;
@@ -95,13 +96,14 @@ function App() {
           tab={tab}
         />
 
-        {tab === 'cards'     && <CardsView batches={filtered} />}
-        {tab === 'table'     && <TableView batches={filtered} />}
-        {tab === 'analytics' && <AnalyticsView batches={BATCHES} />}
+        {tab === 'cards'     && <CardsView batches={filtered} onOpen={setSelectedBatch} />}
+        {tab === 'table'     && <TableView batches={filtered} onOpen={setSelectedBatch} />}
+        {tab === 'analytics' && <AnalyticsView batches={BATCHES} onOpen={setSelectedBatch} />}
         {tab === 'activity'  && <ActivityView />}
       </div>
 
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
+      {selectedBatch && <BatchModal batch={selectedBatch} onClose={() => setSelectedBatch(null)} />}
     </div>
   );
 }
@@ -175,22 +177,22 @@ function Pill({ label, active, onClick }) {
 }
 
 /* ===== View: Batch Cards ===== */
-function CardsView({ batches }) {
+function CardsView({ batches, onOpen }) {
   if (!batches.length) {
     return <EmptyState heading="No batches found" sub="Try adjusting your filters or search term." />;
   }
   return (
     <div className="batch-stack">
       <InfoCallout variant="info">
-        3 batches synced from Notion at 14:02. BAT-1 enters critical billing window in 3 days.
+        3 batches synced from Notion at 14:02. Progress is schedule-aware as of Jun 2, 2026.
       </InfoCallout>
-      {batches.map(b => <BatchCard key={b.id} batch={b} />)}
+      {batches.map(b => <BatchCard key={b.id} batch={b} onClick={() => onOpen(b)} />)}
     </div>
   );
 }
 
 /* ===== View: Table ===== */
-function TableView({ batches }) {
+function TableView({ batches, onOpen }) {
   if (!batches.length) {
     return <EmptyState heading="No batches found" sub="Try adjusting your filters or search term." />;
   }
@@ -258,7 +260,7 @@ function TableView({ batches }) {
           </tr>
         </thead>
         <tbody>
-          {batches.map((b, i) => <TableRow key={b.id} batch={b} odd={i % 2 === 0} />)}
+          {batches.map((b, i) => <TableRow key={b.id} batch={b} odd={i % 2 === 0} onOpen={() => onOpen(b)} />)}
         </tbody>
       </table>
     </div>
@@ -279,7 +281,7 @@ function Th({ children, align }) {
   );
 }
 
-function TableRow({ batch, odd }) {
+function TableRow({ batch, odd, onOpen }) {
   const cellStyle = {
     padding: '0 12px', height: 40,
     fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--color-text-primary)',
@@ -289,7 +291,7 @@ function TableRow({ batch, odd }) {
     verticalAlign: 'middle',
   };
   return (
-    <tr>
+    <tr onClick={onOpen} className="clickable-row">
       <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>{batch.id}</td>
       <td style={cellStyle}>
         <div style={{ fontWeight: 500 }}>{batch.name.replace(/ · Batch \d+$/, '')}</div>
@@ -367,7 +369,7 @@ function DownloadBatchButton({ batch }) {
 }
 
 /* ===== View: Analytics ===== */
-function AnalyticsView({ batches }) {
+function AnalyticsView({ batches, onOpen }) {
   const progressRows = batches
     .slice()
     .sort((a, b) => b.progressPct - a.progressPct)
@@ -397,7 +399,14 @@ function AnalyticsView({ batches }) {
     <div className="analytics-grid">
       <div className="surface chart-card">
         <div className="chart-head"><div className="chart-title">Training progress by batch</div><div className="chart-sub">% complete · descending</div></div>
-        <HBar rows={progressRows} max={100} />
+        <HBar
+          rows={progressRows}
+          max={100}
+          onRowClick={onOpen ? row => {
+            const batch = batches.find(b => b.id === row.label);
+            if (batch) onOpen(batch);
+          } : undefined}
+        />
       </div>
       <div className="surface chart-card">
         <div className="chart-head"><div className="chart-title">Days elapsed vs remaining</div><div className="chart-sub">solid = elapsed · light = remaining</div></div>

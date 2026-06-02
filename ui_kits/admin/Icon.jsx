@@ -13,6 +13,7 @@ const ICONS = {
   'file-off':     '<path d="M3 3l18 18"/><path d="M7 3h7l5 5v7m0 4a2 2 0 0 1 -2 2H7a2 2 0 0 1 -2 -2V7"/>',
   certificate:    '<circle cx="15" cy="15" r="3"/><path d="M13 17v5l2 -1.5l2 1.5v-5"/><path d="M10 19H5a2 2 0 0 1 -2 -2V5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v7"/><path d="M6 9h12"/><path d="M6 12h3"/><path d="M6 15h2"/>',
   receipt:        '<path d="M5 21V5a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"/><path d="M14 8h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3H10"/>',
+  briefcase:      '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0 -2 -2h-4a2 2 0 0 0 -2 2v2"/>',
   calendar:       '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/>',
   clock:          '<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
   check:          '<path d="M5 12l5 5l10 -10"/>',
