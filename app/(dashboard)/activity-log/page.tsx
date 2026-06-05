@@ -17,14 +17,14 @@
  */
 
 // TODO S1-1: Import MOCK_ACTIVITY from the data layer.
-// import { MOCK_ACTIVITY } from '@/lib/data/mock-batches';
+import { MOCK_ACTIVITY } from '@/lib/data/mock-batches';
 
 // TODO S1-2: Import ActivityEvent type (used for typing the mapped items).
-// import type { ActivityEvent } from '@/lib/data/types';
+import type { ActivityEvent } from '@/lib/data/types';
 
 export default function ActivityLogPage() {
   // TODO S1-3: Replace this placeholder with real data.
-  // const events = MOCK_ACTIVITY;  // later: await getActivityFromDb()
+const events = MOCK_ACTIVITY;  // later: await getActivityFromDb()
 
   return (
     <div>
