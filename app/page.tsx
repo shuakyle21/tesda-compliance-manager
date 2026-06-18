@@ -22,13 +22,13 @@ import { redirect } from 'next/navigation';
 // LEARN Ch 4 — Creating Layouts and Pages: https://nextjs.org/learn/dashboard-app/creating-layouts-and-pages
 // LEARN Ch 5 — Navigating Between Pages: https://nextjs.org/learn/dashboard-app/navigating-between-pages
 //
-// The build order in TODO.md says to implement Activity Log first —
-// so during development, redirect to '/activity-log'.
-// Once all screens are built, change this to '/batch-cards' (the primary view).
+// Route mapping now defines `/dashboard` as the landing route for the Figma
+// "Frame 1 - Dashboard" screen. Individual screen implementation can still
+// follow the TODO build order.
 //
-// The path matches the folder: app/(dashboard)/activity-log/page.tsx
+// The path matches the folder: app/(dashboard)/dashboard/page.tsx
 // The `(dashboard)` part is a Route Group — it does NOT appear in the URL.
 // DOCS on Route Groups: https://nextjs.org/docs/app/building-your-application/routing/route-groups
 export default function RootPage() {
-  redirect('/activity-log'); // TODO 5: update path once screens are built
+  redirect('/dashboard');
 }
