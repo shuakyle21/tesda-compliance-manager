@@ -1,17 +1,30 @@
-import { SignUp } from '@clerk/nextjs';
+'use client';
 
 /**
- * Sign-up page.
+ * Sign-up page — Clerk prebuilt <SignUp> branded with the TCS design system
+ * via the shared `appearance` config (lib/clerkAppearance).
  *
- * The catch-all segment `[[...sign-up]]` lets Clerk handle every sub-path
- * needed for its hosted sign-up flow (e.g. /sign-up/verify-email-address).
- *
- * DOCS: https://clerk.com/docs/references/nextjs/custom-sign-in-or-up-page
+ * Methods (configured in the Clerk dashboard): email + password (with email
+ * verification code), Google OAuth. The `[[...sign-up]]` catch-all is required
+ * so Clerk can handle its own sub-paths mid-flow (verify-email, SSO callback).
  */
+
+import { SignUp } from '@clerk/nextjs';
+import { clerkAppearance } from '@/lib/clerkAppearance';
+
 export default function SignUpPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg)]">
-      <SignUp />
+    <main className="auth-shell">
+      <div className="auth-stack">
+        <div className="auth-brand">TVI-CAMS · Compliance &amp; Audit</div>
+        <SignUp
+          appearance={clerkAppearance}
+          routing="path"
+          path="/sign-up"
+          signInUrl="/sign-in"
+          fallbackRedirectUrl="/"
+        />
+      </div>
     </main>
   );
 }

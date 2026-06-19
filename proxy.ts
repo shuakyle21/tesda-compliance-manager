@@ -20,25 +20,23 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
 ]);
 
-/**
- * Matches every request except:
- * - Next.js internal routes (_next/*)
- * - Static assets (images, fonts, css, js bundles, icons, archives, manifests)
- */
-const ASSET_SKIP_PATTERN =
-  '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)';
-
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     // Explicitly redirect to /sign-in so the destination is predictable
     // regardless of the Clerk dashboard's "Sign-in URL" setting.
-    await auth.protect({ unauthenticatedUrl: '/sign-in' });
+    // `unauthenticatedUrl` must be an ABSOLUTE URL — Next.js middleware
+    // rejects relative paths — so resolve it against the request origin.
+    const signInUrl = new URL('/sign-in', request.url);
+    await auth.protect({ unauthenticatedUrl: signInUrl.toString() });
   }
 });
 
 export const config = {
+  // Turbopack (Next 16) requires every matcher entry to be a static string
+  // literal, so the asset-skip pattern is inlined here rather than referenced
+  // via a const. Matches every request except Next internals + static assets.
   matcher: [
-    ASSET_SKIP_PATTERN,
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for Clerk's auto-proxy path.
     '/__clerk/(.*)',
     // Always run for API routes.
