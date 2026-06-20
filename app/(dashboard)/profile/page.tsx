@@ -89,7 +89,6 @@ export default async function ProfilePage() {
     : '14:02 PHT';
 
   const hasGoogle = clerkUser.externalAccounts?.some((a) => a.provider === 'google') ?? false;
-  const hasMicrosoft = clerkUser.externalAccounts?.some((a) => a.provider === 'microsoft') ?? false;
 
   const roleColor = ROLE_COLOR[role];
   const roleBlurb = ROLE_BLURB[role];
@@ -258,18 +257,6 @@ export default async function ProfilePage() {
             desc={hasGoogle ? email : 'Not connected'}
             status={hasGoogle ? 'Connected' : 'Off'}
             statusTone={hasGoogle ? 'green' : 'amber'}
-          />
-          <SecRow
-            icon="external-link"
-            title="Microsoft"
-            desc={hasMicrosoft ? email : 'Not connected'}
-            status={hasMicrosoft ? 'Connected' : 'Off'}
-            statusTone={hasMicrosoft ? 'green' : 'amber'}
-            action={
-              !hasMicrosoft
-                ? <button type="button" className="btn ghost sm" disabled aria-disabled="true" style={{ marginLeft: 8 }}>Connect</button>
-                : undefined
-            }
             last
           />
 

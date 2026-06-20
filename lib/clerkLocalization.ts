@@ -13,7 +13,7 @@ type Localization = NonNullable<ComponentProps<typeof ClerkProvider>['localizati
  *
  * IMPORTANT — what this file CANNOT change (these are Clerk *instance* settings,
  * configured in the Clerk dashboard, not in code):
- *   - Which OAuth providers appear (e.g. adding "Continue with Microsoft").
+ *   - Which OAuth providers appear (TVI-CAMS uses Google only).
  *   - The in-card brand logo/mark.
  *   - Whether public sign-up is enabled (drives the footer link).
  *   - The "Development mode" badge (only absent on a production Clerk instance).
