@@ -16,8 +16,9 @@
  * FONTS: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
  */
 
-import "@globals.css";
+import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { clerkLocalization } from "@/lib/clerkLocalization";
 import type { Metadata } from "next";
 // TODO 4a: Replace Geist with IBM_Plex_Sans and IBM_Plex_Mono.
 // LEARN Ch 3 — Optimizing Fonts and Images: https://nextjs.org/learn/dashboard-app/optimizing-fonts-images
@@ -83,7 +84,7 @@ export default function RootLayout({
       className={`${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--color-bg)]">
-        <ClerkProvider>{children}</ClerkProvider>
+        <ClerkProvider localization={clerkLocalization}>{children}</ClerkProvider>
       </body>
     </html>
   );
