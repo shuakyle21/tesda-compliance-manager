@@ -21,7 +21,31 @@ jobs:
     - uses: actions/stale@v5
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'Stale issue message'
-        stale-pr-message: 'Stale pull request message'
+        
+        # Configuration for issues
+        days-before-issue-stale: 30
+        days-before-issue-close: 7
+        stale-issue-message: |
+          @shuakyle21 This issue has been inactive for 30 days. If this issue is still relevant and needs attention, please comment to keep it open. Otherwise, it will be closed in 7 days.
+        close-issue-message: |
+          @shuakyle21 This issue was closed due to inactivity. If you believe this issue is still relevant, feel free to reopen it or create a new one with updated information.
         stale-issue-label: 'no-issue-activity'
+        
+        # Configuration for pull requests
+        days-before-pr-stale: 14
+        days-before-pr-close: 7
+        stale-pr-message: |
+          @shuakyle21 This pull request has been inactive for 14 days. Please review and update if needed, or it will be closed in 7 days.
+        close-pr-message: |
+          @shuakyle21 This pull request was closed due to inactivity. If you'd like to continue with this work, please reopen it or create a new PR with your latest changes.
         stale-pr-label: 'no-pr-activity'
+        
+        # Don't mark issues/PRs with these labels as stale
+        exempt-issue-labels: 'pinned,blocked,help-wanted'
+        exempt-pr-labels: 'pinned,blocked,wip'
+        
+        # Mark as stale even if there are discussions
+        ignore-updates: false
+        
+        # Operations per run (to avoid rate limiting)
+        operations-per-run: 30
