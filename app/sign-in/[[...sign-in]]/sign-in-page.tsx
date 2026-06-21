@@ -150,7 +150,10 @@ export function SignInCard() {
 
   return (
     <div className={styles.card}>
-      <span className={styles.mark} aria-hidden="true" />
+      {/* Brand mark — Figma node 743:3076 (shipped as public/assets/mark.svg,
+          the same logo the Topbar/Sidebar use). The SVG is self-contained:
+          blue tile + rounded corners are baked in. */}
+      <img src="/assets/mark.svg" alt="" width={40} height={40} className={styles.mark} />
 
       {view === 'signin' ? (
         <>
@@ -309,7 +312,6 @@ export function SignInCard() {
   );
 }
 
-/** Official Google "G" mark (inline so we don't depend on a Figma asset URL). */
 function GoogleG() {
   return (
     <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
