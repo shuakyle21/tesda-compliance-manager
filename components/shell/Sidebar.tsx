@@ -152,6 +152,11 @@ export function Sidebar() {
           {OPERATIONS.map((item) => (
             <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
           ))}
+
+          <div className="sb-group-label">Account</div>
+          {ACCOUNT.map((item) => (
+            <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
+          ))}
         </nav>
 
         {/* User card */}
