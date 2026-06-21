@@ -32,6 +32,10 @@ const WORKSPACE: NavItem[] = [
   { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
 ];
 
+const ACCOUNT: NavItem[] = [
+  { label: 'My Account', icon: 'user', href: '/profile' },
+];
+
 const OPERATIONS: NavItem[] = [
   { label: 'Import CSV', icon: 'download' }, // route not built yet
   { label: 'Settings', icon: 'settings' }, // route not built yet
