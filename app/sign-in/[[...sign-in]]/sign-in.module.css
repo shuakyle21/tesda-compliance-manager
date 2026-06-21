@@ -209,6 +209,18 @@
 }
 .footLink:hover { text-decoration: underline; }
 
+.badge {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.badge img { display: block; }
+
 .back {
   appearance: none;
   background: none;

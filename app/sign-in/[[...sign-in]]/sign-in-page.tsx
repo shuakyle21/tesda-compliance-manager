@@ -308,6 +308,13 @@ export function SignInCard() {
           </button>
         </>
       )}
+
+      {/* "Secured by Clerk" badge — Figma node 743:2908. The prebuilt widget
+          rendered this automatically; the custom card adds it back. */}
+      <div className={styles.badge}>
+        <span>Secured by</span>
+        <img src="/assets/clerk-logo.svg" alt="Clerk" width={37} height={11} />
+      </div>
     </div>
   );
 }
