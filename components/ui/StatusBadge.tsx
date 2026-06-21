@@ -1,63 +1,62 @@
 /**
- * UI COMPONENT — StatusBadge
+ * UI COMPONENT — StatusBadge (ported from components/StatusBadge.jsx)
  *
- * WHY THIS COMPONENT EXISTS:
- * Status badges appear in the Table View, Batch Cards, and Documents Matrix.
- * Centralizing it means: if the spec changes a color, you change it once.
- *
- * SERVER vs CLIENT: Server Component. No interactivity, pure rendering.
- *
- * SPEC RULES:
- *   - Height: 20px (--h-badge)
- *   - Radius: 6px (--radius-md)
- *   - Typography: t-badge class (IBM Plex Mono, 11px, 500 weight, 0.04em spacing)
- *   - Colors: use semantic tokens (bg-lt, border-color, text-dk per tier)
- *   - Icon: 12px inside the badge, left of text, 4px gap
- *   - Never use raw hex colors — always CSS variables
- *
- * REFERENCE: ui_kits/admin/StatusBadge.jsx
+ * Categorical-state chip. Variant maps to a semantic color pair; mono type,
+ * 20px tall, 6px radius per spec. Server Component — pure render.
  */
 
-// TODO C1-1: Define the StatusTone type.
-// LEARN Ch 2 — CSS Styling (clsx for conditional classes): https://nextjs.org/learn/dashboard-app/css-styling
-// It maps to the semantic color tiers: 'green' | 'amber' | 'red' | 'blue' | 'purple' | 'muted'
-type StatusTone = 'green' | 'amber' | 'red' | 'blue' | 'purple' | 'muted';
+import type { CSSProperties, ReactNode } from 'react';
+import { Icon, type IconName } from './Icon';
+
+export type BadgeVariant =
+  | 'twsp' | 'cfsp' | 'nc-ii' | 'nc-i' | 'ongoing' | 'completed'
+  | 'upcoming' | 'cancelled' | 'approved' | 'not-approved'
+  | 'critical' | 'warning' | 'on-track';
+
+const BADGE_STYLES: Record<BadgeVariant, { bg: string; fg: string; border?: string }> = {
+  twsp:           { bg: 'var(--color-blue-lt)',   fg: 'var(--color-blue-dk)' },
+  cfsp:           { bg: 'var(--color-teal-lt)',   fg: 'var(--color-teal-dk)' },
+  'nc-ii':        { bg: 'var(--color-purple-lt)', fg: 'var(--color-purple-dk)' },
+  'nc-i':         { bg: 'var(--color-amber-lt)',  fg: 'var(--color-amber-dk)' },
+  ongoing:        { bg: 'var(--color-blue-lt)',   fg: 'var(--color-blue-dk)' },
+  completed:      { bg: 'var(--color-green-lt)',  fg: 'var(--color-green-dk)' },
+  upcoming:       { bg: 'var(--color-amber-lt)',  fg: 'var(--color-amber-dk)' },
+  cancelled:      { bg: 'var(--color-red-lt)',    fg: 'var(--color-red-dk)' },
+  approved:       { bg: 'var(--color-green-lt)',  fg: 'var(--color-green-dk)' },
+  'not-approved': { bg: 'var(--color-surface-alt)', fg: 'var(--color-text-muted)', border: 'var(--color-border)' },
+  critical:       { bg: 'var(--color-red-lt)',    fg: 'var(--color-red-dk)' },
+  warning:        { bg: 'var(--color-amber-lt)',  fg: 'var(--color-amber-dk)' },
+  'on-track':     { bg: 'var(--color-green-lt)',  fg: 'var(--color-green-dk)' },
+};
 
 interface StatusBadgeProps {
-  label: string;
-  tone: StatusTone;
-  // TODO C1-2: Add optional `icon` prop (Tabler icon name string).
+  variant?: BadgeVariant;
+  iconName?: IconName;
+  children: ReactNode;
+  style?: CSSProperties;
 }
 
-// TODO C1-3: Define a TOKEN_MAP that maps each tone to its CSS variable set.
-// LEARN Ch 2 — Conditional styles with clsx: https://nextjs.org/learn/dashboard-app/css-styling
-// Example:
-//   const TOKEN_MAP: Record<StatusTone, { bg: string; border: string; text: string }> = {
-//     green:  { bg: 'var(--color-green-lt)', border: 'var(--color-green-border)', text: 'var(--color-green-dk)' },
-//     amber:  { bg: 'var(--color-amber-lt)', border: 'var(--color-amber-border)', text: 'var(--color-amber-dk)' },
-//     ...
-//   };
-//
-// WHY a map instead of conditionals: Adding a new tone requires one new
-// entry in the map — no scattered if/else chains across the component.
-
-export function StatusBadge({ label, tone }: StatusBadgeProps) {
-  // TODO C1-4: Look up token values from TOKEN_MAP[tone].
-  // Apply them as inline styles (since Tailwind can't interpolate CSS vars dynamically).
-
+export function StatusBadge({ variant = 'ongoing', iconName, children, style }: StatusBadgeProps) {
+  const s = BADGE_STYLES[variant] || BADGE_STYLES.ongoing;
   return (
     <span
-      className="t-badge inline-flex items-center gap-1 px-2 rounded-[var(--radius-md)]"
+      className="status-badge"
       style={{
-        height: 'var(--h-badge)',
-        // TODO C1-4: set backgroundColor, borderColor, color from TOKEN_MAP
-        backgroundColor: 'var(--color-surface-alt)',
-        border: '1px solid var(--color-border)',
-        color: 'var(--color-text-muted)',
+        display: 'inline-flex', alignItems: 'center', gap: 4,
+        height: 20, padding: '0 8px',
+        borderRadius: 'var(--radius-md)',
+        background: s.bg, color: s.fg,
+        border: s.border ? `1px solid ${s.border}` : 'none',
+        fontFamily: 'var(--font-mono)',
+        fontSize: 11, fontWeight: 500, letterSpacing: '0.04em',
+        whiteSpace: 'nowrap',
+        ...style,
       }}
     >
-      {/* TODO C1-5: Render icon here once Icon component is built */}
-      {label}
+      {iconName ? <Icon name={iconName} size={12} /> : null}
+      {children}
     </span>
   );
 }
+
+export default StatusBadge;

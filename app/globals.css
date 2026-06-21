@@ -18,6 +18,15 @@
 
 @import "tailwindcss";
 
+/* Design-system component styles ported verbatim from the handoff bundle's
+   styles/kit.css. These classes (.sidebar, .batch-stack, .metrics, .doc-grid,
+   .nm-sheet, etc.) are the contract the ported components render against. They
+   reference the tokens defined in :root below, so they must load after them at
+   the cascade level — @import hoists this, but specificity/order is fine because
+   every rule is class-scoped and the tokens are custom properties (globally
+   resolved, order-independent). */
+@import "./design-system.css";
+
 /* =========================================================================
    TODO 3a: Copy ALL tokens from colors_and_type.css into :root here.
    LEARN Ch 2 — CSS Styling: https://nextjs.org/learn/dashboard-app/css-styling
@@ -107,8 +116,11 @@
   /* ============================================================
      TYPOGRAPHY
      ============================================================ */
-  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  /* next/font self-hosts IBM Plex and exposes these CSS variables on <html>;
+     we prepend them so the optimized, layout-shift-free fonts are used, with
+     the web/system names as fallbacks. */
+  --font-sans: var(--font-ibm-plex-sans), 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), 'IBM Plex Mono', 'Courier New', monospace;
 
   /* Sizes — 1.2 minor third with manual tweaks in the 11–14 range */
   --fs-2xs:  10px;   --lh-2xs: 14px;
