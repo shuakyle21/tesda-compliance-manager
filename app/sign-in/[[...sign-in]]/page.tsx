@@ -1,35 +1,38 @@
 'use client';
 
 /**
- * Sign-in page — Clerk prebuilt <SignIn> branded with the TCS design system
- * via the shared `appearance` config (lib/clerkAppearance).
+ * Sign-in route.
  *
- * Methods (configured in the Clerk dashboard): email + password, Google OAuth.
- * The `[[...sign-in]]` catch-all is required so Clerk can handle its own
- * sub-paths mid-flow (verification, SSO callback).
+ * Renders the custom <SignInCard> (sign-in-page.tsx) inside the branded auth
+ * shell. Because the route is a `[[...sign-in]]` catch-all, it also receives the
+ * Google OAuth return at `/sign-in/sso-callback`; on that sub-path we render
+ * Clerk's <AuthenticateWithRedirectCallback /> to finish the handshake and
+ * activate the session before redirecting on.
  */
 
-import { SignIn } from '@clerk/nextjs';
-import { useSearchParams } from 'next/navigation';
-import { clerkAppearance } from '@/lib/clerkAppearance';
+import { AuthenticateWithRedirectCallback } from '@clerk/nextjs';
+import { usePathname } from 'next/navigation';
+import { SignInCard } from './sign-in-page';
 
 export default function SignInPage() {
-  const reason = useSearchParams().get('reason');
+  const pathname = usePathname();
+
+  if (pathname?.includes('/sso-callback')) {
+    return (
+      <main className="auth-shell">
+        <AuthenticateWithRedirectCallback
+          signInUrl="/sign-in"
+          signInFallbackRedirectUrl="/"
+          signUpFallbackRedirectUrl="/"
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="auth-shell">
       <div className="auth-stack">
-        <div className="auth-brand">TVI-CAMS · Compliance &amp; Audit</div>
-        {reason === 'auth-required' && (
-          <p className="auth-global-error">Please sign in to continue.</p>
-        )}
-        <SignIn
-          appearance={clerkAppearance}
-          routing="path"
-          path="/sign-in"
-          signUpUrl="/sign-up"
-          fallbackRedirectUrl="/"
-        />
+        <SignInCard />
       </div>
     </main>
   );
