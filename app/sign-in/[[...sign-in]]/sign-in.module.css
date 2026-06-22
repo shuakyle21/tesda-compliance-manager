@@ -1,0 +1,236 @@
+/**
+ * Scoped styles for the custom sign-in card (sign-in-page.tsx).
+ * Mirrors Figma "Auth · Sign-in" card (node 741:2459) using TCS design tokens.
+ * A CSS Module is used (rather than inline styles) so :hover / :focus-visible /
+ * ::placeholder / :disabled states can match the design faithfully.
+ */
+
+.card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 28px 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 20px 0 0;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.sub {
+  margin: 6px 0 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+/* ── Error banner ─────────────────────────────────────────────────────────── */
+.error {
+  margin: 16px 0 0;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-red-lt);
+  border: 1px solid var(--color-red-border);
+  color: var(--color-red-dk);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+/* ── OAuth button ─────────────────────────────────────────────────────────── */
+.oauth {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.oauth:hover:not(:disabled) { background: var(--color-surface-alt); }
+.oauth:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ── Divider ──────────────────────────────────────────────────────────────── */
+.divider {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.divider span {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* ── Fields ───────────────────────────────────────────────────────────────── */
+.field { margin-top: 16px; display: flex; flex-direction: column; gap: 4px; }
+.field + .field { margin-top: 12px; }
+
+.labelRow { display: flex; align-items: center; justify-content: space-between; }
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.forgot {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-blue-dk);
+  cursor: pointer;
+}
+.forgot:hover { text-decoration: underline; }
+
+.input {
+  box-sizing: border-box;
+  height: 38px;
+  width: 100%;
+  padding: 0 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.input::placeholder { color: var(--color-text-muted); }
+.input:focus-visible {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px var(--color-blue-lt);
+}
+.input.mono { font-family: var(--font-mono); letter-spacing: 0.08em; }
+
+/* ── Submit ───────────────────────────────────────────────────────────────── */
+.submit {
+  margin-top: 16px;
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-blue);
+  border: 1px solid var(--color-blue);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.submit:hover:not(:disabled) { background: var(--color-blue-dk); }
+.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Demo account ─────────────────────────────────────────────────────────── */
+.demo {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-faint);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.demo:hover:not(:disabled) { background: var(--color-border-faint); }
+.demo:disabled { opacity: 0.6; cursor: not-allowed; }
+.demo span:last-child { color: var(--color-text-muted); }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.foot {
+  margin: 12px 0 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+.footLink {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--color-blue-dk);
+  cursor: pointer;
+}
+.footLink:hover { text-decoration: underline; }
+
+.badge {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.badge img { display: block; }
+
+.back {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-top: 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  align-self: center;
+}
+.back:hover { text-decoration: underline; }

@@ -32,6 +32,10 @@ const WORKSPACE: NavItem[] = [
   { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
 ];
 
+const ACCOUNT: NavItem[] = [
+  { label: 'My Account', icon: 'user', href: '/profile' },
+];
+
 const OPERATIONS: NavItem[] = [
   { label: 'Import CSV', icon: 'download' }, // route not built yet
   { label: 'Settings', icon: 'settings' }, // route not built yet
@@ -148,18 +152,23 @@ export function Sidebar() {
           {OPERATIONS.map((item) => (
             <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
           ))}
+
+          <div className="sb-group-label">Account</div>
+          {ACCOUNT.map((item) => (
+            <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
+          ))}
         </nav>
 
-        {/* User card */}
+        {/* User card — links to My Account (/profile) */}
         <div className="sb-user-wrap">
-          <button type="button" className="sb-user" aria-label="Account menu">
+          <Link href="/profile" className="sb-user" aria-label="My account" onClick={closeDrawer}>
             <span className="user-avatar" style={{ background: 'var(--color-teal)' }}>KC</span>
             <span className="sb-user-text">
               <span className="sb-user-name">Karina Cruz</span>
               <span className="role-tag coordinator">coordinator</span>
             </span>
-            <Icon name="chevron-down" size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
-          </button>
+            <Icon name="chevron-right" size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
+          </Link>
         </div>
       </aside>
     </>
