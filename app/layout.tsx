@@ -16,6 +16,7 @@
  * FONTS: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
  */
 
+import "@globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 // TODO 4a: Replace Geist with IBM_Plex_Sans and IBM_Plex_Mono.
