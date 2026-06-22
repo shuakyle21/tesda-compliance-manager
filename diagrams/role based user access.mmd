@@ -1,0 +1,25 @@
+flowchart TD
+  Request[API request] --> Verify[Verify Clerk user]
+  Verify --> Profile[Load profile]
+  Profile --> Role{Role}
+
+  Role --> Admin[Admin]
+  Role --> Coordinator[Coordinator]
+  Role --> Trainer[Trainer]
+  Role --> Viewer[Viewer]
+
+  Admin --> AdminScope[One-school tenant scope<br/>Full write inside tenant]
+  Coordinator --> CoordScope[Assigned multi-school scope<br/>Compliance workflow writes]
+  Trainer --> TrainerScope[Assigned batches only<br/>Training-side writes only]
+  Viewer --> ViewerScope[Assigned schools<br/>Read-only]
+
+  AdminScope --> Query[Tenant-scoped query]
+  CoordScope --> Query
+  ViewerScope --> Query
+
+  TrainerScope --> HideTrainerFields[Remove billing deadline<br/>Remove BSRS<br/>Remove NTP lag<br/>Remove financial documents]
+  HideTrainerFields --> AssignedBatchCheck{Assigned batch?}
+  AssignedBatchCheck -->|Yes| Query
+  AssignedBatchCheck -->|No| Deny[403 Forbidden]
+
+  Query --> Response[Return allowed data]

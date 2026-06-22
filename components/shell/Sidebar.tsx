@@ -197,5 +197,3 @@ function NavRow({ item, active, onNavigate }: { item: NavItem; active: boolean; 
     </Link>
   );
 }
-
-export default Sidebar;

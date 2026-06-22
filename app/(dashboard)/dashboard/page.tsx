@@ -12,8 +12,13 @@ import { redirect } from 'next/navigation';
 import { InfoCallout } from '@/components/ui/InfoCallout';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { MetricCard } from '@/components/ui/MetricCard';
+import { EgaceOutcomes } from '@/components/dashboard/EgaceOutcomes';
+import { DocumentStatusDonut } from '@/components/dashboard/DocumentStatusDonut';
+import { ProgressTrend } from '@/components/dashboard/ProgressTrend';
+import { BatchTimeline } from '@/components/dashboard/BatchTimeline';
+import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
+import { EmptyState } from '@/components/ui/EmptyState';
 import {
-  DOCUMENT_REQUIREMENTS,
   MOCK_ACTIVITY,
   MOCK_BATCHES,
   getMockMetrics,
@@ -61,6 +66,9 @@ const SUMMARY_CARDS: { title: string; icon: IconName; meta?: string }[] = [
   { title: 'Lifecycle', icon: 'timeline' },
 ];
 
+// Exact "data as of" stamp shown alongside relative labels (TES-8 stale-data AC).
+const DATA_AS_OF = 'Jun 19, 2026 · 14:02';
+
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const role = await resolveDashboardRole(params);
@@ -78,22 +86,75 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
     ? MOCK_BATCHES
     : MOCK_BATCHES.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
   const metrics = getMockMetrics(batches);
-  const criticalRequirements = DOCUMENT_REQUIREMENTS.filter((requirement) => requirement.critical);
-  const criticalTotal = Math.max(1, criticalRequirements.length * Math.max(1, batches.length));
   const criticalMissing = metrics.docMissing;
   const criticalPending = metrics.docPending;
-  const criticalVerified = Math.max(0, criticalTotal - criticalMissing - criticalPending);
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
+  // ---- Dashboard states (TES-8) ----
+  // `empty` derives from the batch set; `sync-failed` / `stale` / `denied` are
+  // demoable via ?state= until the live signals exist (sync & stale → TES-30
+  // data contracts, denied → TES-34 role resolver).
+  const forcedState = firstParam(params.state);
+  const isDenied = forcedState === 'denied';
+  const isEmpty = forcedState === 'empty' || batches.length === 0;
+  const syncFailed = forcedState === 'sync-failed';
+  const isStale = forcedState === 'stale';
+
+  const header = (
+    <div className="page-head">
+      <h1>Dashboard</h1>
+      <span className="subline">
+        {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {metrics.activeBatches === 1 ? 'batch' : 'batches'}
+        {' · '}Data as of {DATA_AS_OF}
+        {isStale && (
+          <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
+            STALE
+          </span>
+        )}
+      </span>
+    </div>
+  );
+
+  // Permission denied — full-page guard state.
+  if (isDenied) {
+    return (
+      <div className="dashboard-view">
+        {header}
+        <EmptyState
+          iconName="shield-off"
+          heading="Access denied"
+          sub="Your role does not have access to this school's dashboard. Contact a coordinator to request access."
+        />
+      </div>
+    );
+  }
+
+  // Empty — no assigned batches; surface the next administrative action.
+  if (isEmpty) {
+    return (
+      <div className="dashboard-view">
+        {header}
+        <EmptyState
+          iconName="folders"
+          heading="No assigned batches"
+          sub="Once a batch is imported or assigned to you, its readiness, lifecycle, and documents appear here."
+          action={<Link href="/batch-cards" className="btn primary" style={{ marginTop: 12 }}>Import a batch</Link>}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-view">
-      <div className="page-head">
-        <h1>Dashboard</h1>
-        <span className="subline">
-          {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {metrics.activeBatches === 1 ? 'batch' : 'batches'} · as of today 14:02
-        </span>
-      </div>
+      {header}
+
+      {syncFailed && (
+        <InfoCallout variant="warning">
+          Sync with Supabase failed — showing the last cached snapshot from {DATA_AS_OF}.
+          <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
+        </InfoCallout>
+      )}
 
       {criticalMissing > 0 && (
         <InfoCallout variant="error">
@@ -108,7 +169,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       <section className="dash-greeting" aria-labelledby="dashboard-role-heading">
         <div>
           <div id="dashboard-role-heading" className="dash-greeting-title">
-            Good afternoon, {roleCopy.name}
+            Good day, {roleCopy.name}
             <span className={`dash-greeting-role role-tag ${dashboardRole}`}>
               {roleCopy.roleLabel}
             </span>
@@ -126,7 +187,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         <MetricCard label="Total Scholars" value={metrics.totalScholars} sub="current active roster" iconName="users" />
         <MetricCard label="Avg Progress" value={`${metrics.avgProgress}%`} sub="training completion" iconName="chart-dots" />
         <MetricCard
-          label="Doc Readiness"
+          label="Doc Compliance"
           value={`${metrics.docCompliancePct}%`}
           sub={criticalMissing ? `${criticalMissing} critical missing` : 'All critical docs verified'}
           iconName="file-check"
@@ -140,7 +201,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
           variant={metrics.daysToEarliestBilling <= 6 ? 'critical' : metrics.daysToEarliestBilling <= 21 ? 'warning' : 'neutral'}
         />
         <MetricCard
-          label="Ready Signals"
+          label="Billing-Ready"
           value={billingReady.length}
           sub={dashboardRole === 'viewer' ? 'read-only visibility' : 'billing prep queue'}
           iconName="send"
@@ -148,24 +209,21 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         />
       </section>
 
+      <section
+        className="dash-charts-row"
+        aria-label="Document status and progress trend"
+        style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) minmax(0, 2fr)', gap: 16 }}
+      >
+        <DocumentStatusDonut batches={batches} />
+        <ProgressTrend />
+      </section>
+
+      <EgaceOutcomes batches={batches} />
+
+      <BatchTimeline batches={batches} />
+
       <section className="dash-main-grid" aria-label="Dashboard summaries">
-        <DashboardPanel title={SUMMARY_CARDS[0].title} icon={SUMMARY_CARDS[0].icon} meta={SUMMARY_CARDS[0].meta}>
-          <div style={{ display: 'grid', gap: 10 }}>
-            {[
-              { label: 'Verified', value: criticalVerified, color: 'var(--color-green)' },
-              { label: 'Pending', value: criticalPending, color: 'var(--color-amber)' },
-              { label: 'Missing', value: criticalMissing, color: 'var(--color-red)' },
-            ].map((item) => (
-              <div key={item.label} className="snap-line" style={{ gridTemplateColumns: '70px 1fr 36px' }}>
-                <span className="snap-date">{item.label}</span>
-                <span className="snap-bar">
-                  <span style={{ width: `${Math.round((item.value / criticalTotal) * 100)}%`, background: item.color }} />
-                </span>
-                <span className="snap-meta">{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </DashboardPanel>
+        <AlertsPanel />
 
         <DashboardPanel title={SUMMARY_CARDS[1].title} icon={SUMMARY_CARDS[1].icon}>
           <div className="dash-program-grid">

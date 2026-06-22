@@ -41,8 +41,18 @@ yarn-error.log*
 skills-lock.json
 
 # claude settings
-.claude/ 
+.claude/
+
+# project-scoped Claude skills (kept local, not shared with the team)
+.claude/skills/
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# IDE / local tooling (not shared with the team)
+.idea/
+.design-sync/

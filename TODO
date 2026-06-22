@@ -1,0 +1,50 @@
+Todo:
+
+  Done / reference work:
+  ☑ Keep Figma as the visual reference, not embedded runtime UI.
+  ☑ Keep `ui_kits/admin` as the static design-system/reference kit.
+  ☑ Add the static admin `BatchModal` reference flow in `ui_kits/admin`.
+  ☑ Add `ENTRE` lifecycle stage and training-day schedule reference data in `ui_kits/admin`.
+  ☑ Add Supabase tenant-scoped migration and seed scaffolding.
+  ☑ Ignore local agent skill cache files with `.gitignore`.
+
+  Next.js dashboard foundation:
+  ☐ Move design tokens from `colors_and_type.css` / `DESIGN.md` into `app/globals.css`.
+  ☐ Add semantic type role classes to `app/globals.css` (`t-page-title`, `t-section`, `t-body`, `t-mono`, `t-badge`, etc.).
+  ☐ Wire `app/(dashboard)/layout.tsx` to use `Topbar`, `MetricsRow`, and `DashboardTabs`.
+  ☐ Replace shell placeholders with real logo, last-synced text, metrics, and active tab UI.
+  ☐ Add a `ContentShell` or equivalent page wrapper only if repeated page spacing grows.
+
+  Data layer:
+  ☐ Complete `lib/data/types.ts` interfaces for lifecycle stages, urgency, batches, activity events, and metrics.
+  ☐ Port typed mock batches from `ui_kits/admin/data.js` into `lib/data/mock-batches.ts`.
+  ☐ Port mock activity events into `lib/data/mock-batches.ts`.
+  ☐ Implement `getMockMetrics()` from mock batch data.
+  ☐ Keep `program` generic as a string / ScholarshipProgram reference, not a hard-coded `TWSP | CFSP` union.
+
+  Shared UI components:
+  ☐ Finish `components/ui/StatusBadge.tsx` token map and optional icon support.
+  ☐ Finish `components/ui/Icon.tsx` with real `@tabler/icons-react` mappings.
+  ☐ Port `ProgressBar`, `LifecyclePipeline`, `TrainerAvatar`, `UrgencyIndicator`, and `BatchCard` from `ui_kits/admin` into typed React components.
+  ☐ Port document/table helpers as needed (`DocumentCell`, `DataTableRow`, `ActivityRow`).
+
+  Screens, in implementation order:
+  ☐ Activity Log: import mock activity and render real activity rows.
+  ☐ Table View: import mock batches and render all configured columns.
+  ☐ Documents Matrix: derive document status per batch and render document cells.
+  ☐ Batch Cards: render typed batch cards sorted by billing urgency.
+  ☐ Analytics: add chart components and server-side chart data derivation.
+  ☐ Documents Architecture note: add `/documents/architecture` only if still needed for portfolio/internal stack documentation.
+
+  Backend and integration:
+  ☐ Keep Supabase as the current database/storage layer for MVP work.
+  ☐ Treat Laravel as a future API/backend direction, not currently implemented.
+  ☐ Connect Supabase only after the static dashboard shell and mock data flow are stable.
+  ☐ Connect Clerk/auth only after dashboard routes and tenant-scoped data assumptions are stable.
+  ☐ Keep TESDA SIS/T2MIS/BSRS as official systems; TVI-CAMS stores internal monitoring and reporting records only.
+
+  Validation:
+  ☐ Run lint after TypeScript placeholders are implemented.
+  ☐ Run build after dashboard layout and data layer are wired.
+  ☐ Verify `/documents` remains the compliance documents matrix route.
+  ☐ Verify `/batch-cards`, `/table-view`, `/documents`, `/analytics`, and `/activity-log` render under the dashboard shell.

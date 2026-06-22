@@ -1,0 +1,152 @@
+erDiagram
+  TENANTS ||--o{ PROFILES : has_members
+  TENANTS ||--o{ BATCHES : owns
+  TENANTS ||--o{ ACTIVITY_LOG : records
+
+  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_RQM : defines
+  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_DOCUMENT_REQUIREMENTS : requires
+  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_BILLING_RULES : configures
+  SCHOLARSHIP_PROGRAMS ||--o{ BATCHES : classifies
+
+  PROFILES ||--o{ BATCHES : trains
+  BATCHES ||--o{ LEARNERS : enrolls
+  BATCHES ||--o{ DOCUMENTS : has_evidence
+  BATCHES ||--o{ ATTENDANCE_RECORDS : tracks
+  BATCHES ||--o{ TRAINER_UPDATES : receives
+  BATCHES ||--o{ LAMR_REPORTS : has
+  BATCHES ||--o{ ACTIVITY_LOG : logs
+
+  PROGRAM_DOCUMENT_REQUIREMENTS ||--o{ DOCUMENTS : validates
+
+  LAMR_REPORTS ||--o{ LAMR_OUTCOMES : defines
+  LAMR_OUTCOMES ||--o{ LAMR_ACTIVITIES : contains
+  LAMR_ACTIVITIES ||--o{ LAMR_ENTRIES : records
+  LEARNERS ||--o{ LAMR_ENTRIES : completes
+  LEARNERS ||--o{ ATTENDANCE_RECORDS : attends
+
+  TENANTS {
+    uuid id PK
+    string code
+    string name
+    string region
+    string type
+  }
+
+  PROFILES {
+    uuid id PK
+    string clerk_user_id
+    string role
+    uuid[] tenant_ids
+    uuid[] assigned_batch_ids
+  }
+
+  SCHOLARSHIP_PROGRAMS {
+    uuid id PK
+    string code
+    string name
+    boolean active
+  }
+
+  PROGRAM_RQM {
+    uuid id PK
+    uuid scholarship_program_id FK
+    string requirement_code
+    string requirement_name
+    string status
+  }
+
+  PROGRAM_DOCUMENT_REQUIREMENTS {
+    uuid id PK
+    uuid scholarship_program_id FK
+    string document_key
+    string label
+    string role_scope
+    boolean critical
+  }
+
+  PROGRAM_BILLING_RULES {
+    uuid id PK
+    uuid scholarship_program_id FK
+    int billing_preparation_threshold
+  }
+
+  BATCHES {
+    uuid id PK
+    uuid tenant_id FK
+    uuid scholarship_program_id FK
+    uuid trainer_profile_id FK
+    string batch_code
+    string qualification
+    string nc_level
+    int progress_pct
+    string lifecycle_stage
+  }
+
+  LEARNERS {
+    uuid id PK
+    uuid batch_id FK
+    string learner_no
+    string full_name
+  }
+
+  DOCUMENTS {
+    uuid id PK
+    uuid batch_id FK
+    uuid requirement_id FK
+    string status
+    string storage_path
+    string source
+  }
+
+  ATTENDANCE_RECORDS {
+    uuid id PK
+    uuid batch_id FK
+    uuid learner_id FK
+    date class_date
+    string status
+  }
+
+  TRAINER_UPDATES {
+    uuid id PK
+    uuid batch_id FK
+    uuid trainer_profile_id FK
+    string update_type
+    text notes
+  }
+
+  LAMR_REPORTS {
+    uuid id PK
+    uuid batch_id FK
+    string module_title
+    string schedule
+    string source_document_path
+  }
+
+  LAMR_OUTCOMES {
+    uuid id PK
+    uuid lamr_report_id FK
+    string outcome_label
+  }
+
+  LAMR_ACTIVITIES {
+    uuid id PK
+    uuid lamr_outcome_id FK
+    string activity_label
+  }
+
+  LAMR_ENTRIES {
+    uuid id PK
+    uuid lamr_activity_id FK
+    uuid learner_id FK
+    boolean completed
+    string assessment_result
+  }
+
+  ACTIVITY_LOG {
+    uuid id PK
+    uuid tenant_id FK
+    uuid batch_id FK
+    uuid actor_profile_id FK
+    string event_type
+    text message
+  }

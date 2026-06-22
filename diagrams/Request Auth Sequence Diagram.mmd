@@ -1,0 +1,34 @@
+sequenceDiagram
+  autonumber
+  participant Browser as Browser
+  participant Next as Next.js
+  participant Clerk as Clerk
+  participant API as Laravel API
+  participant Policy as Policies
+  participant DB as Supabase Postgres
+  participant Storage as Supabase Storage
+
+  Browser->>Next: Open protected route
+  Next->>Clerk: Read signed-in session
+  Clerk-->>Next: User identity + claims
+  Next->>API: Request with Clerk token
+  API->>Clerk: Verify token
+  Clerk-->>API: Verified user id
+  API->>DB: Load profile + tenant memberships
+  DB-->>API: Role, tenant_ids, assigned_batch_ids
+  API->>Policy: Authorize route/action
+
+  alt Authorized
+    Policy-->>API: Allow
+    API->>DB: Tenant-scoped query
+    opt File operation
+      API->>Storage: Upload/read scoped object
+      Storage-->>API: File metadata or signed URL
+    end
+    API-->>Next: Scoped response
+    Next-->>Browser: Render UI
+  else Denied
+    Policy-->>API: Deny
+    API-->>Next: 403 Forbidden
+    Next-->>Browser: Access denied state
+  end

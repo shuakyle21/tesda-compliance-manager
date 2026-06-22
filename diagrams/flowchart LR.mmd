@@ -1,0 +1,21 @@
+flowchart LR
+  User[User browser] --> Next[Next.js App Router]
+  Next --> Clerk[Clerk auth]
+  Next --> API[Laravel API]
+
+  API --> Auth[Auth middleware<br/>Verify Clerk session/JWT]
+  Auth --> Policy[Laravel policies<br/>Role + tenant + trainer scope]
+
+  Policy --> Services[Domain services]
+  Services --> DB[(Supabase Postgres)]
+  Services --> Storage[(Supabase Storage<br/>S3-compatible)]
+  Services --> Queue[Laravel queue jobs]
+
+  Queue --> Import[CSV import]
+  Queue --> Export[CSV export]
+  Queue --> Activity[Activity log writer]
+
+  DB --> Services
+  Storage --> Services
+  Services --> API
+  API --> Next

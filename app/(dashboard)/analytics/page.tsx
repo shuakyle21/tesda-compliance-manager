@@ -1,82 +1,102 @@
 /**
- * SCREEN 5 — Analytics (build last)
+ * SCREEN — Analytics (ported from App.jsx AnalyticsView)
  *
- * WHY LAST:
- * Analytics requires chart components (Recharts) and aggregated data
- * computed across all batches. Building it last means the data layer and
- * component patterns are already solid.
- *
- * NEXT.JS CONCEPT: Charts use browser APIs (canvas/SVG animation) so the
- * chart components must be 'use client'. But the data fetching and
- * aggregation still happens server-side in this page — you pass the computed
- * data DOWN to the client chart components as props.
- *
- * This pattern (Server Component page → Client Component chart) is the
- * correct way to use Recharts (or any charting lib) in Next.js App Router.
- *
- * DOCS: https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#using-third-party-packages-and-providers
- * LEARN Ch 9 — Streaming (Server → Client pattern): https://nextjs.org/learn/dashboard-app/streaming
- * LEARN Ch 7 — Fetching Data (server-side aggregation): https://nextjs.org/learn/dashboard-app/fetching-data
- *
- * SPEC RULES:
- *   - Use Recharts (referenced in ui_kits/admin/Charts.jsx)
- *   - Chart colors use semantic tokens — never arbitrary colors
- *   - Charts animate on mount (400ms, ease-spring), once only
- *   - No colored shadows on chart elements
- *   - Chart labels use t-mono or t-label classes
- *
- * REQUIRED CHARTS (from the spec):
- *   1. Progress comparison bar chart (one bar per batch)
- *   2. Timeline / Gantt-style training period chart
- *   3. Billing deadline countdown (days remaining per batch)
+ * Six dependency-free SVG charts derived from the active batch set. Pure render,
+ * so this stays a Server Component — the charts compute from MOCK_BATCHES at
+ * render time.
  */
 
-// TODO S5-1: Import MOCK_BATCHES.
-// import { MOCK_BATCHES } from '@/lib/data/mock-batches';
-
-// TODO S5-2: Import chart components (these will be 'use client').
-// import { ProgressChart } from '@/components/ui/charts/ProgressChart';
-// import { TimelineChart } from '@/components/ui/charts/TimelineChart';
-// import { BillingCountdownChart } from '@/components/ui/charts/BillingCountdownChart';
+import { MOCK_BATCHES, DOCUMENT_REQUIREMENTS } from '@/lib/data/mock-batches';
+import { HBar, VBar, StackedBar, ChartLegend, BATCH_COLOR } from '@/components/ui/Charts';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Icon } from '@/components/ui/Icon';
 
 export default function AnalyticsPage() {
-  // TODO S5-3: Compute chart data from MOCK_BATCHES server-side.
-  // Example for progress chart:
-  //   const progressData = MOCK_BATCHES.map(b => ({
-  //     label: b.id,
-  //     value: b.progressPct,
-  //     color: `var(--color-${b.urgency === 'critical' ? 'red' : b.urgency === 'warning' ? 'amber' : 'green'})`,
-  //   }));
-  //
-  // WHY compute here: If you compute in the Client Component, it runs
-  // on the browser on every render. Here, it runs once on the server.
+  const batches = MOCK_BATCHES;
+
+  if (!batches.length) {
+    return (
+      <div>
+        <Header />
+        <EmptyState heading="No data to chart" sub="Import a CSV to populate analytics." />
+      </div>
+    );
+  }
+
+  const progressRows = batches.slice().sort((a, b) => b.progressPct - a.progressPct)
+    .map((b, i) => ({ label: b.id, value: b.progressPct, colorKey: BATCH_COLOR[i % BATCH_COLOR.length] }));
+
+  const daysRows = batches.map((b) => ({
+    label: b.id, elapsed: b.currentDay, remaining: b.totalDays - b.currentDay,
+    colorKey: BATCH_COLOR[batches.indexOf(b) % BATCH_COLOR.length],
+  }));
+
+  const ntpRows = batches.map((b) => ({
+    label: b.id, value: b.ntpLag, colorKey: b.ntpLag === 0 ? 'green' : b.ntpLag <= 7 ? 'amber' : 'red',
+  }));
+
+  const scholarRows = batches.map((b, i) => ({ label: b.id, value: b.scholars, colorKey: BATCH_COLOR[i % BATCH_COLOR.length] }));
+  const avgSch = scholarRows.reduce((s, r) => s + r.value, 0) / scholarRows.length;
+
+  const docRows = batches.map((b, i) => {
+    const crit = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
+    const ok = crit.filter((r) => b.documents[r.key].status === 'verified').length;
+    return { label: b.id, value: Math.round((ok / crit.length) * 100), colorKey: BATCH_COLOR[i % BATCH_COLOR.length] };
+  });
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="t-page-title">Analytics</h1>
+      <Header />
+      <div className="analytics-grid">
+        <div className="surface chart-card">
+          <div className="chart-head"><div className="chart-title">Training progress by batch</div><div className="chart-sub">% complete · descending</div></div>
+          <HBar rows={progressRows} max={100} />
+        </div>
+        <div className="surface chart-card">
+          <div className="chart-head"><div className="chart-title">Days elapsed vs remaining</div><div className="chart-sub">solid = elapsed · light = remaining</div></div>
+          <ChartLegend items={progressRows.map((r) => ({ label: r.label, colorKey: r.colorKey }))} />
+          <StackedBar rows={daysRows} max={50} />
+        </div>
+        <div className="surface chart-card">
+          <div className="chart-head"><div className="chart-title">NTP → Training start lag</div><div className="chart-sub">15-day rule reference</div></div>
+          <VBar rows={ntpRows} max={15} unit="d" referenceLine={15} />
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 8, fontStyle: 'italic' }}>
+            BAT-2 started same day as NTP receipt.
+          </div>
+        </div>
+        <div className="surface chart-card">
+          <div className="chart-head"><div className="chart-title">Document compliance</div><div className="chart-sub">critical docs verified · %</div></div>
+          <HBar rows={docRows} max={100} />
+        </div>
+        <div className="surface chart-card">
+          <div className="chart-head"><div className="chart-title">Enrolled scholars by batch</div><div className="chart-sub">avg {avgSch.toFixed(1)} per batch</div></div>
+          <VBar rows={scholarRows} max={20} referenceLine={avgSch} />
+        </div>
+        <div className="surface chart-card">
+          <div className="chart-head"><div className="chart-title">Alerts sent (30 days)</div><div className="chart-sub">by category</div></div>
+          <HBar
+            rows={[
+              { label: 'Billing critical', value: 8, colorKey: 'red' },
+              { label: 'Doc missing', value: 6, colorKey: 'amber' },
+              { label: 'BSRS approved', value: 3, colorKey: 'green' },
+              { label: 'NTP lag', value: 2, colorKey: 'red' },
+              { label: 'Weekly digest', value: 4, colorKey: 'blue' },
+            ]}
+            max={10}
+          />
+        </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="grid grid-cols-1 gap-6">
-        {/* TODO S5-4: Replace each placeholder with a real chart component.
-            Pass computed data as props.
-
-            Chart card wrapper pattern:
-              <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)]
-                 border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-4">
-                <h2 className="t-section mb-4">Training Progress</h2>
-                <ProgressChart data={progressData} />
-              </div> */}
-
-        <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-4">
-          <h2 className="t-section mb-2">Training Progress</h2>
-          <p className="t-body">Chart placeholder — complete TODO S5-3 and S5-4.</p>
-        </div>
-
-        <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-4">
-          <h2 className="t-section mb-2">Billing Deadlines</h2>
-          <p className="t-body">Chart placeholder — complete TODO S5-3 and S5-4.</p>
-        </div>
+function Header() {
+  return (
+    <div className="page-head">
+      <h1>Analytics</h1>
+      <span className="subline">4 charts · tenant-scoped</span>
+      <div style={{ marginLeft: 'auto' }}>
+        <button className="btn secondary"><Icon name="download" size={14} />Export</button>
       </div>
     </div>
   );

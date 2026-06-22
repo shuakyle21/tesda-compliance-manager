@@ -1,99 +1,252 @@
 /**
  * STEP 1 — Data Layer: TypeScript Interfaces
  *
- * WHY THIS FILE EXISTS:
- * Before writing any React component, define the *shape* of your data.
- * TypeScript interfaces act as a contract between your mock data, your
- * components, and (eventually) your Supabase database schema.
- *
- * NEXT.JS CONCEPT: TypeScript is first-class in Next.js App Router.
- * Files in `lib/` are never bundled into the browser unless explicitly
- * imported by a Client Component. Keep pure data types here.
+ * These types are the contract between the ported mock data (lib/data/seed.ts),
+ * the UI components, and (eventually) the Supabase/Laravel schema. They mirror
+ * the shapes defined in the design handoff's `data/seed.js`.
  *
  * DOCS: https://nextjs.org/docs/app/building-your-application/configuring/typescript
- * LEARN (TypeScript setup in Next.js): https://nextjs.org/learn/dashboard-app/getting-started
  */
 
 // ---------------------------------------------------------------------------
-// TODO 1a: Define the lifecycle stage type.
-//
-// A lifecycle stage has:
-//   - key: one of 'aou' | 'ntp' | 'tip' | 'train' | 'assess' | 'bill'
-//   - label: the display string (e.g. 'AOU', 'TRAINING')
-//   - status: 'done' | 'active' | 'pending'
-//   - date: a human-readable date string (e.g. 'Apr 9' or 'Pending')
-//
-// TIP: Use a string union type for `key` and `status` so TypeScript will
-// catch typos at compile time. See: https://www.typescriptlang.org/docs/handbook/2/narrowing.html
+// Lifecycle — the TESDA batch process pipeline (AOU → NTP → TIP → TRAINING →
+// ENTRE → ASSESS → BILLING). ENTRE is spliced in by the enrichment pass.
 // ---------------------------------------------------------------------------
-export type LifecycleStageKey = // TODO: fill in the union
-  never;
+export type LifecycleStageKey =
+  | 'aou' | 'ntp' | 'tip' | 'train' | 'entre' | 'assess' | 'bill';
 
-export type LifecycleStatus = // TODO: fill in the union
-  never;
+export type LifecycleStatus = 'done' | 'active' | 'pending';
 
 export interface LifecycleStage {
-  // TODO 1a: add fields here
+  key: LifecycleStageKey;
+  label: string;
+  status: LifecycleStatus;
+  date: string;
 }
 
 // ---------------------------------------------------------------------------
-// TODO 1b: Define the UrgencyTier type.
-//
-// Urgency drives the left-border color on batch cards:
-//   'critical' → red  (< 7 days to billing)
-//   'warning'  → amber (7–21 days)
-//   'on-track' → green (> 21 days)
-//   'muted'    → neutral (no deadline soon)
-//
-// TIP: This is a discriminated union pattern — a single string that controls
-// both color and icon choice across many components.
+// Urgency drives the 3px left-border color on batch cards. Derived from
+// daysToBilling (see urgencyTier()).
 // ---------------------------------------------------------------------------
-export type UrgencyTier = // TODO: fill in the union
-  never;
+export type UrgencyTier = 'critical' | 'warning' | 'on-track' | 'muted';
 
 // ---------------------------------------------------------------------------
-// TODO 1c: Define the Batch interface.
-//
-// Look at ui_kits/admin/data.js for the real field names.
-// Key fields to include:
-//   - id, name, qualification, ncLevel
-//   - program: string  (generic — NOT a union of 'TWSP' | 'CFSP')
-//   - trainer, scholars (number)
-//   - progressPct (number 0–100)
-//   - billingDeadline (string), daysToBilling (number)
-//   - bsrs (boolean)
-//   - remark (string)
-//   - status: 'ongoing' | 'completed' | 'pending'
-//   - lifecycle: LifecycleStage[]
-//   - urgency: UrgencyTier  ← derive this from daysToBilling
-//
-// NOTE on `program`: The spec says to use generic ScholarshipProgram records,
-// not hard-coded 'TWSP' | 'CFSP'. Using `string` now keeps the door open.
+// Documents — each batch embeds a record keyed by document requirement key.
+// ---------------------------------------------------------------------------
+export type DocStatus = 'verified' | 'submitted' | 'pending' | 'missing';
+
+export interface DocRecord {
+  status: DocStatus;
+  url: string | null;
+  updated: string | null;
+  source: string | null;
+  verifiedBy?: string | null;
+  verifiedDate?: string | null;
+}
+
+export interface DocumentRequirement {
+  key: string;
+  label: string;
+  stage: string;
+  critical: boolean;
+  icon: string;
+}
+
+// ---------------------------------------------------------------------------
+// Tenants (TVI schools) and Users (roles + access scope).
+// ---------------------------------------------------------------------------
+export interface Tenant {
+  id: string;
+  code: string;
+  color: string;
+  name: string;
+  region: string;
+  type: string;
+  plan: string;
+  activeBatches: number;
+  totalScholars: number;
+}
+
+export type UserRole = 'owner' | 'admin' | 'coordinator' | 'trainer' | 'viewer';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  initials: string;
+  tenantIds: string[];
+  assignedBatchIds?: string[];
+}
+
+// ---------------------------------------------------------------------------
+// EGACE — the five-stage TESDA outcome funnel + per-scholar T2MIS roster.
+// ---------------------------------------------------------------------------
+export interface EgaceCounts {
+  enrolled: number;
+  graduate: number;
+  assessed: number;
+  certified: number;
+  employed: number;
+}
+
+export interface EmploymentFollowUp {
+  due: string | null;
+  certified: number;
+  employed: number;
+  awaiting: number;
+  unemployed: number;
+  rate: number;
+  reported: number;
+}
+
+export interface ScholarRow {
+  seq: number;
+  lastName: string;
+  firstName: string;
+  middleInit: string;
+  extName: string;
+  uli: string;
+  sex: string;
+  dob: string;
+  age: number;
+  civilStatus: string;
+  education: string;
+  nationality: string;
+  clientClass: string;
+  scholarshipType: string;
+  contact: string;
+  email: string;
+  trainingStatus: string;
+  dateStarted: string;
+  dateFinished: string;
+  dateAssessed: string;
+  assessmentResult: string;
+  empStatusBefore: string;
+  employmentStatus: string;
+  dateEmployed: string;
+  occupation: string;
+  employer: string;
+  empClassification: string;
+  salary: string;
+}
+
+export interface Competency {
+  name: string;
+  focus: string;
+}
+
+export interface ScheduleAdjustment {
+  date: string;
+  reason: string;
+  effect: string;
+}
+
+// ---------------------------------------------------------------------------
+// Batch — the central record. Many fields are back-filled by the enrichment
+// passes in seed.ts (currentDay, progressPct, entreStart, egace, etc.).
 // ---------------------------------------------------------------------------
 export interface Batch {
-  // TODO 1c: add fields here
+  id: string;
+  tenantId: string;
+  name: string;
+  qualification: string;
+  program: string; // generic ScholarshipProgram code (e.g. 'TWSP' | 'CFSP')
+  ncLevel: string;
+  trainer: string;
+  trainerId: string;
+  scholars: number;
+  trainingDays: string;
+  trainingDaySchedule: string[];
+  notes: string;
+  trainingStart: string;
+  trainingEnd: string;
+  duration: number;
+  currentDay: number;
+  totalDays: number;
+  progressPct: number;
+  ntpLag: number;
+  tipDate: string;
+  billingDeadline: string;
+  daysToBilling: number;
+  bsrs: boolean;
+  remark: string;
+  status: 'ongoing' | 'completed' | 'pending';
+  lifecycle: LifecycleStage[];
+  documents: Record<string, DocRecord>;
+
+  // Enrichment-derived (optional at the source, always present after load)
+  entreStart?: string;
+  entreEnd?: string;
+  approvedSeats?: number;
+  completers?: number;
+  dropouts?: number;
+  aouDate?: string;
+  ntpDate?: string;
+  reportDate?: string;
+  assessedDate?: string;
+  followUpReportDate?: string;
+  followUpDue?: string | null;
+  scholars_list?: ScholarRow[];
+  egace?: EgaceCounts;
+  employmentFollowUp?: EmploymentFollowUp | null;
+  competencies?: Competency[];
+  competenciesDone?: number;
+  currentCompetency?: Competency | null;
+  hoursPerDay?: number;
+  remainingDays?: number;
+  remainingHours?: number;
+  scheduleAdjustments?: ScheduleAdjustment[];
 }
 
 // ---------------------------------------------------------------------------
-// TODO 1d: Define the ActivityEvent interface.
-//
-// From ui_kits/admin/data.js, an activity event has:
-//   - id, when (display string), who, text
-//   - tone: 'green' | 'blue' | 'amber' | 'red'  ← maps to semantic colors
+// Activity log + alerts + snapshots.
 // ---------------------------------------------------------------------------
 export interface ActivityEvent {
-  // TODO 1d: add fields here
+  id: string;
+  when: string;
+  tone: 'green' | 'blue' | 'amber' | 'red';
+  who: string;
+  role: string;
+  text: string;
+}
+
+export interface AlertEntry {
+  id: string;
+  sentAt: string;
+  kind: string;
+  batch: string;
+  recipients: number;
+  status: string;
+  subject: string;
+}
+
+export interface Snapshot {
+  batchId: string;
+  date: string;
+  progressPct: number;
+  docsComplete: number;
+}
+
+export interface EgaceStage {
+  key: string;
+  label: string;
+  short: string;
+  icon: string;
+  colorKey: string;
 }
 
 // ---------------------------------------------------------------------------
-// TODO 1e: Define the DashboardMetrics interface.
-//
-// The metrics row shows 5 cards:
-//   - totalBatches, totalScholars, avgProgress (number)
-//   - earliestBillingDeadline (string), activeBatches (number)
-//
-// DESIGN RULE: metric values always render in IBM Plex Mono (t-metric-value class).
+// Dashboard metrics — the 5-card summary row.
 // ---------------------------------------------------------------------------
 export interface DashboardMetrics {
-  // TODO 1e: add fields here
+  totalBatches: number;
+  totalScholars: number;
+  avgProgress: number;
+  earliestBillingDeadline: string;
+  daysToEarliestBilling: number;
+  activeBatches: number;
+  docCompliancePct: number;
+  docMissing: number;
+  docPending: number;
 }
