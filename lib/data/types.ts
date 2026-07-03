@@ -175,6 +175,9 @@ export interface Batch {
   lifecycle: LifecycleStage[];
   documents: Record<string, DocRecord>;
 
+  /** ISO `updated_at` of the source row; drives dashboard data-freshness (TES-8 AC6, #65). */
+  updatedAt?: string;
+
   // Enrichment-derived (optional at the source, always present after load)
   entreStart?: string;
   entreEnd?: string;

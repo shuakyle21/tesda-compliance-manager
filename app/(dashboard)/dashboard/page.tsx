@@ -24,6 +24,7 @@ import {
   getMockMetrics,
   isBillingReady,
 } from '@/lib/data/mock-batches';
+import { getBatchesSnapshot } from '@/lib/data/batches';
 import { getCurrentUser } from '@/lib/auth';
 import type { UserRole } from '@/lib/data/types';
 
@@ -66,8 +67,27 @@ const SUMMARY_CARDS: { title: string; icon: IconName; meta?: string }[] = [
   { title: 'Lifecycle', icon: 'timeline' },
 ];
 
-// Exact "data as of" stamp shown alongside relative labels (TES-8 stale-data AC).
-const DATA_AS_OF = 'Jun 19, 2026 · 14:02';
+// Data older than this is surfaced as "stale" (TES-8 AC6). The real timestamp
+// now comes from the freshest batch row's `updated_at`; this is only the policy
+// threshold, not the data itself.
+const DATA_STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24h
+
+// Shown when running on the cached/mock snapshot (no live `updated_at` to read),
+// e.g. in environments where Supabase isn't configured.
+const DATA_AS_OF_FALLBACK = 'cached snapshot';
+
+// "Jun 19, 2026 · 14:02"-style stamp from a real timestamp.
+function formatDataStamp(date: Date): string {
+  const d = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const t = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${d} · ${t}`;
+}
+
+// Wraps the `Date.now()` clock read so it stays out of the component body
+// (react-hooks/purity forbids impure calls during render).
+function isDataStale(asOf: Date | null): boolean {
+  return asOf ? Date.now() - asOf.getTime() > DATA_STALE_AFTER_MS : false;
+}
 
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
@@ -82,31 +102,48 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // than a write-enabled one. Use `?role=` to preview other variants.
   const dashboardRole = role ?? 'viewer';
   const roleCopy = ROLE_COPY[dashboardRole];
-  const batches = dashboardRole === 'viewer'
+
+  // ---- Live load (TES-8 AC6) ----
+  // Attempt the real Supabase fetch. `ok` → live rows (already RLS-scoped, so no
+  // manual tenant filter). `sync-failed`/`unconfigured` → fall back to the mock
+  // snapshot, applying the role filter the database would otherwise enforce.
+  const snapshot = await getBatchesSnapshot();
+  const mockScoped = dashboardRole === 'viewer'
     ? MOCK_BATCHES
     : MOCK_BATCHES.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
+  const batches = snapshot.status === 'ok' ? snapshot.batches : mockScoped;
   const metrics = getMockMetrics(batches);
   const criticalMissing = metrics.docMissing;
   const criticalPending = metrics.docPending;
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
-  // ---- Dashboard states (TES-8) ----
-  // `empty` derives from the batch set; `sync-failed` / `stale` / `denied` are
-  // demoable via ?state= until the live signals exist (sync & stale → TES-30
-  // data contracts, denied → TES-34 role resolver).
+  // ---- Dashboard states (TES-8 AC6) ----
+  // `?state=` remains a manual preview override for every state. Beyond that:
+  //   - sync-failed: real Supabase fetch failure (configured-but-errored).
+  //   - stale:       real data freshness from the freshest row's `updated_at`.
+  //   - denied:      still preview-only — derives from the tenant/role resolver,
+  //                  which does not exist yet (blocked by TES-34 / #32).
   const forcedState = firstParam(params.state);
-  const isDenied = forcedState === 'denied';
+
+  const dataAsOfDate = snapshot.status === 'ok' && snapshot.dataAsOf
+    ? new Date(snapshot.dataAsOf)
+    : null;
+  // A real stamp when we have live data; null on the cached/mock path so copy
+  // can fall back gracefully instead of printing a fake precise timestamp.
+  const dataAsOfLabel = dataAsOfDate ? formatDataStamp(dataAsOfDate) : null;
+
+  const isDenied = forcedState === 'denied'; // TODO(#32): wire to real role resolver
   const isEmpty = forcedState === 'empty' || batches.length === 0;
-  const syncFailed = forcedState === 'sync-failed';
-  const isStale = forcedState === 'stale';
+  const syncFailed = forcedState === 'sync-failed' || snapshot.status === 'sync-failed';
+  const isStale = forcedState === 'stale' || isDataStale(dataAsOfDate);
 
   const header = (
     <div className="page-head">
       <h1>Dashboard</h1>
       <span className="subline">
         {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {metrics.activeBatches === 1 ? 'batch' : 'batches'}
-        {' · '}Data as of {DATA_AS_OF}
+        {' · '}Data as of {dataAsOfLabel ?? DATA_AS_OF_FALLBACK}
         {isStale && (
           <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
             STALE
@@ -151,7 +188,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
 
       {syncFailed && (
         <InfoCallout variant="warning">
-          Sync with Supabase failed — showing the last cached snapshot from {DATA_AS_OF}.
+          Sync with Supabase failed — showing the last cached snapshot{dataAsOfLabel ? ` from ${dataAsOfLabel}` : ''}.
           <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
         </InfoCallout>
       )}

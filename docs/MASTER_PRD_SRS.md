@@ -29,7 +29,7 @@ Sources reviewed:
 | `specs/general/UI-IMPROVEMENTS.md` | Latest Figma audit: near handoff-ready structurally, not production sign-off ready. Flags layer debt, component binding, date semantics, contrast, responsive gaps, and document blocker visibility. |
 | `docs/UI_UX_MODAL_AUDIT.md` | Modal and drawer accessibility, state, and implementation requirements. |
 | `specs/general/TVI-CAMS-HANDOFF-READINESS.md` | Handoff readiness and component contract guidance. |
-| Current `app/`, `components/`, `lib/` code | Next.js shell, Clerk provider/proxy, route placeholders, auth helpers, and many TODO data/component stubs. No production API routes found. |
+| Current `app/`, `components/`, `lib/` code | Next.js shell, Clerk provider/proxy, route placeholders, auth helpers, and many TODO data/component stubs. A Supabase-backed batches data-access contract now exists (`lib/data/batches.ts`, TES-30), not yet wired into the dashboard. No production API **route handlers** (`app/api/*`) found. |
 
 Confirmed conflicts and resolutions:
 
@@ -148,7 +148,7 @@ Explicitly excluded from current MVP:
 
 | Constraint Type | Constraint |
 | --- | --- |
-| Technical | Current app has route and component placeholders; many TypeScript data contracts are TODO. |
+| Technical | Current app has route and component placeholders; many TypeScript data contracts are TODO. The batches data-access contract is now implemented (`lib/data/batches.ts`, TES-30) as the reference for the rest. |
 | Technical | No production API route handlers found in current Next.js app. |
 | Technical | Supabase migration exists, but live hosted Supabase connectivity was not validated in this pass. |
 | Technical | Figma screens contain generated/imported layer debt and are not final production sign-off ready. |
@@ -1200,9 +1200,10 @@ Frontend must receive user-friendly DTOs, not raw database payloads. API example
 - Dashboard shell layout exists but renders placeholders instead of imported shell components.
 - `/` redirects to `/dashboard`, but `/dashboard` page is missing.
 - Batch Cards, Table View, Documents, Analytics, Activity Log, Trainer routes exist as placeholders/TODOs.
-- `lib/data/types.ts` and `lib/data/mock-batches.ts` contain TODOs and will not support real rendering until completed.
+- `lib/data/batches.ts` now provides a real Supabase-backed data-access contract (TES-30: `getBatches`/`getBatchesSnapshot`/`mapBatchRow`, fetch→map→derive) — the reference pattern for other entities. It is **not yet wired into the dashboard** (still `MOCK_BATCHES`) and carries `TODO(contract)`/`TODO(join)` gaps (billing-deadline field, documents join).
+- `lib/data/types.ts` and the remaining mock data still contain TODOs and will not support full real rendering until completed.
 - Several components are partial placeholders, including `Icon`, `StatusBadge`, `MetricsRow`, `Topbar`.
-- No production API client/data fetching layer exists.
+- A batches data-fetching layer now exists (`lib/data/batches.ts`); no production API **route handlers** (`app/api/*`) exist yet — fetching is via Server Components calling the `lib/data/*` contract.
 
 ### State Management Approach
 
@@ -1611,7 +1612,7 @@ Security:
 | Risk | Severity | Description | Recommendation |
 | --- | --- | --- | --- |
 | Missing `/dashboard` route | High | Root redirects to `/dashboard`, but implementation file is absent. | Add role-aware dashboard route or change redirect to implemented default. |
-| Placeholder implementation | High | Many pages/components/data files are TODO placeholders. | Complete data contracts, shell components, and core screens before claiming MVP. |
+| Placeholder implementation | High | Many pages/components/data files are TODO placeholders. Batches now has a real data-access contract (`lib/data/batches.ts`, TES-30); other entities still stubbed. | Extend the batches fetch→map→derive pattern to remaining entities, complete shell components and core screens, and wire the dashboard off mocks before claiming MVP. |
 | Conflicting backend direction | High | Supabase-only MVP and Laravel future API are mixed in docs. | Keep MVP Supabase-based; document Laravel as future only until implemented. |
 | Incomplete API layer | High | No production API routes found. | Implement stable API/DTO boundary via Next route handlers or Laravel. |
 | Schema gaps for trainer attendance | High | Trainer attendance/progress required but no dedicated table exists. | Add attendance/trainer update tables or explicitly model in documents/LAMR with tradeoffs. |
@@ -1626,7 +1627,7 @@ Security:
 ### Actionable Recommendations
 
 1. Fix the route baseline: add `/dashboard` or change root redirect; then implement role-aware shell navigation.
-2. Complete `lib/data/types.ts` and `lib/data/mock-batches.ts`, or replace them with API-backed data functions.
+2. `lib/data/batches.ts` is now the reference Supabase-backed data function (TES-30). Extend the same fetch→map→derive pattern to the other entities, close its `TODO(contract)`/`TODO(join)` gaps, and wire the dashboard off `MOCK_BATCHES`.
 3. Implement core DTO/API layer before building more UI states.
 4. Add attendance/progress schema and tests, or explicitly scope Trainer MVP to document/LAMR evidence only.
 5. Decide whether Reports and RQM are MVP requirements; update route map/schema accordingly.

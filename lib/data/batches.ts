@@ -16,7 +16,7 @@
  * TES-63 (wire live signals). See gaps marked `TODO(contract)` / `TODO(join)`.
  */
 
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import type {
   Database,
   LifecycleStage as DbLifecycleStage,
@@ -42,13 +42,19 @@ type BatchRowWithProgram = BatchRow & {
 // UI:  aou ntp tip train    entre      assess  bill
 // 'entre' is UI-only (no contract column); it is omitted from derived pipelines.
 // ---------------------------------------------------------------------------
-const DB_TO_UI_STAGE: Partial<Record<DbLifecycleStage, LifecycleStageKey>> = {
+// Total (non-Partial) map: every DbLifecycleStage MUST appear, so adding a new
+// DB enum variant becomes a compile error here until its UI treatment is chosen
+// (review SUGGESTION). `null` = no direct UI pipeline stage; deriveLifecycle
+// gives those their own treatment (completed → all done, blocked → none active).
+const DB_TO_UI_STAGE: Record<DbLifecycleStage, LifecycleStageKey | null> = {
   aou: 'aou',
   ntp: 'ntp',
   tip: 'tip',
   training: 'train',
   assessment: 'assess',
   billing: 'bill',
+  completed: null,
+  blocked: null,
 };
 
 /** Canonical UI pipeline order used to derive a lifecycle array from one stage. */
@@ -80,7 +86,7 @@ function deriveLifecycle(currentStage: DbLifecycleStage): LifecycleStage[] {
     ? UI_PIPELINE.findIndex((s) => s.key === uiCurrent)
     : currentStage === 'completed'
       ? UI_PIPELINE.length // everything done
-      : -1; // 'blocked' or unmapped → nothing marked active
+      : -1; // 'blocked' → nothing marked active
 
   return UI_PIPELINE.map((stage, i) => {
     let status: LifecycleStatus = 'pending';
@@ -92,11 +98,18 @@ function deriveLifecycle(currentStage: DbLifecycleStage): LifecycleStage[] {
   });
 }
 
-/** Days from today to the batch end_date (placeholder for a real billing deadline). */
+/**
+ * Whole days from today to `dateIso` (placeholder for a real billing deadline).
+ * A missing date returns Infinity — the established "no known deadline" sentinel
+ * that sorts last and never triggers urgency tiers. An *unparseable* date is
+ * treated the same way: without the guard, `new Date('garbage').getTime()` is
+ * NaN, and a NaN `daysToBilling` silently corrupts sorting and urgency math
+ * downstream (review CRITICAL).
+ */
 function daysUntil(dateIso: string | null): number {
   if (!dateIso) return Number.POSITIVE_INFINITY;
   const ms = new Date(dateIso).getTime() - Date.now();
-  return Math.ceil(ms / 86_400_000);
+  return Number.isFinite(ms) ? Math.ceil(ms / 86_400_000) : Number.POSITIVE_INFINITY;
 }
 
 // ---------------------------------------------------------------------------
@@ -113,12 +126,17 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     ncLevel: row.nc_level ?? '',
     trainer: row.trainer_name ?? '',
     trainerId: row.trainer_profile_id ?? '',
-    scholars: row.learner_count,
-    progressPct: row.progress_percent,
+    // `?? 0`: these are typed non-null by the contract, but a null slipping
+    // through at runtime would feed NaN into roster totals and progress bars.
+    scholars: row.learner_count ?? 0,
+    progressPct: row.progress_percent ?? 0,
     trainingStart: row.start_date ?? '',
     trainingEnd: row.end_date ?? '',
     status: normalizeStatus(row.status),
     bsrs: row.billing_report_status === 'verified',
+
+    // Source-row freshness — drives the dashboard stale-data signal (TES-8 AC6, #65).
+    updatedAt: row.updated_at,
 
     // Derived from current_stage:
     lifecycle: deriveLifecycle(row.current_stage),
@@ -150,19 +168,57 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
 // Fetch — server-only. RLS (Clerk JWT) scopes rows to the caller's tenant, so
 // "assigned batches" filtering happens in the database, not here.
 // ---------------------------------------------------------------------------
-export async function getBatches(): Promise<Batch[]> {
-  const supabase = await createSupabaseServerClient();
 
-  const { data, error } = await supabase
-    .from('batches')
-    .select('*, scholarship_programs(code)')
-    .order('end_date', { ascending: true });
+/**
+ * Outcome of a dashboard batch load. The data layer owns error *shaping* so the
+ * dashboard server component can map each state straight to UI (TES-8 AC6, #65):
+ *   - `ok`           — live rows; `dataAsOf` is the freshest row's `updated_at`.
+ *   - `sync-failed`  — Supabase is configured but the query failed → real
+ *                      sync-failed callout.
+ *   - `unconfigured` — no Supabase env in this environment → caller falls back
+ *                      to the cached/mock snapshot *silently* (no false alarm).
+ */
+export type BatchesSnapshot =
+  | { status: 'ok'; batches: Batch[]; dataAsOf: string | null }
+  | { status: 'sync-failed'; error: string }
+  | { status: 'unconfigured' };
 
-  if (error) {
-    // Surface to the caller so the dashboard can show its sync-failed state
-    // (TES-63) instead of silently rendering empty.
-    throw new Error(`getBatches failed: ${error.message}`);
+/** Freshest `updated_at` across the loaded rows, or null when there are none. */
+function latestUpdatedAt(batches: Batch[]): string | null {
+  return batches.reduce<string | null>(
+    (max, b) => (b.updatedAt && (!max || b.updatedAt > max) ? b.updatedAt : max),
+    null,
+  );
+}
+
+export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
+  if (!isSupabaseConfigured()) return { status: 'unconfigured' };
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from('batches')
+      .select('*, scholarship_programs(code)')
+      .order('end_date', { ascending: true });
+
+    if (error) return { status: 'sync-failed', error: error.message };
+
+    const batches = (data ?? []).map((row) => mapBatchRow(row as BatchRowWithProgram));
+    return { status: 'ok', batches, dataAsOf: latestUpdatedAt(batches) };
+  } catch (err) {
+    // Network / client-construction failures land here, not in `error` above.
+    return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
   }
+}
 
-  return (data ?? []).map((row) => mapBatchRow(row as BatchRowWithProgram));
+/**
+ * Throwing convenience wrapper over {@link getBatchesSnapshot} for callers that
+ * just want the rows (the original foundational contract). The dashboard uses
+ * the snapshot directly so it can distinguish unconfigured from failed.
+ */
+export async function getBatches(): Promise<Batch[]> {
+  const snap = await getBatchesSnapshot();
+  if (snap.status === 'ok') return snap.batches;
+  if (snap.status === 'unconfigured') throw new Error('getBatches failed: Supabase is not configured');
+  throw new Error(`getBatches failed: ${snap.error}`);
 }
