@@ -19,7 +19,7 @@ This document consolidates the provided PDF, repository documentation, live Figm
 Sources reviewed:
 
 | Source | Current finding |
-| --- | --- |
+| - | - |
 | Live Figma file `vZKyWXSipBHmiQFuHl5e1O` | Accessible. Pages include Cover, Foundations, Components, Overlays, States, Responsive, Screens, Production Readiness, Handoff Notes, and Archive. Screens include Coordinator, Admin, Viewer, and Trainer variants. |
 | `/Users/gabz_1/Downloads/training_compliance_system_requirements_3.pdf` | Legacy portfolio-style requirements v2.0 for Training Program Compliance System. Includes Level 0-3 roadmap: batch display, progress, deadlines, NTP lag, documents, analytics, Supabase, Clerk, email alerts, Upstash, PWA. |
 | `README.md` | Current MVP scope and official systems boundary. Explicitly states Supabase-only operational data, no official TESDA replacement, and no Laravel assumptions. |
@@ -40,7 +40,8 @@ Confirmed conflicts and resolutions:
 | Route map lists `/dashboard` as implemented, but current `app/` tree has no `app/(dashboard)/dashboard/page.tsx`. | `/dashboard` is required by Figma and root redirect, but implementation is missing. This is a P0 implementation gap. |
 | Figma has role-specific Admin, Coordinator, Viewer, Trainer screens plus Report and updated T2MIS/BSRS import overlay; route map covers fewer surfaces. | Screen inventory includes all live Figma surfaces and flags missing routes. |
 | Database migration includes `profile_tenant_memberships`; earlier docs describe `tenant_ids` arrays in `profiles`. | Implemented membership table is canonical for the database. UI and API should expose this as "assigned schools", not arrays or table names. |
-| API diagram mentions `PROGRAM_RQM`, `ATTENDANCE_RECORDS`, and `TRAINER_UPDATES`, but migration does not create them. | These are gaps or future schema additions. MVP must either add tables or map them to existing documents/LAMR/activity records with explicit acceptance criteria. |
+| API diagram mentions `PROGRAM_RQM`, `ATTENDANCE_RECORDS`, and `TRAINER_UPDATES`, but migration does not create them. | **Resolved by ADR-001:** `attendance_records` is required (per-learner, time in/out); RQM is an NTP authorization on the batch (one RQM = one batch), not a `program_rqm` table; `trainer_updates` folded into `attendance_records` + `activity_log`. |
+| Billing scoped as a passive "preparation signal" (FR-09) vs. school practice of generating official TESDA billing documents. | **Resolved by ADR-001 (2026-06-30):** billing is a document-generating engine (TSF/Allowance, Training Cost, Entrepreneurship) driven by TESDA Circular 015 s.2026 + rules 5.1.x/7.2.x. **ADR-001 takes precedence over any "signal-only" wording in this document and `docs/MVP_PRD.md`.** Assessment billing stays out of scope; no submission workflow. |
 
 ## 1. Executive Summary
 
@@ -547,44 +548,75 @@ Dependencies: `lamr_reports`, `lamr_outcomes`, `lamr_activities`, `lamr_entries`
 
 Priority: Must Have.
 
-### FR-09 Internal Billing Preparation Signal
+### FR-09 Billing Engine & Readiness (revised by ADR-001)
 
-Purpose: Notify Admin/Coordinator when a batch is internally ready for billing preparation.
+> **Superseded scope:** ADR-001 (`docs/adr/ADR-001-billing-and-domain-model.md`,
+> 2026-06-30) promotes billing from a passive "preparation signal" to a
+> **document-generating engine**. The readiness signal below is retained as the
+> *trigger*; the generation behavior is the new core. Where this section and
+> ADR-001 conflict, **ADR-001 wins** (see Source Register precedence note).
+
+Purpose: Surface billing readiness to Admin/Coordinator and **generate the
+official TVI-billed TESDA billing documents** (TSF/Allowance, Training Cost,
+Entrepreneurship) from attendance-derived eligibility.
 
 Business rules:
 
-- Default threshold is 80% progress and is configurable per program.
-- Wording must be "Billing Preparation" and must not imply official TESDA approval.
-- Signal is visible only to Admin and Coordinator.
-- Signal clears when the billing report status becomes Submitted or Verified.
+- **Readiness (trigger):** computed per billing type at TESDA thresholds —
+  TSF 20/50/80% (rules 7.2.2/7.2.3), Training Cost 50%/end (rules 5.1.x, 60-
+  *training*-day boundary); partial-billing toggle + thresholds configurable
+  (tenant override → program default). Readiness fires only when the threshold is
+  reached **and** the tranche's supporting documents are verified.
+- **Eligibility:** a scholar with **≥ 5 absences** is excluded from TSF billing.
+- **Generation (V2):** populate the school's `.docx` template (per-school header,
+  tenant signatories, addressee); scholar rows alphabetized + numbered; total in
+  words. Assessment Fee is **out of scope** (billed by the Assessment Center).
+- **Amounts** derive from the **batch's snapshotted cost row** (Schedule of Cost,
+  Circular 015 s.2026): TSF = `days × ₱160` (entrepreneurship-done −₱480), New
+  Normal ₱1,000, etc. The final TSF tranche nets `absences × ₱160` (both
+  schedules).
+- Visible only to Admin/Coordinator; **entirely hidden from Trainers**.
+- Each generation appends a versioned `billing_records` snapshot; no envelope
+  ledger (the TESDA PO reconciles).
 
 User stories:
 
-- As a Coordinator, I want a billing preparation badge so that I know when to assemble internal documents.
+- As a Coordinator, I want the app to generate a regulation-correct billing
+  document for eligible scholars so that I submit accurate billings without manual
+  computation.
 - As a Trainer, I do not want billing details so that my view remains focused.
 
 Acceptance criteria:
 
-- Given a batch reaches 80% progress, when an Admin/Coordinator views it, then Billing Preparation appears.
-- Given the same batch is viewed by a Trainer, when trainer screens load, then no billing preparation signal is shown.
-- Given billing report status is Submitted or Verified, when the batch renders, then the preparation signal is cleared or marked complete.
+- Given a batch reaches a billing threshold **and** its tranche docs are verified,
+  when an Admin/Coordinator views it, then the billing-ready alert appears and the
+  document can be generated.
+- Given an eligible cohort, when a billing document is generated, then amounts
+  match the TESDA rules (worked CFSP example = ₱137,000) and the school template
+  format.
+- Given the same batch viewed by a Trainer, then no billing data or alert is shown.
+- Given attendance is corrected after generation, when re-generated, then a new
+  `billing_records` version is appended (prior retained).
 
-Inputs: Program billing rule, batch progress, billing report status, role.
+Inputs: Snapshotted cost row, attendance/eligibility, RQM `approved_slots`,
+per-program thresholds, tenant settings, role.
 
-Outputs: Badge/banner, blocker summary, activity log if status changes.
+Outputs: Generated `.docx` billing document, billing-ready alert, blocker summary,
+`billing_records` snapshot, activity log.
 
 Validation rules:
 
-- Threshold must be 0-100.
-- Status must be Missing, Pending, Submitted, or Verified.
+- Threshold must be 0-100; billed pax ≤ `approved_slots`.
+- Supporting-document status must be Verified before generation.
 
-Error states: Missing rule, invalid threshold, permission denied.
+Error states: Missing cost-schedule match, missing tenant signatories, unverified
+tranche docs, permission denied.
 
-Edge cases: Progress manually corrected below threshold, program-specific thresholds, verified billing document but incomplete assessment.
+Dependencies: `scholarship_cost_schedule`, `attendance_records`,
+`program_billing_rules` (+ tenant overrides), `billing_records`, `tenant_settings`,
+batch RQM fields, documents.
 
-Dependencies: `program_billing_rules`, `batches.billing_report_status`, documents.
-
-Priority: Should Have.
+Priority: Must Have.
 
 ### FR-10 CSV Import and Export
 

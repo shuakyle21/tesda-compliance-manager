@@ -35,14 +35,14 @@ export function DocumentStatusDonut({ batches }: { batches: Batch[] }) {
   // Figma centre value (e.g. 8/12 = 67%).
   const compliancePct = Math.round(((counts.verified + counts.submitted) / total) * 100);
 
-  // Pre-compute donut arcs as percentages with cumulative offsets.
-  let cumulative = 0;
-  const arcs = SEGMENTS.map((seg) => {
-    const pct = (counts[seg.key] / total) * 100;
-    const arc = { color: seg.color, pct, offset: 100 - cumulative };
-    cumulative += pct;
-    return arc;
-  });
+  // Pre-compute donut arcs as percentages; each offset is 100 minus the sum
+  // of the preceding segments' percentages (prefix sum, no mutation).
+  const pcts = SEGMENTS.map((seg) => (counts[seg.key] / total) * 100);
+  const arcs = SEGMENTS.map((seg, i) => ({
+    color: seg.color,
+    pct: pcts[i],
+    offset: 100 - pcts.slice(0, i).reduce((sum, p) => sum + p, 0),
+  }));
 
   return (
     <section className="dash-panel" aria-labelledby="docdist-heading">

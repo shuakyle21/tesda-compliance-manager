@@ -26,19 +26,38 @@ The MVP must reduce manual tracking friction without overbuilding automation, an
 - Let Trainers update only assigned batch attendance, progress, and training evidence.
 - Track required document status and exact missing document names.
 - Represent LAMR as structured evidence for blended/asynchronous learning, not just a file upload.
-- Provide an internal billing preparation signal at the configured progress threshold.
+- Generate the official TVI-billed TESDA billing documents (TSF/Allowance, Training Cost, Entrepreneurship) from attendance-derived eligibility, triggered at the configured progress thresholds (see §7.7 / ADR-001).
 - Support basic CSV import/export for operational handoff.
 - Preserve strict role and tenant boundaries.
 
 ## 4. Non-Goals For First Ship
 
 - No direct integration with SIS, T2MIS, or BSRS.
-- No official TESDA submission or approval workflow.
+- No official TESDA submission or approval workflow (the app **generates** billing
+  documents but does not transmit them to TESDA — see §7.7 / ADR-001 V2).
 - No email automation, scheduled jobs, weekly digests, or Resend integration.
+  In-app alerts are **computed on read**, not pushed (ADR-001 JJ1).
 - No advanced analytics charts.
-- No MongoDB, OCR, AI document review, or document intelligence layer.
+- No MongoDB, AI document review, or document intelligence layer.
 - No PWA/offline mode.
-- No advanced TESDA-format report generation beyond basic CSV exports.
+
+### 4.1 Revised non-goals (per ADR-001, 2026-06-30)
+
+A domain-modeling interview revised three earlier non-goals. See
+`docs/adr/ADR-001-billing-and-domain-model.md` §12 for the full record.
+
+- **Billing document generation is now IN scope.** The app generates the
+  official TVI-billed TESDA billing documents (TSF/Allowance, Training Cost,
+  Entrepreneurship) by populating school-provided `.docx` templates. It does
+  **not** generate Assessment billing (the Assessment Center bills that) and does
+  **not** submit to TESDA. *(Supersedes "no advanced TESDA-format report
+  generation".)*
+- **OCR is deferred, not excluded.** Trainers enter attendance manually for MVP;
+  the paper attendance sheet is uploaded as evidence. The `attendance_records`
+  schema is designed so an OCR pipeline can later populate the same rows.
+- **Cross-school ULI identity is a future seam.** ULI is the permanent learner
+  key, but cross-TVET lifetime tracking remains with TESDA's systems; no
+  cross-school double-enrollment detection in MVP.
 
 ## 5. Users And Permissions
 
@@ -62,7 +81,7 @@ Every tenant-owned record must include `tenant_id`. Supabase RLS must enforce th
 5. User tracks lifecycle: AOU, NTP, TIP, Training, Assessment, Billing.
 6. User reviews missing documents and compliance status.
 7. User monitors progress, urgency, and internal alerts.
-8. If configured threshold is reached, app shows internal billing preparation signal.
+8. When a billing threshold is reached and supporting documents are verified, the app surfaces a billing-ready alert and generates the official billing document (§7.7).
 9. User exports CSV/report for internal review or manual official-system update.
 
 ### 6.2 Trainer Daily Class Workflow
@@ -161,13 +180,64 @@ Required LAMR fields:
 
 LAMR must support blended and asynchronous learning evidence, including LMS progress, LAMR evidence, and BSRS attendance exemption evidence where applicable.
 
-### 7.7 Internal Billing Preparation Signal
+### 7.7 Billing Engine (TESDA-rule-driven)
 
-- Use configurable default threshold of 80% progress.
-- Label as “Billing Preparation”, not official billing approval.
-- Show banner/badge only to Admin and Coordinator.
-- Hide billing preparation signal from Trainer.
-- Signal clears when billing report status becomes `submitted` or `verified`.
+Replaces the earlier "preparation signal only" scope. Full rules and citations
+in `docs/adr/ADR-001-billing-and-domain-model.md`. Visible to Admin/Coordinator
+only; entirely hidden from Trainers.
+
+**7.7.1 Attendance & progress (basis for all billing).** Attendance is recorded
+per learner per session date (manual entry; paper sheet uploaded as evidence).
+Batch progress = `sessions_held ÷ total_sessions`, where `total_sessions` =
+program nominal hours ÷ 8, snapshotted on the batch at creation.
+
+**7.7.2 Eligibility.** A scholar with **5 or more absences is ineligible** for
+allowance (configurable cap). Eligibility gates inclusion in TSF billing.
+
+**7.7.3 Cost schedule.** A seeded reference table mirrors the TESDA Schedule of
+Cost (Circular 015 s.2026) keyed by program + qualification. The batch snapshots
+its cost row at creation (rates: training cost, assessment fee, TSF day-rate
+₱160, New Normal ₱1,000, Insurance ₱100.80, Entrepreneurship ₱800 — CFSP/TWSP).
+
+**7.7.4 Billing documents (TVI-billed only).** The app generates: ① TSF /
+Allowance, ② Training Cost, ③ Entrepreneurship — by populating the school's
+`.docx` template (per-school header, tenant signatories, addressee). Scholar rows
+alphabetized + numbered; total rendered in words. Assessment Fee is billed by the
+Assessment Center (out of app scope).
+
+**7.7.5 TSF release schedule** (per-scholar attendance %, rules 7.2.2–7.2.4):
+
+- **< 2 months:** 50% @ ≥20% · remaining 50% (less `absences × ₱160`) @ ≥80%.
+- **≥ 2 months:** 20% @ ≥20% · 40% @ ≥50% · 40% (less `absences × ₱160`) @ ≥80%.
+
+**7.7.6 Training Cost release** (rules 5.1.1–5.1.2, boundary = 60 *training* days):
+
+- **< 60 days:** full payment at completion.
+- **> 60 days:** 50% @ ≥50% duration · 50% at end.
+
+**7.7.7 Entrepreneurship.** ₱800 × scholars *without* the
+`entrepreneurship_completed` flag (the flag is a dual-training guard, set after
+T2MIS/BSRS verification; it also reduces TSF by ₱480 and training duration by 3
+days).
+
+**7.7.8 Billing readiness & supporting documents.** Each tranche requires
+verified supporting documents (Billing Statement [app-generated], MIS-0302 /
+Terminal Report, Annex K, Daily Attendance Sheet) tracked at tranche level. A
+billing-ready alert fires only when the threshold is reached **and** the tranche's
+supporting documents are verified.
+
+**7.7.9 No envelope ledger.** The app records each generation in a versioned
+`billing_records` log but does not reconcile totals against the RQM envelope —
+the TESDA Provincial Office reconciles. Attendance stays editable post-billing;
+re-generation appends a new snapshot (audit-logged).
+
+### 7.9 RQM / NTP Authorization
+
+Each batch is authorized by exactly **one RQM allocation** (one RQM code = one
+batch), sourced from the Notice to Proceed. Stored on the batch: `rqm_code`,
+`ntp_number`, `approved_slots` (billable-pax cap), `total_amount` (funding
+envelope), and NTP dates. The NTP "act within N days" clause drives the NTP-lag
+deadline (hidden from Trainers).
 
 ### 7.8 Basic Import/Export
 
@@ -196,9 +266,25 @@ Core tables:
 | `lamr_entries` | Learner activity completion and assessment results. |
 | `activity_log` | User and system events. |
 
+Tables added by ADR-001 (now required for first ship):
+
+| Table | Purpose |
+|---|---|
+| `attendance_records` | Per-learner per-date attendance (time in/out); basis for progress + billing eligibility. |
+| `program_modules` | Fixed module list per program/qualification; drives one-LAMR-per-module + missing-LAMR by name. |
+| `batch_trainer_assignments` | Many-to-many trainer↔batch (co-trainers, cross-school); RLS scope for trainers. |
+| `scholarship_cost_schedule` | Seeded TESDA Schedule-of-Cost rates by program + qualification. |
+| `billing_records` | Versioned generation log per billing document (type, amount, scholar snapshot, generated-by). |
+| `tenant_settings` | Per-school signatories, letterhead, TESDA PO addressee, billing-threshold overrides. |
+| `learner_identities` | Thin global ULI dimension — **future seam only**, not populated in MVP. |
+
+Batch gains: RQM/NTP fields, `schedule_pattern`, `total_sessions`, snapshotted
+cost components, `entrepreneurship_delivered`. Learner gains: `uli` (permanent
+key), `entrepreneurship_completed`. `lamr_reports` gains `module_id` FK.
+
 Later tables, not required for first ship:
 
-- `alerts_log`
+- `alerts_log` (alerts are computed on read for MVP — ADR-001 JJ1)
 - `batch_snapshots`
 - advanced audit/document intelligence collections
 
@@ -247,11 +333,15 @@ Later tables, not required for first ship:
 - LAMR can store metadata, learning outcomes, activity checks, learner results, signature fields, and source upload.
 - Blended/asynchronous batch can show LAMR/LMS evidence separately from attendance evidence.
 
-### Billing Preparation
+### Billing (engine — see §7.7 / ADR-001)
 
-- Internal billing preparation banner appears at configured threshold.
-- Banner is visible only to Admin/Coordinator.
-- Banner wording does not imply official TESDA approval.
+- Billing-ready alert appears when the configured threshold is reached AND the
+  tranche's supporting documents are verified.
+- Generated billing document amounts match the TESDA rules (worked CFSP example =
+  ₱137,000) and use the school's `.docx` template + tenant signatories.
+- Billing is visible only to Admin/Coordinator; entirely hidden from Trainers.
+- The app generates documents but does not submit them to TESDA; the TESDA PO
+  reconciles totals.
 
 ### Import/Export
 
@@ -273,4 +363,3 @@ Later tables, not required for first ship:
 - Initial tenants: AKB, J3ED, NEN.
 - MVP is internal-only for five users.
 - Email automation, analytics, MongoDB, OCR, and direct official-system integrations are not part of first ship.
-
