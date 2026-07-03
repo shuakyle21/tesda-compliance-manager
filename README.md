@@ -11,9 +11,6 @@ This tool is an internal operational database and workflow layer only. It does n
 
 Official TESDA records, approved qualification maps, schedules, ULI records, attendance submissions, billing documents, and required reports remain authoritative in the official TESDA systems. Supabase stores internal working copies, document evidence, status tracking, audit notes, and references to official system records.
 
-## MVP Scope
-
-The first ship is intentionally small. The goal is to give five internal users clear batch visibility, document readiness tracking, trainer-side updates, and audit-ready evidence without overbuilding automation or analytics.
 
 ### Core Features
 
