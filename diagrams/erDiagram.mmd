@@ -1,5 +1,6 @@
 erDiagram
-  TENANTS ||--o{ PROFILES : has_members
+  TENANTS ||--o{ PROFILE_TENANT_MEMBERSHIPS : has_members
+  PROFILES ||--o{ PROFILE_TENANT_MEMBERSHIPS : belongs_to
   TENANTS ||--o{ BATCHES : owns
   TENANTS ||--o{ ACTIVITY_LOG : records
 
@@ -29,15 +30,22 @@ erDiagram
     string code
     string name
     string region
-    string type
+    string school_type
+    boolean is_active
   }
 
   PROFILES {
     uuid id PK
     string clerk_user_id
     string role
-    uuid[] tenant_ids
-    uuid[] assigned_batch_ids
+    boolean is_active
+  }
+
+  PROFILE_TENANT_MEMBERSHIPS {
+    uuid id PK
+    uuid tenant_id FK
+    uuid profile_id FK
+    boolean is_default
   }
 
   SCHOLARSHIP_PROGRAMS {

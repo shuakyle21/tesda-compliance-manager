@@ -1,25 +1,44 @@
 flowchart TD
-  Request[API request] --> Verify[Verify Clerk user]
-  Verify --> Profile[Load profile]
-  Profile --> Role{Role}
+  Request[API request] --> ClerkCheck{Clerk session valid?}
+  ClerkCheck -->|No| SignIn[Redirect to /sign-in]
+  ClerkCheck -->|Yes| ProfileLookup[Load active profile]
+
+  ProfileLookup --> ProfileCheck{Active profile found?}
+  ProfileCheck -->|No| SetupError[Access-setup error state<br/>not a raw 500]
+  ProfileCheck -->|Yes| Memberships[Load profile_tenant_memberships<br/>resolve default tenant]
+
+  Memberships --> Resolved{Role + tenant resolved?<br/>TES-34 resolver}
+  Resolved -->|"Gap: not yet wired -<br/>falls back to '?role=' preview"| LeastPriv[Least-privilege fallback<br/>render as Viewer]
+  Resolved -->|Yes, once TES-34 ships| Role{Role}
 
   Role --> Admin[Admin]
   Role --> Coordinator[Coordinator]
   Role --> Trainer[Trainer]
   Role --> Viewer[Viewer]
+  Role -.->|absent from profile_role enum| SuperAdmin[["Super Admin<br/>future - not implemented"]]
 
-  Admin --> AdminScope[One-school tenant scope<br/>Full write inside tenant]
-  Coordinator --> CoordScope[Assigned multi-school scope<br/>Compliance workflow writes]
-  Trainer --> TrainerScope[Assigned batches only<br/>Training-side writes only]
+  Admin --> AdminScope[One assigned school<br/>Full write inside tenant]
+  Coordinator --> CoordScope[One or more assigned schools<br/>Switch tenant context<br/>Compliance workflow writes]
+  Trainer --> TrainerScope[Assigned batches/classes only<br/>Training-side writes only]
   Viewer --> ViewerScope[Assigned schools<br/>Read-only]
+  LeastPriv --> ViewerScope
 
-  AdminScope --> Query[Tenant-scoped query]
-  CoordScope --> Query
-  ViewerScope --> Query
+  AdminScope --> AdminCheck{Target tenant = assigned tenant?}
+  AdminCheck -->|Yes| Query[Tenant-scoped query]
+  AdminCheck -->|No| Deny[403 Forbidden]
 
-  TrainerScope --> HideTrainerFields[Remove billing deadline<br/>Remove BSRS<br/>Remove NTP lag<br/>Remove financial documents]
-  HideTrainerFields --> AssignedBatchCheck{Assigned batch?}
+  CoordScope --> CoordCheck{Target tenant in memberships?}
+  CoordCheck -->|Yes| Query
+  CoordCheck -->|No| Deny
+
+  TrainerScope --> HideTrainerFields[Omit billing deadline, billing prep,<br/>NTP lag, BSRS, financial documents<br/>server-side in DTO]
+  HideTrainerFields --> AssignedBatchCheck{Assigned to this batch?}
   AssignedBatchCheck -->|Yes| Query
-  AssignedBatchCheck -->|No| Deny[403 Forbidden]
+  AssignedBatchCheck -->|No| Deny
 
-  Query --> Response[Return allowed data]
+  ViewerScope --> WriteAttempt{Create/edit/delete/<br/>import/upload attempted?}
+  WriteAttempt -->|Yes| Deny
+  WriteAttempt -->|No, read only| Query
+
+  Query --> RLS[Supabase RLS<br/>final authority - denies any<br/>row the JWT may not see]
+  RLS --> Response[Return allowed data]

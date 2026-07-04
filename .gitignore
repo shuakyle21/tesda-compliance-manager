@@ -56,3 +56,6 @@ next-env.d.ts
 # IDE / local tooling (not shared with the team)
 .idea/
 .design-sync/
+
+# Obsidian vault workspace state (repo doubles as a vault)
+.obsidian/
