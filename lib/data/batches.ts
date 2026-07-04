@@ -112,6 +112,24 @@ function daysUntil(dateIso: string | null): number {
   return Number.isFinite(ms) ? Math.ceil(ms / 86_400_000) : Number.POSITIVE_INFINITY;
 }
 
+/**
+ * ISO date → the UI's display convention. `Batch` stores dates as pre-formatted
+ * display strings (see lib/data/seed.ts: "Jun 18, 2026"; training start drops
+ * the year: "Apr 21"). Passing raw ISO through would render "2026-06-18" in the
+ * cards and silently defeat getMockMetrics' `, YYYY`-trimming regex.
+ * Null/unparseable → '' (the UI's established empty convention).
+ */
+function toDisplayDate(dateIso: string | null, withYear = true): string {
+  if (!dateIso) return '';
+  const d = new Date(dateIso);
+  if (!Number.isFinite(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    ...(withYear ? { year: 'numeric' as const } : {}),
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Mapper — pure, no I/O. Unit-test this against a fixture row.
 // ---------------------------------------------------------------------------
@@ -130,8 +148,8 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     // through at runtime would feed NaN into roster totals and progress bars.
     scholars: row.learner_count ?? 0,
     progressPct: row.progress_percent ?? 0,
-    trainingStart: row.start_date ?? '',
-    trainingEnd: row.end_date ?? '',
+    trainingStart: toDisplayDate(row.start_date, false),
+    trainingEnd: toDisplayDate(row.end_date),
     status: normalizeStatus(row.status),
     bsrs: row.billing_report_status === 'verified',
 
@@ -143,7 +161,7 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
 
     // TODO(contract): no billing-deadline column exists yet — using end_date as a
     // stand-in. Add `billing_deadline` to the batches contract (TES-30).
-    billingDeadline: row.end_date ?? '',
+    billingDeadline: toDisplayDate(row.end_date),
     daysToBilling: daysUntil(row.end_date),
 
     // TODO(join): the documents map requires a join to the `documents` table.

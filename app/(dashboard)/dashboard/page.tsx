@@ -79,7 +79,9 @@ const DATA_AS_OF_FALLBACK = 'cached snapshot';
 // "Jun 19, 2026 · 14:02"-style stamp from a real timestamp.
 function formatDataStamp(date: Date): string {
   const d = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  const t = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  // hourCycle 'h23' (not hour12: false, which implies 'h24') so midnight is
+  // "00:02", never "24:02".
+  const t = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
   return `${d} · ${t}`;
 }
 
@@ -115,6 +117,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const metrics = getMockMetrics(batches);
   const criticalMissing = metrics.docMissing;
   const criticalPending = metrics.docPending;
+  // Live rows carry no document records until the documents join lands
+  // (TODO(join) in lib/data/batches.ts), and getMockMetrics counts absent
+  // records as verified — so an untracked set would read as 100% compliant.
+  // Distinguish "no document data yet" from "all docs verified".
+  const docsTracked = batches.some((b) => Object.keys(b.documents).length > 0);
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
@@ -225,15 +232,23 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         <MetricCard label="Avg Progress" value={`${metrics.avgProgress}%`} sub="training completion" iconName="chart-dots" />
         <MetricCard
           label="Doc Compliance"
-          value={`${metrics.docCompliancePct}%`}
-          sub={criticalMissing ? `${criticalMissing} critical missing` : 'All critical docs verified'}
+          value={docsTracked ? `${metrics.docCompliancePct}%` : '—'}
+          sub={!docsTracked
+            ? 'document sync pending'
+            : criticalMissing ? `${criticalMissing} critical missing` : 'All critical docs verified'}
           iconName="file-check"
           variant={criticalMissing ? 'critical' : criticalPending ? 'warning' : 'neutral'}
         />
         <MetricCard
           label="Earliest Billing"
-          value={metrics.earliestBillingDeadline}
-          sub={earliestBatch ? `${earliestBatch.id} · ${metrics.daysToEarliestBilling} days left` : 'No batches'}
+          value={metrics.earliestBillingDeadline || '—'}
+          sub={!earliestBatch
+            ? 'No batches'
+            // Infinity is the "no known deadline" sentinel from daysUntil();
+            // sound for sorting/urgency, but never printable copy.
+            : Number.isFinite(metrics.daysToEarliestBilling)
+              ? `${earliestBatch.id} · ${metrics.daysToEarliestBilling} days left`
+              : `${earliestBatch.id} · no deadline set`}
           iconName="receipt"
           variant={metrics.daysToEarliestBilling <= 6 ? 'critical' : metrics.daysToEarliestBilling <= 21 ? 'warning' : 'neutral'}
         />
