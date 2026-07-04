@@ -363,3 +363,9 @@ Later tables, not required for first ship:
 - Initial tenants: AKB, J3ED, NEN.
 - MVP is internal-only for five users.
 - Email automation, analytics, MongoDB, OCR, and direct official-system integrations are not part of first ship.
+
+## Related
+
+- [[MASTER_PRD_SRS]] — consolidated source of truth
+- [[ADR-001-billing-and-domain-model]] — billing engine + revised non-goals
+- [[TVI-CAMS Knowledge Base]]

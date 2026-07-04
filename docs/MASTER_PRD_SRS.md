@@ -1645,3 +1645,11 @@ Security:
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-06-12 | Codex | Initial consolidated Master PRD/SRS from PDF, repo docs, live Figma inventory, schema migration, and current implementation. |
 
+
+## Related
+
+- [[ADR-001-billing-and-domain-model]] — supersedes billing-signal wording (FR-09)
+- [[TRD]] — engineering companion
+- [[MVP_PRD]] — MVP-scoped PRD
+- [[IMPLEMENTATION_PLAN]] — phased build plan
+- [[TVI-CAMS Knowledge Base]]

@@ -636,3 +636,11 @@ segment. One context = one tenant (no cross-school aggregate view).
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-06-30 | System Architecture | Initial TRD grounded in MASTER_PRD_SRS, migration, route map, and verified current code. |
 | 1.1.0 | 2026-06-30 | Product + Architecture | Added §4.3a (ADR-001 tables) and §16 (billing engine, tenancy path routing); reconciled RQM as batch authorization. |
+
+## Related
+
+- [[MASTER_PRD_SRS]] — product source of truth this TRD implements
+- [[ADR-001-billing-and-domain-model]] — supersedes conflicting billing wording
+- [[IMPLEMENTATION_PLAN]] — phased execution of this TRD
+- [[SUPABASE_SCHEMA_GUIDE]] — canonical schema this document references
+- [[TVI-CAMS Knowledge Base]]

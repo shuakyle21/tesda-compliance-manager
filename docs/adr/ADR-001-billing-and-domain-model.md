@@ -224,3 +224,11 @@ CSV export format & scope; LAMR entry-workflow UI detail; MIS-0302 / Terminal
 Report handling (tracked as an external attachment); attendance edit windows
 beyond X2; ≥2-month Training Cost edge interactions. These are intentionally
 left for a follow-up pass against the updated docs.
+
+## Related
+
+- [[MASTER_PRD_SRS]] — FR-09 revised per this ADR
+- [[MVP_PRD]] — non-goals revised per §12
+- [[TRD]] — §4.3a / §16 implement these decisions
+- [[IMPLEMENTATION_PLAN]] — Phase 4B is this ADR's build plan
+- [[TVI-CAMS Knowledge Base]]

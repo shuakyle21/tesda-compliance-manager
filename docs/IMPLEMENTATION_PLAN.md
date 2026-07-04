@@ -555,3 +555,10 @@ runs continuously but gates release.
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-06-30 | System Architecture | Initial phased plan grounded in TRD, MASTER_PRD_SRS, route map, and verified current code (dashboard exists on mock data; Phase 0 unblocks real wiring). |
 | 1.1.0 | 2026-06-30 | Product + Architecture | Expanded 0.1 with ADR-001 schema; added Phase 4B (billing engine: domain logic, cost snapshot + RQM, .docx generation, readiness/alerts). |
+
+## Related
+
+- [[TRD]] — engineering decisions this plan executes
+- [[ADR-001-billing-and-domain-model]] — Phase 0.1 schema + Phase 4B billing engine source
+- [[MASTER_PRD_SRS]] — acceptance criteria and test matrix
+- [[TVI-CAMS Knowledge Base]]
