@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "c9ddbae707a15df9",
+        "id": "84a5ba43c6032971",
         "type": "tabs",
         "children": [
           {
-            "id": "87e733602607ba5f",
+            "id": "c18a5c6d87e75130",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -37,7 +37,7 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": true
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -90,6 +90,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "DESIGN.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +100,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for DESIGN"
             }
           },
           {
@@ -108,11 +109,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "DESIGN.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from DESIGN"
             }
           },
           {
@@ -150,12 +152,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "DESIGN.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of DESIGN"
             }
           }
         ],
@@ -177,8 +180,12 @@
       "bases:Create new base": false
     }
   },
-  "active": "87e733602607ba5f",
+  "active": "c18a5c6d87e75130",
   "lastOpenFiles": [
+    "uploads/Design system.pdf",
+    "DESIGN.md",
+    "ARCHITECTURE.md",
+    "uploads/training-compliance-design-system.md",
     "wiki/Wiki Home.md",
     "wiki/Product Overview.md",
     "wiki/Docs Precedence.md",
@@ -202,7 +209,6 @@
     "wiki/Billing Engine.md",
     "wiki/Attendance And Progress.md",
     "wiki/Batch Lifecycle.md",
-    "wiki/Roles And Permissions.md",
     "wiki"
   ]
 }
