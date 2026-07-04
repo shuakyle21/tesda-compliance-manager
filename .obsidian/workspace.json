@@ -4,31 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "c9ddbae707a15df9",
+        "id": "84a5ba43c6032971",
         "type": "tabs",
         "children": [
           {
-            "id": "87e733602607ba5f",
+            "id": "c18a5c6d87e75130",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "DESIGN.md",
-                "mode": "preview",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "DESIGN"
+              "title": "New tab"
             }
           }
         ]
@@ -63,7 +49,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "wiki",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -84,8 +70,7 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -195,11 +180,12 @@
       "bases:Create new base": false
     }
   },
-  "active": "695260e4a7dc0362",
+  "active": "c18a5c6d87e75130",
   "lastOpenFiles": [
+    "uploads/Design system.pdf",
+    "DESIGN.md",
     "ARCHITECTURE.md",
     "uploads/training-compliance-design-system.md",
-    "uploads/Design system.pdf",
     "wiki/Wiki Home.md",
     "wiki/Product Overview.md",
     "wiki/Docs Precedence.md",
@@ -223,7 +209,6 @@
     "wiki/Billing Engine.md",
     "wiki/Attendance And Progress.md",
     "wiki/Batch Lifecycle.md",
-    "wiki/Roles And Permissions.md",
     "wiki"
   ]
 }
