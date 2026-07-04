@@ -14,7 +14,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "TVI-CAMS Knowledge Base.md",
+                "file": "DESIGN.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -29,7 +29,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "TVI-CAMS Knowledge Base"
+              "title": "DESIGN"
             }
           },
           {
@@ -56,8 +56,7 @@
               "title": "ARCHITECTURE"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       },
       {
         "id": "566751fc7f400176",
@@ -70,7 +69,7 @@
             "state": {
               "type": "localgraph",
               "state": {
-                "file": "ARCHITECTURE.md",
+                "file": "DESIGN.md",
                 "options": {
                   "collapse-filter": true,
                   "search": "",
@@ -98,7 +97,7 @@
                 }
               },
               "icon": "lucide-git-fork",
-              "title": "Graph of ARCHITECTURE"
+              "title": "Graph of DESIGN"
             }
           }
         ]
@@ -264,10 +263,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "e2926c39e41bf335",
+  "active": "c18a5c6d87e75130",
   "lastOpenFiles": [
-    "README.md",
     "TVI-CAMS Knowledge Base.md",
+    "ARCHITECTURE.md",
+    "README.md",
     "docs/TVI_CAMS_REGENERATED_REQUIREMENTS_2026-06-19.md",
     "docs/MASTER_PRD_SRS.md",
     "wiki/Database Schema.md",
@@ -291,7 +291,6 @@
     "wiki/Auth And Tenancy.md",
     "wiki/Attendance And Progress.md",
     "wiki/Architecture Overview.md",
-    "wiki/Alerts.md",
     "wiki",
     "uploads/Design system.pdf",
     "Untitled.canvas"
