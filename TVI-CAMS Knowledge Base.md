@@ -2,6 +2,10 @@
 
 Map of content for every markdown document in this repo. The repo itself is the Obsidian vault — open the graph view to see how these connect. Follow a cluster top-to-bottom for a guided reading order.
 
+## Wiki (distilled topic notes)
+
+[[Wiki Home]] is the entry point to `wiki/` — ~20 short, interlinked topic notes distilled from `docs/` (one concept per note: [[Billing Engine]], [[Auth And Tenancy]], [[Batch Lifecycle]], [[Data Layer Pattern]], …). Read the wiki for orientation; follow its source links into the raw docs below for authority.
+
 ## Start Here
 
 - [[README]] — what the tool is, official-systems boundary, roles, initial tenants

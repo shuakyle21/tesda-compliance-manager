@@ -14,19 +14,19 @@ Official TESDA records, approved qualification maps, schedules, ULI records, att
 
 ### Core Features
 
-| Feature | MVP behavior |
-| --- | --- |
-| Authentication and tenant access | Clerk sign-in with role-based access for Admin, Coordinator, Trainer, and Viewer. |
-| Tenant isolation | Three initial schools: AKB, J3ED, and NEN. Supabase RLS enforces strict school-level scoping. |
-| Role dashboards | Admin and Coordinator see assigned school batches. Trainer sees only assigned classes. Viewer is read-only. |
-| Batch lifecycle tracking | Internal lifecycle stages: AOU, NTP, TIP, Training, Assessment, Billing. |
-| Document checklist | Required document tracking per program with missing, pending, submitted, and verified states. |
-| Evidence uploads | Supabase Storage stores uploaded or linked internal evidence files. |
-| Trainer class updates | Trainers can view rosters, mark daily attendance or progress, and upload training-side evidence. |
-| LAMR structured evidence | LAMR captures TVI name, program, batch, module, schedule, learner rows, learning outcomes, activity checks, assessment result, prepared by, approved by, and source file upload. |
-| Blended learning support | LAMR can be used as structured evidence for blended or asynchronous learning activities. |
-| Billing preparation signal | Configurable 80% progress threshold shows an internal billing preparation badge for Admin and Coordinator only. |
-| Basic import/export | CSV batch import and filtered CSV export, respecting tenant and role scope. |
+| Feature                          | MVP behavior                                                                                                                                                                     |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication and tenant access | Clerk sign-in with role-based access for Admin, Coordinator, Trainer, and Viewer.                                                                                                |
+| Tenant isolation                 | Three initial schools: AKB, J3ED, and NEN. Supabase RLS enforces strict school-level scoping.                                                                                    |
+| Role dashboards                  | Admin and Coordinator see assigned school batches. Trainer sees only assigned classes. Viewer is read-only.                                                                      |
+| Batch lifecycle tracking         | Internal lifecycle stages: AOU, NTP, TIP, Training, Assessment, Billing.                                                                                                         |
+| Document checklist               | Required document tracking per program with missing, pending, submitted, and verified states.                                                                                    |
+| Evidence uploads                 | Supabase Storage stores uploaded or linked internal evidence files.                                                                                                              |
+| Trainer class updates            | Trainers can view rosters, mark daily attendance or progress, and upload training-side evidence.                                                                                 |
+| LAMR structured evidence         | LAMR captures TVI name, program, batch, module, schedule, learner rows, learning outcomes, activity checks, assessment result, prepared by, approved by, and source file upload. |
+| Blended learning support         | LAMR can be used as structured evidence for blended or asynchronous learning activities.                                                                                         |
+| Billing preparation signal       | Configurable 80% progress threshold shows an internal billing preparation badge for Admin and Coordinator only.                                                                  |
+| Basic import/export              | CSV batch import and filtered CSV export, respecting tenant and role scope.                                                                                                      |
 
 ### Later Features
 
