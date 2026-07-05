@@ -9,8 +9,8 @@
  */
 
 import { useMemo, useState } from 'react';
-import { BatchCard } from '@/components/ui/BatchCard';
-import { BatchModal } from '@/components/ui/BatchModal';
+import { BatchCard } from '@/modules/batches/ui/BatchCard';
+import { BatchModal } from '@/modules/batches/ui/BatchModal';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';

@@ -13,7 +13,7 @@ import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
-import { BatchModal } from '@/components/ui/BatchModal';
+import { BatchModal } from '@/modules/batches/ui/BatchModal';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';

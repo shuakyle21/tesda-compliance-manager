@@ -4,7 +4,7 @@
  */
 
 import { MOCK_BATCHES } from '@/shared/mocks';
-import { DocumentsView } from '@/components/screens/DocumentsView';
+import { DocumentsView } from '@/modules/documents/ui/DocumentsView';
 
 export default function DocumentsPage() {
   return <DocumentsView batches={MOCK_BATCHES} />;

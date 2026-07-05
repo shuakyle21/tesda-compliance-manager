@@ -6,7 +6,7 @@
  */
 
 import { MOCK_BATCHES } from '@/shared/mocks';
-import { CardsView } from '@/components/screens/CardsView';
+import { CardsView } from '@/modules/batches/ui/CardsView';
 
 export default function BatchCardsPage() {
   return <CardsView batches={MOCK_BATCHES} />;

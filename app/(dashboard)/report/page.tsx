@@ -9,7 +9,7 @@
 
 import { MOCK_BATCHES } from '@/shared/mocks';
 import { TENANTS } from '@/shared/mocks/seed';
-import { ReportView } from '@/components/screens/ReportView';
+import { ReportView } from '@/modules/reports/ui/ReportView';
 
 export default function ReportPage() {
   return <ReportView batches={MOCK_BATCHES} tenants={TENANTS} />;
