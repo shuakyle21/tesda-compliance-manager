@@ -48,7 +48,7 @@ database via Row Level Security (RLS), keyed off the Clerk JWT.
         │  - Server Components (data fetch + role-scoped render)   │
         │  - Route Handlers / Server Actions (mutations)           │
         │  - Clerk middleware (route protection + proxy)           │
-        │  - lib/data/* contracts (fetch → map → derive)           │
+        │  - modules/*/data contracts (fetch → map → derive)           │
         └───────┬──────────────────────────────┬──────────────────┘
                 │ Clerk JWT (template: supabase)│ Clerk session
                 ▼                               ▼
@@ -77,7 +77,7 @@ The PRD conflict table is explicit: README says "no Laravel assumptions" while
 route/API docs propose a Laravel API. **Resolution: MVP is Next.js + Clerk +
 Supabase. Laravel is a future backend/API layer only.** This TRD honors that.
 The data-contract boundary (Section 5) is designed so that *if* Laravel is later
-introduced, it slots in behind the same `lib/data/*` DTO shapes without a UI
+introduced, it slots in behind the same `modules/*/data` DTO shapes without a UI
 rewrite (Strangler-Fig-friendly seam).
 
 ---
@@ -99,7 +99,7 @@ PRD's prose mentions "Next.js 16"; the lockfile is the source of truth below.
 | Icons | `@tabler/icons-react` | `^3.44.0` | Line icons (no emoji, per design rules) | Matches design-system iconography mandate. |
 | Lint | ESLint + `eslint-config-next` | `^9` / `16.2.6` | Code quality gate | Standard. |
 | Deploy (FE) | Vercel | n/a | Frontend hosting | Matches Next.js, zero-config. |
-| Charts | (none installed) | — | Analytics visualization | Recharts referenced in PRD/comments but **not** in `package.json`. Current charts are hand-built (`components/ui/Charts.tsx`, `components/dashboard/*`). Treat a chart lib as a deferred decision. |
+| Charts | (none installed) | — | Analytics visualization | Recharts referenced in PRD/comments but **not** in `package.json`. Current charts are hand-built (`shared/ui/Charts.tsx`, `modules/batches/ui/dashboard/*`). Treat a chart lib as a deferred decision. |
 
 **Not in the MVP stack** (explicitly, per PRD Out-of-Scope): Resend (email),
 Upstash Redis, MongoDB, OCR/AI, GitHub Actions cron, PWA, Laravel.
@@ -120,7 +120,7 @@ Two stores, one binding:
   legacy `tenant_ids` array described in older docs (per PRD conflict table).
 
 A Clerk user must map to an **active** `profiles` row before any scoped data is
-returned (PRD FR-01). The `lib/auth/profile.ts` types (`Profile`,
+returned (PRD FR-01). The `modules/tenancy/domain/profile.ts` types (`Profile`,
 `TenantMembership`, `ProfileRole`) model this binding on the application side.
 
 ### 3.2 Clerk → Supabase token bridge (implemented)
@@ -216,7 +216,7 @@ batch_code)`; `documents` FK to tenant/batch/requirement; LAMR entries unique
 
 **Enum-mismatch note (real, in code):** the UI lifecycle adds an `entre`
 (entrepreneurship) stage with no DB column, and the UI `batch.status` union has
-no `blocked` member. `lib/data/batches.ts` already documents the bridge:
+no `blocked` member. `modules/batches/data/batches.ts` already documents the bridge:
 `DB_TO_UI_STAGE` maps `training→train`, `assessment→assess`, `billing→bill`;
 `entre` is UI-only; DB `blocked` is surfaced as UI `pending`. Any new contract
 work must preserve this mapping in the mapper layer, not in components.
@@ -265,7 +265,7 @@ Secondary gaps (deferred, document only): `alerts_log` (notifications),
 `batch_snapshots` (historical timeline), report/EGACE employment entities, and a
 standardized soft-delete/retention policy. The UI already carries shapes for some
 of these (`Snapshot`, `EgaceCounts`, `EmploymentFollowUp`, `AlertEntry` in
-`lib/data/types.ts`) as forward-looking placeholders.
+`shared/types.ts`) as forward-looking placeholders.
 
 ### 4.4 Relationship to TypeScript types
 
@@ -273,12 +273,12 @@ Two type families exist and must stay deliberately separate:
 
 - **`lib/supabase/database.types.ts`** — generated from the live schema; the raw
   DB row shapes. Regenerate after every migration (Section 5.3).
-- **`lib/data/types.ts`** — the UI **domain** types (`Batch`, `LifecycleStage`,
+- **`shared/types.ts`** — the UI **domain** types (`Batch`, `LifecycleStage`,
   `DocRecord`, `DashboardMetrics`, etc.). These are the contract between
   components and data, intentionally richer/friendlier than DB rows.
 
-The mapper (`mapBatchRow` in `lib/data/batches.ts`) is the only place DB rows
-become domain objects. **Rule:** components import domain types; only `lib/data/*`
+The mapper (`mapBatchRow` in `modules/batches/data/batches.ts`) is the only place DB rows
+become domain objects. **Rule:** components import domain types; only `modules/*/data`
 imports `database.types`. This keeps DB churn out of the UI (frontend
 layered-architecture boundary).
 
@@ -289,8 +289,8 @@ layered-architecture boundary).
 ### 5.1 Current model: Server Components + typed Supabase queries
 
 There are **no production API route handlers** yet (PRD-confirmed). The MVP
-fetches data inside **Server Components** through the `lib/data/*` contract layer,
-which the codebase has already templated in `lib/data/batches.ts` as three
+fetches data inside **Server Components** through the `modules/*/data` contract layer,
+which the codebase has already templated in `modules/batches/data/batches.ts` as three
 intentionally separated layers:
 
 1. **fetch** — `getBatches()`: a typed `supabase.from('batches').select(...)`
@@ -318,8 +318,8 @@ After any schema migration:
 
 1. Apply the migration (Supabase).
 2. Regenerate `lib/supabase/database.types.ts` from the live schema.
-3. Update the affected mapper(s) in `lib/data/*` and any domain type in
-   `lib/data/types.ts`.
+3. Update the affected mapper(s) in `modules/*/data` and any domain type in
+   `shared/types.ts`.
 4. Run unit tests on mappers + integration tests against Supabase.
 
 ### 5.4 DTO contract rules (stable boundary)
@@ -334,7 +334,7 @@ After any schema migration:
 
 If Laravel is later introduced, it sits **above** Supabase/Postgres, enforces the
 same tenant/role rules, and returns the **same DTO shapes** defined in
-`lib/data/types.ts`. The `lib/data/*` functions become thin API clients instead
+`shared/types.ts`. The `modules/*/data` functions become thin API clients instead
 of direct Supabase queries — the UI does not change. This is the designed seam;
 it must not be implemented in the MVP.
 
@@ -359,7 +359,7 @@ Public routes are `/sign-in` and `/sign-up`.
 | `/sign-in` | `app/sign-in/[[...sign-in]]/page.tsx` | Public | — | Implemented. |
 | `/sign-up` | `app/sign-up/[[...sign-up]]/page.tsx` | Public | — | Implemented. |
 | `/dashboard` | `app/(dashboard)/dashboard/page.tsx` | Clerk | Admin, Coordinator, Viewer (Trainer redirected to `/trainer`) | **Built on mock data.** Role-aware variants + loading/empty/denied/sync-failed/stale states exist; **not** wired to Supabase; role resolver incomplete (TES-34/TES-63). |
-| `/batch-cards` | `app/(dashboard)/batch-cards/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`components/screens/CardsView`). |
+| `/batch-cards` | `app/(dashboard)/batch-cards/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`modules/batches/ui/CardsView`). |
 | `/table-view` | `app/(dashboard)/table-view/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`TableView`). |
 | `/documents` | `app/(dashboard)/documents/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`DocumentsView`). |
 | `/analytics` | `app/(dashboard)/analytics/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder. |
@@ -390,12 +390,17 @@ Phase 1 reflects this.
 ### 7.1 Layering
 
 ```text
-app/(dashboard)/<route>/page.tsx     ← Server Component: fetch (lib/data) + compose
-   └─ components/screens/*           ← screen-level views (CardsView, TableView, ...)
-        └─ components/ui/*           ← design-system primitives (Server-safe)
-        └─ components/dashboard/*    ← dashboard widgets (charts, panels)
-   └─ components/shell/*             ← AppShell: Sidebar, Topbar, MetricsRow, MobileHeader
+app/(dashboard)/<route>/page.tsx     ← Server Component: fetch (modules/*/data) + compose
+   └─ modules/<domain>/ui/*          ← domain screens/views (CardsView, TableView, DocumentsView, ...)
+        └─ shared/ui/*               ← design-system primitives (props-only, Server-safe)
+        └─ modules/batches/ui/dashboard/*    ← dashboard widgets (charts, panels)
+   └─ modules/shell/ui/*             ← AppShell: Sidebar, Topbar, MetricsRow, MobileHeader
 ```
+
+Import direction is ESLint-enforced (`import/no-restricted-paths` in
+`eslint.config.mjs`): `app → modules → shared → lib/supabase`; another
+module's `data/` folder is private (its public surface is `domain/` + `ui/`);
+no index barrels — deep imports are the convention.
 
 Existing primitives to reuse (do not re-create): `Icon`, `MetricCard`,
 `StatusBadge`, `UrgencyIndicator`, `ProgressBar`, `LifecyclePipeline`,
@@ -434,7 +439,7 @@ skeleton; `EmptyState` and `InfoCallout` are the shared primitives.
 
 | State kind | Mechanism | Examples |
 | --- | --- | --- |
-| Server state | RSC + `lib/data/*` (fetch at render) | Batches, documents, metrics, activity. No React Query in MVP; add only if client-side refetch/caching becomes necessary. |
+| Server state | RSC + `modules/*/data` (fetch at render) | Batches, documents, metrics, activity. No React Query in MVP; add only if client-side refetch/caching becomes necessary. |
 | URL state | Search params (shareable, SSR-readable) | Filters, search, sort, tenant selection, tab, `?batchId=`, dashboard `?role=`/`?state=` previews. |
 | Client state | Local component state (`useState`/context) | Modal/drawer open, upload progress, unsaved form rows, selected rows. `NavDrawerProvider` is the one shared client context. |
 
@@ -514,7 +519,7 @@ Engineering approach:
 
 | Level | Scope | Notes |
 | --- | --- | --- |
-| Unit | Pure mappers + derive helpers (`mapBatchRow`, lifecycle/days), date/progress/urgency engine, billing-threshold logic (`lib/domain/*`). | Use fixed `as-of` dates; no I/O. The mapper split exists specifically to make this trivial. |
+| Unit | Pure mappers + derive helpers (`mapBatchRow`, lifecycle/days), date/progress/urgency engine, billing-threshold logic (module `domain/` layers). | Use fixed `as-of` dates; no I/O. The mapper split exists specifically to make this trivial. |
 | Integration | Data contracts against **real Supabase** (no mocks) — RLS scoping, tenant isolation, trainer field omission, document/LAMR writes + activity logging. | PRD mandates real-Supabase integration tests. Use seeded tenants (AKB/J3ED/NEN) and per-role JWTs. |
 | E2E | Role journeys: unauthenticated redirect, Admin cross-tenant denial, Trainer unassigned-batch denial, Viewer write-blocked, upload → submitted, modal focus-trap. | Maps to PRD test matrix T-001..T-030. |
 
@@ -600,8 +605,8 @@ These mirror the PRD risk register, framed as engineering work:
 ## 16. Billing Engine Architecture (ADR-001)
 
 The billing engine is **pure domain logic over snapshotted data** — no external
-calls, deterministic, unit-testable. It lives in `lib/domain/billing/*`
-(eligibility, tranche schedules, amount math) and `lib/data/billing.ts`
+calls, deterministic, unit-testable. It lives in `modules/billing/domain/*`
+(eligibility, tranche schedules, amount math) and `modules/billing/data/billing.ts`
 (fetch/persist `billing_records`).
 
 - **Inputs are all snapshots:** `total_sessions`, cost components, and RQM

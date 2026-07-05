@@ -88,20 +88,20 @@ trustworthy until this is done.
   `Database['public']['Tables']`; `tsc` passes.
 - **Effort:** S
 
-### 0.3 Complete data-contract stubs in `lib/data/`
+### 0.3 Complete data-contract stubs in module `data/` layers
 
 - **Build:** Finish the fetch→map→derive contracts following the
-  `lib/data/batches.ts` reference. Close its marked gaps: `TODO(join)` documents
+  `modules/batches/data/batches.ts` reference. Close its marked gaps: `TODO(join)` documents
   map, `TODO(contract)` billing-deadline field, lifecycle history. Add sibling
   contracts: `documents.ts`, `learners.ts`, `lamr.ts`, `activity.ts`,
   `attendance.ts`, `metrics.ts` (real version of `getMockMetrics`).
-- **Files:** `lib/data/batches.ts` (complete), `lib/data/documents.ts`,
-  `lib/data/learners.ts`, `lib/data/lamr.ts`, `lib/data/activity.ts`,
-  `lib/data/attendance.ts`, `lib/data/metrics.ts`; keep `lib/data/types.ts` as the
+- **Files:** `modules/batches/data/batches.ts` (complete), `modules/documents/data/documents.ts`,
+  `modules/batches/data/learners.ts`, `modules/lamr/data/lamr.ts`, `modules/activity/data/activity.ts`,
+  `modules/attendance/data/attendance.ts`, `modules/batches/data/metrics.ts`; keep `shared/types.ts` as the
   domain contract.
 - **Depends on:** 0.2.
 - **Acceptance:**
-  - Each contract returns domain types from `lib/data/types.ts`, never raw rows.
+  - Each contract returns domain types from `shared/types.ts`, never raw rows.
   - Mappers are pure and unit-tested (0.4).
   - Trainer-facing contracts omit billing/financial/NTP-lag/BSRS fields.
   - DB `blocked`→UI `pending` and `entre` UI-only mapping preserved in mappers.
@@ -129,8 +129,8 @@ trustworthy until this is done.
   role → default/selected tenant) that the dashboard's `?role=` fallback
   currently stands in for (TES-34). Add a server-side Storage path builder
   (tenant-UUID prefixed) and signed-URL helper (TRD §9).
-- **Files:** `lib/auth/profile.ts` (extend; add a `getCurrentProfile()` /
-  `resolveActiveTenant()`), `lib/data/storage.ts` (new).
+- **Files:** `modules/tenancy/domain/profile.ts` (extend; add a `getCurrentProfile()` /
+  `resolveActiveTenant()`), `modules/documents/data/storage.ts` (new).
 - **Depends on:** 0.3.
 - **Acceptance:**
   - A signed-in user with a profile resolves role + tenant **without** a `?role=`
@@ -156,11 +156,11 @@ landing page across all four role variants.
 
 - **Build:** Replace `MOCK_BATCHES` / `getMockMetrics` / `MOCK_ACTIVITY` in the
   dashboard with `getBatches()` / `getMetrics()` / `getActivity()` from
-  `lib/data/*`. Drive the `sync-failed` state from a real caught error (not
+  `modules/*/data`. Drive the `sync-failed` state from a real caught error (not
   `?state=`), and `stale` from a real as-of signal.
 - **Files:** `app/(dashboard)/dashboard/page.tsx`,
-  `app/(dashboard)/dashboard/loading.tsx`, `lib/data/metrics.ts`,
-  `lib/data/activity.ts`.
+  `app/(dashboard)/dashboard/loading.tsx`, `modules/batches/data/metrics.ts`,
+  `modules/activity/data/activity.ts`.
 - **Depends on:** Phase 0 (0.3, 0.4, 0.5).
 - **Acceptance:**
   - Dashboard renders only the caller's tenant-scoped batches (RLS-verified).
@@ -178,7 +178,7 @@ landing page across all four role variants.
   surfaces school-oversight controls, Coordinator gets the full workflow. Use the
   resolver from 0.5 instead of `?role=`.
 - **Files:** `app/(dashboard)/dashboard/page.tsx`, `app/(dashboard)/trainer/page.tsx`
-  (Trainer landing parity), `components/shell/Sidebar.tsx` (role-based nav
+  (Trainer landing parity), `modules/shell/ui/Sidebar.tsx` (role-based nav
   visibility).
 - **Depends on:** 1.1, 0.5.
 - **Acceptance:**
@@ -195,8 +195,8 @@ landing page across all four role variants.
   382:3, Viewer 394:723) and remove the `?state=` demo overrides once real
   signals exist. Keep states: loading, empty, sync-failed, stale, permission
   denied.
-- **Files:** `app/(dashboard)/dashboard/page.tsx`, `components/ui/EmptyState.tsx`,
-  `components/ui/InfoCallout.tsx`.
+- **Files:** `app/(dashboard)/dashboard/page.tsx`, `shared/ui/EmptyState.tsx`,
+  `shared/ui/InfoCallout.tsx`.
 - **Depends on:** 1.1, 1.2.
 - **Acceptance:** Each state reachable from real conditions; stale shows exact
   timestamp (T-007); WCAG AA on banners/skeletons.
@@ -229,8 +229,8 @@ documents, attach/verify evidence, move status.
 - **Build:** Wire `BatchModal`/Batch Detail drawer to `getBatch(batchId)` with
   deep-link `/batch-cards?batchId=:id`. Dialog semantics, focus trap, focus
   return.
-- **Files:** `components/ui/BatchModal.tsx`, `components/screens/CardsView.tsx`,
-  `app/(dashboard)/batch-cards/page.tsx`, `lib/data/batches.ts`
+- **Files:** `modules/batches/ui/BatchModal.tsx`, `modules/batches/ui/CardsView.tsx`,
+  `app/(dashboard)/batch-cards/page.tsx`, `modules/batches/data/batches.ts`
   (`getBatch`).
 - **Depends on:** Phase 1.
 - **Acceptance:** Modal opens from card (Enter/Space), shows lifecycle + docs +
@@ -244,9 +244,9 @@ documents, attach/verify evidence, move status.
   `documents`; exact missing-document names + blocker strip; upload/link via the
   Storage path builder (0.5); status transitions missing→pending→submitted→
   verified.
-- **Files:** `components/screens/DocumentsView.tsx`,
-  `app/(dashboard)/documents/page.tsx`, `lib/data/documents.ts`,
-  `lib/data/storage.ts`, `components/ui/FilePreviewModal.tsx`.
+- **Files:** `modules/documents/ui/DocumentsView.tsx`,
+  `app/(dashboard)/documents/page.tsx`, `modules/documents/data/documents.ts`,
+  `modules/documents/data/storage.ts`, `shared/ui/FilePreviewModal.tsx`.
 - **Depends on:** 0.5, 2.1.
 - **Acceptance:** Missing docs named (T-013); valid upload → `submitted` +
   `activity_log` event (T-014); oversized/invalid upload blocked inline (T-015);
@@ -258,7 +258,7 @@ documents, attach/verify evidence, move status.
 - **Build:** Structured LAMR (header + outcomes + activities + learner entries) on
   `/batches/[batchId]/lamr`; link source file. Uniqueness on learner/activity.
 - **Files:** `app/(dashboard)/batches/[batchId]/lamr/page.tsx` (new),
-  `lib/data/lamr.ts`, LAMR components (new under `components/screens/` or
+  `modules/lamr/data/lamr.ts`, LAMR components (new under `modules/lamr/ui/` or
   `components/lamr/`).
 - **Depends on:** 0.3, 2.2.
 - **Acceptance:** Create LAMR persists header + entries (T-018); duplicate
@@ -270,8 +270,8 @@ documents, attach/verify evidence, move status.
 
 - **Build:** Lifecycle stage updates with audit logging and impossible-state
   validation (e.g. Billing-ready before Assessment).
-- **Files:** `lib/data/batches.ts` (mutation/Server Action),
-  `components/ui/LifecyclePipeline.tsx`, batch detail surfaces.
+- **Files:** `modules/batches/data/batches.ts` (mutation/Server Action),
+  `modules/batches/ui/LifecyclePipeline.tsx`, batch detail surfaces.
 - **Depends on:** 2.1.
 - **Acceptance:** Stage change logs activity (T-008); impossible state flagged
   (T-009); Viewer sees lifecycle but cannot edit; mapper keeps `entre`/`blocked`
@@ -293,8 +293,8 @@ exposure.
 - **Build:** Real `/trainer` and `/trainer/classes` from trainer-scoped contracts
   (assigned batches only); class cards + roster preview.
 - **Files:** `app/(dashboard)/trainer/page.tsx`,
-  `app/(dashboard)/trainer/classes/page.tsx`, `lib/data/batches.ts` (trainer
-  scope), `lib/data/learners.ts`.
+  `app/(dashboard)/trainer/classes/page.tsx`, `modules/batches/data/batches.ts` (trainer
+  scope), `modules/batches/data/learners.ts`.
 - **Depends on:** Phase 0, Phase 1.
 - **Acceptance:** Only assigned batches appear (T-016); direct URL to an
   unassigned batch is permission-denied (T-005); DTO omits billing/NTP-lag/BSRS.
@@ -306,7 +306,7 @@ exposure.
   `/trainer/classes/[batchId]/attendance` writing to `attendance_records`;
   date-within-schedule + duplicate-day handling.
 - **Files:** `app/(dashboard)/trainer/classes/[batchId]/attendance/page.tsx`,
-  `lib/data/attendance.ts`, roster components.
+  `modules/attendance/data/attendance.ts`, roster components.
 - **Depends on:** 0.1, 3.1.
 - **Acceptance:** Valid attendance saved + logged; duplicate date → warning/merge
   (T-017); progress ≤100%; trainer-write RLS enforced; live save status (a11y).
@@ -317,7 +317,7 @@ exposure.
 - **Build:** Trainer-audience document upload on
   `/trainer/classes/[batchId]/documents` via the shared Storage helper.
 - **Files:** `app/(dashboard)/trainer/classes/[batchId]/documents/page.tsx`,
-  `lib/data/documents.ts`, `lib/data/storage.ts`.
+  `modules/documents/data/documents.ts`, `modules/documents/data/storage.ts`.
 - **Depends on:** 0.5, 2.2, 3.1.
 - **Acceptance:** Upload restricted to assigned batch + trainer audience; success
   → `submitted` + activity event; type/size validated; mobile 44px targets +
@@ -337,9 +337,9 @@ evidence) in under 2 minutes (PRD metric), seeing no billing/financial data.
 
 - **Build:** Import modal with file-type/header/row validation, duplicate-batch
   handling, tenant-scoped commit; filtered export.
-- **Files:** import modal under `components/screens/` or `components/ui/`,
+- **Files:** import modal under `modules/import-export/ui/`,
   `app/api/import/batches/route.ts` (Route Handler), `app/api/export/batches/route.ts`,
-  `lib/data/import.ts`, `lib/data/export.ts`.
+  `modules/import-export/data/import.ts`, `modules/import-export/data/export.ts`.
 - **Depends on:** Phase 2.
 - **Acceptance:** Wrong type → inline error (T-022); duplicate batch IDs blocked
   until resolved (T-023); confirmed import scoped to selected tenant + activity
@@ -350,7 +350,7 @@ evidence) in under 2 minutes (PRD metric), seeing no billing/financial data.
 
 - **Build:** In-app notifications drawer (activity/blocker-derived for MVP; no
   email). Accessible drawer with unread count.
-- **Files:** `components/shell/*` (drawer + bell), `lib/data/notifications.ts`
+- **Files:** `modules/shell/ui/*` (drawer + bell), `modules/notifications/data/notifications.ts`
   (activity-backed), optional `app/api/notifications/route.ts`.
 - **Depends on:** Phase 1; reuses `activity_log`.
 - **Acceptance:** Drawer focus-trapped, background inert, Escape closes (T-028);
@@ -363,7 +363,7 @@ evidence) in under 2 minutes (PRD metric), seeing no billing/financial data.
   deadline/program rules, billing threshold. Confirmation/undo on role changes.
 - **Files:** `app/(dashboard)/settings/page.tsx` (or modal),
   `app/api/settings/members/route.ts`, `app/api/settings/programs/route.ts`,
-  `lib/data/settings.ts`.
+  `modules/settings/data/settings.ts`.
 - **Depends on:** 0.5, Phase 2.
 - **Acceptance:** Check/cross icons have text equivalents (T-029); role change
   requires confirm/undo + activity log; requirement edits recalc document
@@ -374,7 +374,7 @@ evidence) in under 2 minutes (PRD metric), seeing no billing/financial data.
 
 - **Build:** Specialized import overlay with source-specific column mapping +
   preview, reusing the 4.1 pipeline.
-- **Files:** import overlay component, `lib/data/import.ts` (mapping profiles).
+- **Files:** import overlay component, `modules/import-export/data/import.ts` (mapping profiles).
 - **Depends on:** 4.1.
 - **Acceptance:** T2MIS/BSRS columns mapped + validated; tenant check enforced;
   preview before commit; clear "internal working copy, not official" framing.
@@ -394,12 +394,12 @@ attendance (Phase 3.2) and the document checklist (Phase 2.2). Full rules:
 
 ### 4B.1 Billing domain logic (pure, unit-tested)
 
-- **Build:** `lib/domain/billing/*` — eligibility (`absences ≥ 5` → ineligible),
+- **Build:** `modules/billing/domain/*` — eligibility (`absences ≥ 5` → ineligible),
   TSF tranche schedules (7.2.2 <2mo 50/50; 7.2.3 ≥2mo 20/40/40; absence deduction
   `absences × ₱160` on the final tranche, both schedules), Training Cost schedule
   (5.1.x, 60-training-day boundary), entrepreneurship (₱800 × non-flagged
   scholars), amount-in-words.
-- **Files:** `lib/domain/billing/eligibility.ts`, `.../tranches.ts`,
+- **Files:** `modules/billing/domain/eligibility.ts`, `.../tranches.ts`,
   `.../amounts.ts`, fixtures + unit tests.
 - **Depends on:** 0.1 (snapshots), 3.2 (attendance).
 - **Acceptance:** Worked CFSP example reproduces ₱137,000 exactly (12×₱8,200 +
@@ -413,7 +413,7 @@ attendance (Phase 3.2) and the document checklist (Phase 2.2). Full rules:
   by program+qualification, snapshot the cost row + `total_sessions` onto the
   batch, and capture the RQM/NTP authorization (one RQM = one batch;
   `approved_slots` as billable cap).
-- **Files:** `lib/data/batches.ts`, import wizard, `lib/data/cost-schedule.ts`.
+- **Files:** `modules/batches/data/batches.ts`, import wizard, `modules/billing/data/cost-schedule.ts`.
 - **Depends on:** 0.1, 4.1 (import).
 - **Acceptance:** New batch carries frozen rates immune to later schedule edits;
   billing cannot exceed `approved_slots`.
@@ -426,7 +426,7 @@ attendance (Phase 3.2) and the document checklist (Phase 2.2). Full rules:
   signatories/header/addressee from `tenant_settings`; scholar rows alphabetized +
   numbered; write a versioned `billing_records` snapshot per generation.
 - **Files:** `lib/billing/docx.ts`, `app/api/billing/[type]/route.ts`,
-  `lib/data/billing.ts`.
+  `modules/billing/data/billing.ts`.
 - **Depends on:** 4B.1, 4B.2, 4.3 (tenant settings).
 - **Acceptance:** Generated doc matches the school template; re-generation after
   an attendance correction appends a new version (old retained); amount in words
@@ -439,7 +439,7 @@ attendance (Phase 3.2) and the document checklist (Phase 2.2). Full rules:
   supporting docs verified — II2); per-tranche document checklist (MIS-0302,
   Annex K, Daily Attendance Sheet) at tranche level (LL1); billing/NTP-lag alerts
   in the notifications drawer (JJ1), hidden from trainers.
-- **Files:** `lib/domain/billing/readiness.ts`, documents view, notifications
+- **Files:** `modules/billing/domain/readiness.ts`, documents view, notifications
   drawer.
 - **Depends on:** 4B.1, 2.2, 4.2.
 - **Acceptance:** Ready alert fires only when threshold + verified docs both hold;
@@ -473,7 +473,7 @@ supporting documents and all amounts derived from snapshotted data.
 
 - **Build:** Full accessibility sweep: keyboard, dialog semantics, live regions,
   contrast, semantic tables, 44px targets, status-not-by-color.
-- **Files:** cross-cutting (`components/ui/*`, `components/shell/*`, screens).
+- **Files:** cross-cutting (`shared/ui/*`, `modules/shell/ui/*`, module screens).
 - **Depends on:** Phases 1–4; `docs/UI_UX_MODAL_AUDIT.md`.
 - **Acceptance:** Keyboard-only modal open/use/close; SR announces title/async/
   errors; grayscale legibility; all icon buttons named.
