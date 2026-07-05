@@ -31,7 +31,7 @@ Single **Next.js 16 App Router** app (React 19, TS strict, Tailwind v4) talking 
   - `data/` — fetch → map → derive. The **only** place (besides `lib/supabase` itself) allowed to import `lib/supabase/database.types.ts`.
   - `domain/` — pure business rules, no I/O (`modules/batches/domain/urgency.ts`, `modules/billing/domain/readiness.ts`); unit-test with fixed as-of dates.
   - `ui/` — domain-aware components.
-- `shared/` — leaf level: `shared/ui/` props-only presentational primitives, `shared/types.ts` (UI domain types — transitional single file; splitting per-module is a tracked follow-up), `shared/mocks/` (seed dataset backing the `unconfigured` fallback). `shared/` must never import `modules/` or `app/`.
+- `shared/` — leaf level: `shared/ui/` props-only presentational primitives, `shared/types.ts` (UI domain types — kept as one file), `shared/mocks/` (seed dataset backing the `unconfigured` fallback). `shared/` must never import `modules/` or `app/`. A per-module type split was **considered and deliberately deferred** (TES-68): `shared/mocks/seed.ts` constructs 11 of these domain types, and `shared/` cannot import `modules/`, so moving types into modules would break the boundary until the mock dataset is relocated out of `shared/`. Do not attempt the split without first solving that.
 - `lib/supabase/` — the external Data boundary (client/server factories + generated `database.types.ts`).
 
 **Import direction is ESLint-enforced** (`import/no-restricted-paths` in `eslint.config.mjs`): `app → modules → shared → lib/supabase`. Another module's `data/` is private — import its `domain/`/`ui/` instead (app/ may fetch from any module's `data/`). No index barrels; deep imports are the convention.
