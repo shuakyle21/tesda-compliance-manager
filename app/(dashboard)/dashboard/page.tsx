@@ -25,7 +25,7 @@ import {
   isBillingReady,
 } from '@/shared/mocks';
 import { getBatchesSnapshot } from '@/lib/data/batches';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser } from '@/modules/auth/data/auth';
 import type { UserRole } from '@/shared/types';
 
 type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;

@@ -7,7 +7,7 @@
  *
  * USAGE (Server Components, Route Handlers, Server Actions):
  *
- *   import { getCurrentUser, getAuthUserId } from '@/lib/auth';
+ *   import { getCurrentUser, getAuthUserId } from '@/modules/auth/data/auth';
  *
  *   // Inside a Server Component or async Route Handler:
  *   const user = await getCurrentUser();

@@ -10,7 +10,7 @@
  */
 
 import { SignUp } from '@clerk/nextjs';
-import { clerkAppearance } from '@/lib/clerkAppearance';
+import { clerkAppearance } from '@/modules/auth/ui/clerkAppearance';
 
 export default function SignUpPage() {
   return (
