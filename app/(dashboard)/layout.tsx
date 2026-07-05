@@ -13,11 +13,11 @@
  * DOCS: https://nextjs.org/docs/app/building-your-application/routing/route-groups
  */
 
-import { NavDrawerProvider } from '@/components/shell/NavDrawerProvider';
-import { Sidebar } from '@/components/shell/Sidebar';
-import { MobileHeader } from '@/components/shell/MobileHeader';
-import { Topbar } from '@/components/shell/Topbar';
-import { MetricsRow } from '@/components/shell/MetricsRow';
+import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
+import { Sidebar } from '@/modules/shell/ui/Sidebar';
+import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
+import { Topbar } from '@/modules/shell/ui/Topbar';
+import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
