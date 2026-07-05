@@ -6,8 +6,8 @@
  * glyph so it reads as its own phase between training and assessment.
  */
 
-import { Icon } from './Icon';
-import type { LifecycleStage } from '@/lib/data/types';
+import { Icon } from '@/shared/ui/Icon';
+import type { LifecycleStage } from '@/shared/types';
 
 export function LifecyclePipeline({ steps }: { steps: LifecycleStage[] }) {
   const dense = steps.length >= 7;

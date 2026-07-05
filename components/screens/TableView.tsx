@@ -8,17 +8,17 @@
  */
 
 import { useMemo, useState, type CSSProperties, type MouseEvent } from 'react';
-import { Icon } from '@/components/ui/Icon';
-import { StatusBadge } from '@/components/ui/StatusBadge';
-import { ProgressBar } from '@/components/ui/ProgressBar';
-import { TrainerAvatar } from '@/components/ui/TrainerAvatar';
-import { UrgencyIndicator, BillingReadyBadge } from '@/components/ui/UrgencyIndicator';
+import { Icon } from '@/shared/ui/Icon';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { ProgressBar } from '@/shared/ui/ProgressBar';
+import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
+import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { BatchModal } from '@/components/ui/BatchModal';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
-import { DOCUMENT_REQUIREMENTS, isBillingReady } from '@/lib/data/mock-batches';
-import type { Batch } from '@/lib/data/types';
+import { DOCUMENT_REQUIREMENTS, isBillingReady } from '@/shared/mocks';
+import type { Batch } from '@/shared/types';
 
 export function TableView({ batches }: { batches: Batch[] }) {
   const [query, setQuery] = useState('');

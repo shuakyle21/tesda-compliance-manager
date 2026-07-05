@@ -11,11 +11,11 @@
 import { useMemo, useState } from 'react';
 import { BatchCard } from '@/components/ui/BatchCard';
 import { BatchModal } from '@/components/ui/BatchModal';
-import { InfoCallout } from '@/components/ui/InfoCallout';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
-import type { Batch } from '@/lib/data/types';
+import type { Batch } from '@/shared/types';
 
 export function CardsView({ batches }: { batches: Batch[] }) {
   const [query, setQuery] = useState('');

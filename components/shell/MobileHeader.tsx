@@ -5,7 +5,7 @@
  * hamburger opens the off-canvas sidebar drawer via the shared NavDrawer context.
  */
 
-import { Icon } from '@/components/ui/Icon';
+import { Icon } from '@/shared/ui/Icon';
 import { useNavDrawer } from './NavDrawerProvider';
 
 export function MobileHeader() {

@@ -11,9 +11,9 @@
  */
 
 import { Fragment } from 'react';
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { EGACE_STAGES } from '@/lib/data/seed';
-import type { Batch, EgaceCounts } from '@/lib/data/types';
+import { Icon, type IconName } from '@/shared/ui/Icon';
+import { EGACE_STAGES } from '@/shared/mocks/seed';
+import type { Batch, EgaceCounts } from '@/shared/types';
 
 /** Stage colorKey → design token, matching the Figma stage accents. */
 const STAGE_COLOR: Record<string, string> = {

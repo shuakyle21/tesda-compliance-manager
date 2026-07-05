@@ -9,24 +9,24 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { InfoCallout } from '@/components/ui/InfoCallout';
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { MetricCard } from '@/components/ui/MetricCard';
+import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { Icon, type IconName } from '@/shared/ui/Icon';
+import { MetricCard } from '@/shared/ui/MetricCard';
 import { EgaceOutcomes } from '@/components/dashboard/EgaceOutcomes';
 import { DocumentStatusDonut } from '@/components/dashboard/DocumentStatusDonut';
 import { ProgressTrend } from '@/components/dashboard/ProgressTrend';
 import { BatchTimeline } from '@/components/dashboard/BatchTimeline';
 import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import {
   MOCK_ACTIVITY,
   MOCK_BATCHES,
   getMockMetrics,
   isBillingReady,
-} from '@/lib/data/mock-batches';
+} from '@/shared/mocks';
 import { getBatchesSnapshot } from '@/lib/data/batches';
 import { getCurrentUser } from '@/lib/auth';
-import type { UserRole } from '@/lib/data/types';
+import type { UserRole } from '@/shared/types';
 
 type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

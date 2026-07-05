@@ -7,7 +7,7 @@
  * screen component, which owns the query/program state.
  */
 
-import { Icon } from '@/components/ui/Icon';
+import { Icon } from '@/shared/ui/Icon';
 
 export function FiltersRow({
   query, onQuery, program, onProgram,

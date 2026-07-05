@@ -7,8 +7,8 @@
  * .xlsx (T2MIS) export.
  */
 
-import { MOCK_BATCHES } from '@/lib/data/mock-batches';
-import { TENANTS } from '@/lib/data/seed';
+import { MOCK_BATCHES } from '@/shared/mocks';
+import { TENANTS } from '@/shared/mocks/seed';
 import { ReportView } from '@/components/screens/ReportView';
 
 export default function ReportPage() {

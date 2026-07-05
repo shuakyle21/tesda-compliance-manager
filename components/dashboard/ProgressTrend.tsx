@@ -11,9 +11,9 @@
  * plot as flattened image vectors — rebuilt here so it tracks the data.
  */
 
-import { Icon } from '@/components/ui/Icon';
-import { DOCUMENT_REQUIREMENTS } from '@/lib/data/mock-batches';
-import { SNAPSHOTS } from '@/lib/data/seed';
+import { Icon } from '@/shared/ui/Icon';
+import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { SNAPSHOTS } from '@/shared/mocks/seed';
 
 const WEEK_LABELS = ['W-5', 'W-4', 'W-3', 'W-2', 'W-1', 'Now'];
 const GRID = [100, 75, 50, 25, 0];

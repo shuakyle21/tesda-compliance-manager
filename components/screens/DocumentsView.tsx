@@ -11,14 +11,14 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Icon } from '@/components/ui/Icon';
-import { StatusBadge } from '@/components/ui/StatusBadge';
-import { InfoCallout } from '@/components/ui/InfoCallout';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Toast, type ToastData } from '@/components/ui/Toast';
-import { FilePreviewModal, type PreviewFile } from '@/components/ui/FilePreviewModal';
-import { DOCUMENT_REQUIREMENTS } from '@/lib/data/mock-batches';
-import type { Batch, DocRecord, DocumentRequirement } from '@/lib/data/types';
+import { Icon } from '@/shared/ui/Icon';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { EmptyState } from '@/shared/ui/EmptyState';
+import { Toast, type ToastData } from '@/shared/ui/Toast';
+import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
+import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
 
 const STATUS_LABEL: Record<string, string> = {
   verified: 'Verified', submitted: 'Submitted', pending: 'Pending', missing: 'Missing', na: 'N/A',

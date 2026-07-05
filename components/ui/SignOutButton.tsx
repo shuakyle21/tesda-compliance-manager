@@ -1,7 +1,7 @@
 'use client';
 
 import { useClerk } from '@clerk/nextjs';
-import { Icon } from './Icon';
+import { Icon } from '@/shared/ui/Icon';
 
 export function SignOutButton({ className }: { className?: string }) {
   const { signOut } = useClerk();

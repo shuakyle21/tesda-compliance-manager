@@ -15,9 +15,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { TENANTS } from '@/lib/data/seed';
-import type { Tenant } from '@/lib/data/types';
+import { Icon, type IconName } from '@/shared/ui/Icon';
+import { TENANTS } from '@/shared/mocks/seed';
+import type { Tenant } from '@/shared/types';
 import { useNavDrawer } from './NavDrawerProvider';
 
 type NavItem = { label: string; icon: IconName; href?: string };

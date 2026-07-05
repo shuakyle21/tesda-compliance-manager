@@ -5,7 +5,7 @@
  * and hands it to the interactive CardsView client island.
  */
 
-import { MOCK_BATCHES } from '@/lib/data/mock-batches';
+import { MOCK_BATCHES } from '@/shared/mocks';
 import { CardsView } from '@/components/screens/CardsView';
 
 export default function BatchCardsPage() {

@@ -10,14 +10,14 @@
  */
 
 import type { CSSProperties, ReactNode, MouseEvent } from 'react';
-import { Icon } from './Icon';
-import { StatusBadge } from './StatusBadge';
-import { ProgressBar } from './ProgressBar';
+import { Icon } from '@/shared/ui/Icon';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
-import { TrainerAvatar } from './TrainerAvatar';
-import { UrgencyIndicator, BillingReadyBadge } from './UrgencyIndicator';
-import { urgencyTier, isBillingReady } from '@/lib/data/mock-batches';
-import type { Batch } from '@/lib/data/types';
+import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
+import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
+import { urgencyTier, isBillingReady } from '@/shared/mocks';
+import type { Batch } from '@/shared/types';
 
 export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => void }) {
   const tier = urgencyTier(batch.daysToBilling);

@@ -18,7 +18,7 @@
 import type {
   Tenant, User, DocumentRequirement, Batch, ActivityEvent, AlertEntry,
   Snapshot, EgaceStage, ScholarRow, Competency, ScheduleAdjustment,
-} from './types';
+} from '@/shared/types';
 
 /* ----- Tenants (Clerk Organizations — TVI schools) ---------- */
 export const TENANTS: Tenant[] = [

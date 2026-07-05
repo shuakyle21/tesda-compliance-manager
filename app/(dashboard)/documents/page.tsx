@@ -3,7 +3,7 @@
  * Server shell → interactive DocumentsView client island (preview + verify flow).
  */
 
-import { MOCK_BATCHES } from '@/lib/data/mock-batches';
+import { MOCK_BATCHES } from '@/shared/mocks';
 import { DocumentsView } from '@/components/screens/DocumentsView';
 
 export default function DocumentsPage() {

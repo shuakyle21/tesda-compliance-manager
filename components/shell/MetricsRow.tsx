@@ -6,9 +6,9 @@
  * the mock data layer at render time. Mirrors the prototype's App.jsx metrics.
  */
 
-import { MetricCard } from '@/components/ui/MetricCard';
-import { getMockMetrics, MOCK_BATCHES } from '@/lib/data/mock-batches';
-import type { DashboardMetrics } from '@/lib/data/types';
+import { MetricCard } from '@/shared/ui/MetricCard';
+import { getMockMetrics, MOCK_BATCHES } from '@/shared/mocks';
+import type { DashboardMetrics } from '@/shared/types';
 
 export function MetricsRow({ metrics = getMockMetrics() }: { metrics?: DashboardMetrics }) {
   const hasBatches = MOCK_BATCHES.length > 0;

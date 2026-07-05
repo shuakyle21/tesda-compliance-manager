@@ -27,7 +27,7 @@ import type {
   LifecycleStage,
   LifecycleStageKey,
   LifecycleStatus,
-} from '@/lib/data/types';
+} from '@/shared/types';
 
 type BatchRow = Database['public']['Tables']['batches']['Row'];
 

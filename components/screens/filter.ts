@@ -3,7 +3,7 @@
  * pill, then sort by earliest billing deadline. Used by Cards, Table, Documents.
  */
 
-import type { Batch } from '@/lib/data/types';
+import type { Batch } from '@/shared/types';
 
 export function filterBatches(batches: Batch[], query: string, program: string): Batch[] {
   let xs = batches;

@@ -9,13 +9,13 @@
  * by urgency). `ALL_BATCHES` includes completed cohorts for the Report surface.
  */
 
-import { BATCHES, ACTIVITY, DOCUMENT_REQUIREMENTS } from './seed';
-import type { Batch, ActivityEvent, DashboardMetrics, UrgencyTier } from './types';
+import { BATCHES, ACTIVITY, DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
+import type { Batch, ActivityEvent, DashboardMetrics, UrgencyTier } from '@/shared/types';
 
 export {
   TENANTS, USERS, DOCUMENT_REQUIREMENTS, ALERTS_LOG, SNAPSHOTS,
   EGACE_STAGES, EMPLOYMENT_STATUSES,
-} from './seed';
+} from '@/shared/mocks/seed';
 
 /** Threshold (training progress %) at which a batch is flagged billing-ready. */
 export const BILLING_READY_THRESHOLD = 80;

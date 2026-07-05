@@ -10,9 +10,9 @@
  * SVG donut (matches the project's "no chart libraries" convention).
  */
 
-import { Icon } from '@/components/ui/Icon';
-import { DOCUMENT_REQUIREMENTS } from '@/lib/data/mock-batches';
-import type { Batch, DocStatus } from '@/lib/data/types';
+import { Icon } from '@/shared/ui/Icon';
+import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import type { Batch, DocStatus } from '@/shared/types';
 
 const SEGMENTS: { key: DocStatus; label: string; color: string }[] = [
   { key: 'verified', label: 'Verified', color: 'var(--color-green)' },

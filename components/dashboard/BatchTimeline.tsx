@@ -11,8 +11,8 @@
  * `tl-swatch`) — no raster assets, consistent with the project's conventions.
  */
 
-import { Icon } from '@/components/ui/Icon';
-import type { Batch } from '@/lib/data/types';
+import { Icon } from '@/shared/ui/Icon';
+import type { Batch } from '@/shared/types';
 
 // Fixed inner width (px) so the lane geometry is deterministic; the wrapping
 // `.tl-scroll` provides horizontal scroll on narrow viewports (Figma: 936px).

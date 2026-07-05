@@ -8,8 +8,8 @@
  */
 
 import Link from 'next/link';
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { ALERTS_LOG } from '@/lib/data/seed';
+import { Icon, type IconName } from '@/shared/ui/Icon';
+import { ALERTS_LOG } from '@/shared/mocks/seed';
 
 const CRITICAL_KINDS = new Set(['billing-critical', 'doc-missing', 'ntp-lag']);
 

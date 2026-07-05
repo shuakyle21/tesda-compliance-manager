@@ -9,15 +9,15 @@
  */
 
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { Icon, type IconName } from './Icon';
-import { StatusBadge } from './StatusBadge';
-import { ProgressBar } from './ProgressBar';
+import { Icon, type IconName } from '@/shared/ui/Icon';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
-import { TrainerAvatar } from './TrainerAvatar';
-import { UrgencyIndicator, BillingReadyBadge } from './UrgencyIndicator';
-import { TrainingDayPills } from './TrainingDayPills';
-import { urgencyTier, isBillingReady } from '@/lib/data/mock-batches';
-import type { Batch } from '@/lib/data/types';
+import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
+import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
+import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
+import { urgencyTier, isBillingReady } from '@/shared/mocks';
+import type { Batch } from '@/shared/types';
 
 export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => void }) {
   const [closing, setClosing] = useState(false);

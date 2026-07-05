@@ -3,7 +3,7 @@
  * Server shell → interactive TableView client island.
  */
 
-import { MOCK_BATCHES } from '@/lib/data/mock-batches';
+import { MOCK_BATCHES } from '@/shared/mocks';
 import { TableView } from '@/components/screens/TableView';
 
 export default function TableViewPage() {

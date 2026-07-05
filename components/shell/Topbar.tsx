@@ -5,7 +5,7 @@
  * last-synced badge on the right. Server Component — display-only.
  */
 
-import { TENANTS } from '@/lib/data/mock-batches';
+import { TENANTS } from '@/shared/mocks';
 
 export function Topbar({ lastSynced = 'Last synced 4 min ago' }: { lastSynced?: string }) {
   const tenant = TENANTS[0];
