@@ -16,7 +16,8 @@ import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
-import { urgencyTier, isBillingReady } from '@/shared/mocks';
+import { urgencyTier } from '@/modules/batches/domain/urgency';
+import { isBillingReady } from '@/modules/billing/domain/readiness';
 import type { Batch } from '@/shared/types';
 
 export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => void }) {

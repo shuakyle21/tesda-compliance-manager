@@ -1,7 +1,7 @@
 /**
  * STEP 2 — Data Layer: Mock Data Facade
  *
- * Thin facade over the ported seed module (lib/data/seed.ts). Components import
+ * Thin facade over the ported seed module (shared/mocks/seed.ts). Components import
  * from here so that when the real backend lands, only this file changes — the
  * seed enrichment logic and the component call sites stay put.
  *
@@ -10,27 +10,16 @@
  */
 
 import { BATCHES, ACTIVITY, DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
-import type { Batch, ActivityEvent, DashboardMetrics, UrgencyTier } from '@/shared/types';
+import type { Batch, ActivityEvent, DashboardMetrics } from '@/shared/types';
 
 export {
   TENANTS, USERS, DOCUMENT_REQUIREMENTS, ALERTS_LOG, SNAPSHOTS,
   EGACE_STAGES, EMPLOYMENT_STATUSES,
 } from '@/shared/mocks/seed';
 
-/** Threshold (training progress %) at which a batch is flagged billing-ready. */
-export const BILLING_READY_THRESHOLD = 80;
-
-/** Derive the urgency tier from days-to-billing. Drives the card left-border. */
-export function urgencyTier(daysToBilling: number): UrgencyTier {
-  if (daysToBilling <= 6) return 'critical';
-  if (daysToBilling <= 21) return 'warning';
-  return 'on-track';
-}
-
-/** A batch is billing-ready once training progress crosses the threshold. */
-export function isBillingReady(b: Batch): boolean {
-  return b.status === 'ongoing' && b.progressPct >= BILLING_READY_THRESHOLD;
-}
+// Domain logic extracted (TES-68): urgencyTier -> modules/batches/domain/urgency.ts;
+// isBillingReady + BILLING_READY_THRESHOLD -> modules/billing/domain/readiness.ts.
+// shared/ must not re-export module code (import direction rule).
 
 /** Every batch, including completed cohorts (Report scope). */
 export const ALL_BATCHES: Batch[] = BATCHES;

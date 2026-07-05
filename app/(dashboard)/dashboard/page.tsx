@@ -22,8 +22,8 @@ import {
   MOCK_ACTIVITY,
   MOCK_BATCHES,
   getMockMetrics,
-  isBillingReady,
 } from '@/shared/mocks';
+import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot } from '@/modules/batches/data/batches';
 import { getCurrentUser } from '@/modules/auth/data/auth';
 import type { UserRole } from '@/shared/types';

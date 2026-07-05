@@ -17,7 +17,8 @@ import { BatchModal } from '@/modules/batches/ui/BatchModal';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
-import { DOCUMENT_REQUIREMENTS, isBillingReady } from '@/shared/mocks';
+import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { isBillingReady } from '@/modules/billing/domain/readiness';
 import type { Batch } from '@/shared/types';
 
 export function TableView({ batches }: { batches: Batch[] }) {
