@@ -20,7 +20,7 @@ There is **no test runner yet** — `npm test` is a placeholder (`echo "No tests
 
 ## Architecture
 
-Single **Next.js 16 App Router** app (React 19, TS strict, Tailwind v4) talking directly to **Supabase** (Postgres + Storage), with **Clerk** as identity. No separate backend; Laravel is documented as future-only — do not build it or treat it as present.
+Single **Next.js 16 App Router** app (React 19, TS strict, Tailwind v4) talking directly to **Supabase** (Postgres + Storage), with **Clerk** as identity. No separate backend; Express.js (Node/TypeScript) is documented as the future-only backend direction — do not build it or treat it as present.
 
 **Auth chain:** `proxy.ts` (Clerk middleware, protects everything except `/sign-in`, `/sign-up`) → `lib/supabase/server.ts` attaches the Clerk JWT (template named exactly `supabase`) as a bearer token on an **anon-key** client → Postgres RLS (`app_private.*` helper functions from the migration) makes every authorization decision. **RLS is the security boundary; UI hiding is usability only.** The service-role key must never reach client code.
 

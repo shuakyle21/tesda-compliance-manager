@@ -23,8 +23,10 @@ Register and Precedence"):
 
 Conflicts are resolved per the MASTER_PRD_SRS conflict-resolution table. This TRD
 does **not** restate product requirements (FR-01..FR-15 live in the PRD) and does
-**not** introduce Laravel as implemented — Laravel is documented only as a future
-direction, consistent with `ARCHITECTURE.md` and the PRD conflict table.
+**not** introduce Express.js as implemented — Express.js is documented only as a
+future direction, consistent with `ARCHITECTURE.md` and the PRD conflict table.
+(The future-backend recommendation was changed from Laravel to Express.js on
+2026-07-06; see §1.3.)
 
 ---
 
@@ -69,16 +71,21 @@ database via Row Level Security (RLS), keyed off the Clerk JWT.
 | Auth provider | Clerk | Already wired (`@clerk/nextjs`, ClerkProvider, proxy). Off-loads session/MFA/account UI. | Two identity stores to reconcile (Clerk user ↔ `profiles` row). |
 | Authorization | Supabase RLS keyed on Clerk JWT `sub` | Defense-in-depth: even if a query is wrong, the DB denies cross-tenant rows. Tenant isolation is a P0 success metric (100% scoped). | RLS helper functions add query cost; must keep JWT template correct. |
 | App framework | Next.js 16 App Router + RSC | Server Components fetch role-scoped data server-side; secrets never reach the client. Matches existing `app/` tree. | RSC + client-island mental model; streaming/caching nuances. |
-| Future backend | Laravel (recommended, **not** built) | PH-team familiarity, conventional API/policy/queue/report layer if the tool outgrows direct-Supabase. | Documented as future only; must not block MVP or appear "implemented". |
+| Future backend | Express.js on Node/TypeScript (recommended, **not** built) | Team's TypeScript/Node familiarity; same language as the app, so `modules/*/domain` business rules and `shared/types.ts` DTOs are reused directly instead of reimplemented in another language; conventional API/middleware/queue/report layer if the tool outgrows direct-Supabase. | Documented as future only; must not block MVP or appear "implemented". |
 
-### 1.3 Why Supabase-first (not Laravel-first)
+### 1.3 Why Supabase-first (not backend-first)
 
 The PRD conflict table is explicit: README says "no Laravel assumptions" while
-route/API docs propose a Laravel API. **Resolution: MVP is Next.js + Clerk +
-Supabase. Laravel is a future backend/API layer only.** This TRD honors that.
-The data-contract boundary (Section 5) is designed so that *if* Laravel is later
-introduced, it slots in behind the same `modules/*/data` DTO shapes without a UI
-rewrite (Strangler-Fig-friendly seam).
+older route/API docs proposed a Laravel API. **Resolution: MVP is Next.js +
+Clerk + Supabase; any dedicated backend is a future API layer only.** This TRD
+honors that. As of 2026-07-06 the recommended future backend is **Express.js
+(Node/TypeScript)**, superseding the earlier Laravel recommendation: the team
+works in TypeScript/Node, and an Express layer reuses `modules/*/domain` rules
+and `shared/types.ts` directly, where a PHP backend would need a parallel
+reimplementation kept in sync by hand. The data-contract boundary (Section 5)
+is framework-agnostic either way: *if* a backend is later introduced, it slots
+in behind the same `modules/*/data` DTO shapes without a UI rewrite
+(Strangler-Fig-friendly seam).
 
 ---
 
@@ -102,7 +109,8 @@ PRD's prose mentions "Next.js 16"; the lockfile is the source of truth below.
 | Charts | (none installed) | — | Analytics visualization | Recharts referenced in PRD/comments but **not** in `package.json`. Current charts are hand-built (`shared/ui/Charts.tsx`, `modules/batches/ui/dashboard/*`). Treat a chart lib as a deferred decision. |
 
 **Not in the MVP stack** (explicitly, per PRD Out-of-Scope): Resend (email),
-Upstash Redis, MongoDB, OCR/AI, GitHub Actions cron, PWA, Laravel.
+Upstash Redis, MongoDB, OCR/AI, GitHub Actions cron, PWA, Express.js (or any
+dedicated backend).
 
 ---
 
@@ -330,13 +338,14 @@ After any schema migration:
   preparation, and financial fields (PRD FR-07 + route-map guard rules).
 - Every screen with relative dates includes an exact `data as of` timestamp.
 
-### 5.5 Future Laravel boundary (not built)
+### 5.5 Future Express.js boundary (not built)
 
-If Laravel is later introduced, it sits **above** Supabase/Postgres, enforces the
-same tenant/role rules, and returns the **same DTO shapes** defined in
-`shared/types.ts`. The `modules/*/data` functions become thin API clients instead
-of direct Supabase queries — the UI does not change. This is the designed seam;
-it must not be implemented in the MVP.
+If Express.js is later introduced, it sits **above** Supabase/Postgres, enforces
+the same tenant/role rules, and returns the **same DTO shapes** defined in
+`shared/types.ts` — which it imports directly, being TypeScript. The
+`modules/*/data` functions become thin API clients instead of direct Supabase
+queries — the UI does not change. This is the designed seam; it must not be
+implemented in the MVP.
 
 ---
 

@@ -19,7 +19,7 @@ Effort tags: **S** ≈ ≤0.5 day · **M** ≈ 1–2 days · **L** ≈ 3–5 day
 
 ### Guiding constraints (from PRD + TRD)
 
-- MVP stack is **Next.js + Clerk + Supabase**. Laravel is future-only; do not
+- MVP stack is **Next.js + Clerk + Supabase**. Express.js is future-only; do not
   build it.
 - RLS is the security boundary; UI hiding is usability only.
 - Integration tests hit **real Supabase** (no mocks).

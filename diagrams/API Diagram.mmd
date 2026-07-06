@@ -1,3 +1,8 @@
+---
+title: Planned Route Catalog (TES-32)
+---
+%% No app/api/ Route Handlers exist yet — Server Components currently call
+%% lib/data/*.ts directly. This catalog later migrates behind Express.js per TES-58.
 flowchart TD
   subgraph Next["Next.js routes"]
     Dashboard["/dashboard"]
@@ -12,7 +17,7 @@ flowchart TD
     TrainerDocuments["/trainer/classes/[batchId]/documents"]
   end
 
-  subgraph API["Laravel API"]
+  subgraph API["Next.js Route Handlers"]
     GetDashboard["GET /api/dashboard"]
     GetBatchSummary["GET /api/batches?summary=true"]
     GetBatches["GET /api/batches"]

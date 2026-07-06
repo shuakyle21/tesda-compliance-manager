@@ -176,4 +176,6 @@ npm run build
 - Supabase is described and implemented as the internal operational database only.
 - TESDA SIS, T2MIS, BSRS, and official reporting systems remain authoritative.
 - Tenant isolation is enforced through Supabase RLS.
-- No Laravel assumptions are included.
+- No dedicated-backend assumptions are included. (Express.js is the documented
+  future backend direction only — recommendation updated from Laravel,
+  2026-07-06; see docs/TRD.md §1.3.)

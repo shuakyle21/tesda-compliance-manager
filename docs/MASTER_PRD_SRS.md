@@ -35,7 +35,7 @@ Confirmed conflicts and resolutions:
 
 | Conflict | Resolution in this master document |
 | --- | --- |
-| README says "No Laravel assumptions"; route/API docs introduce Laravel API. | Current MVP remains Next.js + Clerk + Supabase. Laravel is documented as a recommended future backend/API layer, not implemented and not required for MVP completion. |
+| README says "No Laravel assumptions"; route/API docs introduce Laravel API. | Current MVP remains Next.js + Clerk + Supabase. A dedicated backend stays future-only; as of 2026-07-06 the recommended future backend is Express.js (Node/TypeScript), superseding the earlier Laravel recommendation (see TRD §1.3). Not implemented and not required for MVP completion. |
 | PDF includes Resend, GitHub Actions, Upstash Redis, Recharts, PWA, and Notion CSV migration. | These are treated as backlog or optional production-grade capabilities unless reconfirmed by current MVP docs or Figma. |
 | Route map lists `/dashboard` as implemented, but current `app/` tree has no `app/(dashboard)/dashboard/page.tsx`. | `/dashboard` is required by Figma and root redirect, but implementation is missing. This is a P0 implementation gap. |
 | Figma has role-specific Admin, Coordinator, Viewer, Trainer screens plus Report and updated T2MIS/BSRS import overlay; route map covers fewer surfaces. | Screen inventory includes all live Figma surfaces and flags missing routes. |
@@ -139,7 +139,7 @@ Explicitly excluded from current MVP:
 - "Latest Figma" means the accessible file key `vZKyWXSipBHmiQFuHl5e1O` inspected on 2026-06-12.
 - The system is initially internal-only and small-team focused.
 - Supabase remains the current MVP database, storage, and RLS layer.
-- Laravel may be added later as a backend/API service layer but is not currently implemented.
+- Express.js (Node/TypeScript) may be added later as a backend/API service layer but is not currently implemented.
 - Program requirements may differ by scholarship program and must remain configurable.
 - All computed deadline/progress values derive from stored source dates and an explicit "data as of" timestamp.
 - Viewer may represent internal audit, external reviewer, or TESDA-facing preparation, but remains read-only unless a future role policy changes.
@@ -1124,7 +1124,7 @@ Additional recommended indexes:
 
 ## 10. API Requirements
 
-Current implementation status: no production API route handlers were found in `app/api` or equivalent. The route map defines planned Laravel endpoints. Until Laravel exists, these can be implemented as Next.js Route Handlers or Server Actions backed by Supabase, but the external contract should remain stable.
+Current implementation status: no production API route handlers were found in `app/api` or equivalent. The route map defines planned API endpoints (originally drafted against a Laravel API; the recommended future backend is now Express.js). Until that backend exists, these can be implemented as Next.js Route Handlers or Server Actions backed by Supabase, but the external contract should remain stable.
 
 Frontend must receive user-friendly DTOs, not raw database payloads. API examples below are conceptual response shapes.
 
@@ -1277,12 +1277,12 @@ Required component families:
 - Supabase Storage for evidence files.
 - Supabase RLS for tenant and role scoping.
 - Clerk for authentication.
-- No Laravel backend is currently implemented.
+- No dedicated backend is currently implemented.
 - No production API route handlers were found.
 
 ### Future Backend Direction
 
-Laravel may be introduced later as an API/business-logic layer for policies, imports, exports, reports, queues, scheduled jobs, document workflows, and maintainability by PH-based teams. If introduced, Laravel must sit above Supabase/Postgres and enforce the same tenant/role rules before returning DTOs.
+Express.js (Node/TypeScript) may be introduced later as an API/business-logic layer for policies, imports, exports, reports, queues, scheduled jobs, and document workflows. It was chosen over the earlier Laravel recommendation (2026-07-06) because the team works in TypeScript/Node and an Express layer reuses `modules/*/domain` rules and `shared/types.ts` DTOs directly. If introduced, Express.js must sit above Supabase/Postgres and enforce the same tenant/role rules before returning DTOs.
 
 ### Authentication Flow
 
@@ -1576,7 +1576,7 @@ Changed:
 | Change | Why | Impacted modules | Impacted users | Technical implications | Migration considerations |
 | --- | --- | --- | --- | --- | --- |
 | Next.js target moved from PDF's Next.js 14 to repo's Next.js 16. | Current `package.json` and README define Next.js 16. | Frontend platform | All | Use App Router, React 19 compatibility. | No data migration; update docs. |
-| Supabase remains current MVP backend, while Laravel is future direction only. | README says no Laravel assumptions; route docs propose Laravel API. | Backend/API | Developers, maintainers | Do not block MVP on Laravel; keep API contracts stable. | If Laravel is later added, migrate service logic, not data model. |
+| Supabase remains current MVP backend; future backend recommendation changed from Laravel to Express.js (2026-07-06). | README says no Laravel assumptions; route docs proposed Laravel API; team works in TypeScript/Node. | Backend/API | Developers, maintainers | Do not block MVP on a future backend; keep API contracts stable. | If Express.js is later added, migrate service logic, not data model; reuse `modules/*/domain` + `shared/types.ts`. |
 | Notion CSV migration became internal CSV import/export and Supabase operational DB. | PDF references Notion CSV; current docs remove Notion as official dependency. | Import/export, data | Coordinator | Import service needs validation/preview. | Map legacy Notion columns only if still used. |
 | Role model clarified to Admin, Coordinator, Trainer, Viewer. | Schema enum confirms four roles. | RBAC | All | Super Admin not implemented. | Add enum/policies only if future role approved. |
 | Profile tenant access changed from arrays in docs to membership table in migration. | Migration implements `profile_tenant_memberships`. | Auth, tenant access | Admin/Coordinator | API and UI should use membership table. | Migrate any array-based profile assumptions. |
@@ -1613,8 +1613,8 @@ Security:
 | --- | --- | --- | --- |
 | Missing `/dashboard` route | High | Root redirects to `/dashboard`, but implementation file is absent. | Add role-aware dashboard route or change redirect to implemented default. |
 | Placeholder implementation | High | Many pages/components/data files are TODO placeholders. Batches now has a real data-access contract (`modules/batches/data/batches.ts`, TES-30); other entities still stubbed. | Extend the batches fetch→map→derive pattern to remaining entities, complete shell components and core screens, and wire the dashboard off mocks before claiming MVP. |
-| Conflicting backend direction | High | Supabase-only MVP and Laravel future API are mixed in docs. | Keep MVP Supabase-based; document Laravel as future only until implemented. |
-| Incomplete API layer | High | No production API routes found. | Implement stable API/DTO boundary via Next route handlers or Laravel. |
+| Conflicting backend direction | High | Supabase-only MVP and a future backend API are mixed in docs. | Keep MVP Supabase-based; document Express.js as future only until implemented. |
+| Incomplete API layer | High | No production API routes found. | Implement stable API/DTO boundary via Next route handlers or a future Express.js API. |
 | Schema gaps for trainer attendance | High | Trainer attendance/progress required but no dedicated table exists. | Add attendance/trainer update tables or explicitly model in documents/LAMR with tradeoffs. |
 | RQM gap | Medium | Route map requires RQM but schema lacks it. | Define Program RQM entity or remove from MVP. |
 | Reports gap | Medium | Figma includes Reports but no route/API/schema. | Decide MVP inclusion; add route/API/schema or remove from nav. |

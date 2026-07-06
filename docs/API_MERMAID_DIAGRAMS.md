@@ -1,42 +1,29 @@
 # TVI-CAMS API Mermaid Diagrams
 
-These diagrams describe the planned production API architecture for TVI-CAMS.
+**These diagrams describe a FUTURE, PLANNED architecture (TES-58, Backlog —
+not started).** Today there is no backend API layer: Next.js Server Components
+call `lib/data/*.ts`, which talks to Supabase directly (see CLAUDE.md
+"Architecture" and `diagrams/System Architecture LR.mmd` / `diagrams/Request
+Auth Sequence Diagram.mmd` for the current state). Do not build against this
+document as if it exists yet.
 
-Stack direction:
+Stack direction (once TES-58 ships):
 
 - Frontend: Next.js App Router
-- Backend: Laravel API
+- Backend: Express.js API on Node/TypeScript (PLANNED; recommendation updated
+  from Laravel, 2026-07-06 — see TRD §1.3)
 - Auth: Clerk
 - Database/storage: Supabase Postgres and Supabase Storage
-- Rule: Laravel enforces tenant, role, and trainer scope before returning data.
+- Rule: the Express.js API enforces tenant, role, and trainer scope before returning data.
 
-## System Architecture
+## System Architecture (future — TES-58)
 
-```mermaid
-flowchart LR
-  User[User browser] --> Next[Next.js App Router]
-  Next --> Clerk[Clerk auth]
-  Next --> API[Laravel API]
+Maintained at `diagrams/flowchart LR.mmd`, explicitly labeled PLANNED there.
+For what actually runs today, see `diagrams/System Architecture LR.mmd`.
 
-  API --> Auth[Auth middleware<br/>Verify Clerk session/JWT]
-  Auth --> Policy[Laravel policies<br/>Role + tenant + trainer scope]
+## Frontend Routes To API Endpoints (planned catalog — TES-32/TES-58)
 
-  Policy --> Services[Domain services]
-  Services --> DB[(Supabase Postgres)]
-  Services --> Storage[(Supabase Storage<br/>S3-compatible)]
-  Services --> Queue[Laravel queue jobs]
-
-  Queue --> Import[CSV import]
-  Queue --> Export[CSV export]
-  Queue --> Activity[Activity log writer]
-
-  DB --> Services
-  Storage --> Services
-  Services --> API
-  API --> Next
-```
-
-## Frontend Routes To API Endpoints
+Mirrors `diagrams/API Diagram.mmd`; keep both in sync.
 
 ```mermaid
 flowchart TD
@@ -53,7 +40,7 @@ flowchart TD
     TrainerDocuments["/trainer/classes/[batchId]/documents"]
   end
 
-  subgraph API["Laravel API"]
+  subgraph API["PLANNED Next.js Route Handlers (TES-32)<br/>later migrates behind Express.js per TES-58"]
     GetDashboard["GET /api/dashboard"]
     GetBatchSummary["GET /api/batches?summary=true"]
     GetBatches["GET /api/batches"]
@@ -88,231 +75,41 @@ flowchart TD
   TrainerDocuments --> PostTrainerDocs
 ```
 
-## Request Authorization Pipeline
+## Request Authorization Pipeline (future — TES-58)
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant Browser as Browser
-  participant Next as Next.js
-  participant Clerk as Clerk
-  participant API as Laravel API
-  participant Policy as Policies
-  participant DB as Supabase Postgres
-  participant Storage as Supabase Storage
-
-  Browser->>Next: Open protected route
-  Next->>Clerk: Read signed-in session
-  Clerk-->>Next: User identity + claims
-  Next->>API: Request with Clerk token
-  API->>Clerk: Verify token
-  Clerk-->>API: Verified user id
-  API->>DB: Load profile + tenant memberships
-  DB-->>API: Role, tenant_ids, assigned_batch_ids
-  API->>Policy: Authorize route/action
-
-  alt Authorized
-    Policy-->>API: Allow
-    API->>DB: Tenant-scoped query
-    opt File operation
-      API->>Storage: Upload/read scoped object
-      Storage-->>API: File metadata or signed URL
-    end
-    API-->>Next: Scoped response
-    Next-->>Browser: Render UI
-  else Denied
-    Policy-->>API: Deny
-    API-->>Next: 403 Forbidden
-    Next-->>Browser: Access denied state
-  end
-```
+Once the Express.js API exists, this pipeline would insert an Express hop
+between Next.js and Supabase. For what actually runs today (no backend API;
+Next.js talks to Supabase directly via `createSupabaseServerClient()`, RLS is
+final authority), see `diagrams/Request Auth Sequence Diagram.mmd`.
 
 ## Role-Based API Access
 
-```mermaid
-flowchart TD
-  Request[API request] --> Verify[Verify Clerk user]
-  Verify --> Profile[Load profile]
-  Profile --> Role{Role}
-
-  Role --> Admin[Admin]
-  Role --> Coordinator[Coordinator]
-  Role --> Trainer[Trainer]
-  Role --> Viewer[Viewer]
-
-  Admin --> AdminScope[One-school tenant scope<br/>Full write inside tenant]
-  Coordinator --> CoordScope[Assigned multi-school scope<br/>Compliance workflow writes]
-  Trainer --> TrainerScope[Assigned batches only<br/>Training-side writes only]
-  Viewer --> ViewerScope[Assigned schools<br/>Read-only]
-
-  AdminScope --> Query[Tenant-scoped query]
-  CoordScope --> Query
-  ViewerScope --> Query
-
-  TrainerScope --> HideTrainerFields[Remove billing deadline<br/>Remove BSRS<br/>Remove NTP lag<br/>Remove financial documents]
-  HideTrainerFields --> AssignedBatchCheck{Assigned batch?}
-  AssignedBatchCheck -->|Yes| Query
-  AssignedBatchCheck -->|No| Deny[403 Forbidden]
-
-  Query --> Response[Return allowed data]
-```
+See `diagrams/role based user access.mmd` for the maintained version (kept in
+sync with MASTER_PRD_SRS.md §8 Permission Matrix, FR-02, and TRD §3.5). It
+additionally shows: the unauthenticated redirect, the `TES-34` least-privilege
+fallback to Viewer, explicit deny checks per role (not just Trainer), and the
+Supabase RLS layer as final authority — none of which this copy has, so treat
+that file as canonical rather than duplicating it here.
 
 ## Core Data Model
 
-```mermaid
-erDiagram
-  TENANTS ||--o{ PROFILES : has_members
-  TENANTS ||--o{ BATCHES : owns
-  TENANTS ||--o{ ACTIVITY_LOG : records
+**Historical note (TES-38):** this section used to show `PROGRAM_RQM`,
+`ATTENDANCE_RECORDS`, and `TRAINER_UPDATES` as if they existed in the
+migration — the exact conflict TES-38 was filed to resolve. ADR-001 (2026-06-30)
+has since settled it: RQM is **not** a separate table (it's `rqm_code` /
+`ntp_number` / etc. columns directly on `batches` — "one RQM code = one
+batch"), `attendance_records` is a real planned table, and
+`TRAINER_UPDATES` was never adopted.
 
-  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_RQM : defines
-  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_DOCUMENT_REQUIREMENTS : requires
-  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_BILLING_RULES : configures
-  SCHOLARSHIP_PROGRAMS ||--o{ BATCHES : classifies
+Current schema (matches the migration exactly): `diagrams/erDiagram.mmd` /
+`diagrams/data model schema.mmd`.
 
-  PROFILES ||--o{ BATCHES : trains
-  BATCHES ||--o{ LEARNERS : enrolls
-  BATCHES ||--o{ DOCUMENTS : has_evidence
-  BATCHES ||--o{ ATTENDANCE_RECORDS : tracks
-  BATCHES ||--o{ TRAINER_UPDATES : receives
-  BATCHES ||--o{ LAMR_REPORTS : has
-  BATCHES ||--o{ ACTIVITY_LOG : logs
+Planned additions per ADR-001, not yet migrated: `diagrams/ADR-001 Planned
+Schema.mmd`.
 
-  PROGRAM_DOCUMENT_REQUIREMENTS ||--o{ DOCUMENTS : validates
-
-  LAMR_REPORTS ||--o{ LAMR_OUTCOMES : defines
-  LAMR_OUTCOMES ||--o{ LAMR_ACTIVITIES : contains
-  LAMR_ACTIVITIES ||--o{ LAMR_ENTRIES : records
-  LEARNERS ||--o{ LAMR_ENTRIES : completes
-  LEARNERS ||--o{ ATTENDANCE_RECORDS : attends
-
-  TENANTS {
-    uuid id PK
-    string code
-    string name
-    string region
-    string type
-  }
-
-  PROFILES {
-    uuid id PK
-    string clerk_user_id
-    string role
-    uuid[] tenant_ids
-    uuid[] assigned_batch_ids
-  }
-
-  SCHOLARSHIP_PROGRAMS {
-    uuid id PK
-    string code
-    string name
-    boolean active
-  }
-
-  PROGRAM_RQM {
-    uuid id PK
-    uuid scholarship_program_id FK
-    string requirement_code
-    string requirement_name
-    string status
-  }
-
-  PROGRAM_DOCUMENT_REQUIREMENTS {
-    uuid id PK
-    uuid scholarship_program_id FK
-    string document_key
-    string label
-    string role_scope
-    boolean critical
-  }
-
-  PROGRAM_BILLING_RULES {
-    uuid id PK
-    uuid scholarship_program_id FK
-    int billing_preparation_threshold
-  }
-
-  BATCHES {
-    uuid id PK
-    uuid tenant_id FK
-    uuid scholarship_program_id FK
-    uuid trainer_profile_id FK
-    string batch_code
-    string qualification
-    string nc_level
-    int progress_pct
-    string lifecycle_stage
-  }
-
-  LEARNERS {
-    uuid id PK
-    uuid batch_id FK
-    string learner_no
-    string full_name
-  }
-
-  DOCUMENTS {
-    uuid id PK
-    uuid batch_id FK
-    uuid requirement_id FK
-    string status
-    string storage_path
-    string source
-  }
-
-  ATTENDANCE_RECORDS {
-    uuid id PK
-    uuid batch_id FK
-    uuid learner_id FK
-    date class_date
-    string status
-  }
-
-  TRAINER_UPDATES {
-    uuid id PK
-    uuid batch_id FK
-    uuid trainer_profile_id FK
-    string update_type
-    text notes
-  }
-
-  LAMR_REPORTS {
-    uuid id PK
-    uuid batch_id FK
-    string module_title
-    string schedule
-    string source_document_path
-  }
-
-  LAMR_OUTCOMES {
-    uuid id PK
-    uuid lamr_report_id FK
-    string outcome_label
-  }
-
-  LAMR_ACTIVITIES {
-    uuid id PK
-    uuid lamr_outcome_id FK
-    string activity_label
-  }
-
-  LAMR_ENTRIES {
-    uuid id PK
-    uuid lamr_activity_id FK
-    uuid learner_id FK
-    boolean completed
-    string assessment_result
-  }
-
-  ACTIVITY_LOG {
-    uuid id PK
-    uuid tenant_id FK
-    uuid batch_id FK
-    uuid actor_profile_id FK
-    string event_type
-    text message
-  }
-```
+Do not re-duplicate the ERD in this file — the two `diagrams/*.mmd` copies
+above are already the source of this exact drift (one got fixed, the other
+and this doc didn't), so a third copy here would just reopen it.
 
 ## Trainer Data Boundary
 
