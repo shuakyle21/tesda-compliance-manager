@@ -1,0 +1,54 @@
+%% TVI-CAMS — Use Case Diagram: BATCH COMPLIANCE & BILLING subsystem
+%% FRs covered: FR-03, FR-04, FR-05, FR-06, FR-09. Source: docs/MASTER_PRD_SRS.md, ADR-001.
+%% Notation: ((circle))=actor  ([stadium])=use case  --> actor initiates  -.-> «include»
+%%{init: {'theme': 'dark', 'flowchart': {'curve': 'basis'}}}%%
+flowchart LR
+    Admin((Admin))
+    Coordinator((Coordinator))
+    Trainer((Trainer))
+    Viewer((Viewer))
+
+    subgraph SYS [Batch Compliance & Billing]
+        direction TB
+        UC03(["FR-03 View Role-Scoped Dashboard"])
+        UC04(["FR-04 Track Batch Lifecycle"])
+        UC05(["FR-05 Compute Deadlines & Urgency"])
+        UC06(["FR-06 Manage Documents & Evidence"])
+        UC09(["FR-09 Generate Billing Documents"])
+    end
+
+    %% --- who initiates what (actor --> use case) ---
+    Admin --> UC03
+    Admin --> UC04
+    Admin --> UC06
+    Admin --> UC09
+
+    Coordinator --> UC03
+    Coordinator --> UC04
+    Coordinator --> UC06
+    Coordinator --> UC09
+
+    Trainer --> UC03
+    Trainer --> UC06
+
+    Viewer --> UC03
+    Viewer --> UC05
+
+    %% --- include (dependency points at the reused use case) ---
+    UC03 -. "«include»" .-> UC05
+    UC09 -. "«include» progress ≥ 80%" .-> UC05
+    UC09 -. "«include» doc readiness" .-> UC06
+
+    %% --- load-bearing exclusion (FR-09 / ADR-001) ---
+    NoBill["Trainer EXCLUDED from FR-09 —<br/>billing / NTP-lag / BSRS / financial<br/>omitted server-side in DTO"]:::warn
+    Trainer -. blocked .- NoBill
+    NoBill -.- UC09
+
+    %% --- cross-subsystem seam ---
+    Platform["Access & Platform:<br/>«include» FR-01 + FR-02 scope (RLS)<br/>writes logged to FR-12"]:::seam
+    SYS -. gated by .-> Platform
+
+    classDef actor fill:#4a148c,stroke:#ba68c8,color:#fff
+    classDef seam fill:#1b3a4b,stroke:#5aa9c9,color:#fff,stroke-dasharray:4 3
+    classDef warn fill:#5a1a1a,stroke:#ff8a65,color:#fff,stroke-dasharray:4 3
+    class Admin,Coordinator,Trainer,Viewer actor
