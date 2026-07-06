@@ -9,24 +9,24 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { InfoCallout } from '@/components/ui/InfoCallout';
-import { Icon, type IconName } from '@/components/ui/Icon';
-import { MetricCard } from '@/components/ui/MetricCard';
-import { EgaceOutcomes } from '@/components/dashboard/EgaceOutcomes';
-import { DocumentStatusDonut } from '@/components/dashboard/DocumentStatusDonut';
-import { ProgressTrend } from '@/components/dashboard/ProgressTrend';
-import { BatchTimeline } from '@/components/dashboard/BatchTimeline';
-import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { Icon, type IconName } from '@/shared/ui/Icon';
+import { MetricCard } from '@/shared/ui/MetricCard';
+import { EgaceOutcomes } from '@/modules/batches/ui/dashboard/EgaceOutcomes';
+import { DocumentStatusDonut } from '@/modules/batches/ui/dashboard/DocumentStatusDonut';
+import { ProgressTrend } from '@/modules/batches/ui/dashboard/ProgressTrend';
+import { BatchTimeline } from '@/modules/batches/ui/dashboard/BatchTimeline';
+import { AlertsPanel } from '@/modules/batches/ui/dashboard/AlertsPanel';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import {
   MOCK_ACTIVITY,
   MOCK_BATCHES,
   getMockMetrics,
-  isBillingReady,
-} from '@/lib/data/mock-batches';
-import { getBatchesSnapshot } from '@/lib/data/batches';
-import { getCurrentUser } from '@/lib/auth';
-import type { UserRole } from '@/lib/data/types';
+} from '@/shared/mocks';
+import { isBillingReady } from '@/modules/billing/domain/readiness';
+import { getBatchesSnapshot } from '@/modules/batches/data/batches';
+import { getCurrentUser } from '@/modules/auth/data/auth';
+import type { UserRole } from '@/shared/types';
 
 type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

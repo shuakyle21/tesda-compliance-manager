@@ -12,12 +12,12 @@
  */
 
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/auth';
-import { Icon } from '@/components/ui/Icon';
-import { SignOutButton } from '@/components/ui/SignOutButton';
-import { TENANTS } from '@/lib/data/mock-batches';
-import type { IconName } from '@/components/ui/Icon';
-import type { UserRole } from '@/lib/data/types';
+import { getCurrentUser } from '@/modules/auth/data/auth';
+import { Icon } from '@/shared/ui/Icon';
+import { SignOutButton } from '@/modules/auth/ui/SignOutButton';
+import { TENANTS } from '@/shared/mocks';
+import type { IconName } from '@/shared/ui/Icon';
+import type { UserRole } from '@/shared/types';
 
 // ── Role display maps (mirrored from ProfileView.jsx) ───────────────────────
 

@@ -1,34 +1,41 @@
+%% CURRENT auth flow — matches CLAUDE.md "Auth chain" + TRD §3.5.
+%% No backend API hop (see System Architecture LR.mmd). Role/tenant resolver
+%% is TES-34, in progress: today the dashboard falls back to '?role=' preview
+%% override rather than the Memberships/Resolve steps below.
 sequenceDiagram
   autonumber
   participant Browser as Browser
-  participant Next as Next.js
+  participant Proxy as proxy.ts (Clerk middleware)
+  participant Next as Server Component / Route Handler
   participant Clerk as Clerk
-  participant API as Laravel API
-  participant Policy as Policies
-  participant DB as Supabase Postgres
-  participant Storage as Supabase Storage
+  participant Supa as createSupabaseServerClient()
+  participant DB as Supabase Postgres (RLS)
 
-  Browser->>Next: Open protected route
-  Next->>Clerk: Read signed-in session
-  Clerk-->>Next: User identity + claims
-  Next->>API: Request with Clerk token
-  API->>Clerk: Verify token
-  Clerk-->>API: Verified user id
-  API->>DB: Load profile + tenant memberships
-  DB-->>API: Role, tenant_ids, assigned_batch_ids
-  API->>Policy: Authorize route/action
-
-  alt Authorized
-    Policy-->>API: Allow
-    API->>DB: Tenant-scoped query
-    opt File operation
-      API->>Storage: Upload/read scoped object
-      Storage-->>API: File metadata or signed URL
+  Browser->>Proxy: Open protected route
+  Proxy->>Clerk: Verify session
+  alt No session
+    Clerk-->>Proxy: Unauthenticated
+    Proxy-->>Browser: Redirect to /sign-in
+  else Session valid
+    Clerk-->>Proxy: User identity
+    Proxy->>Next: Continue request
+    Next->>Clerk: getToken({ template: 'supabase' })
+    Clerk-->>Next: Clerk JWT
+    Next->>Supa: Attach JWT as bearer (anon key client)
+    Supa->>DB: current_profile_id() via app_private.current_clerk_user_id()
+    DB-->>Supa: profile_id, role
+    Note over Next,DB: Gap TES-34 - resolver not yet wired into pages, falls back to a role query-param preview override
+    Supa->>DB: profile_tenant_memberships (resolve default tenant)
+    DB-->>Supa: tenant_id(s), is_default
+    Next->>DB: Tenant-scoped query (RLS-enforced)
+    alt RLS allows
+      DB-->>Next: Scoped rows only
+      opt File operation
+        Next->>DB: Signed URL / storage read (tenant-UUID path prefix)
+      end
+      Next-->>Browser: Render UI
+    else RLS denies
+      DB-->>Next: Zero rows / policy violation
+      Next-->>Browser: 403 / access-denied state
     end
-    API-->>Next: Scoped response
-    Next-->>Browser: Render UI
-  else Denied
-    Policy-->>API: Deny
-    API-->>Next: 403 Forbidden
-    Next-->>Browser: Access denied state
   end

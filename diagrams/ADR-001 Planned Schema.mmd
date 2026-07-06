@@ -1,0 +1,104 @@
+---
+title: Planned Schema — Not Yet Migrated (ADR-001 §11, TES-38)
+---
+%% Diffs against erDiagram.mmd (current schema): everything styled "planned"
+%% below does not exist in supabase/migrations/ yet.
+%% trainer_credentials, once proposed here too, has since shipped — see
+%% erDiagram.mmd / data model schema.mmd (migration 20260705150000, TES-69).
+erDiagram
+  BATCHES ||--o{ ATTENDANCE_RECORDS : tracks
+  LEARNERS ||--o{ ATTENDANCE_RECORDS : attends
+
+  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_MODULES : defines
+  PROGRAM_MODULES ||--o{ LAMR_REPORTS : "module_id FK"
+
+  BATCHES ||--o{ BATCH_TRAINER_ASSIGNMENTS : assigns
+  PROFILES ||--o{ BATCH_TRAINER_ASSIGNMENTS : co_trains
+
+  SCHOLARSHIP_PROGRAMS ||--o{ SCHOLARSHIP_COST_SCHEDULE : rates
+  BATCHES ||--o{ BILLING_RECORDS : generates
+  TENANTS ||--o{ TENANT_SETTINGS : configures
+  LEARNERS ||--o| LEARNER_IDENTITIES : "future seam, uli-keyed"
+
+  ATTENDANCE_RECORDS:::planned {
+    uuid id PK
+    uuid tenant_id FK
+    uuid batch_id FK
+    uuid learner_id FK
+    date attendance_date
+    time time_in
+    time time_out
+    boolean present
+    uuid marked_by FK
+    timestamptz marked_at
+  }
+
+  PROGRAM_MODULES:::planned {
+    uuid id PK
+    uuid program_id FK
+    string module_title
+    int sort_order
+  }
+
+  BATCH_TRAINER_ASSIGNMENTS:::planned {
+    uuid id PK
+    uuid batch_id FK
+    uuid trainer_profile_id FK
+    string schedule_pattern
+  }
+
+  SCHOLARSHIP_COST_SCHEDULE:::planned {
+    uuid id PK
+    uuid program_id FK
+    string cost_component
+    numeric rate
+  }
+
+  BILLING_RECORDS:::planned {
+    uuid id PK
+    uuid tenant_id FK
+    uuid batch_id FK
+    string generation_type
+    date generated_at
+    string generated_by
+    numeric amount
+    jsonb scholar_snapshot
+  }
+
+  TENANT_SETTINGS:::planned {
+    uuid id PK
+    uuid tenant_id FK
+    string prepared_by_name
+    string approved_by_name
+    string letterhead_image_path
+    string tesda_po_addressee
+    boolean partial_billing_enabled
+  }
+
+  LEARNER_IDENTITIES:::planned {
+    string uli PK
+    string full_name
+  }
+
+  BATCHES {
+    string rqm_code "replaces the rejected PROGRAM_RQM table idea"
+    string ntp_number
+    int approved_slots
+    numeric total_amount
+    date indicative_start_date
+    date ntp_approval_date
+    date ntp_received_date
+    string schedule_pattern
+    int total_sessions "nominal_hours / 8, snapshotted"
+    boolean entrepreneurship_delivered
+  }
+
+  LEARNERS {
+    boolean entrepreneurship_completed "dual-training guard"
+  }
+
+  LAMR_REPORTS {
+    uuid module_id FK
+  }
+
+  classDef planned fill:#fff3cd,stroke:#b38600,stroke-width:1px,stroke-dasharray:4 3

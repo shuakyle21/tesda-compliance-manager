@@ -15,7 +15,7 @@ flowchart TD
   Role --> Coordinator[Coordinator]
   Role --> Trainer[Trainer]
   Role --> Viewer[Viewer]
-  Role -.->|absent from profile_role enum| SuperAdmin[["Super Admin<br/>future - not implemented"]]
+  Role -.->|absent from profile_role enum| SuperAdmin[["Super Admin"]]
 
   Admin --> AdminScope[One assigned school<br/>Full write inside tenant]
   Coordinator --> CoordScope[One or more assigned schools<br/>Switch tenant context<br/>Compliance workflow writes]
@@ -42,3 +42,6 @@ flowchart TD
 
   Query --> RLS[Supabase RLS<br/>final authority - denies any<br/>row the JWT may not see]
   RLS --> Response[Return allowed data]
+
+  class SuperAdmin future
+  classDef future fill:#fff3cd,stroke:#b38600,stroke-width:1px,stroke-dasharray:4 3

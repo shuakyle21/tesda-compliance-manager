@@ -6,10 +6,10 @@
  * render time.
  */
 
-import { MOCK_BATCHES, DOCUMENT_REQUIREMENTS } from '@/lib/data/mock-batches';
-import { HBar, VBar, StackedBar, ChartLegend, BATCH_COLOR } from '@/components/ui/Charts';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Icon } from '@/components/ui/Icon';
+import { MOCK_BATCHES, DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { HBar, VBar, StackedBar, ChartLegend, BATCH_COLOR } from '@/shared/ui/Charts';
+import { EmptyState } from '@/shared/ui/EmptyState';
+import { Icon } from '@/shared/ui/Icon';
 
 export default function AnalyticsPage() {
   const batches = MOCK_BATCHES;

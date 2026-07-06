@@ -6,8 +6,8 @@
  * tone dot (green/blue/amber/red) matching the event category.
  */
 
-import { MOCK_ACTIVITY } from '@/lib/data/mock-batches';
-import { Icon } from '@/components/ui/Icon';
+import { MOCK_ACTIVITY } from '@/shared/mocks';
+import { Icon } from '@/shared/ui/Icon';
 
 export default function ActivityLogPage() {
   const events = MOCK_ACTIVITY;

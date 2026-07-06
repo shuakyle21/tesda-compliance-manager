@@ -1,21 +1,19 @@
+%% CURRENT architecture — matches CLAUDE.md "Architecture" section.
+%% No separate backend exists. See "flowchart LR.mmd" for the future
+%% Express.js-integration plan (TES-58, Backlog, not started).
 flowchart LR
-  User[User browser] --> Next[Next.js App Router]
-  Next --> Clerk[Clerk auth]
-  Next --> API[Laravel API]
+  User[User browser] --> Next[Next.js 16 App Router<br/>React 19]
+  Next --> Clerk[Clerk auth<br/>identity + session]
 
-  API --> Auth[Auth middleware<br/>Verify Clerk session/JWT]
-  Auth --> Policy[Laravel policies<br/>Role + tenant + trainer scope]
+  Next --> Proxy[proxy.ts<br/>Clerk middleware<br/>protects all routes except sign-in/sign-up]
+  Proxy --> Server[Server Component / Route Handler<br/>app/lib/data/*.ts]
 
-  Policy --> Services[Domain services]
-  Services --> DB[(Supabase Postgres)]
-  Services --> Storage[(Supabase Storage<br/>S3-compatible)]
-  Services --> Queue[Laravel queue jobs]
+  Server --> SupaClient[lib/supabase/server.ts<br/>createSupabaseServerClient<br/>attaches Clerk JWT template 'supabase' as bearer, anon key]
+  SupaClient --> RLS{Supabase RLS<br/>app_private.* helper functions<br/>security boundary}
 
-  Queue --> Import[CSV import]
-  Queue --> Export[CSV export]
-  Queue --> Activity[Activity log writer]
+  RLS --> DB[(Supabase Postgres)]
+  RLS --> Storage[(Supabase Storage<br/>compliance-evidence bucket<br/>tenant-UUID path prefix)]
 
-  DB --> Services
-  Storage --> Services
-  Services --> API
-  API --> Next
+  DB --> Server
+  Storage --> Server
+  Server --> Next
