@@ -436,6 +436,29 @@ export interface Database {
         };
         Update: Partial<Database['public']['Tables']['activity_log']['Insert']>;
       };
+      trainer_credentials: {
+        Row: {
+          id: string;
+          profile_id: string;
+          credential_number: string | null;
+          certified_nc_levels: string[];
+          specialization: string | null;
+          accreditation_expiry: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          credential_number?: string | null;
+          certified_nc_levels?: string[];
+          specialization?: string | null;
+          accreditation_expiry?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['trainer_credentials']['Insert']>;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
