@@ -1,19 +1,20 @@
+%% CURRENT schema only — matches supabase/migrations/20260528160300_create_tenant_scoped_schema.sql
+%% Planned-but-not-yet-migrated tables/columns (ADR-001, TES-38) live in
+%% "ADR-001 Planned Schema.mmd", not here.
 erDiagram
   TENANTS ||--o{ PROFILE_TENANT_MEMBERSHIPS : has_members
   PROFILES ||--o{ PROFILE_TENANT_MEMBERSHIPS : belongs_to
   TENANTS ||--o{ BATCHES : owns
   TENANTS ||--o{ ACTIVITY_LOG : records
 
-  SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_RQM : defines
   SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_DOCUMENT_REQUIREMENTS : requires
   SCHOLARSHIP_PROGRAMS ||--o{ PROGRAM_BILLING_RULES : configures
   SCHOLARSHIP_PROGRAMS ||--o{ BATCHES : classifies
 
   PROFILES ||--o{ BATCHES : trains
+  PROFILES ||--o| TRAINER_CREDENTIALS : "has credential (trainer-role only)"
   BATCHES ||--o{ LEARNERS : enrolls
   BATCHES ||--o{ DOCUMENTS : has_evidence
-  BATCHES ||--o{ ATTENDANCE_RECORDS : tracks
-  BATCHES ||--o{ TRAINER_UPDATES : receives
   BATCHES ||--o{ LAMR_REPORTS : has
   BATCHES ||--o{ ACTIVITY_LOG : logs
 
@@ -23,7 +24,7 @@ erDiagram
   LAMR_OUTCOMES ||--o{ LAMR_ACTIVITIES : contains
   LAMR_ACTIVITIES ||--o{ LAMR_ENTRIES : records
   LEARNERS ||--o{ LAMR_ENTRIES : completes
-  LEARNERS ||--o{ ATTENDANCE_RECORDS : attends
+  DOCUMENTS ||--o{ LAMR_REPORTS : sources
 
   TENANTS {
     uuid id PK
@@ -37,6 +38,7 @@ erDiagram
   PROFILES {
     uuid id PK
     string clerk_user_id
+    string full_name
     string role
     boolean is_active
   }
@@ -52,109 +54,139 @@ erDiagram
     uuid id PK
     string code
     string name
-    boolean active
-  }
-
-  PROGRAM_RQM {
-    uuid id PK
-    uuid scholarship_program_id FK
-    string requirement_code
-    string requirement_name
-    string status
+    boolean is_active
   }
 
   PROGRAM_DOCUMENT_REQUIREMENTS {
     uuid id PK
-    uuid scholarship_program_id FK
+    uuid program_id FK
     string document_key
-    string label
-    string role_scope
-    boolean critical
+    string document_name
+    string required_for_stage
+    string audience
+    boolean is_required
+    int sort_order
   }
 
   PROGRAM_BILLING_RULES {
     uuid id PK
-    uuid scholarship_program_id FK
-    int billing_preparation_threshold
+    uuid program_id FK
+    int progress_threshold_percent
+    string label
   }
 
   BATCHES {
     uuid id PK
     uuid tenant_id FK
-    uuid scholarship_program_id FK
+    uuid program_id FK
     uuid trainer_profile_id FK
     string batch_code
-    string qualification
+    string batch_section
+    string qualification_title
     string nc_level
-    int progress_pct
-    string lifecycle_stage
+    int learner_count
+    date start_date
+    date end_date
+    string current_stage
+    string status
+    int progress_percent
+    string billing_report_status
   }
 
   LEARNERS {
     uuid id PK
+    uuid tenant_id FK
     uuid batch_id FK
     string learner_no
-    string full_name
+    string uli
+    string last_name
+    string first_name
+    string assessment_result
+    boolean is_active
   }
 
   DOCUMENTS {
     uuid id PK
+    uuid tenant_id FK
     uuid batch_id FK
     uuid requirement_id FK
+    string document_key
     string status
+    string audience
     string storage_path
-    string source
-  }
-
-  ATTENDANCE_RECORDS {
-    uuid id PK
-    uuid batch_id FK
-    uuid learner_id FK
-    date class_date
-    string status
-  }
-
-  TRAINER_UPDATES {
-    uuid id PK
-    uuid batch_id FK
-    uuid trainer_profile_id FK
-    string update_type
-    text notes
+    string external_url
+    uuid submitted_by FK
+    uuid verified_by FK
   }
 
   LAMR_REPORTS {
     uuid id PK
+    uuid tenant_id FK
     uuid batch_id FK
+    uuid source_document_id FK
+    string tvi_name
+    string program_title
     string module_title
-    string schedule
-    string source_document_path
+    string schedule_text
+    string prepared_by
+    string approved_by
   }
 
   LAMR_OUTCOMES {
     uuid id PK
+    uuid tenant_id FK
     uuid lamr_report_id FK
-    string outcome_label
+    string outcome_code
+    string outcome_title
+    numeric hours
+    int sort_order
   }
 
   LAMR_ACTIVITIES {
     uuid id PK
-    uuid lamr_outcome_id FK
-    string activity_label
+    uuid tenant_id FK
+    uuid lamr_report_id FK
+    uuid outcome_id FK
+    string activity_code
+    string activity_title
+    int sort_order
   }
 
   LAMR_ENTRIES {
     uuid id PK
-    uuid lamr_activity_id FK
+    uuid tenant_id FK
+    uuid lamr_report_id FK
     uuid learner_id FK
-    boolean completed
+    uuid activity_id FK
+    boolean is_completed
     string assessment_result
+    uuid marked_by FK
   }
 
   ACTIVITY_LOG {
     uuid id PK
     uuid tenant_id FK
     uuid batch_id FK
-    uuid actor_profile_id FK
-    string event_type
-    text message
+    uuid profile_id FK
+    string action
+    string entity_type
+    uuid entity_id
+    string summary
+    jsonb metadata
+  }
+
+  %% Added 2026-07-05 (Linear TES-69) via /grilling session on TVET Trainer
+  %% identity. No tenant_id: global like PROFILES itself (trainer can be
+  %% cross-school per ADR-001 M2). RLS: SELECT mirrors "read own or
+  %% same-tenant profiles"; INSERT/UPDATE is trainer-self-only
+  %% (profile_id = current_profile_id() and current_role() = 'trainer') -
+  %% admin/coordinator cannot edit, only view (verification happens via the
+  %% existing trainer_qual document review workflow instead).
+  TRAINER_CREDENTIALS {
+    uuid id PK
+    uuid profile_id FK "unique - 1:1 with profiles"
+    string credential_number
+    text_array certified_nc_levels
+    string specialization
+    date accreditation_expiry
   }
