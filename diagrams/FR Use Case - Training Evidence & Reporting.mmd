@@ -1,0 +1,44 @@
+%% TVI-CAMS — Use Case Diagram: TRAINING EVIDENCE & REPORTING subsystem
+%% FRs covered: FR-07, FR-08, FR-10, FR-11, FR-15. Source: docs/MASTER_PRD_SRS.md.
+%% Notation: ((circle))=actor  ([stadium])=use case  --> actor initiates  -.-> «include»/«extend»
+%%{init: {'theme': 'dark', 'flowchart': {'curve': 'basis'}}}%%
+flowchart LR
+    Admin((Admin))
+    Coordinator((Coordinator))
+    Trainer((Trainer))
+    Viewer((Viewer))
+
+    subgraph SYS [Training Evidence & Reporting]
+        direction TB
+        UC07(["FR-07 Submit Attendance & Progress"])
+        UC08(["FR-08 Maintain LAMR Evidence"])
+        UC10(["FR-10 Import / Export CSV"])
+        UC11(["FR-11 View Analytics"])
+        UC15(["FR-15 View Reports (planned)"]):::future
+    end
+
+    %% --- who initiates what (actor --> use case) ---
+    Trainer --> UC07
+    Trainer --> UC08
+
+    Coordinator --> UC07
+    Coordinator --> UC08
+    Coordinator --> UC10
+    Coordinator --> UC11
+
+    Admin --> UC10
+    Admin --> UC11
+
+    Viewer --> UC11
+
+    %% --- include (LAMR draws on the same class attendance/progress) ---
+    UC08 -. "«include»" .-> UC07
+
+    %% --- cross-subsystem seam ---
+    Platform["Access & Platform:<br/>«include» FR-01 + FR-02 scope (RLS)<br/>writes logged to FR-12"]:::seam
+    SYS -. gated by .-> Platform
+
+    classDef actor fill:#4a148c,stroke:#ba68c8,color:#fff
+    classDef seam fill:#1b3a4b,stroke:#5aa9c9,color:#fff,stroke-dasharray:4 3
+    classDef future fill:#4a3f00,stroke:#b38600,color:#fff,stroke-dasharray:4 3
+    class Admin,Coordinator,Trainer,Viewer actor

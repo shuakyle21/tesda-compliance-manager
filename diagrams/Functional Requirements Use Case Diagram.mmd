@@ -1,0 +1,101 @@
+%% TVI-CAMS — Functional Requirements Use Case Diagram
+%% Source of truth: docs/MASTER_PRD_SRS.md (FR-01..FR-15), ADR-001 (billing), FR-02 role boundaries.
+%% Mermaid has no native UML use-case type; emulated with a flowchart per convention:
+%%   ((circle)) = actor, ([stadium]) = use case, --- = association, -.-> = <<include>>/<<extend>>.
+flowchart LR
+    Admin((Admin))
+    Coordinator((Coordinator))
+    Trainer((Trainer))
+    Viewer((Viewer))
+    SuperAdmin((Super Admin)):::future
+
+    Clerk[/"Clerk (identity)"/]:::ext
+    TESDA[/"TESDA SIS / T2MIS / BSRS<br/>(authoritative, no submission)"/]:::ext
+
+    subgraph SYS [TVI-CAMS Compliance Manager]
+        UC01(["FR-01 Authenticate & Protected Access"])
+        UC02(["FR-02 Enforce Tenant / Role Scope (RLS)"])
+        UC03(["FR-03 View Role-Scoped Dashboard"])
+        UC04(["FR-04 Track Batch Lifecycle"])
+        UC05(["FR-05 Compute Deadlines & Urgency"])
+        UC06(["FR-06 Manage Document Checklist & Evidence"])
+        UC07(["FR-07 Submit Attendance & Progress"])
+        UC08(["FR-08 Maintain LAMR Evidence"])
+        UC09(["FR-09 Generate Billing Documents"])
+        UC10(["FR-10 Import / Export CSV"])
+        UC11(["FR-11 View Analytics"])
+        UC12(["FR-12 Review Activity & Audit Log"])
+        UC13(["FR-13 Open Notifications Drawer"])
+        UC14(["FR-14 Configure Settings / Roles / RQM"])
+        UC15(["FR-15 View Reports (planned)"]):::future
+    end
+
+    %% --- Actor associations ---
+    Admin --- UC03
+    Admin --- UC04
+    Admin --- UC06
+    Admin --- UC09
+    Admin --- UC10
+    Admin --- UC11
+    Admin --- UC12
+    Admin --- UC13
+    Admin --- UC14
+
+    Coordinator --- UC03
+    Coordinator --- UC04
+    Coordinator --- UC06
+    Coordinator --- UC07
+    Coordinator --- UC08
+    Coordinator --- UC09
+    Coordinator --- UC10
+    Coordinator --- UC11
+    Coordinator --- UC12
+    Coordinator --- UC13
+
+    Trainer --- UC03
+    Trainer --- UC06
+    Trainer --- UC07
+    Trainer --- UC08
+    Trainer --- UC13
+
+    Viewer --- UC03
+    Viewer --- UC05
+    Viewer --- UC11
+    Viewer --- UC12
+    Viewer --- UC13
+
+    %% --- Supporting / external actors ---
+    UC01 --- Clerk
+    TESDA -. "no submission (out of scope)" .- SYS
+
+    %% --- Excluded / future ---
+    SuperAdmin -. "not in profile_role enum" .- SYS
+
+    %% --- include / extend ---
+    UC02 -. "«include»" .-> UC01
+    UC03 -. "«include»" .-> UC02
+    UC04 -. "«include»" .-> UC02
+    UC06 -. "«include»" .-> UC02
+    UC07 -. "«include»" .-> UC02
+    UC09 -. "«include»" .-> UC02
+    UC10 -. "«include»" .-> UC02
+    UC14 -. "«include»" .-> UC02
+
+    UC03 -. "«include»" .-> UC05
+    UC09 -. "«include» progress ≥ 80%" .-> UC05
+    UC09 -. "«include» doc readiness" .-> UC06
+    UC04 -. "«include» logs event" .-> UC12
+    UC06 -. "«include» logs event" .-> UC12
+    UC10 -. "«include» logs event" .-> UC12
+
+    %% --- Load-bearing exclusion (FR-09 / ADR-001) ---
+    NoBill["Trainer EXCLUDED from billing —<br/>billing/NTP-lag/BSRS/financial<br/>omitted server-side in DTO"]:::warn
+    NoBill -. blocks .- Trainer
+    NoBill -.- UC09
+
+    classDef actor fill:#4a148c,stroke:#ba68c8,color:#fff
+    classDef ext fill:#1b3a4b,stroke:#5aa9c9,color:#fff
+    classDef warn fill:#5a1a1a,stroke:#ff8a65,color:#fff,stroke-dasharray:4 3
+    classDef future fill:#4a3f00,stroke:#b38600,color:#fff,stroke-dasharray:4 3
+
+    class Admin,Coordinator,Trainer,Viewer actor
