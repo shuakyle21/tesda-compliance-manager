@@ -40,11 +40,15 @@ yarn-error.log*
 .agents/
 skills-lock.json
 
-# claude settings
-.claude/
+# claude settings — ignore everything under .claude/ (must use /* so Git still
+# descends into re-included subdirs below; a bare `.claude/` would block them)
+.claude/*
+!.claude/skills/
 
-# project-scoped Claude skills (kept local, not shared with the team)
-.claude/skills/
+# project-scoped Claude skills (kept local, not shared with the team) ...
+.claude/skills/*
+# ... except the mermaid skill, which is version-controlled and shared with the team
+!.claude/skills/mermaid/
 
 # typescript
 *.tsbuildinfo
