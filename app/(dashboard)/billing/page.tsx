@@ -1,12 +1,15 @@
 /**
- * SCREEN ROUTE — Billing packet queue (FR-09).
+ * SCREEN ROUTE — Billing packet queue + statement engine (FR-09).
  *
  * Figma reference: file vZKyWXSipBHmiQFuHl5e1O, node 840:5128.
- * Domain reference: ADR-003 (packet-queue projection amending ADR-001 §4).
+ * Domain reference: ADR-003 (packet-queue projection amending ADR-001 §4);
+ * ADR-001 §V2/§W1 (statement preview as the document-generating surface).
  *
  * Server Component: resolves the role, fetches the batch snapshot, projects
- * packets through the billing domain, and composes the client island. No
- * business logic lives here — the projection is `modules/billing/domain`.
+ * packets through the billing domain, derives the per-batch billing cards the
+ * statement preview consumes, and composes the client island. No business
+ * logic lives here — projection is `modules/billing/domain`, card derivation
+ * is `modules/billing/data`.
  */
 
 import { redirect } from 'next/navigation';
@@ -16,6 +19,7 @@ import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks/seed';
 import { getBatchesSnapshot } from '@/modules/batches/data/batches';
 import { firstParam, resolveRouteRole } from '@/modules/auth/data/role';
 import { buildPackets } from '@/modules/billing/domain/packets';
+import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
 import type { Batch } from '@/shared/types';
 
@@ -78,6 +82,11 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   const schoolCodes = Object.fromEntries(TENANTS.map((t) => [t.id, t.code]));
   const packets = buildPackets(visible, DOCUMENT_REQUIREMENTS, schoolCodes);
 
+  // Statement-preview inputs: one card per active batch (gate + tracks + tenant
+  // header context). The queue row is the ADR-003 projection; the card is what
+  // `buildStatement` derives the actual document from — same batches, two views.
+  const cards = buildBillingCards(visible);
+
   const latestUpdate = visible
     .map((b) => b.updatedAt)
     .filter((v): v is string => Boolean(v))
@@ -102,6 +111,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   return (
     <BillingQueueView
       packets={packets}
+      cards={cards}
       role={billingRole}
       dataAsOf={formatAsOf(latestUpdate)}
       syncFailed={syncFailed}
