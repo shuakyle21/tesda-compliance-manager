@@ -1,4 +1,4 @@
-[![Mark stale issues and pull requests](https://github.com/shuakyle21/tesda-compliance-manager/actions/workflows/stale.yml/badge.svg?branch=main)](https://github.com/shuakyle21/tesda-compliance-manager/actions/workflows/stale.yml)
+[![Mark stale issues and pull requests](https://github.com/shuakyle21/tesda-compliance-manager/actions/workflows/stale.yml/badge.svg?branch=main)](https://github.com/shuakyle21/tesda-compliance-manager/actions/workflows/stale.yml) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/shuakyle21/tesda-compliance-manager)
 # TESDA Document and Compliance Manager
 
 Internal compliance and document tracking tool for farm schools and TVIs implementing TESDA scholarship programs.
