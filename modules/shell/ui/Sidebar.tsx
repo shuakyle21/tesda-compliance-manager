@@ -43,7 +43,7 @@ const OPERATIONS: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { open, closeDrawer } = useNavDrawer();
+  const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
 
   // School selector (no tenant backend yet — switch updates local display).
   const [orgOpen, setOrgOpen] = useState(false);
@@ -76,16 +76,31 @@ export function Sidebar() {
   return (
     <>
       <div className={`sidebar-scrim${open ? ' show' : ''}`} onClick={closeDrawer} aria-hidden="true" />
-      <aside className={`sidebar${open ? ' open' : ''}`} aria-label="Primary navigation">
-        {/* Brand */}
+      <aside
+        className={`sidebar${open ? ' open' : ''}${collapsed ? ' collapsed' : ''}`}
+        aria-label="Primary navigation"
+      >
+        {/* Brand — full TVI-CAMS lockup, the same transparent-background asset
+            the sign-in card renders. The image is the only brand text in the
+            sidebar, so it carries a real alt. */}
         <div className="sb-brand">
-          <span aria-hidden="true" style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--color-blue)', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
-            TVI
-          </span>
-          <span className="sb-brand-text">
-            <span className="sb-brand-name">TVI-CAMS</span>
-            <span className="sb-brand-sub">Compliance &amp; Audit</span>
-          </span>
+          <img
+            src="/assets/tvi-cams-logo.svg"
+            alt="TVI-CAMS — Compliance and Attendance Management System"
+            width={334}
+            height={167}
+            className="sb-brand-lockup"
+          />
+          {/* One dismiss control per breakpoint — the CSS reveals exactly one:
+              collapse (rail slides out, ≥801px) / close drawer (X, ≤800px). */}
+          <button
+            type="button"
+            className="sb-collapse icon-btn"
+            onClick={toggleCollapsed}
+            aria-label="Collapse sidebar"
+          >
+            <Icon name="layout-sidebar" size={18} />
+          </button>
           <button type="button" className="sb-close icon-btn" onClick={closeDrawer} aria-label="Close navigation">
             <Icon name="x" size={16} />
           </button>

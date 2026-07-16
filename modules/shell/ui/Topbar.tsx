@@ -2,15 +2,19 @@
  * STEP 7a — Shell Component: Topbar
  *
  * Application header: brand mark + wordmark on the left, the active school +
- * last-synced badge on the right. Server Component — display-only.
+ * last-synced badge on the right. Server Component — the only interactive part
+ * is the <SidebarExpandButton> client island, which appears once the desktop
+ * sidebar is collapsed.
  */
 
 import { TENANTS } from '@/shared/mocks';
+import { SidebarExpandButton } from './SidebarExpandButton';
 
 export function Topbar({ lastSynced = 'Last synced 4 min ago' }: { lastSynced?: string }) {
   const tenant = TENANTS[0];
   return (
     <div className="topbar-flex">
+      <SidebarExpandButton />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/assets/mark.svg" alt="" width={28} height={28} style={{ borderRadius: 'var(--radius-md)' }} />
       <div style={{ minWidth: 0 }}>

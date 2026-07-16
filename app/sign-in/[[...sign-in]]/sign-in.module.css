@@ -19,10 +19,14 @@
   box-shadow: var(--shadow-sm);
 }
 
-.mark {
+/* Brand lockup — spans the card's inner width at the source art's native ~2:1
+   ratio (bundle renders it 334x168). `aspect-ratio` + `height:auto` keeps the
+   slot reserved so there's no layout shift while the SVG loads. */
+.logo {
   display: block;
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 334 / 168;
   flex-shrink: 0;
 }
 
