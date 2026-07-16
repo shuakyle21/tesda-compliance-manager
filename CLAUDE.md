@@ -56,6 +56,8 @@ Two type families stay deliberately separate: `lib/supabase/database.types.ts` (
 
 `docs/MASTER_PRD_SRS.md` is the product source of truth, `docs/TRD.md` the engineering companion, `docs/IMPLEMENTATION_PLAN.md` the phased plan — but **`docs/adr/ADR-001-billing-and-domain-model.md` supersedes any conflicting "billing = preparation signal only" wording**. Billing is a document-generating engine (TSF/Allowance, Training Cost, Entrepreneurship — populated `.docx` templates; Assessment Fee is out of scope). Key locked domain facts: progress = `sessions_held / total_sessions` (nominal hours ÷ 8, snapshotted on the batch); a scholar with ≥5 absences is ineligible; one RQM code = one batch (NTP authorization on the batch); ULI is the permanent learner key; tenant context lives in the URL path segment; alerts are computed on read (no cron/email). Consult the ADR before changing schema or billing math.
 
+`CONTEXT.md` (repo root) is the domain glossary / ubiquitous language reference (Batch, RQM, NTP, ULI, training progress, billing track/tranche, readiness gate, etc.) — check it before naming new fields, functions, or UI copy so terminology stays consistent with the rest of the app. `docs/adr/ADR-002-design-prototype-portrays-adr-001-target.md` records that the Claude Design prototype (project `e3ea69aa`) intentionally portrays the full ADR-001 target system (billing engine, RQM/NTP-on-batch, attendance) even where the backing schema isn't migrated yet — honesty there is carried by copy discipline, not implemented-vs-planned badges. Don't treat prototype screens as evidence a module is implemented in this repo; check `modules/<domain>/data/` for that.
+
 ## Design system rules (spec-mandated, non-negotiable)
 
 - **No emoji** anywhere in UI; icons are `@tabler/icons-react` line icons
@@ -70,4 +72,4 @@ Two type families stay deliberately separate: `lib/supabase/database.types.ts` (
 ## Git / workflow
 
 - Linear team **TESDA-CAMS** (key `TES`) two-way syncs with this GitHub repo: create issues on **one side only** to avoid duplicate pairs. Branch names follow Linear's `klynejoshua13/tes-NN-…` convention.
-- The single migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is canonical for schema + RLS; new migrations are additive. After any migration: regenerate `database.types.ts`, then update affected mappers and domain types.
+- The base migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is canonical for schema + RLS; new migrations are additive (e.g. `20260705150000_add_trainer_credentials.sql`). After any migration: regenerate `database.types.ts`, then update affected mappers and domain types.

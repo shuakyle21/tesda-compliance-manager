@@ -19,7 +19,7 @@ Distilled knowledge base for TVI-CAMS, built entirely from `docs/`. Each note is
 
 ## Engineering — how
 
-- [[Architecture Overview]] — single Next.js app → Supabase, Clerk identity, Laravel future-only
+- [[Architecture Overview]] — single Next.js app → Supabase, Clerk identity, Express.js future-only
 - [[Auth And Tenancy]] — Clerk→Supabase JWT bridge, RLS helpers, tenant-in-URL
 - [[Data Layer Pattern]] — fetch → map → derive; the two type families; DTO rules
 - [[Database Schema]] — implemented tables, enums, and the ADR-001 additions
@@ -40,4 +40,4 @@ Distilled knowledge base for TVI-CAMS, built entirely from `docs/`. Each note is
 
 [[MASTER_PRD_SRS]] · [[TRD]] · [[IMPLEMENTATION_PLAN]] · [[MVP_PRD]] · [[ADR-001-billing-and-domain-model]] · [[SUPABASE_SCHEMA_GUIDE]] · [[UI_UX_MODAL_AUDIT]] · [[API_MERMAID_DIAGRAMS]] · [[TVI_CAMS_REGENERATED_REQUIREMENTS_2026-06-19]] · [[GIT_PROCESS_REPORT]] · [[GITHUB_PROJECTS_INTEGRATION]] · [[GITHUB_PROJECT_BACKLOG]] · [[Priority PLAN]]
 
-Related: [[TVI-CAMS Knowledge Base]]
+Related: [[TVI-CAMS Knowledge Base]] · [[Codebase Map]] — the code side (one node per `modules/<domain>`)

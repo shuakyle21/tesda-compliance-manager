@@ -6,7 +6,7 @@
 
 | Level | Scope | Rule |
 | --- | --- | --- |
-| **Unit** | Pure mappers + derive helpers (`mapBatchRow`), date/progress/urgency engine, billing math (`lib/domain/*`) | Use **fixed as-of dates**; no I/O. The fetch/map split exists specifically to make this trivial ([[Data Layer Pattern]]) |
+| **Unit** | Pure mappers + derive helpers (`mapBatchRow`), date/progress/urgency engine, billing math (`modules/billing/domain/*`) | Use **fixed as-of dates**; no I/O. The fetch/map split exists specifically to make this trivial ([[Data Layer Pattern]]) |
 | **Integration** | Data contracts against **real Supabase — no mocks**: RLS scoping, tenant isolation, trainer field omission, writes + activity logging | Seeded tenants (AKB/J3ED/NEN) with per-role JWTs |
 | **E2E** | Role journeys: unauthenticated redirect, cross-tenant denial, trainer unassigned-batch denial, viewer write-block, upload flow, modal focus trap | Maps to the PRD test matrix **T-001..T-030** |
 

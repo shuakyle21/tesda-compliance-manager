@@ -9,7 +9,7 @@ Next.js 16 App Router (Vercel)
   - Server Components: fetch + role-scoped render
   - Route Handlers / Server Actions: mutations
   - Clerk middleware (route protection)
-  - lib/data/* contracts (fetch → map → derive)
+  - modules/<domain>/data/* contracts (fetch → map → derive)
   ↓ Clerk JWT (template "supabase")        ↓ session
 Supabase Postgres + Storage                Clerk
   - tenant-scoped schema, RLS (app_private.*)
@@ -24,19 +24,19 @@ Supabase Postgres + Storage                Clerk
 | Auth | Clerk | Already wired; offloads session/MFA/account UI |
 | Authorization | Supabase RLS keyed on Clerk JWT | Defense in depth — even a wrong query returns zero unauthorized rows |
 | Framework | Next.js App Router + RSC | Role-scoped data fetched server-side; secrets never reach the client |
-| Future backend | **Laravel — documented only, never built** | The `lib/data/*` DTO boundary is the designed seam: Laravel could later slot in behind the same shapes without a UI rewrite |
+| Future backend | **Express.js (Node/TS) — documented only, never built** | Recommendation changed from Laravel on 2026-07-06 ([[TRD]] §1.3): same language means an Express layer reuses `modules/*/domain` rules + `shared/types.ts` DTOs directly, slotting in behind the module `data/` boundary without a UI rewrite |
 
-## Laravel is future-only
+## Express.js is future-only
 
-The [[API_MERMAID_DIAGRAMS]] describe a *planned* Laravel API architecture. Per the PRD conflict table, **the MVP is Next.js + Clerk + Supabase** — do not build Laravel or treat it as present ([[Docs Precedence]]).
+The [[API_MERMAID_DIAGRAMS]] describe a *planned* Express.js API architecture (the recommendation was changed from Laravel on 2026-07-06 — [[TRD]] §1.3; older diagrams and docs that still say "Laravel" are superseded). Per the PRD conflict table, **the MVP is Next.js + Clerk + Supabase** — do not build the Express.js backend or treat it as present ([[Docs Precedence]]).
 
 ## Component layering
 
-`app/(dashboard)/<route>/page.tsx` (Server Component: fetch + compose) → `components/screens/*` → `components/ui/*` primitives + `components/dashboard/*` widgets; `components/shell/*` is the app shell (Sidebar → Topbar → MetricsRow). Default to Server Components; client islands only for interactivity. Reuse existing primitives (`BatchCard`, `BatchModal`, `StatusBadge`, `LifecyclePipeline`, `EmptyState`, …) rather than creating parallels.
+Code is grouped by **domain, not file type** (TES-68 — see [[Codebase Map]]): `app/(dashboard)/<route>/page.tsx` (Server Component: fetch + compose) → `modules/<domain>/ui/*` screens → `shared/ui/*` primitives; `modules/batches/ui/dashboard/*` holds the dashboard widgets and `modules/shell/ui/*` is the app shell (Sidebar → Topbar → MetricsRow). Default to Server Components; client islands only for interactivity. Reuse existing primitives (`BatchCard`, `BatchModal`, `StatusBadge`, `LifecyclePipeline`, `EmptyState`, …) rather than creating parallels.
 
 ## State management
 
-Server state via RSC + `lib/data/*` (no React Query in MVP); **URL state** for anything shareable (filters, sort, tenant, `?batchId=`); local client state only for transient UI (modals, uploads, unsaved forms).
+Server state via RSC + `modules/<domain>/data/*` (no React Query in MVP); **URL state** for anything shareable (filters, sort, tenant, `?batchId=`); local client state only for transient UI (modals, uploads, unsaved forms).
 
 ## Related
 

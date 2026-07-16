@@ -1,6 +1,6 @@
 # Data Layer Pattern
 
-`lib/data/batches.ts` (TES-30) is the **reference implementation** every entity contract must follow — three deliberately separated layers:
+`modules/batches/data/batches.ts` (TES-30) is the **reference implementation** every entity contract must follow — three deliberately separated layers (code is grouped by domain since TES-68; see [[Codebase Map]]):
 
 1. **fetch** — a typed Supabase query (`getBatches()`); **RLS scopes rows** — never manually filter by tenant in JS
 2. **map** — a pure, I/O-free DB-row → domain translation (`mapBatchRow`), unit-testable against fixtures
@@ -9,9 +9,9 @@
 ## Two type families, kept apart
 
 - `lib/supabase/database.types.ts` — **generated** raw DB row shapes; regenerate after every migration
-- `lib/data/types.ts` — the UI **domain** types (`Batch`, `DocRecord`, `DashboardMetrics`, …), the contract between components and data
+- `shared/types.ts` — the UI **domain** types (`Batch`, `DocRecord`, `DashboardMetrics`, …), the contract between components and data (kept as one file; a per-module split was considered and deliberately deferred in TES-68)
 
-**Rule: only `lib/data/*` may import `database.types`; components import domain types only.** This keeps DB churn out of the UI.
+**Rule: only module `data/*` layers may import `database.types`; components import domain types only.** This keeps DB churn out of the UI.
 
 ## The enum bridge lives here
 
