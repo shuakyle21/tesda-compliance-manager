@@ -38,9 +38,15 @@ The **absence deduction** (`absences × ₱160`) applies to the **final tranche 
 - **No envelope ledger / no over-billing guard** — the TESDA Provincial Office reconciles (NoLedger). `approved_slots` on the batch is the billable-pax cap ([[RQM And NTP Authorization]]).
 - Output formatting: scholar rows **alphabetized by last name + numbered**; total rendered **in words**.
 
-## Where it lives in code (planned)
+## Where it lives in code
 
-Pure domain logic in `lib/domain/billing/*` (eligibility, tranches, amounts — deterministic, unit-testable with fixed as-of dates); persistence in `lib/data/billing.ts`; `.docx` templating in `lib/billing/`. Built in Phase 4B of the [[Implementation Roadmap]].
+Implemented as the `modules/billing/` module — TES-70 shipped the billing UI and on-screen statement preview ([[Billing Module]] · [[Codebase Map]]):
+
+- `domain/` — pure, deterministic rules unit-testable with fixed as-of dates: `rates.ts` (amounts), `tracks.ts` (tranche schedules), `readiness.ts` (the readiness gate), `statement.ts` (`buildStatement` assembles the statement), `amountInWords.ts` (total-in-words rendering)
+- `data/billing.ts` — persistence + fetch → map → derive ([[Data Layer Pattern]])
+- `ui/` — `BillingView.tsx` and `BillingStatementModal.tsx` (the statement preview, one source of truth with the target `.docx`)
+
+**Still to come** (module README): real `.docx` template population and the append-only, versioned `billing_records` generation log (the ₱137k → ₱145.2k re-generation story). The on-screen preview is an *internal working copy* — TESDA SIS/BSRS remain authoritative. Remaining work is Phase 4B of the [[Implementation Roadmap]].
 
 ## Related
 

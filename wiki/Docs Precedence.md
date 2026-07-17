@@ -15,7 +15,7 @@ When the PRD itself consolidates conflicting sources: live Figma (UI structure) 
 
 ## Key resolved conflicts
 
-- **Laravel:** README says "no Laravel assumptions"; route/API docs propose a Laravel API ([[API_MERMAID_DIAGRAMS]]). Resolution: MVP is Next.js + Clerk + Supabase; **Laravel is future-only** — never treat it as present ([[Architecture Overview]]).
+- **Future backend:** README says "no Laravel assumptions"; older route/API docs proposed a Laravel API ([[API_MERMAID_DIAGRAMS]]). Resolution: MVP is Next.js + Clerk + Supabase; a dedicated backend is **future-only** — and as of 2026-07-06 the recommended one is **Express.js** (Node/TS), superseding Laravel ([[TRD]] §1.3, [[Architecture Overview]]).
 - **Billing scope:** passive signal (original FR-09) vs. document generation. Resolution: **ADR-001 wins** — generation is in scope; Assessment Fee billing and official submission are not.
 - **Tenant access shape:** `tenant_ids` arrays in older docs vs. the `profile_tenant_memberships` table in the migration. The **membership table is canonical**.
 - **RQM:** diagrams mention a `program_rqm` table; ADR-001 resolves RQM as an **NTP authorization on the batch** ([[RQM And NTP Authorization]]), not a table.

@@ -23,7 +23,7 @@ The UI lifecycle differs from the DB enum, and the translation lives **in the ma
 - UI **`entre`** (entrepreneurship) stage is **UI-only** — no DB column
 - DB **`blocked`** surfaces as UI **`pending`** (the UI status union has no `blocked`)
 
-`DB_TO_UI_STAGE` in `lib/data/batches.ts` is a total map: a new DB enum variant fails compilation until its UI treatment is chosen.
+`DB_TO_UI_STAGE` in `modules/batches/data/batches.ts` is a total map: a new DB enum variant fails compilation until its UI treatment is chosen.
 
 ## Rules
 

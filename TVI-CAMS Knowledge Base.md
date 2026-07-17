@@ -6,6 +6,10 @@ Map of content for every markdown document in this repo. The repo itself is the 
 
 [[Wiki Home]] is the entry point to `wiki/` — ~20 short, interlinked topic notes distilled from `docs/` (one concept per note: [[Billing Engine]], [[Auth And Tenancy]], [[Batch Lifecycle]], [[Data Layer Pattern]], …). Read the wiki for orientation; follow its source links into the raw docs below for authority.
 
+## Codebase (the code side)
+
+[[Codebase Map]] is the entry point to `codebase/` — one node per `modules/<domain>` (DDD layout, TES-68), each linked to the wiki concept it implements. Open the graph view to see the code cluster bridge to the concept cluster.
+
 ## Start Here
 
 - [[README]] — what the tool is, official-systems boundary, roles, initial tenants

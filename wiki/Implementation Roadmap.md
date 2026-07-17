@@ -6,12 +6,12 @@ The build plan is **phased and dependency-ordered** — phases are sequential, i
 
 | Phase | Goal | Key items |
 | --- | --- | --- |
-| **0 — Foundation** (blocks everything) | Make real data, types, and tests possible | 0.1 ADR-001 schema migration ([[Database Schema]]) · 0.2 regenerate DB types · 0.3 complete `lib/data/*` contracts ([[Data Layer Pattern]]) · 0.4 test harness ([[Testing Strategy]]) · 0.5 tenant-role resolver + storage path/signed-URL helpers |
+| **0 — Foundation** (blocks everything) | Make real data, types, and tests possible | 0.1 ADR-001 schema migration ([[Database Schema]]) · 0.2 regenerate DB types · 0.3 complete `modules/<domain>/data/*` contracts ([[Data Layer Pattern]]) · 0.4 test harness ([[Testing Strategy]]) · 0.5 tenant-role resolver + storage path/signed-URL helpers |
 | **1 — `/dashboard`** (the audit's #1 P0 gap) | Real, role-correct, Supabase-wired landing page | Wire off `MOCK_BATCHES`; complete role variants; real state signals; remove `?role=`/`?state=` overrides |
 | **2 — Batch + Documents** | The core compliance loop | Batch detail modal · document matrix + upload ([[Document Checklist And Evidence]]) · [[LAMR Evidence]] UI · lifecycle transitions with validation |
 | **3 — Trainer views** | Mobile-first trainer workflow, no financial exposure | My Classes · attendance form → `attendance_records` · trainer evidence upload |
 | **4 — Admin/Coordinator** | Operational tooling | CSV import wizard + export ([[Learner Identity And Import]]) · notifications drawer ([[Alerts]]) · settings modal · T2MIS/BSRS overlay |
-| **4B — Billing Engine** | ADR-001's build plan | Pure domain logic (`lib/domain/billing/*`) · cost snapshot + RQM on creation · `.docx` generation · readiness + tranche gating + alerts ([[Billing Engine]]) |
+| **4B — Billing Engine** | ADR-001's build plan | Pure domain logic (`modules/billing/domain/*`) · cost snapshot + RQM on creation · readiness + tranche gating + alerts — UI, domain rules, and statement preview **shipped** (TES-70); `.docx` generation + append-only `billing_records` log remain ([[Billing Engine]]) |
 | **5 — Quality & Handoff** | Production readiness | Figma-route parity · WCAG 2.2 AA pass ([[Design System Rules]]) · full T-001..T-030 suite · production readiness checklist |
 
 ## Dependency spine

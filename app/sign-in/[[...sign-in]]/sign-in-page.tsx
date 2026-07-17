@@ -154,10 +154,13 @@ export function SignInCard() {
 
   return (
     <div className={styles.card}>
-      {/* Brand mark — Figma node 743:3076 (shipped as public/assets/mark.svg,
-          the same logo the Topbar/Sidebar use). The SVG is self-contained:
-          blue tile + rounded corners are baked in. */}
-      <img src="/assets/mark.svg" alt="" width={40} height={40} className={styles.mark} />
+      {/* Full TVI-CAMS brand lockup — the recently-updated Sign-in design swaps
+          the small 40x40 mark for the horizontal logotype (document-checklist
+          mark + "TVI-CAMS" wordmark + "Compliance & Audit" tagline), rendered
+          near the full card width at its native ~2:1 ratio. Decorative here:
+          the same brand is announced by the "Sign in to TVI-CAMS" heading, so
+          alt="" avoids a duplicate screen-reader announcement. */}
+      <img src="/assets/tvi-cams-logo.svg" alt="" width={334} height={168} className={styles.logo} />
 
       {view === 'signin' ? (
         <>
