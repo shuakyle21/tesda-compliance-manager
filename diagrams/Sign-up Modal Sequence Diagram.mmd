@@ -15,7 +15,7 @@ sequenceDiagram
   participant Clerk as Clerk (useSignUp)
   participant Email as User inbox
 
-  Note over Browser,SignIn: Opened via Sign-up link on sign-in card<br/>or via /sign-up?sign_up=1 redirect
+  Note over Browser,SignIn: Opened via Sign-up link on sign-in card<br/>or via /sign-up which redirects to /sign-in?sign_up=1
 
   alt Email + password path
     Browser->>Browser: Validate firstName, lastName, email, password<br/>(+ invite code if NEXT_PUBLIC_REQUIRE_INVITE_CODE)
@@ -36,6 +36,6 @@ sequenceDiagram
   else Google OAuth path
     Browser->>Clerk: signUp.authenticateWithRedirect({ redirectUrl: /sign-in/sso-callback,<br/>redirectUrlComplete: /dashboard })
     Clerk-->>Browser: Redirect to Google, then return to /sign-in/sso-callback
-    Note over Browser,Clerk: Handled by AuthenticateWithRedirectCallback in<br/>app/sign-in/[[__p10__]]/page.tsx. Session is activated here.
+    Note over Browser,Clerk: Handled by AuthenticateWithRedirectCallback in<br/>app/sign-in sso-callback route. Session is activated here.
     Browser->>Browser: Land on /dashboard with active session
   end
