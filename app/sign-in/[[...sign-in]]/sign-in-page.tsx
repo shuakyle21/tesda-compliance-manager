@@ -24,6 +24,7 @@
 import { useSignIn } from '@clerk/nextjs/legacy';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
 import styles from './sign-in.module.css';
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL;
@@ -46,6 +47,9 @@ export function SignInCard() {
   const redirectUrl = params.get('redirect_url') || '/';
 
   const [view, setView] = useState<'signin' | 'forgot'>('signin');
+  // Sign-up modal state — owned here (the auth screen) per the handoff; the
+  // /sign-up route deep-links into it via ?sign_up=1.
+  const [signUpOpen, setSignUpOpen] = useState(params.get('sign_up') === '1');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
@@ -226,7 +230,16 @@ export function SignInCard() {
             <span aria-hidden="true">›</span>
           </button>
 
-          <p className={styles.foot}>No account? Contact your school administrator</p>
+          <p className={styles.foot}>
+            No account?{' '}
+            <button
+              type="button"
+              className={styles.footLink}
+              onClick={() => setSignUpOpen(true)}
+            >
+              Sign up
+            </button>
+          </p>
         </>
       ) : (
         // ── Forgot-password view ───────────────────────────────────────────
@@ -315,6 +328,10 @@ export function SignInCard() {
         <span>Secured by</span>
         <img src="/assets/clerk-logo.svg" alt="Clerk" width={37} height={11} />
       </div>
+
+      {/* Sign-up modal — renders over the auth screen; closing (X, backdrop,
+          Escape, or "Go to sign in") returns to this card. */}
+      <SignUpModal open={signUpOpen} onClose={() => setSignUpOpen(false)} />
     </div>
   );
 }
