@@ -1,30 +1,16 @@
-'use client';
-
 /**
- * Sign-up page — Clerk prebuilt <SignUp> branded with the TCS design system
- * via the shared `appearance` config (lib/clerkAppearance).
+ * Sign-up route — sign-up now happens in the custom <SignUpModal> launched
+ * from the sign-in screen (per the sign-up modal design handoff), so this
+ * route only preserves deep links: /sign-up redirects to the sign-in screen
+ * with the modal already open.
  *
- * Methods (configured in the Clerk dashboard): email + password (with email
- * verification code), Google OAuth. The `[[...sign-up]]` catch-all is required
- * so Clerk can handle its own sub-paths mid-flow (verify-email, SSO callback).
+ * The `[[...sign-up]]` catch-all is kept so any stale Clerk sub-path links
+ * (e.g. /sign-up/verify-email-address) land here too instead of 404ing; the
+ * custom modal flow never navigates to sub-paths itself.
  */
 
-import { SignUp } from '@clerk/nextjs';
-import { clerkAppearance } from '@/modules/auth/ui/clerkAppearance';
+import { redirect } from 'next/navigation';
 
 export default function SignUpPage() {
-  return (
-    <main className="auth-shell">
-      <div className="auth-stack">
-        <div className="auth-brand">TVI-CAMS · Compliance &amp; Audit</div>
-        <SignUp
-          appearance={clerkAppearance}
-          routing="path"
-          path="/sign-up"
-          signInUrl="/sign-in"
-          fallbackRedirectUrl="/"
-        />
-      </div>
-    </main>
-  );
+  redirect('/sign-in?sign_up=1');
 }
