@@ -355,6 +355,17 @@ Route group `app/(dashboard)/` shares one shell (`layout.tsx`: Sidebar →
 MobileHeader → Topbar → MetricsRow → content). `/` redirects to `/dashboard`.
 Public routes are `/sign-in` and `/sign-up`.
 
+> **Sign-up flow (TES-72):** sign-up is a **custom modal** (`modules/auth/ui/
+> SignUpModal.tsx`) launched from the "No account? Sign up" link on the sign-in
+> card, driven by Clerk's `useSignUp()` hook (email + email-code verify, or
+> Google OAuth) — it replaces Clerk's prebuilt `<SignUp>` widget. `/sign-up` is
+> now only a **redirect** to `/sign-in?sign_up=1` (opens the modal), kept as a
+> catch-all so stale Clerk sub-paths don't 404. The email path deliberately does
+> **not** activate a session on success (a registrar must assign school + role
+> first — PRD FR-01), so it returns the user to sign in; Google OAuth returns via
+> `/sign-in/sso-callback` and lands signed-in on `/dashboard`. See
+> `diagrams/Sign-up Modal Sequence Diagram.mmd`.
+
 > **ADR-001 reconciliation (K1):** the routes below are written in their *current*
 > flat form. ADR-001 moves the admin/coordinator/viewer dashboard tree under a
 > **`[tenant]` path segment** (`/{tenant}/dashboard`, `/{tenant}/batch-cards`, …);
@@ -366,7 +377,7 @@ Public routes are `/sign-in` and `/sign-up`.
 | --- | --- | --- | --- | --- |
 | `/` → `/dashboard` | `app/page.tsx` | Public redirect | — | Implemented (redirect). |
 | `/sign-in` | `app/sign-in/[[...sign-in]]/page.tsx` | Public | — | Implemented. |
-| `/sign-up` | `app/sign-up/[[...sign-up]]/page.tsx` | Public | — | Implemented. |
+| `/sign-up` | `app/sign-up/[[...sign-up]]/page.tsx` | Public | — | Redirects to `/sign-in?sign_up=1`; sign-up is the `SignUpModal` (TES-72). |
 | `/dashboard` | `app/(dashboard)/dashboard/page.tsx` | Clerk | Admin, Coordinator, Viewer (Trainer redirected to `/trainer`) | **Built on mock data.** Role-aware variants + loading/empty/denied/sync-failed/stale states exist; **not** wired to Supabase; role resolver incomplete (TES-34/TES-63). |
 | `/batch-cards` | `app/(dashboard)/batch-cards/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`modules/batches/ui/CardsView`). |
 | `/table-view` | `app/(dashboard)/table-view/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`TableView`). |
@@ -585,6 +596,7 @@ Vercel (Next.js 16)  ──HTTPS──▶  Supabase (hosted Postgres + Storage)
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk provider | — |
 | `CLERK_SECRET_KEY` | Clerk server | — |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `..._SIGN_UP_URL` / after-auth URLs | Clerk routing | Align with `/sign-in`, `/sign-up`, `/dashboard`. |
+| `NEXT_PUBLIC_REQUIRE_INVITE_CODE` | `SignUpModal` (TES-72) | Optional; `'true'` shows the required invite-code field (stored as Clerk `unsafeMetadata`). Default off. |
 
 Operational monitoring (production): auth failures, RLS denials, import/upload
 failures, API latency, error rates. Backups: daily Supabase DB backups once real
