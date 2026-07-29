@@ -19,24 +19,24 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@clerk/nextjs": "^7.4.1",
-    "@supabase/ssr": "^0.12.0",
-    "@supabase/supabase-js": "^2.108.2",
-    "@tabler/icons-react": "^3.44.0",
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "@clerk/nextjs": "^7.6.3",
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.111.0",
+    "@tabler/icons-react": "^3.46.0",
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "code-to-figma": "^0.4.3",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "serve": "^14.2.0",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "eslint": "^10.8.0",
+    "eslint-config-next": "^16.2.12",
+    "serve": "^14.2.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
   }
 }
