@@ -71,6 +71,13 @@ Entrepreneurship ₱800. All values appear verbatim in Circular 015 s.2026.
 
 ## 4. Billing — General Model
 
+> **Amended by [[ADR-003-billing-packet-queue]] (2026-08-01).** ADR-003 adds a
+> *packet queue* projection over this engine (P1–P7): derived packet identity,
+> a `draft → ready → generated → submitted → settled` lifecycle, and derived due
+> dates. It does **not** change the tranche math below, and it explicitly
+> upholds **NoLedger** and **JJ1** — `submitted`/`settled` are user-asserted
+> bookkeeping marks, and "Send reminder" is in-app follow-up only, never email.
+
 | ID | Decision |
 | --- | --- |
 | **V2** | The app **generates the official TESDA billing documents** (not merely a signal). *This reverses two MVP non-goals — see §12.* |
@@ -227,6 +234,7 @@ left for a follow-up pass against the updated docs.
 
 ## Related
 
+- [[ADR-003-billing-packet-queue]] — amends §4 with the packet-queue projection
 - [[MASTER_PRD_SRS]] — FR-09 revised per this ADR
 - [[MVP_PRD]] — non-goals revised per §12
 - [[TRD]] — §4.3a / §16 implement these decisions
