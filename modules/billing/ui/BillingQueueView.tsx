@@ -216,7 +216,12 @@ export function BillingQueueView({
                       <tr
                         key={packet.ref}
                         className={`data-row${active ? ' selected' : ''}`}
-                        aria-selected={active}
+                        // aria-current, not aria-selected: the latter is only
+                        // meaningful inside role="grid", and declaring a grid
+                        // would promise arrow-key navigation this table does not
+                        // implement. aria-current is valid on any element and
+                        // says exactly what the tint means.
+                        aria-current={active ? 'true' : undefined}
                         tabIndex={0}
                         onClick={() => setSelectedRef(packet.ref)}
                         onKeyDown={(e) => {
