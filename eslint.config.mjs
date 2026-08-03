@@ -59,6 +59,9 @@ const eslintConfig = defineConfig([
     "uploads/**",
     "tesda-compliance-manager-design-system-v0/**",
     "next-env.d.ts",
+    // Vendored agent tooling, not project source.
+    ".claude/**",
+    ".agents/**",
   ]),
 ]);
 

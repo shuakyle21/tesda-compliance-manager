@@ -63,4 +63,6 @@ next-env.d.ts
 
 # Obsidian vault workspace state (repo doubles as a vault)
 .obsidian/
+
+# Local agent scratch state
 .fallow/
