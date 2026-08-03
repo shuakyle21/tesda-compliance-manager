@@ -22,8 +22,8 @@ export default function SignInPage() {
       <main className="auth-shell">
         <AuthenticateWithRedirectCallback
           signInUrl="/sign-in"
-          signInFallbackRedirectUrl="/"
-          signUpFallbackRedirectUrl="/"
+          signInFallbackRedirectUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
         />
       </main>
     );

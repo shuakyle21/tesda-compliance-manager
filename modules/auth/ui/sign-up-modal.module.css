@@ -1,0 +1,383 @@
+/**
+ * Scoped styles for the sign-up modal (SignUpModal.tsx).
+ * Mirrors the design handoff "Sign Up Modal.dc.html" using TCS design tokens.
+ * A CSS Module is used (matching sign-in.module.css) so :hover / :focus /
+ * ::placeholder / :disabled states can match the design faithfully.
+ */
+
+/* ── Modal shell ──────────────────────────────────────────────────────────── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(24, 24, 15, 0.46);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  overflow-y: auto;
+  animation: su-backdrop-in 150ms ease;
+}
+
+.scroller {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.dialog {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 28px 32px 24px;
+  animation: su-sheet-in 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes su-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes su-sheet-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backdrop, .dialog { animation-duration: 0.01ms; }
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+.close:hover {
+  background: var(--color-surface-alt);
+  color: var(--color-text-secondary);
+}
+
+.mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+
+/* ── Headings ─────────────────────────────────────────────────────────────── */
+.title {
+  margin: 16px 0 0;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.sub {
+  margin: 6px 0 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.emailEcho {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-primary);
+}
+
+/* ── General (non-field) error banner — same ramp as the sign-in card ─────── */
+.error {
+  margin: 16px 0 0;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  background: var(--color-red-lt);
+  border: 1px solid var(--color-red-border);
+  color: var(--color-red-dk);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+/* ── OAuth button ─────────────────────────────────────────────────────────── */
+.oauth {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.oauth:hover:not(:disabled) { background: var(--color-surface-raised); }
+.oauth:active:not(:disabled) { transform: scale(0.98); }
+.oauth:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Divider ──────────────────────────────────────────────────────────────── */
+.divider {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.divider span {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* ── Fields ───────────────────────────────────────────────────────────────── */
+.nameGrid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.nameGrid .field { margin-top: 0; }
+
+.field {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.input {
+  box-sizing: border-box;
+  height: 38px;
+  width: 100%;
+  padding: 0 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.input::placeholder { color: var(--color-text-muted); }
+.input:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px var(--color-blue-lt);
+}
+.inputInvalid {
+  background: var(--color-red-lt);
+  border-color: var(--color-red-border);
+  color: var(--color-red-dk);
+}
+
+.pwInput {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  padding-right: 40px;
+}
+.inviteInput {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.pwWrap {
+  position: relative;
+  display: flex;
+}
+.eye {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.eye:hover { color: var(--color-text-secondary); }
+
+.helper {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.fieldError {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-red-dk);
+}
+
+/* ── Primary button ───────────────────────────────────────────────────────── */
+.primary {
+  margin-top: 18px;
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-blue);
+  border: 1px solid var(--color-blue);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.primary:hover:not(:disabled) { background: var(--color-blue-dk); }
+.primary:active:not(:disabled) { transform: scale(0.98); }
+.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Step-switch / helper links ───────────────────────────────────────────── */
+.switchLine {
+  margin: 14px 0 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+.switchLine + .switchLine { margin-top: 6px; }
+
+.link {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--color-blue-dk);
+  cursor: pointer;
+}
+.link:hover { text-decoration: underline; }
+
+.mutedLink {
+  color: var(--color-text-muted);
+}
+
+/* ── Verify step ──────────────────────────────────────────────────────────── */
+.codeRow {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.codeInput {
+  box-sizing: border-box;
+  width: 42px;
+  height: 48px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.codeInput:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px var(--color-blue-lt);
+}
+
+.codeError {
+  margin: 10px 0 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-red-dk);
+}
+
+/* ── Done step ────────────────────────────────────────────────────────────── */
+.doneWrap {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.doneCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: var(--color-green-lt);
+  border: 1px solid var(--color-green-border);
+  color: var(--color-green);
+}
+
+.doneTitle {
+  margin: 14px 0 0;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.doneWrap .primary { width: 100%; }
+
+/* ── Footer badge ─────────────────────────────────────────────────────────── */
+.footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.footer img { display: block; height: 12px; width: auto; }
