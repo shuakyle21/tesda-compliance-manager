@@ -126,14 +126,15 @@ LAMR is represented as structured evidence, not only as a file upload. Each reco
 
 | Path | Purpose |
 | --- | --- |
-| `app/` | Next.js App Router routes and dashboard pages. |
-| `components/` | Reusable UI components. |
-| `lib/` | Shared data, helpers, and domain utilities. |
+| `app/` | Next.js App Router routes only — Server Components fetch and compose. |
+| `modules/<domain>/` | Domain modules (`data/`, `domain/`, `ui/`), one per PRD functional requirement. |
+| `shared/` | Props-only UI primitives, UI domain types, and the mock seed dataset. |
+| `lib/supabase/` | External data boundary: client/server factories and generated `database.types.ts`. |
+| `RULES.md` | Non-negotiable invariants (security, module boundaries, design system). |
 | `docs/MVP_PRD.md` | Full MVP product requirements document. |
 | `docs/GITHUB_PROJECTS_INTEGRATION.md` | GitHub Projects workflow notes. |
 | `docs/GITHUB_PROJECT_BACKLOG.md` | MVP backlog prepared for GitHub Issues and Projects. |
 | `DESIGN.md` | Product design direction and interface rules. |
-| `ARCHITECTURE.md` | System architecture alignment. |
 | `colors_and_type.css` | Design tokens and typography reference. |
 
 ## Local Development
