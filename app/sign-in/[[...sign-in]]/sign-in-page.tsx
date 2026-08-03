@@ -140,7 +140,7 @@ export function SignInCard() {
   }
 
   // ── Demo account ──────────────────────────────────────────────────────────
-  function useDemo() {
+  function handleUseDemo() {
     if (!DEMO_EMAIL) {
       setError('Demo account is not configured. Set NEXT_PUBLIC_DEMO_EMAIL / NEXT_PUBLIC_DEMO_PASSWORD.');
       return;
@@ -225,7 +225,7 @@ export function SignInCard() {
             </button>
           </form>
 
-          <button type="button" className={styles.demo} onClick={useDemo} disabled={disabled}>
+          <button type="button" className={styles.demo} onClick={handleUseDemo} disabled={disabled}>
             <span>Use a demo account</span>
             <span aria-hidden="true">›</span>
           </button>
