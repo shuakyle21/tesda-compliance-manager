@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Read [`RULES.md`](RULES.md) before making any code change.** It is the checklist of
+> non-negotiable invariants — security boundary, module boundaries, data-layer contract, design
+> system, do-not-edit directories — with each rule's enforcement level (hook / lint / types / RLS /
+> review). This file explains the architecture and the *why*; `RULES.md` states the *what*. Where
+> the two appear to disagree, `RULES.md` wins and the drift should be fixed.
+
 ## What this is
 
 TVI-CAMS — an internal multi-tenant compliance tool for TVI schools running TESDA scholarship batches (TWSP/CFSP). It tracks batch lifecycle, documents, attendance, LAMR evidence, and generates official TESDA billing documents. It is an **internal working layer only**: TESDA SIS/T2MIS/BSRS remain the authoritative systems, and UI copy must never imply official approval or submission.
@@ -56,18 +62,27 @@ Two type families stay deliberately separate: `lib/supabase/database.types.ts` (
 
 `docs/MASTER_PRD_SRS.md` is the product source of truth, `docs/TRD.md` the engineering companion, `docs/IMPLEMENTATION_PLAN.md` the phased plan — but **`docs/adr/ADR-001-billing-and-domain-model.md` supersedes any conflicting "billing = preparation signal only" wording**, and **`docs/adr/ADR-003-billing-packet-queue.md` amends ADR-001 §4** with the packet-queue projection (derived packet identity, `draft → ready → generated → submitted → settled`, derived due dates) while upholding NoLedger and JJ1. Billing is a document-generating engine (TSF/Allowance, Training Cost, Entrepreneurship — populated `.docx` templates; Assessment Fee is out of scope). Key locked domain facts: progress = `sessions_held / total_sessions` (nominal hours ÷ 8, snapshotted on the batch); a scholar with ≥5 absences is ineligible; one RQM code = one batch (NTP authorization on the batch); ULI is the permanent learner key; tenant context lives in the URL path segment; alerts are computed on read (no cron/email). Consult the ADR before changing schema or billing math.
 
-## Design system rules (spec-mandated, non-negotiable)
+## Design system
 
-- **No emoji** anywhere in UI; icons are `@tabler/icons-react` line icons
-- IBM Plex fonts; semantic color tokens only (defined in `app/globals.css` + `app/design-system.css`) — never raw hex in components
-- Status conveyed by text + icon, never color alone; WCAG 2.2 AA target
-- Every data screen implements: loading, empty, no-results, error/sync-failed, permission-denied, stale-data states; screens with relative dates show an exact "Data as of" timestamp
+Spec-mandated and non-negotiable: no emoji, `@tabler/icons-react` line icons, IBM Plex, semantic
+color tokens only, status by text + icon (never color alone), WCAG 2.2 AA, and six required states
+on every data screen. The design system exists because the app is a compliance tool — a coordinator
+misreading a status by color alone is a real operational failure, not a cosmetic one.
+**Full list: [`RULES.md` §4](RULES.md).**
 
 ## Static/handoff directories — do not edit
 
-`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim from the design bundle and excluded from lint/build (`eslint.config.mjs` globalIgnores). A PreToolUse hook (`.claude/hooks/protect-static-dirs.sh`) blocks edits there. Edit the source design files instead, or confirm with the user first. `FIGMA FILES/`, `diagrams/`, `.design-sync/` are likewise design artifacts, not app code.
+`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim from the design
+bundle and excluded from lint/build (`eslint.config.mjs` globalIgnores); a PreToolUse hook
+(`.claude/hooks/protect-static-dirs.sh`) blocks edits there. `FIGMA FILES/`, `diagrams/`,
+`.design-sync/` are likewise design artifacts, not app code. **See [`RULES.md` §6](RULES.md).**
 
 ## Git / workflow
 
-- Linear team **TESDA-CAMS** (key `TES`) two-way syncs with this GitHub repo: create issues on **one side only** to avoid duplicate pairs. Branch names follow Linear's `klynejoshua13/tes-NN-…` convention.
-- The single migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is canonical for schema + RLS; new migrations are additive. After any migration: regenerate `database.types.ts`, then update affected mappers and domain types.
+- Linear team **TESDA-CAMS** (key `TES`) two-way syncs with this GitHub repo — hence the
+  one-side-only issue rule and the `klynejoshua13/tes-NN-…` branch convention
+  ([`RULES.md` §8](RULES.md)).
+- The single migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is
+  canonical for schema + RLS; new migrations are additive. After any migration: regenerate
+  `database.types.ts`, then update affected mappers and domain types
+  ([`RULES.md` §3](RULES.md)).
