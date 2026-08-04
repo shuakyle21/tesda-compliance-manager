@@ -7,6 +7,8 @@ reviewing, or merging code.
 **Read this file before any code change.** Each rule states its enforcement level:
 
 - **[hook]** — blocked by a PreToolUse hook; cannot be bypassed by an agent
+- **[deny]** — blocked by `permissions.deny` in `.claude/settings.json`; an agent cannot
+  request an exception in-session, so lifting it means editing that file first
 - **[lint]** / **[types]** — fails `npm run lint` or `npx tsc --noEmit`
 - **[rls]** — enforced by Postgres row-level security, not application code
 - **[review]** — no automated check; a human or agent must catch it
@@ -105,6 +107,22 @@ reviewing, or merging code.
     of `docs/IMPLEMENTATION_PLAN.md`.
 35. When tests exist: **mappers and module `domain/` layers are unit-tested with fixed as-of
     dates**; **RLS/tenant-isolation tests run against real Supabase, no mocks.** **[review]**
+
+## 10. Agent conduct
+
+36. **Never execute statements against the live Supabase project without explicit user
+    permission, or an agreed plan that covers it.** Covers `execute_sql` (**including
+    read-only `select`s** — the tool is denied, not the statement kind), `apply_migration`,
+    branch create/merge/reset, and edge-function deploys, by any route: the MCP server, the
+    CLI (`db push`, `db reset`, `migration up`), or `psql`. State exactly what will run and
+    why, then wait. There is one hosted project and no staging, so an unreviewed statement
+    lands on real tenant data. **[deny]** (`.claude/settings.json` `permissions.deny`)
+
+    Schema questions should be answered from the checked-in migrations and
+    `lib/supabase/database.types.ts` first. The read-only introspection tools
+    (`list_tables`, `list_migrations`, `get_advisors`, `search_docs`) remain available for
+    what those cannot answer — note that `list_tables` row counts are `reltuples` planner
+    estimates, not counts.
 
 ---
 
