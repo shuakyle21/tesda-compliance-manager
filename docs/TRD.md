@@ -24,7 +24,7 @@ Register and Precedence"):
 Conflicts are resolved per the MASTER_PRD_SRS conflict-resolution table. This TRD
 does **not** restate product requirements (FR-01..FR-15 live in the PRD) and does
 **not** introduce Express.js as implemented — Express.js is documented only as a
-future direction, consistent with `ARCHITECTURE.md` and the PRD conflict table.
+future direction, consistent with the PRD conflict table.
 (The future-backend recommendation was changed from Laravel to Express.js on
 2026-07-06; see §1.3.)
 

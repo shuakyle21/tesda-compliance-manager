@@ -1,0 +1,216 @@
+/**
+ * Billing packets (FR-09) — pure domain logic, no I/O.
+ *
+ * ADR-003 P1: a "packet" is a PROJECTION over `(batch_id, billing_type,
+ * tranche_no)` — the same key ADR-001 §4.1/§4.2 already tranches on. It is not a
+ * stored invoice and carries no ledger. Everything in this file is derived from
+ * a batch plus its documents, which is why the whole module is a pure function
+ * of its inputs and can be unit-tested with a fixed as-of date.
+ *
+ * ADR-003 P5: `dueDate` and "overdue" are computed on read, never stored, so the
+ * screen inherits the existing "Data as of" stamp instead of drifting.
+ */
+
+import type { Batch, DocRecord, DocStatus, DocumentRequirement } from '@/shared/types';
+
+/** ₱/day TSF rate — TESDA Circular 015 s.2026, recorded in ADR-001 §3. */
+export const TSF_DAY_RATE = 160;
+
+/**
+ * Lifecycle stages whose documents must be settled before a packet can be
+ * generated. Deliberately excludes `assess`/`bill` stage documents: those are
+ * produced *by* billing, so requiring them would make readiness circular and
+ * leave Generate permanently dead (the same gate scoping TES-70 landed on).
+ */
+export const PRE_BILLING_STAGES = ['aou', 'ntp', 'tip', 'train'] as const;
+
+/** Progress threshold at which the final TSF tranche unlocks (ADR-001 §4.1). */
+export const PACKET_READY_THRESHOLD = 80;
+
+export type PacketState = 'draft' | 'ready' | 'generated' | 'submitted' | 'settled';
+
+export interface PacketDoc {
+  key: string;
+  label: string;
+  status: DocStatus;
+  /** A doc counts as satisfied once uploaded — ADR-001 §7.2.4 accepts the
+   *  manual attendance sheet as evidence, so `submitted` is not a blocker. */
+  satisfied: boolean;
+}
+
+export interface BillingPacket {
+  /** Display-only reference (ADR-003 P1) — NOT an accounting document number. */
+  ref: string;
+  batchId: string;
+  batchName: string;
+  qualification: string;
+  program: string;
+  schoolCode: string;
+  scholars: number;
+  /** TSF/Allowance component in centavos-free pesos (see {@link tsfAmount}). */
+  amount: number;
+  state: PacketState;
+  /** Derived (P5). Negative = past due. */
+  daysToDue: number;
+  dueLabel: string;
+  docs: PacketDoc[];
+  /** Human-readable reasons the packet is not yet generatable. */
+  blockers: string[];
+}
+
+/**
+ * TSF / Allowance total for a batch: `training days × ₱160 × scholars`
+ * (ADR-001 §3). The Training Cost component is deliberately NOT summed here —
+ * it needs the per-qualification cost-schedule snapshot (BB1) which is not yet
+ * on the `Batch` contract. Surfacing a partial, labelled figure is honest;
+ * inventing a rate would not be.
+ */
+export function tsfAmount(batch: Batch): number {
+  return batch.totalDays * TSF_DAY_RATE * batch.scholars;
+}
+
+/** Peso formatting used by both the tiles and the queue rows. */
+export function formatPeso(amount: number): string {
+  return `₱${amount.toLocaleString('en-PH')}`;
+}
+
+/** Compact peso for the summary tiles — ₱184K rather than ₱184,000. */
+export function formatPesoCompact(amount: number): string {
+  if (amount >= 1_000_000) return `₱${(amount / 1_000_000).toFixed(1)}M`;
+  if (amount >= 1_000) return `₱${Math.round(amount / 1_000)}K`;
+  return `₱${amount}`;
+}
+
+function dueLabelFor(daysToDue: number): string {
+  if (daysToDue < 0) return `${Math.abs(daysToDue)}d past due`;
+  if (daysToDue === 0) return 'Due today';
+  if (daysToDue === 1) return 'Due tomorrow';
+  return `Due in ${daysToDue}d`;
+}
+
+/**
+ * Builds the packet projection for one batch.
+ *
+ * `state` is derived rather than read, because ADR-003 P2/P3 puts `generated` in
+ * `billing_records` (table not yet migrated) and makes `submitted`/`settled`
+ * user-asserted marks with no store yet. Completed batches therefore stand in
+ * as `settled` — a prototype portrayal of the target, per ADR-002.
+ */
+export function buildPacket(
+  batch: Batch,
+  requirements: DocumentRequirement[],
+  schoolCode: string,
+  sequence: number,
+): BillingPacket {
+  const docs: PacketDoc[] = requirements
+    .filter((r) => (PRE_BILLING_STAGES as readonly string[]).includes(r.stage))
+    .map((r) => {
+      const record: DocRecord | undefined = batch.documents[r.key];
+      const status = record?.status ?? 'missing';
+      return {
+        key: r.key,
+        label: r.label,
+        status,
+        satisfied: status === 'verified' || status === 'submitted',
+      };
+    });
+
+  const unsatisfied = docs.filter((d) => !d.satisfied);
+  const belowThreshold = batch.progressPct < PACKET_READY_THRESHOLD;
+
+  const blockers: string[] = [];
+  if (belowThreshold) {
+    blockers.push(
+      `Training progress is ${batch.progressPct}% — the final tranche unlocks at ${PACKET_READY_THRESHOLD}%.`,
+    );
+  }
+  if (unsatisfied.length > 0) {
+    blockers.push(
+      `${unsatisfied.length} supporting ${unsatisfied.length === 1 ? 'document is' : 'documents are'} not yet on file: ${unsatisfied
+        .map((d) => d.label)
+        .join(', ')}.`,
+    );
+  }
+
+  const state: PacketState =
+    batch.status === 'completed' ? 'settled' : blockers.length === 0 ? 'ready' : 'draft';
+
+  return {
+    ref: `PKT-${String(sequence).padStart(3, '0')}`,
+    batchId: batch.id,
+    batchName: batch.name.replace(/ · Batch \d+$/, ''),
+    qualification: batch.qualification,
+    program: batch.program,
+    schoolCode,
+    scholars: batch.scholars,
+    amount: tsfAmount(batch),
+    state,
+    daysToDue: batch.daysToBilling,
+    dueLabel: batch.status === 'completed' ? 'Settled' : dueLabelFor(batch.daysToBilling),
+    docs,
+    blockers,
+  };
+}
+
+/** True when a live packet has passed its derived due date (ADR-003 P5). */
+export function isOverdue(packet: BillingPacket): boolean {
+  return packet.state !== 'settled' && packet.daysToDue < 0;
+}
+
+export function buildPackets(
+  batches: Batch[],
+  requirements: DocumentRequirement[],
+  schoolCodes: Record<string, string>,
+): BillingPacket[] {
+  return batches.map((batch, i) =>
+    buildPacket(batch, requirements, schoolCodes[batch.tenantId] ?? '—', i + 1),
+  );
+}
+
+export interface PacketSummary {
+  ready: number;
+  readyCount: number;
+  pendingReview: number;
+  pendingCount: number;
+  overdue: number;
+  overdueCount: number;
+  settled: number;
+  settledCount: number;
+}
+
+/**
+ * The four summary tiles (ADR-003 P6). Every figure is a sum over the
+ * projection, not a stored aggregate — and `settled` is an *observation* total
+ * (what someone marked), never a reconciliation.
+ */
+export function summarizePackets(packets: BillingPacket[]): PacketSummary {
+  const sum = (list: BillingPacket[]) => list.reduce((total, p) => total + p.amount, 0);
+
+  const ready = packets.filter((p) => p.state === 'ready' && !isOverdue(p));
+  const pending = packets.filter((p) => p.state === 'draft' && !isOverdue(p));
+  const overdue = packets.filter(isOverdue);
+  const settled = packets.filter((p) => p.state === 'settled');
+
+  return {
+    ready: sum(ready),
+    readyCount: ready.length,
+    pendingReview: sum(pending),
+    pendingCount: pending.length,
+    overdue: sum(overdue),
+    overdueCount: overdue.length,
+    settled: sum(settled),
+    settledCount: settled.length,
+  };
+}
+
+/** Free-text filter across the fields the queue's search box advertises. */
+export function filterPackets(packets: BillingPacket[], query: string): BillingPacket[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return packets;
+  return packets.filter((p) =>
+    [p.ref, p.batchName, p.qualification, p.schoolCode, p.program]
+      .join(' ')
+      .toLowerCase()
+      .includes(q),
+  );
+}

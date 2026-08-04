@@ -310,6 +310,111 @@ body { min-height: 100vh; margin: 0; }
   .metrics { grid-template-columns: 1fr; }
 }
 
+/* Billing's summary row is four tiles, not the five the dashboard row assumes. */
+.metrics.metrics-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1100px) { .metrics.metrics-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 440px)  { .metrics.metrics-4 { grid-template-columns: 1fr; } }
+
+/* ----- Billing packet queue (FR-09, Figma 840:5128) ---------- */
+/* Queue + detail panel sit side by side at desktop width; the panel drops below
+   the queue before the table would need to squeeze. */
+.billing-queue-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+@media (max-width: 1000px) {
+  .billing-queue-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.billing-queue { padding: 0; overflow: hidden; }
+.billing-queue-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px 12px;
+}
+.billing-queue-title {
+  margin: 0;
+  font-family: var(--font-sans); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.billing-queue-search {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 16px 12px;
+  padding: 0 10px; height: 34px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+}
+.billing-queue-search input {
+  flex: 1; min-width: 0;
+  border: 0; background: transparent; outline: none;
+  font-family: var(--font-sans); font-size: 13px;
+  color: var(--color-text-primary);
+}
+.billing-queue-search:focus-within {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px var(--color-blue-lt);
+}
+
+.billing-table { width: 100%; min-width: 640px; border-collapse: collapse; }
+.billing-table th {
+  padding: 8px 12px;
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-sans); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-align: left; white-space: nowrap;
+}
+.billing-table td {
+  padding: 10px 12px;
+  font-family: var(--font-sans); font-size: 12px;
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+/* Packet refs, amounts and due labels are single tokens — wrapping them mid-value
+   ("PKT-" / "001") reads as two fields. Only the batch cell may wrap. */
+.billing-table .mono { font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; }
+.billing-table td:not(:nth-child(2)) { white-space: nowrap; }
+.billing-table-sub {
+  font-family: var(--font-mono); font-size: 10.5px;
+  color: var(--color-text-muted);
+}
+
+.billing-detail { padding: 16px; }
+.billing-detail-title {
+  margin: 0 0 8px;
+  font-family: var(--font-sans); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+.billing-detail-ref {
+  margin: 0 0 10px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--color-blue);
+}
+.billing-detail-note {
+  margin: 12px 0;
+  font-family: var(--font-sans); font-size: 12px; line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+.billing-doc-list { list-style: none; margin: 0 0 14px; padding: 0; }
+.billing-doc-list li {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-border-faint);
+  font-family: var(--font-sans); font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.billing-doc-list li:last-child { border-bottom: 0; }
+.billing-detail-actions { display: flex; flex-direction: column; gap: 8px; }
+.billing-detail-actions .btn { justify-content: center; }
+
 /* ----- Tab bar ---------------------------------------------- */
 .tabbar {
   display: flex; gap: 0;
@@ -379,15 +484,77 @@ body { min-height: 100vh; margin: 0; }
               border-color var(--dur-base) var(--ease-standard);
 }
 .btn svg { width: 14px; height: 14px; }
+
+/* Per-variant states are specified by Figma component set "Actions/Button"
+   (node 840:4781–840:4790, Type × State × Status × Size). Each state below is a
+   drawn variant, not an opacity approximation — see .btn:disabled fallback. */
 .btn.primary { background: var(--color-blue); color: white; }
-.btn.primary:hover { background: var(--color-blue-dk); }
-.btn.primary:active { transform: scale(0.98); }
-.btn.secondary { background: var(--color-surface); color: var(--color-text-primary); border-color: var(--color-border); }
-.btn.secondary:hover { background: var(--color-surface-raised); }
-.btn.ghost { background: transparent; color: var(--color-text-secondary); }
-.btn.ghost:hover { background: var(--color-surface-alt); color: var(--color-text-primary); }
+.btn.primary:hover:not(:disabled) { background: var(--color-blue-dk); }
+.btn.primary:active:not(:disabled) { transform: scale(0.98); }
+.btn.primary:disabled { background: var(--color-blue-border); color: var(--color-blue); opacity: 1; }
+
+.btn.secondary { background: var(--color-surface); color: var(--color-text-secondary); border-color: var(--color-border); }
+.btn.secondary:hover:not(:disabled) { background: var(--color-surface); border-color: var(--color-border-strong); }
+.btn.secondary:disabled { background: var(--color-surface); border-color: var(--color-border); color: var(--color-text-disabled); opacity: 1; }
+
+.btn.ghost { background: transparent; color: var(--color-blue); }
+.btn.ghost:hover:not(:disabled) { background: var(--color-blue-lt); color: var(--color-blue); }
+.btn.ghost:disabled { background: transparent; color: var(--color-blue-border); opacity: 1; }
+
 .btn.sm { height: 26px; padding: 0 10px; font-size: 12px; }
+
+/* Fallback for a .btn carrying no variant class; every variant above opts out
+   by resetting opacity, so the drawn disabled colors win where they exist. */
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Loading — drawn as "Primary / Loading" on the Buttons sheet (840:4282): the
+   label stays put and a spinner takes the leading slot, so the button does not
+   change width mid-action. aria-busy is the accessible half of this state. */
+.btn.loading { pointer-events: none; }
+.btn.loading::before {
+  content: '';
+  width: 12px; height: 12px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: btn-spin 620ms linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .btn.loading::before { animation-duration: 2s; }
+}
+
+/* ----- Focus ------------------------------------------------- */
+/* The stylesheet previously carried NO focus-visible rule at all, which fails
+   the mandated WCAG 2.2 AA target (2.4.7 Focus Visible / 2.4.11 Not Obscured).
+   The Figma component set draws no Focus variant, so the ring is specified here
+   rather than ported: 2px --color-blue at 2px offset, which clears every drawn
+   border color in the set. :focus-visible (not :focus) keeps it off mouse
+   clicks. */
+:where(a, button, [role='button'], input, select, textarea, summary,
+       [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+/* Blue-on-blue would vanish against a primary button, so it inverts. */
+.btn.primary:focus-visible { outline-color: var(--color-text-primary); }
+
+/* ----- Data rows --------------------------------------------- */
+/* Figma "DataDisplay/TableRow" (840:4874/4889/4904) — Default / Hover /
+   Selected. Selected is the newly drawn state: it tints the row and recolors
+   its text, which is how a queue row signals that it drives a detail panel. */
+.data-row {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-faint);
+  transition: background var(--dur-base) var(--ease-standard);
+  cursor: pointer;
+}
+.data-row:hover { background: var(--color-surface-raised); }
+.data-row.selected { background: var(--color-blue-lt); }
+.data-row.selected .data-row-strong { color: var(--color-blue); }
+/* Selection is also announced structurally (aria-selected), never by tint
+   alone — the tint is reinforced by the detail panel it drives. */
 
 /* ----- Batch cards stack ------------------------------------ */
 .batch-stack { display: flex; flex-direction: column; gap: 24px; }
@@ -1774,7 +1941,11 @@ body { min-height: 100vh; margin: 0; }
 .doc-status {
   display: inline-flex; align-items: center; gap: 4px;
   height: 22px; padding: 0 8px;
-  border-radius: var(--radius-md);
+  /* Pill radius + a matching border on every tone: Figma "Status/Chip"
+     (840:4794–840:4803) draws each chip as bg + border pair, so the chip keeps
+     a visible edge against both --color-surface and --color-surface-alt rows. */
+  border-radius: 999px;
+  border: 1px solid transparent;
   font-family: var(--font-mono); font-size: 10.5px;
   font-weight: 500; letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1782,11 +1953,17 @@ body { min-height: 100vh; margin: 0; }
   cursor: pointer;
   transition: background var(--dur-base) var(--ease-standard);
 }
-.doc-status.verified  { background: var(--color-green-lt); color: var(--color-green-dk); }
-.doc-status.submitted { background: var(--color-blue-lt);  color: var(--color-blue-dk);  }
-.doc-status.pending   { background: var(--color-amber-lt); color: var(--color-amber-dk); }
-.doc-status.missing   { background: var(--color-red-lt);   color: var(--color-red-dk);   }
-.doc-status.na        { background: var(--color-surface-alt); color: var(--color-text-muted); border: 1px solid var(--color-border); }
+.doc-status.verified  { background: var(--color-green-lt); color: var(--color-green-dk); border-color: var(--color-green-border); }
+.doc-status.submitted { background: var(--color-blue-lt);  color: var(--color-blue-dk);  border-color: var(--color-blue-border); }
+.doc-status.pending   { background: var(--color-amber-lt); color: var(--color-amber-dk); border-color: var(--color-amber-border); }
+.doc-status.missing   { background: var(--color-red-lt);   color: var(--color-red-dk);   border-color: var(--color-red-border); }
+/* Drawn on the Chips sheet (840:4372) but NOT yet reachable: public.document_status
+   has no 'rejected' member, so promoting it needs an additive migration + a
+   DocStatus union change. Styled now so the migration is a one-line follow-up.
+   Until then 'missing' deliberately keeps the red tone the sheet moves to
+   'rejected' — otherwise the documents screen has no critical state at all. */
+.doc-status.rejected  { background: var(--color-red-lt);   color: var(--color-red-dk);   border-color: var(--color-red-border); }
+.doc-status.na        { background: var(--color-surface-alt); color: var(--color-text-muted); border-color: var(--color-border); }
 .doc-status:hover { filter: brightness(0.96); }
 
 /* completeness score bar in docs header */

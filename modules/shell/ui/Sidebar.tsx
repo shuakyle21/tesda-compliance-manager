@@ -27,6 +27,10 @@ const WORKSPACE: NavItem[] = [
   { label: 'Batch Cards', icon: 'folders', href: '/batch-cards' },
   { label: 'Table View', icon: 'file-text', href: '/table-view' },
   { label: 'Documents', icon: 'file-check', href: '/documents' },
+  // Billing sits between Documents and Analytics per the Figma nav rail
+  // (840:5128). The route itself redirects trainers — nav order is cosmetic,
+  // the role gate is server-side.
+  { label: 'Billing', icon: 'receipt', href: '/billing' },
   { label: 'Analytics', icon: 'chart-bar', href: '/analytics' },
   { label: 'Report', icon: 'file-invoice', href: '/report' },
   { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
