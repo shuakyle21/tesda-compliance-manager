@@ -44,6 +44,9 @@ skills-lock.json
 # descends into re-included subdirs below; a bare `.claude/` would block them)
 .claude/*
 !.claude/skills/
+# ... except the hooks, which enforce repo invariants (see RULES.md) and so
+# must travel with the repo rather than living on one machine
+!.claude/hooks/
 
 # project-scoped Claude skills (kept local, not shared with the team) ...
 .claude/skills/*
