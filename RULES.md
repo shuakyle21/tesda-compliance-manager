@@ -106,6 +106,15 @@ reviewing, or merging code.
 35. When tests exist: **mappers and module `domain/` layers are unit-tested with fixed as-of
     dates**; **RLS/tenant-isolation tests run against real Supabase, no mocks.** **[review]**
 
+## 10. Agent conduct
+
+36. **Never execute anything against the live Supabase project without explicit user
+    permission, or an agreed plan that covers it.** This includes `execute_sql`,
+    `apply_migration`, branch create/merge/reset, and edge-function deploys — via the MCP
+    server, the CLI, or any other route. Reads are not exempt: ask first, state exactly what
+    will run and why, and wait. There is one hosted project and no staging, so an unreviewed
+    statement lands on real tenant data. **[review]**
+
 ---
 
 ## Locked domain facts
