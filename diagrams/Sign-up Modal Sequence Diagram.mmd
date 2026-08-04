@@ -1,0 +1,41 @@
+sequenceDiagram
+%% Sign-up flow (TES-72) — custom modal driven by Clerk's useSignUp() hook,
+%% replacing Clerk's prebuilt <SignUp> widget. See modules/auth/ui/SignUpModal.tsx
+%% and CLAUDE.md "Auth chain". This flow runs entirely client-side against Clerk;
+%% no Server Component or Supabase interaction occurs until sign-in (see Request)
+%% Auth Sequence Diagram.mmd).
+%%
+%% Email path: account is created and verified, but no session is activated.
+%% User must sign in again, and a registrar assigns school + role before scoped
+%% data is accessible (PRD FR-01). Google OAuth path: user lands signed-in on
+%% /dashboard with an active session.
+  autonumber
+  participant Browser as Browser (SignUpModal)
+  participant SignIn as Sign-in card
+  participant Clerk as Clerk (useSignUp)
+  participant Email as User inbox
+
+  Note over Browser,SignIn: Opened via Sign-up link on sign-in card<br/>or via /sign-up which redirects to /sign-in?sign_up=1
+
+  alt Email + password path
+    Browser->>Browser: Validate firstName, lastName, email, password<br/>(+ invite code if NEXT_PUBLIC_REQUIRE_INVITE_CODE)
+    Browser->>Clerk: signUp.create({ firstName, lastName, emailAddress, password,<br/>unsafeMetadata.inviteCode? })
+    Clerk-->>Browser: signUp created (status: missing_requirements)
+    Browser->>Clerk: prepareEmailAddressVerification({ strategy: 'email_code' })
+    Clerk->>Email: Send 6-digit verification code
+    Browser->>Browser: User enters 6-digit verification code
+    Browser->>Clerk: attemptEmailAddressVerification({ code })
+    alt Code valid
+      Clerk-->>Browser: status: complete (email verified)
+      Note over Browser,Clerk: Modal closes without calling setActive().<br/>No session is created at this stage.
+      Browser-->>SignIn: Return to sign-in card
+      Note over SignIn: User signs in next&#59; registrar assigns school + role<br/>before scoped data is returned (PRD FR-01)
+    else Code invalid or expired
+      Clerk-->>Browser: Verification error&#59; allow resend
+    end
+  else Google OAuth path
+    Browser->>Clerk: signUp.authenticateWithRedirect({ redirectUrl: /sign-in/sso-callback,<br/>redirectUrlComplete: /dashboard })
+    Clerk-->>Browser: Redirect to Google, then return to /sign-in/sso-callback
+    Note over Browser,Clerk: Handled by AuthenticateWithRedirectCallback in<br/>app/sign-in sso-callback route. Session is activated here.
+    Browser->>Browser: Land on /dashboard with active session
+  end
