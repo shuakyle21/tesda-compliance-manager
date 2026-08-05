@@ -15,7 +15,7 @@ TVI-CAMS is a Next.js 16 App Router application (React 19, TypeScript strict, Ta
 
 ```mermaid
 architecture-beta
-    group client(dashboard)[Client Browser]
+    group client(Browser)[Client Browser]
     group nextjs(cloud)[Next JS App]
     group auth(cloud)[Authentication]
     group data(database)[Data Layer]

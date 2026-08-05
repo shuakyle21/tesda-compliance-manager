@@ -1,3 +1,25 @@
 {
-  "todo-tree.ripgrep.rgPath": "/usr/local/bin/rg"
+  "todo-tree.ripgrep.rgPath": "/usr/local/bin/rg",
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.requireConfig": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "*.jsx": "javascriptreact",
+    "*.ts": "typescriptreact"
+  },
+  "js/ts.autoClosingTags.enabled": true,
+  "js/ts.preferences.renameMatchingJsxTags": true,
+  "breadcrumbs.enabled": true,
+  "js/ts.suggest.autoImports": true,
+  "js/ts.preferences.importModuleSpecifier": "relative",
+  "js/ts.preferences.includePackageJsonAutoImports": "on"
 }
