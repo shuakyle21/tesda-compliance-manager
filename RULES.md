@@ -124,6 +124,16 @@ reviewing, or merging code.
     what those cannot answer — note that `list_tables` row counts are `reltuples` planner
     estimates, not counts.
 
+## 11. Dependencies
+
+37. **Do not leave a dependency bump uncommitted.** `package.json` is one line in `git status` but
+    changes hundreds of resolved packages; an unreviewed bump has already broken `npm run lint`
+    and `npx tsc` in this repo. If you bump, commit `package.json` + `package-lock.json` together
+    with whatever migration the bump requires. **[review]**
+38. **Read `npm WARN ERESOLVE overriding peer dependency`.** npm proceeds past peer conflicts by
+    default, converting an install-time error into a runtime crash inside an unrelated tool.
+    **[review]**
+
 ---
 
 ## Locked domain facts

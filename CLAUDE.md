@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > **Read [`RULES.md`](RULES.md) before making any code change.** It is the checklist of
 > non-negotiable invariants — security boundary, module boundaries, data-layer contract, design
-> system, do-not-edit directories — with each rule's enforcement level (hook / lint / types / RLS /
-> review). This file explains the architecture and the *why*; `RULES.md` states the *what*. Where
-> the two appear to disagree, `RULES.md` wins and the drift should be fixed.
+> system, do-not-edit directories, dependency hygiene — with each rule's enforcement level (hook /
+> lint / types / RLS / deny / review). This file explains the architecture and the *why*;
+> `RULES.md` states the *what*. Where the two appear to disagree, `RULES.md` wins and the drift
+> should be fixed.
 
 ## What this is
 
@@ -86,3 +87,6 @@ bundle and excluded from lint/build (`eslint.config.mjs` globalIgnores); a PreTo
   canonical for schema + RLS; new migrations are additive. After any migration: regenerate
   `database.types.ts`, then update affected mappers and domain types
   ([`RULES.md` §3](RULES.md)).
+- **Never leave a dependency bump uncommitted** — `package.json` reads as one modified file but
+  changes hundreds of resolved packages. An unreviewed bump has already broken `npm run lint` and
+  `npx tsc` here ([`RULES.md` §11](RULES.md)).
