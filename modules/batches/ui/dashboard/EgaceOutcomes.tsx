@@ -12,7 +12,7 @@
 
 import { Fragment } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
-import { EGACE_STAGES } from '@/shared/mocks/seed';
+import { EGACE_STAGES } from '@/shared/vocab';
 import type { Batch, EgaceCounts } from '@/shared/types';
 
 /** Stage colorKey → design token, matching the Figma stage accents. */

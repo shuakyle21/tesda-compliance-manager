@@ -20,7 +20,8 @@
 import { useMemo, useState } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
-import { EGACE_STAGES, EMPLOYMENT_STATUSES, TENANTS } from '@/shared/mocks/seed';
+import { EGACE_STAGES, EMPLOYMENT_STATUSES } from '@/shared/vocab';
+import { TENANTS } from '@/shared/mocks/seed';
 import type { Batch, EgaceCounts, Tenant } from '@/shared/types';
 
 /* ============================ xlsx writer ============================ */

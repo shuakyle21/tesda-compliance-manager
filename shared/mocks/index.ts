@@ -14,8 +14,12 @@ import type { Batch, ActivityEvent, DashboardMetrics } from '@/shared/types';
 
 export {
   TENANTS, USERS, DOCUMENT_REQUIREMENTS, ALERTS_LOG, SNAPSHOTS,
-  EGACE_STAGES, EMPLOYMENT_STATUSES,
 } from '@/shared/mocks/seed';
+
+// EGACE_STAGES / EMPLOYMENT_STATUSES are NOT re-exported here (TES-74). They are
+// fixed TESDA vocabulary, not mock data — import them from '@/shared/vocab'.
+// Deliberately not shimmed: a pass-through here would preserve exactly the
+// "is this real or mock?" ambiguity the move exists to remove.
 
 // Domain logic extracted (TES-68): urgencyTier -> modules/batches/domain/urgency.ts;
 // isBillingReady + BILLING_READY_THRESHOLD -> modules/billing/domain/readiness.ts.

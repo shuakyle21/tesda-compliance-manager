@@ -17,8 +17,11 @@
 
 import type {
   Tenant, User, DocumentRequirement, Batch, ActivityEvent, AlertEntry,
-  Snapshot, EgaceStage, ScholarRow, Competency, ScheduleAdjustment,
+  Snapshot, ScholarRow, Competency, ScheduleAdjustment,
 } from '@/shared/types';
+// Fixed TESDA vocabulary, not fixture data — see shared/vocab.ts. The roster
+// enrichment pass below classifies generated scholars against these terms.
+import { EMPLOYMENT_STATUSES } from '@/shared/vocab';
 
 /* ----- Tenants (Clerk Organizations — TVI schools) ---------- */
 export const TENANTS: Tenant[] = [
@@ -264,21 +267,8 @@ export const SNAPSHOTS: Snapshot[] = [
   { batchId: 'BAT-1', date: 'today',  progressPct: 74, docsComplete: 9 },
 ];
 
-export const EGACE_STAGES: EgaceStage[] = [
-  { key: 'enrolled',  label: 'Enrolled',  short: 'E', icon: 'users',        colorKey: 'blue' },
-  { key: 'graduate',  label: 'Graduate',  short: 'G', icon: 'presentation', colorKey: 'teal' },
-  { key: 'assessed',  label: 'Assessed',  short: 'A', icon: 'file-check',   colorKey: 'amber' },
-  { key: 'certified', label: 'Certified', short: 'C', icon: 'certificate',  colorKey: 'purple' },
-  { key: 'employed',  label: 'Employed',  short: 'E', icon: 'briefcase',    colorKey: 'green' },
-];
-
-export const EMPLOYMENT_STATUSES = {
-  wage: 'Wage-Employed',
-  self: 'Self-Employed',
-  awaiting: 'Awaiting Follow-up',
-  unemployed: 'Unemployed',
-  na: '',
-} as const;
+/* EGACE_STAGES and EMPLOYMENT_STATUSES moved to shared/vocab.ts (TES-74) —
+   fixed TESDA vocabulary, not fixture data. */
 
 /* ===========================================================================
    ENRICHMENT PASS 1 — schedule-aware day counts + ENTRE lifecycle stage.
