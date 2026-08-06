@@ -39,7 +39,11 @@ export function ProgressBar({ percent, label, variant = 'default' }: ProgressBar
           width: `${Math.max(safePct, safePct === 0 ? 0 : 2)}%`,
           background: fillColor,
           borderRadius: 9999,
-          animation: 'progress-fill 400ms var(--ease-spring) 100ms backwards',
+          // --ease-standard, not --ease-spring: the spring curve overshoots
+          // (y=1.56), so the bar would render past the real percentage before
+          // settling. Progress here is sessions_held / total_sessions and feeds
+          // billing readiness, so it must never read high, even for 200ms.
+          animation: 'progress-fill 400ms var(--ease-standard) 100ms backwards',
         }}
       />
     </div>

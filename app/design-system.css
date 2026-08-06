@@ -1978,7 +1978,9 @@ body { min-height: 100vh; margin: 0; }
   display: block;
   height: 100%;
   background: var(--color-green);
-  transition: width 600ms var(--ease-spring);
+  /* --ease-standard, not --ease-spring: the spring curve overshoots (y=1.56), so
+     the fill would animate past the real completeness value before settling. */
+  transition: width 600ms var(--ease-standard);
 }
 .completeness-bar.warning > span { background: var(--color-amber); }
 .completeness-bar.critical > span { background: var(--color-red); }
