@@ -3,10 +3,11 @@
 /**
  * SCREEN — Billing packet queue (FR-09), Figma node 840:5128.
  *
- * Client island because the queue owns two pieces of interaction state: the
- * search box and the selected row that drives the detail panel. Everything it
- * renders is derived by `modules/billing/domain/packets.ts` — this file holds no
- * business rules.
+ * Client island because the queue owns the interaction state: the search box,
+ * the selected row that drives the detail panel, and (TES-70) the statement
+ * preview modal + its save toast. Everything it renders is derived by
+ * `modules/billing/domain/packets.ts` (rows) and `data/billing.ts` (preview
+ * cards) — this file holds no business rules.
  *
  * DELIBERATE DEVIATIONS from the Figma frame, all recorded in ADR-003:
  *  - "Invoice" → "packet" throughout (P1: there is no invoice entity, and the
@@ -24,6 +25,7 @@ import { Icon, type IconName } from '@/shared/ui/Icon';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { MetricCard } from '@/shared/ui/MetricCard';
+import { Toast, type ToastData } from '@/shared/ui/Toast';
 import {
   filterPackets,
   formatPeso,
@@ -33,11 +35,19 @@ import {
   type BillingPacket,
   type PacketState,
 } from '@/modules/billing/domain/packets';
+import type { BillingCard } from '@/modules/billing/data/billing';
+import { BillingStatementModal } from './BillingStatementModal';
 
 type BillingRole = 'admin' | 'coordinator' | 'viewer';
 
 interface BillingQueueViewProps {
   packets: BillingPacket[];
+  /**
+   * Statement-preview inputs, keyed to packets via `batch.id`. Optional so the
+   * queue renders without the engine (e.g. in isolation); without cards the
+   * generate/preview actions stay inert exactly as before TES-70.
+   */
+  cards?: BillingCard[];
   role: BillingRole;
   /** Exact timestamp for the mandated "Data as of" stamp. */
   dataAsOf: string;
@@ -81,6 +91,7 @@ function stateChipClass(packet: BillingPacket): string {
 
 export function BillingQueueView({
   packets,
+  cards,
   role,
   dataAsOf,
   syncFailed = false,
@@ -88,10 +99,37 @@ export function BillingQueueView({
 }: BillingQueueViewProps) {
   const [query, setQuery] = useState('');
   const [selectedRef, setSelectedRef] = useState<string | null>(packets[0]?.ref ?? null);
+  const [preview, setPreview] = useState<BillingCard | null>(null);
+  const [toast, setToast] = useState<ToastData | null>(null);
 
   const summary = useMemo(() => summarizePackets(packets), [packets]);
   const filtered = useMemo(() => filterPackets(packets, query), [packets, query]);
   const selected = filtered.find((p) => p.ref === selectedRef) ?? filtered[0] ?? null;
+
+  // Preview inputs, joined on batch id. The packet is the ADR-003 queue
+  // projection; the card is what `buildStatement` derives the document from.
+  const cardByBatch = useMemo(
+    () => new Map((cards ?? []).map((c) => [c.batch.id, c])),
+    [cards],
+  );
+  const selectedCard = selected ? cardByBatch.get(selected.batchId) ?? null : null;
+  // The card's compound gate (ADR-001 §Ready) governs generation, not the
+  // packet chip — both derive from the same batch, but the gate is the rule.
+  const selectedGenerable = Boolean(selectedCard?.gate.ready);
+  const firstGenerableCard =
+    packets.map((p) => cardByBatch.get(p.batchId)).find((c) => c?.gate.ready) ?? null;
+
+  const openPreview = (card: BillingCard | null) => {
+    if (card?.gate.ready) setPreview(card);
+  };
+
+  const handleSave = (label: string) => {
+    setPreview(null);
+    setToast({
+      title: 'Working copy saved',
+      message: `${label} recorded to the generation log (append-only). Nothing was submitted to TESDA.`,
+    });
+  };
 
   // Viewer is read-only. The server route is the real boundary (RLS + role
   // gate); hiding the controls here is usability, not security.
@@ -111,7 +149,12 @@ export function BillingQueueView({
               <Icon name="download" size={14} />
               Export summary
             </button>
-            <button type="button" className="btn primary" disabled={summary.readyCount === 0}>
+            <button
+              type="button"
+              className="btn primary"
+              disabled={summary.readyCount === 0 || !cards}
+              onClick={() => openPreview(selectedGenerable ? selectedCard : firstGenerableCard)}
+            >
               <Icon name="file-invoice" size={14} />
               Generate packet
             </button>
@@ -296,7 +339,19 @@ export function BillingQueueView({
 
               {canWrite && (
                 <div className="billing-detail-actions">
-                  <button type="button" className="btn primary">
+                  {/* Statement preview (TES-70): enabled only when the compound
+                      gate is open — the blockers text above already says why
+                      when it is not (text, not colour, carries the reason). */}
+                  <button
+                    type="button"
+                    className="btn primary"
+                    disabled={!selectedGenerable}
+                    onClick={() => openPreview(selectedCard)}
+                  >
+                    <Icon name="file-invoice" size={14} />
+                    Preview statement
+                  </button>
+                  <button type="button" className="btn secondary">
                     <Icon name="file-check" size={14} />
                     Review documents
                   </button>
@@ -325,6 +380,17 @@ export function BillingQueueView({
         appends a new snapshot — it never overwrites an earlier one, so a corrected
         attendance figure produces a new packet rather than editing history.
       </InfoCallout>
+
+      {preview && (
+        <BillingStatementModal
+          card={preview}
+          initialTrackId={preview.tracks[0].id}
+          readOnly={!canWrite}
+          onClose={() => setPreview(null)}
+          onSave={handleSave}
+        />
+      )}
+      {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }
