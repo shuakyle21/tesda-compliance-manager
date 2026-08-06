@@ -1,19 +1,13 @@
 /*
- * STEP 3 — Design Tokens in globals.css
+ * Design tokens.
  *
- * WHY THIS FILE IS CENTRAL:
- * Tailwind v4 uses @import "tailwindcss" instead of a tailwind.config.js.
- * The @theme block below is how you expose CSS variables to Tailwind's
- * utility classes (e.g. `bg-[var(--color-bg)]` or theme-aware `bg-surface`).
+ * Tailwind v4 is configured in CSS (@import "tailwindcss"), not a
+ * tailwind.config.js. All raw token values live in :root as custom properties;
+ * the @theme block maps them to Tailwind utility names. That split is what keeps
+ * every token usable both in plain CSS and as a Tailwind class.
  *
- * NEXT.JS / TAILWIND v4 DOCS:
- * https://tailwindcss.com/docs/v4-beta#css-first-configuration
- * https://nextjs.org/docs/app/building-your-application/styling/tailwind-css
- * LEARN Ch 2 — CSS Styling: https://nextjs.org/learn/dashboard-app/css-styling
- *
- * PATTERN: All raw token values live in :root as CSS custom properties.
- * The @theme block maps them to Tailwind utility names. This keeps the
- * tokens usable in plain CSS *and* as Tailwind classes.
+ * Token values are the design system's — do not invent new ones here. Semantic
+ * colors carry one meaning each (see spec 3.3).
  */
 
 @import "tailwindcss";
@@ -28,22 +22,9 @@
 @import "./design-system.css";
 
 /* =========================================================================
-   TODO 3a: Copy ALL tokens from colors_and_type.css into :root here.
-   LEARN Ch 2 — CSS Styling: https://nextjs.org/learn/dashboard-app/css-styling
-
-   Sections to copy:
-     - COLORS — Neutrals (bg, surface, surface-alt, surface-raised, borders)
-     - COLORS — Text (primary, secondary, muted, disabled, inverse)
-     - COLORS — Semantic (blue, teal, green, amber, red, purple — 5 tiers each)
-     - TYPOGRAPHY (font-family variables, --fs-*, --lh-*, --fw-*)
-     - SPACING (--space-*)
-     - BORDER & RADIUS (--border-*, --radius-*)
-     - SHADOWS (--shadow-*)
-     - MOTION (--dur-*, --ease-*)
-     - COMPONENT SIZING (--h-*, --avatar-*, --bar-*)
-
-   TIP: Do NOT delete or merge — copy the entire :root block verbatim from
-   colors_and_type.css. Then the @theme block below maps them to Tailwind.
+   Token source of truth, ported verbatim from the design handoff's
+   colors_and_type.css. Kept in the handoff's ordering and grouping so the two
+   stay diffable when the design bundle is updated.
    ========================================================================= */
 :root {
 

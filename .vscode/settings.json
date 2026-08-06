@@ -9,7 +9,7 @@
   },
   "prettier.requireConfig": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true
+    "source.organizeImports": "explicit"
   },
   "files.associations": {
     "*.js": "javascriptreact",
