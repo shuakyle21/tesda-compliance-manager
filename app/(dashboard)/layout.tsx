@@ -10,16 +10,29 @@
  * from the mock data layer at render time; Sidebar is the only client island
  * (it reads the pathname to highlight the active nav item).
  *
+ * TRAINER OMISSION: this layout mounts MetricsRow once for every route under
+ * `(dashboard)`, including `/trainer/*`. Trainer-facing surfaces must omit
+ * billing figures server-side (CLAUDE.md role rules) — but layouts don't
+ * receive `searchParams`, and no real trainer accounts exist yet (TES-34) to
+ * key off Clerk role metadata, so route path is the only signal available
+ * here. `proxy.ts` forwards the path as the `x-pathname` header for this
+ * reason; see that file's doc comment.
+ *
  * DOCS: https://nextjs.org/docs/app/building-your-application/routing/route-groups
  */
 
+import { headers } from 'next/headers';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
 import { Topbar } from '@/modules/shell/ui/Topbar';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const headerList = await headers();
+  const pathname = headerList.get('x-pathname') ?? '';
+  const isTrainerRoute = pathname.startsWith('/trainer');
+
   return (
     <NavDrawerProvider>
       <div className="app-layout">
@@ -28,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <MobileHeader />
           <main className="main-content">
             <Topbar />
-            <MetricsRow />
+            <MetricsRow hideBilling={isTrainerRoute} />
             {children}
           </main>
         </div>
