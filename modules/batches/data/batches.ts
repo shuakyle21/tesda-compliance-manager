@@ -13,7 +13,10 @@
  *   3. derive  — lifecycle/days helpers built from the single current_stage enum.
  *
  * Related Linear: TES-30 (complete data contracts), TES-60 (qualification title),
- * TES-63 (wire live signals). See gaps marked `TODO(contract)` / `TODO(join)`.
+ * TES-63 (wire live signals). The `TODO(join)` documents-map gap is closed via
+ * an embedded `documents(*)` select (see `modules/documents/data/documents.ts`
+ * for the sibling contract that serves the same table for the Documents
+ * screen); the billing-deadline `TODO(contract)` remains — see that comment.
  */
 
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
@@ -24,17 +27,58 @@ import type {
 } from '@/lib/supabase/database.types';
 import type {
   Batch,
+  DocRecord,
   LifecycleStage,
   LifecycleStageKey,
   LifecycleStatus,
 } from '@/shared/types';
 
 type BatchRow = Database['public']['Tables']['batches']['Row'];
+type DocumentRow = Database['public']['Tables']['documents']['Row'];
+type RequirementRow = Database['public']['Tables']['program_document_requirements']['Row'];
 
-/** The join row we actually select: batch + its program code. */
+/** The join row we actually select: batch + its program (+ requirements) + its documents. */
 type BatchRowWithProgram = BatchRow & {
-  scholarship_programs: { code: string } | null;
+  scholarship_programs: { code: string; program_document_requirements: RequirementRow[] | null } | null;
+  documents: DocumentRow[] | null;
 };
+
+/**
+ * Duplicated from `modules/documents/data/documents.ts` (`mapDocumentRow` /
+ * `MISSING_DOC` / the backfill in `mapDocumentRows`) — a module's `data/`
+ * layer is private to that module (import direction rule), so this pure logic
+ * is kept in sync by hand rather than imported. Closes the `TODO(join)`
+ * below, backfilled against the batch's program requirement catalog so every
+ * requirement key resolves to a real `DocRecord` — "no row means missing" is
+ * this contract's decision, not each caller's (a caller reading `.status`
+ * unguarded, or a compliance-percent count that treats an absent key as
+ * neither missing nor pending, would otherwise silently misread a sparse
+ * map). RLS already scopes which document rows this embedded select returns
+ * (see documents.ts's trainer-omission note), so this mapper, like the rest
+ * of the file, stays unaware of the caller's role.
+ */
+const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
+
+function mapDocumentRow(row: DocumentRow): DocRecord {
+  return {
+    status: row.status,
+    url: row.storage_path ?? row.external_url,
+    updated: row.verified_at ?? row.submitted_at ?? row.updated_at,
+    source: row.storage_path ? 'Uploaded file' : row.external_url ? 'External link' : null,
+    verifiedBy: row.verified_by,
+    verifiedDate: row.verified_at,
+  };
+}
+
+function mapDocumentsMap(
+  documentRows: DocumentRow[],
+  requirementRows: RequirementRow[],
+): Record<string, DocRecord> {
+  const map: Record<string, DocRecord> = {};
+  for (const req of requirementRows) map[req.document_key] = MISSING_DOC;
+  for (const row of documentRows) map[row.document_key] = mapDocumentRow(row);
+  return map;
+}
 
 // ---------------------------------------------------------------------------
 // Enum normalization — the contract and the UI use different spellings.
@@ -164,9 +208,11 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     billingDeadline: toDisplayDate(row.end_date),
     daysToBilling: daysUntil(row.end_date),
 
-    // TODO(join): the documents map requires a join to the `documents` table.
-    // Empty until then — DocumentStatusDonut renders zero-state safely.
-    documents: {},
+    // Closed (TES-30): joined + backfilled from the embedded selects below.
+    documents: mapDocumentsMap(
+      row.documents ?? [],
+      row.scholarship_programs?.program_document_requirements ?? [],
+    ),
 
     // TODO(contract): fields the UI type requires but the contract does not yet
     // provide. Defaulted so the shape is valid; replace as the contract grows.
@@ -216,7 +262,7 @@ export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from('batches')
-      .select('*, scholarship_programs(code)')
+      .select('*, scholarship_programs(code, program_document_requirements(*)), documents(*)')
       .order('end_date', { ascending: true });
 
     if (error) return { status: 'sync-failed', error: error.message };
