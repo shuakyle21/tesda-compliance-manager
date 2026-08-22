@@ -10,13 +10,25 @@ import { MetricCard } from '@/shared/ui/MetricCard';
 import { getMockMetrics } from '@/shared/mocks';
 import type { DashboardMetrics } from '@/shared/types';
 
-export function MetricsRow({ metrics = getMockMetrics() }: { metrics?: DashboardMetrics }) {
+export function MetricsRow({
+  metrics = getMockMetrics(),
+  hideBilling = false,
+}: {
+  metrics?: DashboardMetrics;
+  /**
+   * Trainer-facing routes must omit billing figures server-side, not via CSS
+   * (CLAUDE.md role rules). This row is mounted once by the shared `(dashboard)`
+   * layout for every route including `/trainer/*`, so the layout — not this
+   * component — decides when that applies; see `app/(dashboard)/layout.tsx`.
+   */
+  hideBilling?: boolean;
+}) {
   // Derived from the injected metrics, never from the mock array (TES-74). Reading
   // MOCK_BATCHES here made the empty state unreachable for any caller passing real
   // data, since the mock set is never empty.
   const hasBatches = metrics.totalBatches > 0;
   return (
-    <div className="metrics">
+    <div className={hideBilling ? 'metrics metrics-4' : 'metrics'}>
       <MetricCard
         label="TOTAL BATCHES"
         value={metrics.totalBatches}
@@ -31,17 +43,19 @@ export function MetricsRow({ metrics = getMockMetrics() }: { metrics?: Dashboard
         iconName="chart-dots"
         variant={!hasBatches ? 'neutral' : metrics.avgProgress < 60 ? 'warning' : 'neutral'}
       />
-      <MetricCard
-        label="EARLIEST BILLING"
-        value={metrics.earliestBillingDeadline}
-        sub={hasBatches ? `${metrics.daysToEarliestBilling} days remaining` : 'No batches'}
-        iconName="receipt"
-        // `hasBatches` guard is load-bearing (TES-74): with no batches,
-        // daysToEarliestBilling is 0, which would otherwise style an empty state
-        // as a critical billing deadline — a red card raising an alarm about a
-        // deadline that does not exist.
-        variant={!hasBatches ? 'neutral' : metrics.daysToEarliestBilling <= 6 ? 'critical' : metrics.daysToEarliestBilling <= 21 ? 'warning' : 'neutral'}
-      />
+      {!hideBilling && (
+        <MetricCard
+          label="EARLIEST BILLING"
+          value={metrics.earliestBillingDeadline}
+          sub={hasBatches ? `${metrics.daysToEarliestBilling} days remaining` : 'No batches'}
+          iconName="receipt"
+          // `hasBatches` guard is load-bearing (TES-74): with no batches,
+          // daysToEarliestBilling is 0, which would otherwise style an empty state
+          // as a critical billing deadline — a red card raising an alarm about a
+          // deadline that does not exist.
+          variant={!hasBatches ? 'neutral' : metrics.daysToEarliestBilling <= 6 ? 'critical' : metrics.daysToEarliestBilling <= 21 ? 'warning' : 'neutral'}
+        />
+      )}
       <MetricCard
         label="DOC COMPLIANCE"
         value={`${metrics.docCompliancePct}%`}

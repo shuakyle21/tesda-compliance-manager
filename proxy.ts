@@ -9,10 +9,17 @@
  * The `/__clerk/(.*)` matcher entry is required so Clerk's auto-proxy path
  * is always routed through this middleware correctly.
  *
+ * Also forwards the request pathname as `x-pathname` so Server Component
+ * layouts — which Next.js does not hand `searchParams` and has no other way
+ * to read the current path from — can make path-scoped rendering decisions
+ * (see `app/(dashboard)/layout.tsx`, which uses it to keep billing figures
+ * off the trainer-only route tree per the CLAUDE.md role rules).
+ *
  * DOCS: https://clerk.com/docs/references/nextjs/clerk-middleware
  */
 
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 /** Routes that do NOT require authentication. */
 const isPublicRoute = createRouteMatcher([
@@ -29,6 +36,10 @@ export default clerkMiddleware(async (auth, request) => {
     const signInUrl = new URL('/sign-in', request.url);
     await auth.protect({ unauthenticatedUrl: signInUrl.toString() });
   }
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 });
 
 export const config = {
