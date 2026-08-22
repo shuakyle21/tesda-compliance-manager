@@ -21,6 +21,8 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import {
   MOCK_ACTIVITY,
   MOCK_BATCHES,
+  DOCUMENT_REQUIREMENTS,
+  SNAPSHOTS,
   getMockMetrics,
 } from '@/shared/mocks';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
@@ -124,6 +126,18 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const docsTracked = batches.some((b) => Object.keys(b.documents).length > 0);
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
+
+  // Progress & Compliance Trend (last 6 weeks) — computed server-side so the
+  // ProgressTrend client component (needs 'use client' for its D3 draw-on
+  // animation + hover crosshair) never has to import the mock seed dataset.
+  const trendDocTotal = Math.max(1, DOCUMENT_REQUIREMENTS.length);
+  const trendPoints = SNAPSHOTS.slice(0, 6);
+  const trendSeries = trendPoints.length
+    ? [
+        { varName: '--color-blue', label: 'Avg training progress', values: trendPoints.map((s) => s.progressPct) },
+        { varName: '--color-green', label: 'Doc compliance', values: trendPoints.map((s) => Math.round((s.docsComplete / trendDocTotal) * 100)) },
+      ]
+    : [];
 
   // ---- Dashboard states (TES-8 AC6) ----
   // `?state=` remains a manual preview override for every state. Beyond that:
@@ -267,7 +281,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) minmax(0, 2fr)', gap: 16 }}
       >
         <DocumentStatusDonut batches={batches} />
-        <ProgressTrend />
+        <ProgressTrend series={trendSeries} />
       </section>
 
       <EgaceOutcomes batches={batches} />
