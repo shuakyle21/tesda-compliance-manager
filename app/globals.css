@@ -18,6 +18,28 @@
 
 @import "tailwindcss";
 
+/* Tremor (analytics module charts only — see analytics_tremor_decision project
+   memory) ships its `tremor-*` utility classes as a v3-style tailwind.config.js
+   preset, not an importable module. Tailwind v4's CSS-first engine doesn't read
+   JS `theme.extend`/`plugins`/`safelist` on its own, so `@config` bridges in
+   that legacy config (kept in its own file, tremor.config.mjs, as a byte-for-byte
+   copy of Tremor's documented snippet). Scoped to modules/analytics via that
+   file's `content` globs — no other screen is affected. */
+@config "../tremor.config.mjs";
+
+/* tremor.config.mjs's `safelist` (Tremor's official pattern for its runtime-
+   constructed color classes, e.g. `fill-rose-500` built as
+   `getColorClassNames(color, ...)` — never a literal string Tailwind's
+   content scanner can find) is NOT honored by Tailwind v4's `@config`
+   compatibility layer — confirmed empirically: the class reaches the DOM but
+   no CSS rule is generated for it, leaving Tremor's DonutChart/BarChart
+   series fills completely uncolored. `@source inline(...)` is v4's own
+   mechanism for the same problem (force-generate utilities without requiring
+   them to appear literally in scanned source) — this duplicates the color set
+   from tremor.config.mjs's safelist regex. */
+@source inline("{bg,text,fill,stroke,border,ring}-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,100,200,300,400,500,600,700,800,900,950}");
+@source inline("dark:{bg,text,fill,stroke,border,ring}-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,100,200,300,400,500,600,700,800,900,950}");
+
 /* Design-system component styles ported verbatim from the handoff bundle's
    styles/kit.css. These classes (.sidebar, .batch-stack, .metrics, .doc-grid,
    .nm-sheet, etc.) are the contract the ported components render against. They
