@@ -18,6 +18,15 @@
 
 @import "tailwindcss";
 
+/* Tremor (analytics module charts only — see analytics_tremor_decision project
+   memory) ships its `tremor-*` utility classes as a v3-style tailwind.config.js
+   preset, not an importable module. Tailwind v4's CSS-first engine doesn't read
+   JS `theme.extend`/`plugins`/`safelist` on its own, so `@config` bridges in
+   that legacy config (kept in its own file, tremor.config.mjs, as a byte-for-byte
+   copy of Tremor's documented snippet). Scoped to modules/analytics via that
+   file's `content` globs — no other screen is affected. */
+@config "../tremor.config.mjs";
+
 /* Design-system component styles ported verbatim from the handoff bundle's
    styles/kit.css. These classes (.sidebar, .batch-stack, .metrics, .doc-grid,
    .nm-sheet, etc.) are the contract the ported components render against. They
