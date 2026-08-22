@@ -9,8 +9,17 @@
  *
  * The Figma renders dots/icons as images; here they're CSS (`tl-node-dot`,
  * `tl-swatch`) — no raster assets, consistent with the project's conventions.
+ *
+ * Geometry comes from d3: `scaleTime` maps milestone dates to the plot's
+ * pixel span, and `timeMonth.range` generates the month ruler ticks — both
+ * from the scoped `d3-scale`/`d3-time` sub-packages (not the `d3` meta-package,
+ * which pulls in DOM-touching modules like d3-selection that don't belong in
+ * a Server Component). The `tl-*` DOM structure (absolute-positioned divs,
+ * not SVG) is unchanged, so the design-system CSS still applies as-is.
  */
 
+import { scaleTime } from 'd3-scale';
+import { timeMonth } from 'd3-time';
 import { Icon } from '@/shared/ui/Icon';
 import type { Batch } from '@/shared/types';
 
@@ -69,20 +78,19 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
   const maxD = new Date(Math.max(...allDates.map((d) => d.getTime())));
   const windowStart = new Date(minD.getFullYear(), minD.getMonth(), 1);
   const windowEnd = new Date(maxD.getFullYear(), maxD.getMonth() + 1, 0); // last day of max month
-  const span = Math.max(1, windowEnd.getTime() - windowStart.getTime());
 
-  const xOf = (d: Date) => PLOT_L + ((d.getTime() - windowStart.getTime()) / span) * PLOT_W;
+  const scale = scaleTime().domain([windowStart, windowEnd]).range([PLOT_L, PLOT_L + PLOT_W]);
+  const xOf = (d: Date) => scale(d);
 
-  // Month gridlines/labels across the window.
-  const months: { x: number; label: string }[] = [];
-  for (let y = windowStart.getFullYear(), m = windowStart.getMonth(); ; m++) {
-    if (m > 11) { m = 0; y++; }
-    const first = new Date(y, m, 1);
-    if (first > windowEnd) break;
-    const label = m === windowStart.getMonth() && y === windowStart.getFullYear() ? `${MONTHS[m]} ${y}` : MONTHS[m];
-    months.push({ x: xOf(first < windowStart ? windowStart : first), label });
-    if (y === windowEnd.getFullYear() && m === windowEnd.getMonth()) break;
-  }
+  // Month gridlines/labels across the window — timeMonth.range stops just
+  // short of its end date, so pad by a day to include windowEnd's own month.
+  const monthStarts = timeMonth.range(windowStart, new Date(windowEnd.getTime() + dayMs));
+  const months = monthStarts.map((first) => ({
+    x: xOf(first),
+    label: first.getMonth() === windowStart.getMonth() && first.getFullYear() === windowStart.getFullYear()
+      ? `${MONTHS[first.getMonth()]} ${first.getFullYear()}`
+      : MONTHS[first.getMonth()],
+  }));
 
   const todayX = xOf(today);
   const bodyH = batches.length * LANE_H;

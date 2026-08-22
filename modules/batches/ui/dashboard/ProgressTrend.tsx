@@ -6,11 +6,16 @@
  * 0–100% gridlines, weekly x-axis (W-5 … Now), and a legend below.
  *
  * Data-driven from `SNAPSHOTS`: progress uses `progressPct`; compliance is
- * `docsComplete` over the required-doc count. Dependency-free inline SVG,
- * matching the project's no-chart-library convention. The Figma renders the
- * plot as flattened image vectors — rebuilt here so it tracks the data.
+ * `docsComplete` over the required-doc count. Geometry (scales + line paths)
+ * comes from d3-scale/d3-shape; the scoped sub-packages rather than the `d3`
+ * meta-package keep this a Server Component (no `document`-touching modules
+ * like d3-selection in the import graph). Rendering itself stays plain SVG
+ * via JSX, styled with the same `var(--color-*)` tokens as the rest of the
+ * design system — no visual exception to document here.
  */
 
+import { scaleLinear, scalePoint } from 'd3-scale';
+import { line as d3Line } from 'd3-shape';
 import { Icon } from '@/shared/ui/Icon';
 import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
 import { SNAPSHOTS } from '@/shared/mocks/seed';
@@ -34,9 +39,15 @@ export function ProgressTrend() {
   const progress = points.map((s) => s.progressPct);
   const compliance = points.map((s) => Math.round((s.docsComplete / docTotal) * 100));
 
-  const xOf = (i: number) => PAD_L + (i / (n - 1)) * (W - PAD_L - PAD_R);
-  const yOf = (v: number) => PLOT_BOTTOM - (Math.max(0, Math.min(100, v)) / 100) * (PLOT_BOTTOM - PLOT_TOP);
-  const polyline = (series: number[]) => series.map((v, i) => `${xOf(i)},${yOf(v)}`).join(' ');
+  const x = scalePoint<number>()
+    .domain(Array.from({ length: n }, (_, i) => i))
+    .range([PAD_L, W - PAD_R]);
+  const y = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_TOP]).clamp(true);
+
+  const xOf = (i: number) => x(i) ?? PAD_L;
+  const yOf = (v: number) => y(v);
+  const lineGen = d3Line<number>().x((_, i) => xOf(i)).y((v) => yOf(v));
+  const pathOf = (series: number[]) => lineGen(series) ?? '';
 
   return (
     <section className="dash-panel" aria-labelledby="trend-heading">
@@ -71,8 +82,8 @@ export function ProgressTrend() {
           ))}
 
           {/* Compliance (green) then progress (blue) so progress sits on top */}
-          <polyline points={polyline(compliance)} fill="none" stroke="var(--color-green)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-          <polyline points={polyline(progress)} fill="none" stroke="var(--color-blue)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+          <path d={pathOf(compliance)} fill="none" stroke="var(--color-green)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+          <path d={pathOf(progress)} fill="none" stroke="var(--color-blue)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
 
           {compliance.map((v, i) => (
             <circle key={`c-${i}`} cx={xOf(i)} cy={yOf(v)} r={3} fill="var(--color-surface)" stroke="var(--color-green)" strokeWidth={1.5} />
