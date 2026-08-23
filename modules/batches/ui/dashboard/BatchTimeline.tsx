@@ -156,7 +156,11 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
       const domain: [Date, Date] = [new Date(Math.min(...allDates)), new Date(Math.max(...allDates))];
       const x = scaleTime().domain(domain).range([LBL, w - PAD]).nice(timeMonth);
 
-      select(host).selectAll('*').remove();
+      // `draw()` re-runs on every ResizeObserver tick; without `.interrupt()`
+      // an in-flight draw-on transition from the previous run keeps its timer
+      // alive on nodes this call is about to remove (a rapid resize replays
+      // the bar/milestone animation from scratch instead of just resizing).
+      select(host).selectAll('*').interrupt().remove();
       const svg = select(host).append('svg').attr('width', w).attr('height', h).attr('role', 'img').attr('aria-label', 'Batch lifecycle timeline').style('display', 'block');
       const tip = select(host)
         .append('div')
@@ -265,7 +269,7 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
     ro.observe(host);
     return () => {
       ro.disconnect();
-      select(host).selectAll('*').remove();
+      select(host).selectAll('*').interrupt().remove();
     };
   }, [rows, today]);
 

@@ -40,6 +40,16 @@ function cssVar(el: Element, name: string): string {
   return getComputedStyle(el.ownerDocument.documentElement).getPropertyValue(name).trim() || '#888';
 }
 
+// The hover tooltip is built as an HTML string (`tip.html(...)`), so it can
+// mix per-series colored bullets with a `<br>`-separated readout line. Every
+// value interpolated into it today is a `series.label` set by the caller
+// (currently hardcoded in page.tsx), a resolved CSS custom property, or a
+// number — no live injection path — but escape defensively so that stays
+// true if a future caller starts feeding this a free-text field.
+function escapeHtml(value: string | number): string {
+  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
+
 export function ProgressTrend({ series }: { series: TrendSeries[] }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,7 +70,11 @@ export function ProgressTrend({ series }: { series: TrendSeries[] }) {
       const muted = cssVar(host, '--color-text-muted');
       const surface = cssVar(host, '--color-surface');
 
-      select(host).selectAll('*').remove();
+      // `draw()` re-runs on every ResizeObserver tick; without `.interrupt()`
+      // an in-flight draw-on transition from the previous run keeps its timer
+      // alive on nodes this call is about to remove (a rapid resize replays
+      // the line-draw animation from scratch instead of just resizing).
+      select(host).selectAll('*').interrupt().remove();
       const svg = select(host)
         .append('svg')
         .attr('width', w)
@@ -175,8 +189,8 @@ export function ProgressTrend({ series }: { series: TrendSeries[] }) {
           }
           rule.attr('x1', x(i) ?? 0).attr('x2', x(i) ?? 0).style('opacity', '1');
           focus.attr('cx', x(i) ?? 0).attr('cy', (d) => y(d.values[i])).style('opacity', '1');
-          const rows = drawn.map((d) => `<span style="color:${d.col}">■</span> ${d.label} <b>${d.values[i]}%</b>`).join('<br>');
-          tip.html(`<div style="opacity:.6;margin-bottom:3px">${labels[i]}</div>${rows}`)
+          const rows = drawn.map((d) => `<span style="color:${d.col}">■</span> ${escapeHtml(d.label)} <b>${escapeHtml(d.values[i])}%</b>`).join('<br>');
+          tip.html(`<div style="opacity:.6;margin-bottom:3px">${escapeHtml(labels[i])}</div>${rows}`)
             .style('opacity', '1')
             .style('left', `${Math.min(w - 140, (x(i) ?? 0) + MARGIN.l + 12)}px`)
             .style('top', `${MARGIN.t + 8}px`);
@@ -193,7 +207,7 @@ export function ProgressTrend({ series }: { series: TrendSeries[] }) {
     ro.observe(host);
     return () => {
       ro.disconnect();
-      select(host).selectAll('*').remove();
+      select(host).selectAll('*').interrupt().remove();
     };
   }, [series]);
 
