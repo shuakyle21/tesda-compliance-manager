@@ -18,6 +18,11 @@
  * here. `proxy.ts` forwards the path as the `x-pathname` header for this
  * reason; see that file's doc comment.
  *
+ * DASHBOARD METRICS DEDUP (design sync, 2026-08-23): `/dashboard` renders its
+ * own richer 6-tile KPI grid (`app/(dashboard)/dashboard/page.tsx`) — mounting
+ * this row there too doubled the metrics on the one route that has its own.
+ * Every other route still gets this row; it's their only KPI summary.
+ *
  * DOCS: https://nextjs.org/docs/app/building-your-application/routing/route-groups
  */
 
@@ -32,6 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const headerList = await headers();
   const pathname = headerList.get('x-pathname') ?? '';
   const isTrainerRoute = pathname.startsWith('/trainer');
+  const isDashboardRoute = pathname === '/dashboard';
 
   return (
     <NavDrawerProvider>
@@ -40,8 +46,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="main-area">
           <MobileHeader />
           <main className="main-content">
-            <Topbar />
-            <MetricsRow hideBilling={isTrainerRoute} />
+            <Topbar isTrainerRoute={isTrainerRoute} />
+            {!isDashboardRoute && <MetricsRow hideBilling={isTrainerRoute} />}
             {children}
           </main>
         </div>

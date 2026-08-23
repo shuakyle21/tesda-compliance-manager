@@ -38,22 +38,26 @@ const ROLE_COPY: Record<DashboardRole, {
   permissionNote: string;
   figmaNode: string;
 }> = {
+  // Full names, matching the identity Sidebar's user card shows for each role
+  // (design's `ROLES[role].name` in TVI-CAMS.dc.html) — the greeting row
+  // below reads as "who is this" the same way the sidebar does, not a
+  // separate "Good day" salutation.
   coordinator: {
-    name: 'Karina',
+    name: 'Karina Cruz',
     roleLabel: 'Coordinator',
     subtitle: 'Monitor assigned schools, urgent billing windows, and document readiness.',
     permissionNote: 'Coordinator actions enabled for assigned tenants.',
     figmaNode: '522:2367',
   },
   admin: {
-    name: 'Rodel',
+    name: 'Rodel Esteban',
     roleLabel: 'Admin',
     subtitle: 'School-level oversight for operational readiness and compliance blockers.',
     permissionNote: 'Admin controls available for the active school.',
     figmaNode: '382:3',
   },
   viewer: {
-    name: 'Rosa',
+    name: 'Rosa C. Mendiola',
     roleLabel: 'Viewer',
     subtitle: 'Read-only audit view of batch readiness, evidence, and recent activity.',
     permissionNote: 'Read-only access. Write actions are hidden and server-denied.',
@@ -201,29 +205,39 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       )}
 
       {criticalMissing > 0 && (
-        <InfoCallout variant="error">
-          {criticalMissing} critical document missing across {batches.length} {batches.length === 1 ? 'batch' : 'batches'}.
-          {' '}Document audit is required before billing release.
-          <Link href="/documents" className="dash-link" style={{ marginLeft: 10 }}>
-            Review docs
-          </Link>
+        <InfoCallout variant="warning">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <span style={{ flex: 1, minWidth: 240 }}>
+              {criticalMissing} critical document missing across {batches.length} {batches.length === 1 ? 'batch' : 'batches'}.
+              {' '}Document audit is required before billing release.
+            </span>
+            <Link
+              href="/documents"
+              className="btn secondary sm"
+              // `.btn.secondary` is gray by default; tinted amber here since
+              // this button only ever sits inside the amber callout above.
+              style={{ flexShrink: 0, color: 'var(--color-amber-dk)', borderColor: 'var(--color-amber-border)', background: 'var(--color-surface)' }}
+            >
+              Review docs
+              <Icon name="arrow-narrow-right" size={14} />
+            </Link>
+          </div>
         </InfoCallout>
       )}
 
+      {/* Compact identity row — name + role, matching the design's greeting
+          card exactly. `subtitle`/`permissionNote` still exist on ROLE_COPY
+          for the a11y label below (screen-reader only), so the read-only
+          boundary is still communicated to a viewer, just not as visible
+          card copy the design doesn't show. */}
       <section className="dash-greeting" aria-labelledby="dashboard-role-heading">
-        <div>
-          <div id="dashboard-role-heading" className="dash-greeting-title">
-            Good day, {roleCopy.name}
-            <span className={`dash-greeting-role role-tag ${dashboardRole}`}>
-              {roleCopy.roleLabel}
-            </span>
-          </div>
-          <div className="dash-greeting-sub">{roleCopy.subtitle}</div>
+        <div id="dashboard-role-heading" className="dash-greeting-title">
+          {roleCopy.name}
+          <span className={`dash-greeting-role role-tag ${dashboardRole}`}>
+            {roleCopy.roleLabel}
+          </span>
         </div>
-        <div className="perm-note">
-          <Icon name={dashboardRole === 'viewer' ? 'shield-off' : 'shield-check'} size={13} />
-          {roleCopy.permissionNote}
-        </div>
+        <span className="sr-only">{roleCopy.subtitle} {roleCopy.permissionNote}</span>
       </section>
 
       <section className="dash-kpi-grid" aria-label="Dashboard key metrics">

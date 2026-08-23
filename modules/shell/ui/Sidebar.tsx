@@ -23,7 +23,12 @@ import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
 import { useNavDrawer } from './NavDrawerProvider';
 
-type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings' };
+type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings'; badge?: number };
+
+// Static demo count, same fidelity as the design's own hardcoded `badge:3` —
+// there is no real unread-activity tracking yet. Exported so the Topbar bell
+// (which links to the same Activity Log) shows the same number.
+export const ACTIVITY_UNREAD = 3;
 
 const WORKSPACE: NavItem[] = [
   { label: 'Dashboard', icon: 'chart-dots', href: '/dashboard' },
@@ -36,7 +41,7 @@ const WORKSPACE: NavItem[] = [
   { label: 'Billing', icon: 'receipt', href: '/billing' },
   { label: 'Analytics', icon: 'chart-bar', href: '/analytics' },
   { label: 'Report', icon: 'file-invoice', href: '/report' },
-  { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
+  { label: 'Activity Log', icon: 'timeline', href: '/activity-log', badge: ACTIVITY_UNREAD },
 ];
 
 const ACCOUNT: NavItem[] = [
@@ -44,7 +49,7 @@ const ACCOUNT: NavItem[] = [
 ];
 
 const OPERATIONS: NavItem[] = [
-  { label: 'Import CSV', icon: 'download', op: 'import' },
+  { label: 'Import records', icon: 'download', op: 'import' },
   { label: 'Settings', icon: 'settings', op: 'settings' },
 ];
 
@@ -62,7 +67,7 @@ interface SidebarProps {
 
 export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
   const pathname = usePathname();
-  const { open, closeDrawer } = useNavDrawer();
+  const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
   const operations = isTrainerRoute ? OPERATIONS.filter((o) => o.op === 'settings') : OPERATIONS;
 
   // School selector (no tenant backend yet — switch updates local display).
@@ -100,18 +105,20 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
   return (
     <>
       <div className={`sidebar-scrim${open ? ' show' : ''}`} onClick={closeDrawer} aria-hidden="true" />
-      <aside className={`sidebar${open ? ' open' : ''}`} aria-label="Primary navigation">
+      <aside className={`sidebar${open ? ' open' : ''}${collapsed ? ' collapsed' : ''}`} aria-label="Primary navigation">
         {/* Brand */}
         <div className="sb-brand">
-          <span aria-hidden="true" style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--color-blue)', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
-            TVI
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/mark.svg" alt="" width={28} height={28} style={{ borderRadius: 7, flexShrink: 0 }} />
           <span className="sb-brand-text">
             <span className="sb-brand-name">TVI-CAMS</span>
             <span className="sb-brand-sub">Compliance &amp; Audit</span>
           </span>
           <button type="button" className="sb-close icon-btn" onClick={closeDrawer} aria-label="Close navigation">
             <Icon name="x" size={16} />
+          </button>
+          <button type="button" className="sb-collapse icon-btn" onClick={toggleCollapsed} aria-label="Collapse sidebar" title="Collapse sidebar">
+            <Icon name="layout-sidebar" size={16} />
           </button>
         </div>
 
@@ -234,6 +241,7 @@ function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boo
     <>
       <Icon name={item.icon} size={17} />
       <span>{item.label}</span>
+      {!!item.badge && <span className="sb-badge">{item.badge}</span>}
     </>
   );
 
