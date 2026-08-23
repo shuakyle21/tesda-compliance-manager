@@ -51,6 +51,27 @@ _Avoid_: "Billing-ready" meaning threshold-only
 A populated `.docx` generated from the school's own template (letterhead, tenant signatories, TESDA-PO addressee). Generation is append-only history — corrections re-generate a new versioned snapshot, nothing is overwritten.
 _Avoid_: Invoice, bill (these imply external issuance the tool does not perform)
 
+### Access & authorization
+
+**Profile**:
+A signed-in user's `public.profiles` row (`clerk_user_id`, `role`, `is_active`). The record RLS actually reads via `app_private.current_profile_id()`/`current_role()` — the resolver must read the same row, not a separate copy.
+_Avoid_: User (ambiguous between the Clerk identity and this row), Account
+
+**Tenant membership**:
+A `public.profile_tenant_memberships` row — one profile's grant of access to one tenant. Today a profile has exactly one active membership in practice; multi-membership (a profile spanning tenants) is out of scope until a real need appears.
+_Avoid_: Assignment, tenant link
+
+**Resolved role**:
+The lowercase role value (`'admin' | 'coordinator' | 'trainer' | 'viewer'`) the app trusts for a request — sourced from the profile's `role` column, matching the `public.profile_role` Postgres enum exactly. `ProfileRole` in `modules/tenancy/domain/profile.ts` must use this same lowercase vocabulary, not its own capitalized set.
+_Avoid_: Capitalized role labels as a type (`'Admin'`, etc.) — those are display copy, not the domain value
+
+**Denied**:
+A profile that resolves (active, has a role) but fails `can_access_tenant` for the tenant in question — distinct from **unresolved**.
+_Avoid_: Using "denied" for a missing profile row
+
+**Unresolved**:
+No active `public.profiles` row exists for the signed-in Clerk user at all — nothing to resolve a role or tenant from. The least-privileged fallback (viewer, read-only) applies here, same as it does for denied, but the two causes are not interchangeable when diagnosing an access problem.
+
 ### Entrepreneurship (three distinct concepts)
 
 **Entrepreneurship component**:
