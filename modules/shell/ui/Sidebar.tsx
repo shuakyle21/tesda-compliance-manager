@@ -16,11 +16,14 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon, type IconName } from '@/shared/ui/Icon';
+import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { TENANTS } from '@/shared/mocks/seed';
 import type { Tenant } from '@/shared/types';
+import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
+import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
 import { useNavDrawer } from './NavDrawerProvider';
 
-type NavItem = { label: string; icon: IconName; href?: string };
+type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings' };
 
 const WORKSPACE: NavItem[] = [
   { label: 'Dashboard', icon: 'chart-dots', href: '/dashboard' },
@@ -41,13 +44,26 @@ const ACCOUNT: NavItem[] = [
 ];
 
 const OPERATIONS: NavItem[] = [
-  { label: 'Import CSV', icon: 'download' }, // route not built yet
-  { label: 'Settings', icon: 'settings' }, // route not built yet
+  { label: 'Import CSV', icon: 'download', op: 'import' },
+  { label: 'Settings', icon: 'settings', op: 'settings' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  /**
+   * The only role signal a Server Component layout can derive today (no real
+   * role model until TES-34 — see layout.tsx's TRAINER OMISSION note). Mirrors
+   * the design's `ROLES[role].ops`: trainer gets Settings only, every other
+   * (assumed-coordinator) route gets both. Import CSV is an office-only
+   * operation — a trainer must not see it, the same boundary `hideBilling`
+   * already enforces for the metrics row.
+   */
+  isTrainerRoute?: boolean;
+}
+
+export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
   const pathname = usePathname();
   const { open, closeDrawer } = useNavDrawer();
+  const operations = isTrainerRoute ? OPERATIONS.filter((o) => o.op === 'settings') : OPERATIONS;
 
   // School selector (no tenant backend yet — switch updates local display).
   const [orgOpen, setOrgOpen] = useState(false);
@@ -56,6 +72,10 @@ export function Sidebar() {
   );
   const orgRef = useRef<HTMLDivElement>(null);
   const canSwitch = TENANTS.length > 1;
+
+  // Operations overlays (Import CSV / Settings) + their completion toast.
+  const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
+  const [toast, setToast] = useState<ToastData | null>(null);
 
   // Click-outside closes the school dropdown.
   useEffect(() => {
@@ -66,16 +86,16 @@ export function Sidebar() {
     return () => document.removeEventListener('mousedown', onDocClick);
   }, []);
 
-  // Esc closes the dropdown, then the drawer.
+  // Esc closes the dropdown, then the drawer (the op modals own their own Esc).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
+      if (e.key !== 'Escape' || activeOp) return;
       if (orgOpen) setOrgOpen(false);
       else if (open) closeDrawer();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [orgOpen, open, closeDrawer]);
+  }, [orgOpen, open, closeDrawer, activeOp]);
 
   return (
     <>
@@ -153,8 +173,14 @@ export function Sidebar() {
           ))}
 
           <div className="sb-group-label">Operations</div>
-          {OPERATIONS.map((item) => (
-            <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
+          {operations.map((item) => (
+            <NavRow
+              key={item.label}
+              item={item}
+              active={item.href === pathname}
+              onNavigate={closeDrawer}
+              onOp={item.op ? () => { closeDrawer(); setActiveOp(item.op!); } : undefined}
+            />
           ))}
 
           <div className="sb-group-label">Account</div>
@@ -175,17 +201,49 @@ export function Sidebar() {
           </Link>
         </div>
       </aside>
+
+      {activeOp === 'import' && (
+        <ImportCsvModal
+          onClose={() => setActiveOp(null)}
+          onImported={(message) => {
+            setActiveOp(null);
+            setToast({ title: 'Import complete', message });
+          }}
+        />
+      )}
+      {activeOp === 'settings' && (
+        <SettingsModal
+          workspaceName={tenant.name}
+          workspaceMeta={`${tenant.code} · ${tenant.region}`}
+          userName="Karina Cruz"
+          userLabel="coordinator"
+          onClose={() => setActiveOp(null)}
+          onSaved={() => {
+            setActiveOp(null);
+            setToast({ title: 'Settings saved' });
+          }}
+        />
+      )}
+      {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </>
   );
 }
 
-function NavRow({ item, active, onNavigate }: { item: NavItem; active: boolean; onNavigate: () => void }) {
+function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boolean; onNavigate: () => void; onOp?: () => void }) {
   const inner = (
     <>
       <Icon name={item.icon} size={17} />
       <span>{item.label}</span>
     </>
   );
+
+  if (onOp) {
+    return (
+      <button type="button" className="sb-nav-item" onClick={onOp}>
+        {inner}
+      </button>
+    );
+  }
 
   if (!item.href) {
     return (

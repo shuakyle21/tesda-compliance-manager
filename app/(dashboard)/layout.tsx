@@ -36,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <NavDrawerProvider>
       <div className="app-layout">
-        <Sidebar />
+        <Sidebar isTrainerRoute={isTrainerRoute} />
         <div className="main-area">
           <MobileHeader />
           <main className="main-content">
