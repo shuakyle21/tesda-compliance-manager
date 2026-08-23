@@ -83,9 +83,12 @@ export function Sidebar() {
       <aside className={`sidebar${open ? ' open' : ''}`} aria-label="Primary navigation">
         {/* Brand */}
         <div className="sb-brand">
-          <span aria-hidden="true" style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--color-blue)', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
-            TVI
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/tvi-cams-mark.svg"
+            alt="TVI-CAMS"
+            style={{ width: 30, height: 30, borderRadius: 7, objectFit: 'contain', flexShrink: 0, background: '#fff', border: '1px solid var(--color-border-faint)' }}
+          />
           <span className="sb-brand-text">
             <span className="sb-brand-name">TVI-CAMS</span>
             <span className="sb-brand-sub">Compliance &amp; Audit</span>

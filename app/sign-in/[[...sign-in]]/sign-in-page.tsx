@@ -154,10 +154,10 @@ export function SignInCard() {
 
   return (
     <div className={styles.card}>
-      {/* Brand mark — Figma node 743:3076 (shipped as public/assets/mark.svg,
-          the same logo the Topbar/Sidebar use). The SVG is self-contained:
-          blue tile + rounded corners are baked in. */}
-      <img src="/assets/mark.svg" alt="" width={40} height={40} className={styles.mark} />
+      {/* Brand lockup — Claude Design e3ea69aa (TVI-CAMS.dc.html) sign-in hero
+          image, shipped as public/assets/sign-in-brandmark.svg. Wider lockup
+          than the Sidebar/Topbar mark, self-contained (no external assets). */}
+      <img src="/assets/sign-in-brandmark.svg" alt="" width={334} height={168} className={styles.mark} />
 
       {view === 'signin' ? (
         <>
