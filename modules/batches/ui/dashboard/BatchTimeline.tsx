@@ -115,6 +115,16 @@ function cssVar(el: Element, name: string): string {
   return getComputedStyle(el.ownerDocument.documentElement).getPropertyValue(name).trim() || '#888';
 }
 
+// The hover tooltip is built as an HTML string (`tip.html(...)`, not `.text()`)
+// so it can mix a bold label with a `<br>`-separated date/detail line. Every
+// value interpolated into that string is currently a hardcoded phase/milestone
+// label or a number/date formatted by d3-time-format, so there is no live HTML
+// injection path today — but escape defensively so that stays true if a future
+// caller starts feeding this a free-text field (e.g. a batch/program name).
+function escapeHtml(value: string | number): string {
+  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
+
 export function BatchTimeline({ batches }: { batches: Batch[] }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
 
@@ -201,7 +211,7 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
           const x0 = x(p.s), x1 = Math.max(x(p.e), x0 + 10);
           const dateRange = `${timeFormat('%b %e')(p.s).trim()} → ${timeFormat('%b %e')(p.e).trim()}`;
           const bar = g.append('g').style('cursor', 'default')
-            .on('mousemove', (ev) => show(ev, `<b>${p.label}</b><br>${dateRange}${p.detail ? `<br>${p.detail}` : ''}`))
+            .on('mousemove', (ev) => show(ev, `<b>${escapeHtml(p.label)}</b><br>${escapeHtml(dateRange)}${p.detail ? `<br>${escapeHtml(p.detail)}` : ''}`))
             .on('mouseleave', hide);
           bar.append('title').text(`${p.label}: ${dateRange}${p.detail ? ` — ${p.detail}` : ''}`);
           const rect = bar.append('rect').attr('x', x0).attr('y', bandY).attr('height', bandH).attr('rx', 4)
@@ -233,7 +243,7 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
             const done = m.status === 'done', active = m.status === 'active';
             const dateLabel = timeFormat('%b %e, %Y')(m.at);
             const mg = g.append('g').attr('transform', `translate(${mx},${mY})`)
-              .on('mousemove', (ev) => show(ev, `<b>${m.label}</b><br>${dateLabel}`))
+              .on('mousemove', (ev) => show(ev, `<b>${escapeHtml(m.label)}</b><br>${escapeHtml(dateLabel)}`))
               .on('mouseleave', hide);
             mg.append('title').text(`${m.label}: ${dateLabel} — ${done ? 'done' : active ? 'in progress' : 'pending'}`);
             mg.append('rect').attr('x', -4.5).attr('y', -4.5).attr('width', 9).attr('height', 9).attr('transform', 'rotate(45)')
