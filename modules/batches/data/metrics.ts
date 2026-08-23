@@ -54,19 +54,24 @@ export function getDashboardMetrics(
     ? batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0]
     : null;
 
-  // Critical-document compliance summary.
+  // Critical-document compliance summary. Counted explicitly (not derived by
+  // subtraction from `critTotal`) so a `criticalDocumentKeys` entry with no
+  // matching key in `b.documents` — a caller/catalog mismatch, see this
+  // function's doc-comment above — falls out of the percentage instead of
+  // silently counting as compliant.
   let missing = 0;
   let pending = 0;
+  let compliant = 0;
   batches.forEach((b) => {
     criticalDocumentKeys.forEach((key) => {
       const st = b.documents[key]?.status;
       if (st === 'missing') missing++;
-      if (st === 'pending') pending++;
+      else if (st === 'pending') pending++;
+      else if (st === 'verified' || st === 'submitted') compliant++;
     });
   });
   const critTotal = criticalDocumentKeys.length * totalBatches;
-  const verified = critTotal - missing - pending;
-  const docCompliancePct = critTotal ? Math.round((verified / critTotal) * 100) : 0;
+  const docCompliancePct = critTotal ? Math.round((compliant / critTotal) * 100) : 0;
 
   return {
     totalBatches,
