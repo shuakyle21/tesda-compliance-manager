@@ -101,7 +101,7 @@ export async function getActivitySnapshot(limit?: number): Promise<ActivitySnaps
       .from('activity_log')
       .select('*, profiles(full_name, role)')
       .order('created_at', { ascending: false });
-    if (limit) query = query.limit(limit);
+    if (limit !== undefined) query = query.limit(limit);
 
     const { data, error } = await query;
 

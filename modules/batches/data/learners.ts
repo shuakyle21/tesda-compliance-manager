@@ -83,11 +83,14 @@ export type LearnersSnapshot =
   | { status: 'unconfigured' };
 
 /**
- * The full roster for one batch, ordered by last name for a stable, readable
- * sequence (the contract has no explicit ordinal column). Returns every
- * learner regardless of `is_active` — whether a dropped-out scholar belongs
- * on a given screen (e.g. excluded from a billing roster) is a caller/domain
- * policy decision, not a fetch-time filter this contract should make silently.
+ * The full roster for one batch, ordered by last name (then first name, then
+ * `id`) for a stable, readable, and — critically — deterministic sequence:
+ * `last_name` alone ties for learners who share a surname, and an unordered
+ * tiebreak would let `seq` reshuffle between identical queries (the contract
+ * has no explicit ordinal column). Returns every learner regardless of
+ * `is_active` — whether a dropped-out scholar belongs on a given screen (e.g.
+ * excluded from a billing roster) is a caller/domain policy decision, not a
+ * fetch-time filter this contract should make silently.
  */
 export async function getBatchLearnersSnapshot(batchId: string): Promise<LearnersSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
@@ -98,7 +101,9 @@ export async function getBatchLearnersSnapshot(batchId: string): Promise<Learner
       .from('learners')
       .select('*')
       .eq('batch_id', batchId)
-      .order('last_name', { ascending: true });
+      .order('last_name', { ascending: true })
+      .order('first_name', { ascending: true })
+      .order('id', { ascending: true });
 
     if (error) return { status: 'sync-failed', error: error.message };
     return { status: 'ok', learners: (data ?? []).map((row, i) => mapLearnerRow(row, i + 1)) };
