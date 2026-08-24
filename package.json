@@ -36,9 +36,11 @@
     "d3-transition": "^3.0.1",
     "drizzle-orm": "^0.45.2",
     "next": "16.2.6",
+    "next-swagger-doc": "^0.4.1",
     "postgres": "^3.4.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "swagger-ui-react": "^5.32.14"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.11",
