@@ -23,7 +23,7 @@ import { useNavDrawer } from './NavDrawerProvider';
 type NavItem = { label: string; icon: IconName; href?: string };
 
 const WORKSPACE: NavItem[] = [
-  { label: 'Dashboard', icon: 'chart-dots', href: '/dashboard' },
+  { label: 'Dashboard', icon: 'layout-dashboard', href: '/dashboard' },
   { label: 'Batch Cards', icon: 'folders', href: '/batch-cards' },
   { label: 'Table View', icon: 'file-text', href: '/table-view' },
   { label: 'Documents', icon: 'file-check', href: '/documents' },
@@ -41,7 +41,7 @@ const ACCOUNT: NavItem[] = [
 ];
 
 const OPERATIONS: NavItem[] = [
-  { label: 'Import CSV', icon: 'download' }, // route not built yet
+  { label: 'Import records', icon: 'download' }, // route not built yet
   { label: 'Settings', icon: 'settings' }, // route not built yet
 ];
 

@@ -3,28 +3,55 @@
  *
  * Figma source of truth: file vZKyWXSipBHmiQFuHl5e1O, node 8:4730.
  * Header with a red critical-count badge + "View all", then alert rows
- * (kind icon · subject · "{sentAt} · {batch} · {status}" meta).
- * Data-driven from ALERTS_LOG.
+ * (tone dot · one-line sentence).
+ *
+ * TES-93: reconciled against the claude-design source (TVI-CAMS.dc.html
+ * `dashVM()`) — alerts are derived live from the same `batches` already
+ * driving the rest of the dashboard (billing-ready, BSRS approved, critical
+ * billing window, missing critical docs, NTP lag), not a static mock log, so
+ * this panel can never drift out of sync with the batches shown alongside it.
+ *
+ * No per-alert "N days/hours ago" timestamp is shown: the Batch model has no
+ * real per-event firing time to derive one from (and this repo forbids
+ * `Date.now()` during render), and a fabricated relative stamp next to a
+ * live, batch-identified sentence would read as real recency information —
+ * worse than the static mock it replaced. Rows are sorted critical-first so
+ * the header's red count always matches what's visible after `limit`.
  */
 
 import Link from 'next/link';
-import { Icon, type IconName } from '@/shared/ui/Icon';
-import { ALERTS_LOG } from '@/shared/mocks/seed';
+import { Icon } from '@/shared/ui/Icon';
+import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
+import { isBillingReady } from '@/modules/billing/domain/readiness';
+import { urgencyTier } from '@/modules/batches/domain/urgency';
+import type { Batch } from '@/shared/types';
 
-const CRITICAL_KINDS = new Set(['billing-critical', 'doc-missing', 'ntp-lag']);
+type Tone = 'green' | 'amber' | 'red';
+type AlertRow = { text: string; tone: Tone };
 
-const KIND_META: Record<string, { icon: IconName; color: string }> = {
-  'billing-ready': { icon: 'send', color: 'var(--color-green)' },
-  'billing-critical': { icon: 'alert-triangle', color: 'var(--color-red)' },
-  'bsrs-approved': { icon: 'shield-check', color: 'var(--color-green)' },
-  'doc-missing': { icon: 'file-check', color: 'var(--color-amber)' },
-  'ntp-lag': { icon: 'alert-circle', color: 'var(--color-red)' },
-  'weekly-digest': { icon: 'receipt', color: 'var(--color-blue)' },
-};
+const CRITICAL_DOCS = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
+const TONE_RANK: Record<Tone, number> = { red: 0, amber: 1, green: 2 };
 
-export function AlertsPanel({ limit = 5 }: { limit?: number }) {
-  const alerts = ALERTS_LOG.slice(0, limit);
-  const criticalCount = ALERTS_LOG.filter((a) => CRITICAL_KINDS.has(a.kind)).length;
+function batchAlerts(b: Batch): AlertRow[] {
+  const rows: AlertRow[] = [];
+  if (isBillingReady(b)) rows.push({ tone: 'green', text: `${b.id} reached 80%+ training progress — ready for billing.` });
+  if (b.bsrs) rows.push({ tone: 'green', text: `${b.id} BSRS approved — eligible for billing.` });
+  if (urgencyTier(b.daysToBilling) === 'critical') rows.push({ tone: 'red', text: `${b.id} billing window opens in ${b.daysToBilling} days.` });
+  // Only flag missing critical docs once this batch's documents are actually
+  // tracked — an empty `documents` map means "not synced yet", not "none
+  // missing" (see the docsTracked guard in page.tsx for the same distinction).
+  if (Object.keys(b.documents).length > 0) {
+    const missing = CRITICAL_DOCS.filter((r) => b.documents[r.key]?.status === 'missing').length;
+    if (missing > 0) rows.push({ tone: 'amber', text: `${b.id} missing ${missing} critical document${missing > 1 ? 's' : ''}.` });
+  }
+  if (b.ntpLag > 7) rows.push({ tone: 'red', text: `${b.id} NTP-to-start lag exceeded 7 days.` });
+  return rows;
+}
+
+export function AlertsPanel({ batches, limit = 5 }: { batches: Batch[]; limit?: number }) {
+  const allAlerts = batches.flatMap(batchAlerts).sort((a, b) => TONE_RANK[a.tone] - TONE_RANK[b.tone]);
+  const alerts = allAlerts.slice(0, limit);
+  const criticalCount = allAlerts.filter((a) => a.tone === 'red').length;
 
   return (
     <section className="dash-panel" aria-labelledby="alerts-heading">
@@ -58,31 +85,25 @@ export function AlertsPanel({ limit = 5 }: { limit?: number }) {
       </div>
 
       <div className="dash-panel-body" style={{ padding: 0 }}>
-        {alerts.map((a, i) => {
-          const meta = KIND_META[a.kind] ?? { icon: 'info-circle' as IconName, color: 'var(--color-text-muted)' };
-          return (
+        {alerts.length === 0 ? (
+          <p className="t-body" style={{ padding: '10px 14px' }}>No alerts — every batch is within its compliance windows.</p>
+        ) : (
+          alerts.map((a, i) => (
             <div
-              key={a.id}
+              key={`${a.text}-${i}`}
               style={{
                 display: 'flex',
-                gap: 10,
+                gap: 9,
                 alignItems: 'flex-start',
                 padding: '10px 14px',
                 borderBottom: i < alerts.length - 1 ? '0.5px solid var(--color-border-faint)' : 'none',
               }}
             >
-              <span style={{ color: meta.color, flexShrink: 0, marginTop: 2 }}>
-                <Icon name={meta.icon} size={14} />
-              </span>
-              <div style={{ flex: '1 0 0', minWidth: 0 }}>
-                <div style={{ fontSize: 12, color: 'var(--color-text-primary)', lineHeight: '16.8px' }}>{a.subject}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', marginTop: 2 }}>
-                  {a.sentAt} · {a.batch} · {a.status}
-                </div>
-              </div>
+              <span style={{ width: 8, height: 8, borderRadius: 999, marginTop: 5, flexShrink: 0, background: `var(--color-${a.tone})` }} aria-hidden="true" />
+              <div style={{ minWidth: 0, fontSize: 12, color: 'var(--color-text-primary)', lineHeight: '16.8px' }}>{a.text}</div>
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </section>
   );

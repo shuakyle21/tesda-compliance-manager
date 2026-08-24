@@ -289,7 +289,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       <BatchTimeline batches={batches} />
 
       <section className="dash-main-grid" aria-label="Dashboard summaries">
-        <AlertsPanel />
+        <AlertsPanel batches={batches} />
 
         <DashboardPanel title={SUMMARY_CARDS[1].title} icon={SUMMARY_CARDS[1].icon}>
           <div className="dash-program-grid">
