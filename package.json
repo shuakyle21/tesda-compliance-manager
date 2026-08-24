@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "TESDA Compliance Manager Design System v0",
   "private": true,
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build",
