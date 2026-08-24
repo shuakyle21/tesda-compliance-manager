@@ -15,14 +15,14 @@ TVI-CAMS — an internal multi-tenant compliance tool for TVI schools running TE
 ## Commands
 
 ```bash
-npm run dev       # Next.js dev server
-npm run build     # production build
-npm run lint      # ESLint (flat config; static dirs below are globally ignored)
-npx tsc --noEmit  # typecheck (strict) — no dedicated script
-npm run preview   # serve the static design preview bundle on :5000
+pnpm dev              # Next.js dev server
+pnpm build            # production build
+pnpm lint             # ESLint (flat config; static dirs below are globally ignored)
+pnpm exec tsc --noEmit # typecheck (strict) — no dedicated script
+pnpm preview          # serve the static design preview bundle on :5000
 ```
 
-There is **no test runner yet** — `npm test` is a placeholder (`echo "No tests defined."`). Standing up Vitest + real-Supabase integration tests is Phase 0.4 of `docs/IMPLEMENTATION_PLAN.md`; when tests exist, mappers and module `domain/` layers must be unit-tested with fixed as-of dates, and RLS/tenant-isolation tests run against real Supabase (no mocks).
+Package manager is **pnpm** (`packageManager` field in `package.json`; `pnpm-lock.yaml` is the committed lockfile — do not add `package-lock.json`/`yarn.lock`). There is **no test runner yet** — `pnpm test` is a placeholder (`echo "No tests defined."`). Standing up Vitest + real-Supabase integration tests is Phase 0.4 of `docs/IMPLEMENTATION_PLAN.md`; when tests exist, mappers and module `domain/` layers must be unit-tested with fixed as-of dates, and RLS/tenant-isolation tests run against real Supabase (no mocks).
 
 ## Architecture
 
