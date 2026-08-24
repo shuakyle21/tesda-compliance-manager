@@ -1,0 +1,36 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "TVI-CAMS API",
+    "version": "0.1.0",
+    "description": "Internal Next.js API routes for TVI-CAMS. Add a `paths` entry here for every new route.ts you create under app/api/."
+  },
+  "servers": [
+    { "url": "/api", "description": "Same-origin Next.js API routes" }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Liveness check",
+        "operationId": "getHealth",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "Service is up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
