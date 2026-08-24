@@ -201,14 +201,8 @@ pnpm preview
 - GitHub Project: https://github.com/users/shuakyle21/projects/4
 - FigJam planning board: https://www.figma.com/board/8yXIDELlmyLxGb8VGHTCXw
 
-## Acceptance Criteria for MVP
+## Application Screenshots
 
-- Core MVP features are clearly separated from later features.
-- Every core feature maps to at least one role.
-- LAMR is stored as structured evidence and can also reference a source file.
-- Supabase is described and implemented as the internal operational database only.
-- TESDA SIS, T2MIS, BSRS, and official reporting systems remain authoritative.
-- Tenant isolation is enforced through Supabase RLS.
-- No dedicated-backend assumptions are included. (Express.js is the documented
-  future backend direction only — recommendation updated from Laravel,
-  2026-07-06; see docs/TRD.md §1.3.)
+![Login Page](<screenshots/login page.png>)
+
+## Login Page
