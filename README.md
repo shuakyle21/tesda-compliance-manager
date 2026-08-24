@@ -3,7 +3,7 @@
 
 Internal compliance and document tracking tool for farm schools and TVIs implementing TESDA scholarship programs.
 
-This repository contains the MVP foundation for a multi-tenant TESDA compliance manager. It helps school admins, coordinators, trainers, and read-only reviewers track training batches, required documents, learner progress, LAMR evidence, and internal billing preparation signals.
+This repository contains the MVP foundation for a multi-tenant TESDA compliance manager. It helps school admins, coordinators, trainers, and read-only reviewers track training batches, required documents, learner progress, LAMR evidence, and internal billing document preparation.
 
 ## Official Systems Boundary
 
@@ -25,7 +25,7 @@ Official TESDA records, approved qualification maps, schedules, ULI records, att
 | Trainer class updates            | Trainers can view rosters, mark daily attendance or progress, and upload training-side evidence.                                                                                 |
 | LAMR structured evidence         | LAMR captures TVI name, program, batch, module, schedule, learner rows, learning outcomes, activity checks, assessment result, prepared by, approved by, and source file upload. |
 | Blended learning support         | LAMR can be used as structured evidence for blended or asynchronous learning activities.                                                                                         |
-| Billing preparation signal       | Configurable 80% progress threshold shows an internal billing preparation badge for Admin and Coordinator only.                                                                  |
+| Billing document generation      | Internal document-generating engine per ADR-001: populates TSF/Allowance, Training Cost, and Entrepreneurship `.docx` templates. A packet is billing-ready only when the compound gate passes — training progress ≥ 80% **and** required documents verified — then moves through `draft → ready → generated → submitted → settled` with derived due dates (ADR-003). Admin and Coordinator only. |
 | Basic import/export              | CSV batch import and filtered CSV export, respecting tenant and role scope.                                                                                                      |
 
 ### Later Features
@@ -46,7 +46,7 @@ Official TESDA records, approved qualification maps, schedules, ULI records, att
 | Role | Scope | Permissions |
 | --- | --- | --- |
 | Admin | One school | Full write access within their school. |
-| Coordinator | One or more schools | Manages lifecycle, documents, imports, exports, and billing preparation signals for assigned schools. |
+| Coordinator | One or more schools | Manages lifecycle, documents, imports, exports, and internal billing document preparation for assigned schools. |
 | Trainer | Assigned batch or class | Views assigned class, marks attendance/progress, uploads training evidence, and manages LAMR inputs. |
 | Viewer | Assigned school or schools | Read-only access for audit review or external review. |
 
@@ -75,7 +75,7 @@ Scholarship programs should be stored as configurable records, not hard-coded UI
 2. Review batch lifecycle status and missing documents.
 3. Upload or link evidence files.
 4. Verify document statuses.
-5. Track progress toward assessment and billing preparation.
+5. Track progress toward assessment and internal billing document preparation.
 6. Export filtered readiness data when needed.
 
 ### Trainer Daily Class
@@ -130,8 +130,16 @@ LAMR is represented as structured evidence, not only as a file upload. Each reco
 | `modules/<domain>/` | Domain modules (`data/`, `domain/`, `ui/`), one per PRD functional requirement. |
 | `shared/` | Props-only UI primitives, UI domain types, and the mock seed dataset. |
 | `lib/supabase/` | External data boundary: client/server factories and generated `database.types.ts`. |
+| `supabase/migrations/` | Canonical schema and RLS policies. New migrations are additive. |
+| `tests/unit/` | Vitest unit tests for mappers and module `domain/` layers. |
 | `RULES.md` | Non-negotiable invariants (security, module boundaries, design system). |
-| `docs/MVP_PRD.md` | Full MVP product requirements document. |
+| `CLAUDE.md` | Architecture guidance and the *why* behind the invariants. |
+| `CONTEXT.md` | Domain model and ubiquitous language. |
+| `docs/adr/` | Architecture decision records. **ADR-001 supersedes any conflicting "billing = preparation signal only" wording elsewhere in the docs.** |
+| `docs/MASTER_PRD_SRS.md` | Product source of truth. |
+| `docs/TRD.md` | Engineering companion to the PRD. |
+| `docs/IMPLEMENTATION_PLAN.md` | Phased delivery plan. |
+| `docs/MVP_PRD.md` | Earlier MVP scope document; `MASTER_PRD_SRS.md` is the product source of truth. |
 | `docs/GITHUB_PROJECTS_INTEGRATION.md` | GitHub Projects workflow notes. |
 | `docs/GITHUB_PROJECT_BACKLOG.md` | MVP backlog prepared for GitHub Issues and Projects. |
 | `DESIGN.md` | Product design direction and interface rules. |
@@ -139,28 +147,52 @@ LAMR is represented as structured evidence, not only as a file upload. Each reco
 
 ## Local Development
 
-Install dependencies:
+This repository uses **pnpm** — `pnpm-lock.yaml` is the only lockfile. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Run lint checks:
 
 ```bash
-npm run lint
+pnpm lint
+```
+
+Typecheck (strict; no dedicated script):
+
+```bash
+pnpm exec tsc --noEmit
+```
+
+Run unit tests once:
+
+```bash
+pnpm test
+```
+
+Run unit tests in watch mode:
+
+```bash
+pnpm test:watch
 ```
 
 Build for production:
 
 ```bash
-npm run build
+pnpm build
+```
+
+Serve the static design preview bundle on port 5000:
+
+```bash
+pnpm preview
 ```
 
 ## Project Links
@@ -169,14 +201,8 @@ npm run build
 - GitHub Project: https://github.com/users/shuakyle21/projects/4
 - FigJam planning board: https://www.figma.com/board/8yXIDELlmyLxGb8VGHTCXw
 
-## Acceptance Criteria for MVP
+## Application Screenshots
 
-- Core MVP features are clearly separated from later features.
-- Every core feature maps to at least one role.
-- LAMR is stored as structured evidence and can also reference a source file.
-- Supabase is described and implemented as the internal operational database only.
-- TESDA SIS, T2MIS, BSRS, and official reporting systems remain authoritative.
-- Tenant isolation is enforced through Supabase RLS.
-- No dedicated-backend assumptions are included. (Express.js is the documented
-  future backend direction only — recommendation updated from Laravel,
-  2026-07-06; see docs/TRD.md §1.3.)
+![Login Page](<screenshots/login page.png>)
+
+## Login Page
