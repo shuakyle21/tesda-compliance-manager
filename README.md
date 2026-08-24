@@ -202,7 +202,6 @@ pnpm preview
 - FigJam planning board: https://www.figma.com/board/8yXIDELlmyLxGb8VGHTCXw
 
 ## Application Screenshots
-
+### Login Page
 ![Login Page](<screenshots/login page.png>)
 
-## Login Page
