@@ -109,7 +109,11 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
         {/* Brand */}
         <div className="sb-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/mark.svg" alt="" width={28} height={28} style={{ borderRadius: 7, flexShrink: 0 }} />
+          <img
+            src="/assets/tvi-cams-mark.svg"
+            alt="TVI-CAMS"
+            style={{ width: 30, height: 30, borderRadius: 7, objectFit: 'contain', flexShrink: 0, background: '#fff', border: '1px solid var(--color-border-faint)' }}
+          />
           <span className="sb-brand-text">
             <span className="sb-brand-name">TVI-CAMS</span>
             <span className="sb-brand-sub">Compliance &amp; Audit</span>
