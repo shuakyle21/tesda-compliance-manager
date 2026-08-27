@@ -249,7 +249,17 @@ export interface DashboardMetrics {
   earliestBillingDeadline: string;
   daysToEarliestBilling: number;
   activeBatches: number;
-  docCompliancePct: number;
+  /**
+   * Critical-document compliance, or `null` when **nothing is tracked** —
+   * unknown, not 0% and not 100% (ADR-004 / TES-94). Callers render "—" for
+   * null rather than a number. Derived by
+   * `modules/batches/domain/metrics.ts`.
+   */
+  docCompliancePct: number | null;
   docMissing: number;
   docPending: number;
+  /** Critical requirement slots that resolved to a record across the batch set. */
+  docTracked: number;
+  /** Critical requirement slots with no record — untracked, excluded from the percentage. */
+  docUntracked: number;
 }

@@ -9,8 +9,8 @@
  * by urgency). `ALL_BATCHES` includes completed cohorts for the Report surface.
  */
 
-import { BATCHES, ACTIVITY, DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
-import type { Batch, ActivityEvent, DashboardMetrics } from '@/shared/types';
+import { BATCHES, ACTIVITY } from '@/shared/mocks/seed';
+import type { Batch, ActivityEvent } from '@/shared/types';
 
 export {
   TENANTS, USERS, DOCUMENT_REQUIREMENTS, ALERTS_LOG, SNAPSHOTS,
@@ -23,6 +23,10 @@ export {
 
 // Domain logic extracted (TES-68): urgencyTier -> modules/batches/domain/urgency.ts;
 // isBillingReady + BILLING_READY_THRESHOLD -> modules/billing/domain/readiness.ts.
+// Extracted again (TES-94): getMockMetrics -> deriveDashboardMetrics in
+// modules/batches/domain/metrics.ts — it was always fed live batches by the
+// dashboard despite the name, and its document-compliance half now consults
+// modules/documents/domain/compliance.ts, which shared/ may not import.
 // shared/ must not re-export module code (import direction rule).
 
 /** Every batch, including completed cohorts (Report scope). */
@@ -35,47 +39,3 @@ export const MOCK_BATCHES: Batch[] = BATCHES
   .sort((a, b) => a.daysToBilling - b.daysToBilling);
 
 export const MOCK_ACTIVITY: ActivityEvent[] = ACTIVITY;
-
-/**
- * Derive the 5-card dashboard metrics from the active batch set. Computed, never
- * hardcoded, so the numbers can never drift from the underlying records.
- */
-export function getMockMetrics(batches: Batch[] = MOCK_BATCHES): DashboardMetrics {
-  const totalBatches = batches.length;
-  const totalScholars = batches.reduce((s, b) => s + b.scholars, 0);
-  const avgProgress = totalBatches
-    ? Math.round(batches.reduce((s, b) => s + b.progressPct, 0) / totalBatches)
-    : 0;
-  const activeBatches = batches.filter((b) => b.status === 'ongoing').length;
-
-  const earliest = totalBatches
-    ? batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0]
-    : null;
-
-  // Critical-document compliance summary
-  const critReqs = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
-  let missing = 0;
-  let pending = 0;
-  batches.forEach((b) => {
-    critReqs.forEach((r) => {
-      const st = b.documents[r.key]?.status;
-      if (st === 'missing') missing++;
-      if (st === 'pending') pending++;
-    });
-  });
-  const critTotal = critReqs.length * totalBatches;
-  const verified = critTotal - missing - pending;
-  const docCompliancePct = critTotal ? Math.round((verified / critTotal) * 100) : 0;
-
-  return {
-    totalBatches,
-    totalScholars,
-    avgProgress,
-    earliestBillingDeadline: earliest ? earliest.billingDeadline.replace(/, \d+$/, '') : '—',
-    daysToEarliestBilling: earliest ? earliest.daysToBilling : 0,
-    activeBatches,
-    docCompliancePct,
-    docMissing: missing,
-    docPending: pending,
-  };
-}

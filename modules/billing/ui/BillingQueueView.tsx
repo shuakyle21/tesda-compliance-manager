@@ -329,9 +329,12 @@ export function BillingQueueView({
                 {selected.docs.map((doc) => (
                   <li key={doc.key}>
                     <span>{doc.label}</span>
-                    <span className={`doc-status ${doc.status}`}>
-                      <Icon name={doc.satisfied ? 'check' : 'clock'} size={12} />
-                      {doc.status}
+                    {/* 'untracked' (ADR-004) has no status pill of its own —
+                        it reuses the muted `.na` treatment and says so in
+                        words, never colour alone. */}
+                    <span className={`doc-status ${doc.status === 'untracked' ? 'na' : doc.status}`}>
+                      <Icon name={doc.satisfied ? 'check' : doc.status === 'untracked' ? 'info-circle' : 'clock'} size={12} />
+                      {doc.status === 'untracked' ? 'not tracked' : doc.status}
                     </span>
                   </li>
                 ))}

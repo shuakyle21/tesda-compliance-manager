@@ -11,6 +11,7 @@
  * screen inherits the existing "Data as of" stamp instead of drifting.
  */
 
+import { docRecordFor, isDocOnFile } from '@/modules/documents/domain/compliance';
 import type { Batch, DocRecord, DocStatus, DocumentRequirement } from '@/shared/types';
 
 /** ₱/day TSF rate — TESDA Circular 015 s.2026, recorded in ADR-001 §3. */
@@ -32,7 +33,13 @@ export type PacketState = 'draft' | 'ready' | 'generated' | 'submitted' | 'settl
 export interface PacketDoc {
   key: string;
   label: string;
-  status: DocStatus;
+  /**
+   * `'untracked'` (ADR-004) when the batch has no record for this requirement
+   * at all — reported as its own state rather than flattened into `'missing'`,
+   * which would assert a document is absent when nothing was ever recorded.
+   * It is never `satisfied`: gates stay closed on unrecorded evidence.
+   */
+  status: DocStatus | 'untracked';
   /** A doc counts as satisfied once uploaded — ADR-001 §7.2.4 accepts the
    *  manual attendance sheet as evidence, so `submitted` is not a blocker. */
   satisfied: boolean;
@@ -105,13 +112,13 @@ export function buildPacket(
   const docs: PacketDoc[] = requirements
     .filter((r) => (PRE_BILLING_STAGES as readonly string[]).includes(r.stage))
     .map((r) => {
-      const record: DocRecord | undefined = batch.documents[r.key];
-      const status = record?.status ?? 'missing';
+      const record: DocRecord | null = docRecordFor(batch, r.key);
+      const status: DocStatus | 'untracked' = record?.status ?? 'untracked';
       return {
         key: r.key,
         label: r.label,
         status,
-        satisfied: status === 'verified' || status === 'submitted',
+        satisfied: isDocOnFile(batch, r.key),
       };
     });
 

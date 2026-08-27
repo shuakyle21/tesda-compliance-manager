@@ -18,6 +18,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
 import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import type { Batch } from '@/shared/types';
 
@@ -95,11 +96,18 @@ function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick
     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle',
   };
 
-  const crit = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
-  const ok = crit.filter((r) => batch.documents[r.key].status === 'verified').length;
-  const pct = Math.round((ok / crit.length) * 100);
-  const missing = crit.filter((r) => batch.documents[r.key].status === 'missing').length;
-  const docTone = missing > 0 ? 'red' : pct >= 90 ? 'green' : 'amber';
+  // ADR-004: read document status through the domain helper. `batch.documents`
+  // is keyed by the batch's *own* requirement catalog, which need not cover
+  // every key in the catalog being iterated — indexing it unguarded threw a
+  // TypeError on any batch missing one (TES-94). Untracked keys count toward
+  // neither `ok` nor `missing`; with nothing tracked the cell reads "—".
+  const crit = criticalRequirements(DOCUMENT_REQUIREMENTS);
+  const docs = summarizeBatchDocCompliance(batch, crit);
+  const docColor = docs.tracked === 0
+    ? 'var(--color-text-muted)'
+    : docs.missing > 0
+      ? 'var(--color-red-dk)'
+      : (docs.verifiedPct ?? 0) >= 90 ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
 
   const onEnter = (e: MouseEvent<HTMLTableRowElement>) => {
     e.currentTarget.querySelectorAll('td').forEach((td) => { (td as HTMLElement).style.background = 'var(--color-surface-raised)'; });
@@ -130,9 +138,12 @@ function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick
         {isBillingReady(batch) ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
       </td>
       <td style={cellStyle}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 11, color: `var(--color-${docTone}-dk)` }}>
-          <Icon name={missing > 0 ? 'alert-triangle' : 'check'} size={11} />
-          {ok}/{crit.length}
+        <span
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 11, color: docColor }}
+          title={docs.untracked > 0 ? `${docs.untracked} required document${docs.untracked === 1 ? '' : 's'} not tracked for this batch` : undefined}
+        >
+          <Icon name={docs.tracked === 0 ? 'info-circle' : docs.missing > 0 ? 'alert-triangle' : 'check'} size={11} />
+          {docs.tracked === 0 ? '—' : `${docs.verified}/${docs.tracked}`}
         </span>
       </td>
       <td style={{ ...cellStyle, textAlign: 'right' }}>

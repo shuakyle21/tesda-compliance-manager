@@ -50,12 +50,12 @@ type BatchRowWithProgram = BatchRow & {
  * is kept in sync by hand rather than imported. Closes the `TODO(join)`
  * below, backfilled against the batch's program requirement catalog so every
  * requirement key resolves to a real `DocRecord` — "no row means missing" is
- * this contract's decision, not each caller's (a caller reading `.status`
- * unguarded, or a compliance-percent count that treats an absent key as
- * neither missing nor pending, would otherwise silently misread a sparse
- * map). RLS already scopes which document rows this embedded select returns
- * (see documents.ts's trainer-omission note), so this mapper, like the rest
- * of the file, stays unaware of the caller's role.
+ * this contract's decision, not each caller's (ADR-004 D1). A key still absent
+ * after the backfill is one this batch's catalog never listed; callers read
+ * that as **untracked** through `modules/documents/domain/compliance.ts`,
+ * never by indexing this map directly. RLS already scopes which document rows
+ * this embedded select returns (see documents.ts's trainer-omission note), so
+ * this mapper, like the rest of the file, stays unaware of the caller's role.
  */
 const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
 
@@ -160,7 +160,7 @@ function daysUntil(dateIso: string | null): number {
  * ISO date → the UI's display convention. `Batch` stores dates as pre-formatted
  * display strings (see lib/data/seed.ts: "Jun 18, 2026"; training start drops
  * the year: "Apr 21"). Passing raw ISO through would render "2026-06-18" in the
- * cards and silently defeat getMockMetrics' `, YYYY`-trimming regex.
+ * cards and silently defeat deriveDashboardMetrics' `, YYYY`-trimming regex.
  * Null/unparseable → '' (the UI's established empty convention).
  */
 function toDisplayDate(dateIso: string | null, withYear = true): string {

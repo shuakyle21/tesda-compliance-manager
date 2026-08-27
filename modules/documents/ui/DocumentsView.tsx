@@ -18,11 +18,17 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
 import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
 import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
 
 const STATUS_LABEL: Record<string, string> = {
   verified: 'Verified', submitted: 'Submitted', pending: 'Pending', missing: 'Missing', na: 'N/A',
 };
+
+// A requirement this batch does not track (ADR-004). Rendered with the muted
+// `.doc-status.na` treatment — deliberately not "Missing", which asserts a
+// document is absent when in fact nothing was ever required or recorded here.
+const UNTRACKED_LABEL = 'Not tracked';
 
 // Single demo identity — an admin (proprietor) who can verify documents.
 const CURRENT_USER = 'Pia Buenaventura';
@@ -36,19 +42,31 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
   const isWriter = true; // admin/coordinator
   const canVerify = true; // admin
 
-  const docOf = (b: Batch, key: string): DocRecord => {
-    const base = b.documents[key];
+  /**
+   * The record for a cell, or `null` when this batch does not track the
+   * requirement at all (ADR-004 — untracked is neither verified nor missing;
+   * the matrix renders it as its own muted "Not tracked" pill). An override
+   * can only refine a record that exists.
+   */
+  const docOf = (b: Batch, key: string): DocRecord | null => {
+    const base = docRecordFor(b, key);
+    if (!base) return null;
     const ov = overrides[b.id + ':' + key];
     return ov ? { ...base, ...ov } : base;
   };
 
   const completeness = useMemo(() => batches.map((b) => {
-    const crit = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
-    const ok = crit.filter((r) => docOf(b, r.key).status === 'verified').length;
-    const pct = Math.round((ok / crit.length) * 100);
-    const missing = crit.filter((r) => docOf(b, r.key).status === 'missing').length;
-    const tier = pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
-    return { ok, total: crit.length, pct, missing, tier };
+    // Counted over *tracked* critical requirements only; `pct` is null when a
+    // batch tracks none of them, so the card reads "—" rather than 0%.
+    const crit = criticalRequirements(DOCUMENT_REQUIREMENTS);
+    const records = crit.map((r) => docOf(b, r.key));
+    const tracked = records.filter((d): d is DocRecord => d !== null);
+    const ok = tracked.filter((d) => d.status === 'verified').length;
+    const pct = tracked.length ? Math.round((ok / tracked.length) * 100) : null;
+    const missing = tracked.filter((d) => d.status === 'missing').length;
+    const untracked = crit.length - tracked.length;
+    const tier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
+    return { ok, total: tracked.length, untracked, pct, missing, tier };
   }), [batches, overrides]);
 
   if (!batches.length) {
@@ -69,6 +87,7 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
 
   const onCellClick = (b: Batch, req: DocumentRequirement) => {
     const doc = docOf(b, req.key);
+    if (!doc) return; // untracked — nothing to preview and nothing to attach against
     if (doc.status === 'verified' || doc.status === 'submitted') setPreview(buildPreview(b, req, doc));
     else if (isWriter) setToast({ title: 'Attach document', message: `Open uploader ⇢ ${b.id} · ${req.label}` });
   };
@@ -103,7 +122,7 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
           return (
             <div key={b.id} style={{
               padding: 12, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-              borderLeft: '3px solid ' + (c.tier === 'critical' ? 'var(--color-red)' : c.tier === 'warning' ? 'var(--color-amber)' : 'var(--color-green)'),
+              borderLeft: '3px solid ' + (c.tier === 'untracked' ? 'var(--color-border-strong)' : c.tier === 'critical' ? 'var(--color-red)' : c.tier === 'warning' ? 'var(--color-amber)' : 'var(--color-green)'),
               borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
@@ -114,15 +133,27 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
                 {b.name.replace(/ · Batch \d+$/, '')}
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 4 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' }}>{c.pct}%</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>{c.ok}/{c.total} critical</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                  {c.pct === null ? '—' : `${c.pct}%`}
+                </span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
+                  {c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`}
+                </span>
               </div>
-              <div className={'completeness-bar ' + (c.tier === 'on-track' ? '' : c.tier)}>
-                <span style={{ width: c.pct + '%' }} />
+              {/* 'untracked' has no fill variant — an unknown score renders as
+                  the empty track (width 0), with the "—" and the "not tracked"
+                  line above carrying the meaning in words. */}
+              <div className={'completeness-bar ' + (c.tier === 'on-track' || c.tier === 'untracked' ? '' : c.tier)}>
+                <span style={{ width: (c.pct ?? 0) + '%' }} />
               </div>
               {c.missing > 0 && (
                 <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-red-dk)' }}>
                   <Icon name="alert-triangle" size={11} />{c.missing} missing
+                </div>
+              )}
+              {c.untracked > 0 && (
+                <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
+                  <Icon name="info-circle" size={11} />{c.untracked} not tracked
                 </div>
               )}
             </div>
@@ -154,19 +185,22 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
             </div>
             {batches.map((b) => {
               const doc = docOf(b, req.key);
-              const s = doc.status;
+              const s = doc?.status ?? 'na';
               return (
                 <div key={b.id} className="cell" style={{ justifyContent: 'space-between' }}>
                   <button
                     type="button"
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
-                    title={doc.updated ? `${STATUS_LABEL[s]} · updated ${doc.updated} · ${doc.source}` : (isWriter ? 'Click to attach' : 'Document not yet provided')}
+                    disabled={!doc}
+                    title={!doc
+                      ? 'This batch does not track this document. Its programme requirement catalog has no entry for it.'
+                      : doc.updated ? `${STATUS_LABEL[s]} · updated ${doc.updated} · ${doc.source}` : (isWriter ? 'Click to attach' : 'Document not yet provided')}
                   >
-                    <Icon name={s === 'verified' ? 'check' : s === 'submitted' ? 'clock' : s === 'pending' ? 'clock' : 'file-off'} size={11} />
-                    {STATUS_LABEL[s]}
+                    <Icon name={!doc ? 'info-circle' : s === 'verified' ? 'check' : s === 'submitted' ? 'clock' : s === 'pending' ? 'clock' : 'file-off'} size={11} />
+                    {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
-                  {doc.updated && (
+                  {doc?.updated && (
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{doc.updated}</span>
                   )}
                 </div>

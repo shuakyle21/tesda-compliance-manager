@@ -23,8 +23,8 @@ import {
   MOCK_BATCHES,
   DOCUMENT_REQUIREMENTS,
   SNAPSHOTS,
-  getMockMetrics,
 } from '@/shared/mocks';
+import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot } from '@/modules/batches/data/batches';
 import { getCurrentUser } from '@/modules/auth/data/auth';
@@ -116,14 +116,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
     ? MOCK_BATCHES
     : MOCK_BATCHES.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
   const batches = snapshot.status === 'ok' ? snapshot.batches : mockScoped;
-  const metrics = getMockMetrics(batches);
+  const metrics = deriveDashboardMetrics(batches, DOCUMENT_REQUIREMENTS);
   const criticalMissing = metrics.docMissing;
   const criticalPending = metrics.docPending;
-  // Live rows carry no document records until the documents join lands
-  // (TODO(join) in lib/data/batches.ts), and getMockMetrics counts absent
-  // records as verified — so an untracked set would read as 100% compliant.
-  // Distinguish "no document data yet" from "all docs verified".
-  const docsTracked = batches.some((b) => Object.keys(b.documents).length > 0);
+  // ADR-004: a null percentage means *nothing* is tracked — unknown, not 0%
+  // and not 100%. The rule lives in modules/documents/domain/compliance.ts;
+  // this route only renders the two cases.
+  const docsTracked = metrics.docCompliancePct !== null;
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
@@ -249,7 +248,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
           value={docsTracked ? `${metrics.docCompliancePct}%` : '—'}
           sub={!docsTracked
             ? 'document sync pending'
-            : criticalMissing ? `${criticalMissing} critical missing` : 'All critical docs verified'}
+            : criticalMissing
+              ? `${criticalMissing} critical missing`
+              // The percentage covers tracked requirements only (ADR-004), so
+              // say so rather than implying a cleared checklist.
+              : metrics.docUntracked > 0
+                ? `${metrics.docTracked} of ${metrics.docTracked + metrics.docUntracked} tracked`
+                : 'All critical docs on file'}
           iconName="file-check"
           variant={criticalMissing ? 'critical' : criticalPending ? 'warning' : 'neutral'}
         />

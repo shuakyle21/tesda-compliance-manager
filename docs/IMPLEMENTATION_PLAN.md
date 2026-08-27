@@ -94,7 +94,9 @@ trustworthy until this is done.
   `modules/batches/data/batches.ts` reference. Close its marked gaps: `TODO(join)` documents
   map, `TODO(contract)` billing-deadline field, lifecycle history. Add sibling
   contracts: `documents.ts`, `learners.ts`, `lamr.ts`, `activity.ts`,
-  `attendance.ts`, `metrics.ts` (real version of `getMockMetrics`).
+  `attendance.ts`, `metrics.ts` (the fetch wrapper; the pure derivation already
+  lives at `modules/batches/domain/metrics.ts` — `deriveDashboardMetrics`,
+  which replaced `getMockMetrics` in TES-94).
 - **Files:** `modules/batches/data/batches.ts` (complete), `modules/documents/data/documents.ts`,
   `modules/batches/data/learners.ts`, `modules/lamr/data/lamr.ts`, `modules/activity/data/activity.ts`,
   `modules/attendance/data/attendance.ts`, `modules/batches/data/metrics.ts`; keep `shared/types.ts` as the
@@ -154,7 +156,7 @@ landing page across all four role variants.
 
 ### 1.1 Wire dashboard to live Supabase data
 
-- **Build:** Replace `MOCK_BATCHES` / `getMockMetrics` / `MOCK_ACTIVITY` in the
+- **Build:** Replace `MOCK_BATCHES` / `deriveDashboardMetrics`-over-mocks / `MOCK_ACTIVITY` in the
   dashboard with `getBatches()` / `getMetrics()` / `getActivity()` from
   `modules/*/data`. Drive the `sync-failed` state from a real caught error (not
   `?state=`), and `stale` from a real as-of signal.
