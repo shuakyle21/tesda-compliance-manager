@@ -46,6 +46,21 @@ const eslintConfig = defineConfig([
       }],
     },
   },
+  // Cyclomatic complexity audit — flags functions with too many independent
+  // branches (if/else if/case/&&/||/ternary/loop) as a maintainability signal.
+  // Warn-only: high complexity is a prompt to consider refactoring, not a
+  // build-breaking violation.
+  {
+    files: [
+      "app/**/*.{ts,tsx}",
+      "modules/**/*.{ts,tsx}",
+      "shared/**/*.{ts,tsx}",
+      "lib/**/*.{ts,tsx}",
+    ],
+    rules: {
+      complexity: ["warn", 15],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
