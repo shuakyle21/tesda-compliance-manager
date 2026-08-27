@@ -54,6 +54,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['tenants']['Insert']>;
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -77,6 +78,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
+        Relationships: [];
       };
       profile_tenant_memberships: {
         Row: {
@@ -94,6 +96,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['profile_tenant_memberships']['Insert']>;
+        Relationships: [];
       };
       scholarship_programs: {
         Row: {
@@ -115,6 +118,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['scholarship_programs']['Insert']>;
+        Relationships: [];
       };
       program_document_requirements: {
         Row: {
@@ -144,6 +148,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['program_document_requirements']['Insert']>;
+        Relationships: [];
       };
       program_billing_rules: {
         Row: {
@@ -167,6 +172,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['program_billing_rules']['Insert']>;
+        Relationships: [];
       };
       batches: {
         Row: {
@@ -216,6 +222,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['batches']['Insert']>;
+        Relationships: [];
       };
       learners: {
         Row: {
@@ -249,6 +256,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['learners']['Insert']>;
+        Relationships: [];
       };
       documents: {
         Row: {
@@ -290,6 +298,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['documents']['Insert']>;
+        Relationships: [];
       };
       lamr_reports: {
         Row: {
@@ -327,6 +336,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['lamr_reports']['Insert']>;
+        Relationships: [];
       };
       lamr_outcomes: {
         Row: {
@@ -352,6 +362,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['lamr_outcomes']['Insert']>;
+        Relationships: [];
       };
       lamr_activities: {
         Row: {
@@ -377,6 +388,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['lamr_activities']['Insert']>;
+        Relationships: [];
       };
       lamr_entries: {
         Row: {
@@ -408,6 +420,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['lamr_entries']['Insert']>;
+        Relationships: [];
       };
       activity_log: {
         Row: {
@@ -435,6 +448,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['activity_log']['Insert']>;
+        Relationships: [];
       };
       trainer_credentials: {
         Row: {
@@ -458,6 +472,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['trainer_credentials']['Insert']>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
