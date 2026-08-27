@@ -1,26 +1,5 @@
 'use client';
 
-/**
- * Custom sign-in card — replaces Clerk's prebuilt <SignIn> widget with markup
- * that matches the Figma "Auth · Sign-in" card (node 741:2459), driven directly
- * by Clerk's `useSignIn()` hook so we own the UI while Clerk owns the auth.
- *
- * Flows handled here:
- *   - Email + password   → signIn.create({ identifier, password }) → setActive
- *   - Google OAuth        → signIn.authenticateWithRedirect (callback in page.tsx)
- *   - Forgot password     → reset_password_email_code (request → verify → setActive)
- *   - Demo account        → prefills NEXT_PUBLIC_DEMO_* creds when configured
- *
- * Microsoft SSO is intentionally omitted (Google-only, per the TES-59 decision),
- * even though the Figma frame shows a Microsoft button.
- *
- * The route file (page.tsx) renders this inside `.auth-shell` and handles the
- * /sign-in/sso-callback sub-path that the Google redirect returns to.
- */
-
-// `@clerk/nextjs/legacy` exposes the classic hook API (isLoaded / signIn.create
-// → status / setActive / authenticateWithRedirect). Clerk v7's default
-// `useSignIn` is the new experimental "signals" API with a different shape.
 import { useSignIn } from '@clerk/nextjs/legacy';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
