@@ -3,7 +3,7 @@
 import { useSignIn } from '@clerk/nextjs/legacy';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
 import styles from './sign-in.module.css';
 
@@ -41,7 +41,7 @@ export function SignInCard() {
   const [oauthBusy, setOauthBusy] = useState(false);
 
   // ── Email + password ──────────────────────────────────────────────────────
-  async function handleSignIn(e: FormEvent) {
+  async function handleSignIn(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isLoaded || busy) return;
     setError(null);
@@ -80,7 +80,7 @@ export function SignInCard() {
   }
 
   // ── Forgot password (reset code flow) ─────────────────────────────────────
-  async function requestReset(e: FormEvent) {
+  async function requestReset(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isLoaded || busy) return;
     setError(null);
@@ -95,7 +95,7 @@ export function SignInCard() {
     }
   }
 
-  async function confirmReset(e: FormEvent) {
+  async function confirmReset(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isLoaded || busy) return;
     setError(null);
