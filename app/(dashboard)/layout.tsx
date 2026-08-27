@@ -22,6 +22,7 @@
  */
 
 import { headers } from 'next/headers';
+import { requireAuthenticatedUser } from '@/modules/auth/data/auth';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
@@ -29,6 +30,7 @@ import { Topbar } from '@/modules/shell/ui/Topbar';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  await requireAuthenticatedUser();
   const headerList = await headers();
   const pathname = headerList.get('x-pathname') ?? '';
   const isTrainerRoute = pathname.startsWith('/trainer');
