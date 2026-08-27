@@ -22,6 +22,7 @@
 // → status / setActive / authenticateWithRedirect). Clerk v7's default
 // `useSignIn` is the new experimental "signals" API with a different shape.
 import { useSignIn } from '@clerk/nextjs/legacy';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
@@ -157,7 +158,7 @@ export function SignInCard() {
       {/* Brand lockup — Claude Design e3ea69aa (TVI-CAMS.dc.html) sign-in hero
           image, shipped as public/assets/sign-in-brandmark.svg. Wider lockup
           than the Sidebar/Topbar mark, self-contained (no external assets). */}
-      <Image/> src="/assets/sign-in-brandmark.svg" alt="" width={334} height={168} className={styles.mark} <Image/>
+      <Image src="/assets/sign-in-brandmark.svg" alt="" width={334} height={168} className={styles.mark} />
 
       {view === 'signin' ? (
         <>
@@ -326,7 +327,7 @@ export function SignInCard() {
           rendered this automatically; the custom card adds it back. */}
       <div className={styles.badge}>
         <span>Secured by</span>
-        <img src="/assets/clerk-logo.svg" alt="Clerk" width={37} height={11} />
+        <Image src="/assets/clerk-logo.svg" alt="Clerk" width={37} height={11} />
       </div>
 
       {/* Sign-up modal — renders over the auth screen; closing (X, backdrop,

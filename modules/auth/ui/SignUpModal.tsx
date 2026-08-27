@@ -30,6 +30,7 @@
 // is the new experimental "signals" API with a different shape.
 import { useSignUp } from '@clerk/nextjs/legacy';
 import { IconCheck, IconEye, IconEyeOff, IconX } from '@tabler/icons-react';
+import Image from 'next/image';
 import {
   useCallback,
   useEffect,
@@ -313,7 +314,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
             <IconX size={14} stroke={2} />
           </button>
 
-          <img src="/assets/mark.svg" alt="" width={40} height={40} className={styles.mark} />
+          <Image src="/assets/mark.svg" alt="" width={40} height={40} className={styles.mark} />
 
           {step === 'form' && (
             <>
@@ -528,7 +529,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
 
           <div className={styles.footer}>
             <span>Secured by</span>
-            <img src="/assets/clerk-logo.svg" alt="Clerk" width={40} height={12} />
+            <Image src="/assets/clerk-logo.svg" alt="Clerk" width={40} height={12} />
           </div>
         </div>
       </div>
