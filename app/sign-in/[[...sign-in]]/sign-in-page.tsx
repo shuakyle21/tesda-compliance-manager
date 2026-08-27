@@ -157,7 +157,7 @@ export function SignInCard() {
       {/* Brand lockup — Claude Design e3ea69aa (TVI-CAMS.dc.html) sign-in hero
           image, shipped as public/assets/sign-in-brandmark.svg. Wider lockup
           than the Sidebar/Topbar mark, self-contained (no external assets). */}
-      <img src="/assets/sign-in-brandmark.svg" alt="" width={334} height={168} className={styles.mark} />
+      <Image/> src="/assets/sign-in-brandmark.svg" alt="" width={334} height={168} className={styles.mark} <Image/>
 
       {view === 'signin' ? (
         <>
