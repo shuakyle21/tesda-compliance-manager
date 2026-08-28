@@ -35,7 +35,7 @@ export function SignInCard() {
   const params = useSearchParams();
   const redirectUrl = params.get("redirect_url") || "/";
 
-  const [view, setView] = useState<'signin' | 'forgot' | 'mfa'>('signin');
+  const [view, setView] = useState<'signin' | 'forgot' | 'mfa' | 'trust'>('signin');
   // Sign-up modal state — owned here (the auth screen) per the handoff; the
   // /sign-up route deep-links into it via ?sign_up=1.
   const [signUpOpen, setSignUpOpen] = useState(params.get('sign_up') === '1');
@@ -59,6 +59,12 @@ export function SignInCard() {
     setError(null);
     setBusy(true);
     try {
+      // A prior attempt (this strategy or another, e.g. an abandoned Google
+      // OAuth click) may have left an incomplete SignIn resource on the
+      // client — it survives signOut() and page reloads since it's tied to
+      // the client, not the session. Starting a brand-new attempt without
+      // clearing it first can leave this one stuck too.
+      if (signIn.status) signIn.reset();
       const { error: signInError } = await signIn.password({ emailAddress: email.trim(), password });
       if (signInError) {
         setError(clerkError(signInError));
@@ -75,6 +81,16 @@ export function SignInCard() {
         setCode('');
         setUseBackup(false);
         setView('mfa');
+        return;
+      }
+      if (signIn.status === 'needs_client_trust') {
+        const { error: sendError } = await signIn.mfa.sendEmailCode();
+        if (sendError) {
+          setError(clerkError(sendError));
+          return;
+        }
+        setCode('');
+        setView('trust');
         return;
       }
       setError('Additional verification is required to finish signing in.');
@@ -114,12 +130,43 @@ export function SignInCard() {
     }
   }
 
+  // ── Device trust (new device, no MFA) ──────────────────────────────────────
+  async function confirmTrust(e: SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!isLoaded || busy) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const { error: verifyError } = await signIn.mfa.verifyEmailCode({ code: code.trim() });
+      if (verifyError) {
+        setError(clerkError(verifyError));
+        return;
+      }
+      if (signIn.status === 'complete') {
+        const { error: finalizeError } = await signIn.finalize({
+          navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
+        });
+        if (finalizeError) setError(clerkError(finalizeError));
+        return;
+      }
+      setError('Could not verify this device. Please try again.');
+    } catch (err) {
+      setError(clerkError(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   // ── Google OAuth ──────────────────────────────────────────────────────────
   async function handleGoogle() {
     if (!isLoaded || oauthBusy) return;
     setError(null);
     setOauthBusy(true);
     try {
+      // Same stale-resource guard as handleSignIn — an abandoned password or
+      // client-trust attempt left on the client would otherwise silently
+      // block signIn.sso() from ever starting a new OAuth attempt.
+      if (signIn.status) signIn.reset();
       const { error: ssoError } = await signIn.sso({
         strategy: 'oauth_google',
         redirectCallbackUrl: '/sign-in/sso-callback',
@@ -190,6 +237,16 @@ export function SignInCard() {
         setCode('');
         setUseBackup(false);
         setView('mfa');
+        return;
+      }
+      if (signIn.status === 'needs_client_trust') {
+        const { error: sendError } = await signIn.mfa.sendEmailCode();
+        if (sendError) {
+          setError(clerkError(sendError));
+          return;
+        }
+        setCode('');
+        setView('trust');
         return;
       }
       setError('Additional verification is required to finish signing in.');
@@ -376,6 +433,48 @@ export function SignInCard() {
             type="button"
             className={styles.back}
             onClick={() => { setError(null); setCode(''); setView('signin'); }}
+          >
+            ‹ Back to sign in
+          </button>
+        </>
+      ) : view === 'trust' ? (
+        // ── Device trust (new device, no MFA) ───────────────────────────────
+        <>
+          <h1 className={styles.title}>Verify this device</h1>
+          <p className={styles.sub}>
+            For your security, enter the code we emailed you to confirm this
+            sign-in.
+          </p>
+
+          {error && <p className={styles.error} role="alert">{error}</p>}
+
+          <form onSubmit={confirmTrust}>
+            <div className={styles.field}>
+              <div className={styles.labelRow}>
+                <label className={styles.label} htmlFor="trust-code">
+                  Verification code
+                </label>
+              </div>
+              <input
+                id="trust-code"
+                inputMode="numeric"
+                className={`${styles.input} ${styles.mono}`}
+                placeholder="123456"
+                autoComplete="one-time-code"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+            </div>
+            <button type="submit" className={styles.submit} disabled={disabled}>
+              {busy ? 'Verifying…' : 'Verify'}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            className={styles.back}
+            onClick={() => { setError(null); setCode(''); signIn.reset(); setView('signin'); }}
           >
             ‹ Back to sign in
           </button>
