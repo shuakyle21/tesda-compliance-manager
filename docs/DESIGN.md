@@ -1104,7 +1104,7 @@ Status / Purple / DEFAULT · Light · Dark
 |---|---|
 | `DESIGN.md` | **This file.** Complete design reference. |
 | `README.md` | Origin story, content rules, visual foundations overview. |
-| `colors_and_type.css` | All design tokens as CSS custom properties. **Source of truth for color.** |
+| `docs/design/colors_and_type.css` | All design tokens as CSS custom properties. **Source of truth for color.** |
 | `assets/logo.svg` | TCS wordmark — replace with real TESDA/TVI brand mark when available. |
 | `assets/mark.svg` | TCS mark (square only, for favicons). |
 | `assets/icons/` | Tabler icon subset (SVG, 24×24, `stroke="currentColor"`). |

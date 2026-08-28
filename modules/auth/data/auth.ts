@@ -18,6 +18,7 @@
 
 import { auth, currentUser } from '@clerk/nextjs/server';
 import type { User } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 /**
  * Returns the authenticated Clerk `User` object or `null` when no session
@@ -46,5 +47,20 @@ export async function getAuthPayload() {
  */
 export async function getAuthUserId(): Promise<string | null> {
   const { userId } = await auth();
+  return userId;
+}
+
+/**
+ * Resource-based auth check for Server Components/layouts: returns the
+ * signed-in Clerk `userId`, or redirects to `/sign-in` when there is none.
+ *
+ * Replaces the deprecated `createRouteMatcher`-based middleware gate — Clerk
+ * now recommends checking auth in the component that renders protected data
+ * rather than via centralised path matching. Call this once per protected
+ * route subtree (e.g. `app/(dashboard)/layout.tsx`) rather than per page.
+ */
+export async function requireAuthenticatedUser(): Promise<string> {
+  const userId = await getAuthUserId();
+  if (!userId) redirect('/sign-in');
   return userId;
 }

@@ -44,6 +44,7 @@ erDiagram
     uuid id PK
     string clerk_user_id
     string full_name
+    string email
     string role
     boolean is_active
   }
@@ -85,6 +86,7 @@ erDiagram
     uuid tenant_id FK
     uuid program_id FK
     uuid trainer_profile_id FK
+    string trainer_name
     string batch_code
     string batch_section
     string qualification_title
@@ -96,6 +98,7 @@ erDiagram
     string status
     int progress_percent
     string billing_report_status
+    string official_system_reference
   }
 
   LEARNERS {

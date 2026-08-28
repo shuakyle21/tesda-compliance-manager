@@ -9,7 +9,7 @@ reviewing, or merging code.
 - **[hook]** — blocked by a PreToolUse hook; cannot be bypassed by an agent
 - **[deny]** — blocked by `permissions.deny` in `.claude/settings.json`; an agent cannot
   request an exception in-session, so lifting it means editing that file first
-- **[lint]** / **[types]** — fails `npm run lint` or `npx tsc --noEmit`
+- **[lint]** / **[types]** — fails `pnpm lint` or `pnpm exec tsc --noEmit`
 - **[rls]** — enforced by Postgres row-level security, not application code
 - **[review]** — no automated check; a human or agent must catch it
 
@@ -103,7 +103,7 @@ reviewing, or merging code.
 
 ## 9. Testing (when the runner exists)
 
-34. There is **no test runner yet** — `npm test` is a placeholder. Standing up Vitest is Phase 0.4
+34. There is **no test runner yet** — `pnpm test` is a placeholder. Standing up Vitest is Phase 0.4
     of `docs/IMPLEMENTATION_PLAN.md`.
 35. When tests exist: **mappers and module `domain/` layers are unit-tested with fixed as-of
     dates**; **RLS/tenant-isolation tests run against real Supabase, no mocks.** **[review]**
