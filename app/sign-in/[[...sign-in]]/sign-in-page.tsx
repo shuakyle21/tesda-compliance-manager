@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type SubmitEvent } from 'react';
 import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
+import { startGoogleSignIn } from '@/modules/auth/domain/oauthSignIn';
 import styles from './sign-in.module.css';
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL;
@@ -163,15 +164,7 @@ export function SignInCard() {
     setError(null);
     setOauthBusy(true);
     try {
-      // Same stale-resource guard as handleSignIn — an abandoned password or
-      // client-trust attempt left on the client would otherwise silently
-      // block signIn.sso() from ever starting a new OAuth attempt.
-      if (signIn.status) signIn.reset();
-      const { error: ssoError } = await signIn.sso({
-        strategy: 'oauth_google',
-        redirectCallbackUrl: '/sign-in/sso-callback',
-        redirectUrl,
-      });
+      const { error: ssoError } = await startGoogleSignIn(signIn, redirectUrl);
       if (ssoError) {
         setError(clerkError(ssoError));
         setOauthBusy(false);
