@@ -17,6 +17,7 @@
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import type { Database, ProfileRole as DbProfileRole } from '@/lib/supabase/database.types';
 import type { Tenant, UserRole } from '@/shared/types';
+import type { Profile } from '@/modules/tenancy/domain/profile';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type TenantRow = Database['public']['Tables']['tenants']['Row'];
@@ -55,19 +56,10 @@ function mapTenantRow(row: TenantRow): Tenant {
   };
 }
 
-export interface AuthProfile {
-  clerkUserId: string;
-  fullName: string | null;
-  email: string | null;
-  role: UserRole;
-  tenants: Tenant[];
-  defaultTenantId: string | null;
-}
-
 // ---------------------------------------------------------------------------
 // Mapper — pure, no I/O. Unit-test this against a fixture row.
 // ---------------------------------------------------------------------------
-export function mapProfileRow(row: ProfileRowWithTenants): AuthProfile {
+export function mapProfileRow(row: ProfileRowWithTenants): Profile {
   const memberships = row.profile_tenant_memberships ?? [];
   const tenants = memberships
     .map((m) => m.tenants)
@@ -102,7 +94,7 @@ export function mapProfileRow(row: ProfileRowWithTenants): AuthProfile {
  *   - `unconfigured` — no Supabase env in this environment.
  */
 export type ProfileSnapshot =
-  | { status: 'ok'; profile: AuthProfile }
+  | { status: 'ok'; profile: Profile }
   | { status: 'not-found' }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
