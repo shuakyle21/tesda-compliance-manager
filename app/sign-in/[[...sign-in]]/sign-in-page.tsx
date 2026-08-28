@@ -1,37 +1,48 @@
 "use client";
 
-import { useSignIn } from "@clerk/nextjs/legacy";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, type SubmitEvent } from "react";
-import { SignUpModal } from "@/modules/auth/ui/SignUpModal";
-import styles from "./sign-in.module.css";
+import { useAuth, useSignIn } from '@clerk/nextjs';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, type SubmitEvent } from 'react';
+import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
+import styles from './sign-in.module.css';
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL;
 const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
 
 function clerkError(err: unknown): string {
   const e = err as {
+    clerkError?: true;
+    longMessage?: string;
+    message?: string;
     errors?: Array<{ longMessage?: string; message?: string }>;
   };
-  return (
-    e?.errors?.[0]?.longMessage ??
-    e?.errors?.[0]?.message ??
-    "Something went wrong. Please try again."
-  );
+  // Only trust message text that actually came from Clerk — an arbitrary thrown
+  // Error (e.g. a network failure) shouldn't have its raw .message shown to the user.
+  if (e?.errors?.length) {
+    return e.errors[0].longMessage ?? e.errors[0].message ?? 'Something went wrong. Please try again.';
+  }
+  if (e?.clerkError) {
+    return e.longMessage ?? e.message ?? 'Something went wrong. Please try again.';
+  }
+  return 'Something went wrong. Please try again.';
 }
 
 export function SignInCard() {
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const { signIn, fetchStatus } = useSignIn();
+  const { isLoaded } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
   const redirectUrl = params.get("redirect_url") || "/";
 
-  const [view, setView] = useState<"signin" | "forgot">("signin");
-  const [signUpOpen, setSignUpOpen] = useState(params.get("sign_up") === "1");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
+  const [view, setView] = useState<'signin' | 'forgot' | 'mfa'>('signin');
+  // Sign-up modal state — owned here (the auth screen) per the handoff; the
+  // /sign-up route deep-links into it via ?sign_up=1.
+  const [signUpOpen, setSignUpOpen] = useState(params.get('sign_up') === '1');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [useBackup, setUseBackup] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [error, setError] = useState<string | null>(
     params.get("reason") === "auth-required"
@@ -48,13 +59,54 @@ export function SignInCard() {
     setError(null);
     setBusy(true);
     try {
-      const res = await signIn.create({ identifier: email.trim(), password });
-      if (res.status === "complete") {
-        await setActive({ session: res.createdSessionId });
-        router.push(redirectUrl);
+      const { error: signInError } = await signIn.password({ emailAddress: email.trim(), password });
+      if (signInError) {
+        setError(clerkError(signInError));
         return;
       }
-      setError("Additional verification is required to finish signing in.");
+      if (signIn.status === 'complete') {
+        const { error: finalizeError } = await signIn.finalize({
+          navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
+        });
+        if (finalizeError) setError(clerkError(finalizeError));
+        return;
+      }
+      if (signIn.status === 'needs_second_factor') {
+        setCode('');
+        setUseBackup(false);
+        setView('mfa');
+        return;
+      }
+      setError('Additional verification is required to finish signing in.');
+    } catch (err) {
+      setError(clerkError(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // ── MFA (second factor) ────────────────────────────────────────────────────
+  async function confirmMfa(e: SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!isLoaded || busy) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const { error: mfaError } = useBackup
+        ? await signIn.mfa.verifyBackupCode({ code: code.trim() })
+        : await signIn.mfa.verifyTOTP({ code: code.trim() });
+      if (mfaError) {
+        setError(clerkError(mfaError));
+        return;
+      }
+      if (signIn.status === 'complete') {
+        const { error: finalizeError } = await signIn.finalize({
+          navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
+        });
+        if (finalizeError) setError(clerkError(finalizeError));
+        return;
+      }
+      setError('Could not verify the code. Please try again.');
     } catch (err) {
       setError(clerkError(err));
     } finally {
@@ -68,11 +120,16 @@ export function SignInCard() {
     setError(null);
     setOauthBusy(true);
     try {
-      await signIn.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/sign-in/sso-callback",
-        redirectUrlComplete: redirectUrl,
+      const { error: ssoError } = await signIn.sso({
+        strategy: 'oauth_google',
+        redirectCallbackUrl: '/sign-in/sso-callback',
+        redirectUrl,
       });
+      if (ssoError) {
+        setError(clerkError(ssoError));
+        setOauthBusy(false);
+      }
+      // On success the browser is navigating away to the OAuth provider.
     } catch (err) {
       setError(clerkError(err));
       setOauthBusy(false);
@@ -86,10 +143,16 @@ export function SignInCard() {
     setError(null);
     setBusy(true);
     try {
-      await signIn.create({
-        strategy: "reset_password_email_code",
-        identifier: email.trim(),
-      });
+      const { error: createError } = await signIn.create({ identifier: email.trim() });
+      if (createError) {
+        setError(clerkError(createError));
+        return;
+      }
+      const { error: sendError } = await signIn.resetPasswordEmailCode.sendCode();
+      if (sendError) {
+        setError(clerkError(sendError));
+        return;
+      }
       setResetSent(true);
     } catch (err) {
       setError(clerkError(err));
@@ -104,17 +167,32 @@ export function SignInCard() {
     setError(null);
     setBusy(true);
     try {
-      const res = await signIn.attemptFirstFactor({
-        strategy: "reset_password_email_code",
-        code: code.trim(),
-        password,
-      });
-      if (res.status === "complete") {
-        await setActive({ session: res.createdSessionId });
-        router.push(redirectUrl);
+      const { error: verifyError } = await signIn.resetPasswordEmailCode.verifyCode({ code: code.trim() });
+      if (verifyError) {
+        setError(clerkError(verifyError));
         return;
       }
-      setError("Could not reset the password. Please restart the process.");
+      const { error: submitError } = await signIn.resetPasswordEmailCode.submitPassword({ password });
+      if (submitError) {
+        setError(clerkError(submitError));
+        return;
+      }
+      // The password was already changed at this point — a non-"complete" status
+      // from here on is the next step (e.g. MFA), not a failed reset.
+      if (signIn.status === 'complete') {
+        const { error: finalizeError } = await signIn.finalize({
+          navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
+        });
+        if (finalizeError) setError(clerkError(finalizeError));
+        return;
+      }
+      if (signIn.status === 'needs_second_factor') {
+        setCode('');
+        setUseBackup(false);
+        setView('mfa');
+        return;
+      }
+      setError('Additional verification is required to finish signing in.');
     } catch (err) {
       setError(clerkError(err));
     } finally {
@@ -134,7 +212,7 @@ export function SignInCard() {
     setPassword(DEMO_PASSWORD ?? "");
   }
 
-  const disabled = !isLoaded || busy;
+  const disabled = !isLoaded || fetchStatus === 'fetching' || busy;
 
   return (
     <div className={styles.card}>
@@ -250,6 +328,57 @@ export function SignInCard() {
               Sign up
             </button>
           </p>
+        </>
+      ) : view === 'mfa' ? (
+        // ── MFA (second factor) view ────────────────────────────────────────
+        <>
+          <h1 className={styles.title}>Verify it&apos;s you</h1>
+          <p className={styles.sub}>
+            {useBackup
+              ? 'Enter one of your unused backup codes.'
+              : 'Enter the code from your authenticator app.'}
+          </p>
+
+          {error && <p className={styles.error} role="alert">{error}</p>}
+
+          <form onSubmit={confirmMfa}>
+            <div className={styles.field}>
+              <div className={styles.labelRow}>
+                <label className={styles.label} htmlFor="mfa-code">
+                  {useBackup ? 'Backup code' : 'Verification code'}
+                </label>
+              </div>
+              <input
+                id="mfa-code"
+                inputMode={useBackup ? 'text' : 'numeric'}
+                className={`${styles.input} ${styles.mono}`}
+                placeholder={useBackup ? 'xxxxx-xxxxx' : '123456'}
+                autoComplete="one-time-code"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+            </div>
+            <button type="submit" className={styles.submit} disabled={disabled}>
+              {busy ? 'Verifying…' : 'Verify'}
+            </button>
+          </form>
+
+          <button
+            type="button"
+            className={styles.forgot}
+            onClick={() => { setError(null); setCode(''); setUseBackup((v) => !v); }}
+          >
+            {useBackup ? 'Use authenticator app instead' : 'Use a backup code instead'}
+          </button>
+
+          <button
+            type="button"
+            className={styles.back}
+            onClick={() => { setError(null); setCode(''); setView('signin'); }}
+          >
+            ‹ Back to sign in
+          </button>
         </>
       ) : (
         // ── Forgot-password view ───────────────────────────────────────────
