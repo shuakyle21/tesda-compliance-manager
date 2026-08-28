@@ -171,6 +171,7 @@ export function SignInCard() {
         strategy: 'oauth_google',
         redirectCallbackUrl: '/sign-in/sso-callback',
         redirectUrl,
+        oidcPrompt: 'select_account',
       });
       if (ssoError) {
         setError(clerkError(ssoError));

@@ -215,6 +215,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
         strategy: 'oauth_google',
         redirectUrl: '/sign-in/sso-callback',
         redirectUrlComplete: '/dashboard',
+        oidcPrompt: 'select_account'
       });
     } catch (err) {
       setError(clerkError(err));
