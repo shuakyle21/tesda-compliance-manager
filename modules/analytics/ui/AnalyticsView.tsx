@@ -19,6 +19,7 @@
 
 import { BarChart, BarList, DonutChart, Card, Title, Text, Grid, Col } from '@tremor/react';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export function AnalyticsView({
@@ -44,15 +45,15 @@ export function AnalyticsView({
 
   const ntpData = batches.map((b) => ({ name: b.id, 'NTP lag (days)': b.ntpLag }));
 
-  const criticalReqs = documentRequirements.filter((r) => r.critical);
-  const docData = criticalReqs.length
-    ? batches
-        .map((b) => {
-          const verified = criticalReqs.filter((r) => b.documents[r.key]?.status === 'verified').length;
-          return { name: b.id, value: Math.round((verified / criticalReqs.length) * 100) };
-        })
-        .sort((a, b) => b.value - a.value)
-    : [];
+  // ADR-004: a batch that tracks none of the critical requirements is left out
+  // of the ranking entirely — plotting it as 0% would read as a compliance
+  // failure rather than an absence of data.
+  const criticalReqs = criticalRequirements(documentRequirements);
+  const docData = batches
+    .map((b) => ({ name: b.id, summary: summarizeBatchDocCompliance(b, criticalReqs) }))
+    .filter((d) => d.summary.verifiedPct !== null)
+    .map((d) => ({ name: d.name, value: d.summary.verifiedPct as number }))
+    .sort((a, b) => b.value - a.value);
 
   const scholarData = batches.map((b) => ({ name: b.id, Scholars: b.scholars }));
   const avgScholars = scholarData.reduce((s, r) => s + r.Scholars, 0) / scholarData.length;
@@ -105,7 +106,13 @@ export function AnalyticsView({
           {docData.length ? (
             <BarList data={docData} valueFormatter={(v: number) => `${v}%`} color="emerald" className="mt-4" />
           ) : (
-            <Text className="mt-4">No critical document requirements defined.</Text>
+            <Text className="mt-4">
+              {criticalReqs.length === 0
+                ? 'No critical document requirements defined.'
+                // Untracked is unknown, not zero (ADR-004) — say so rather
+                // than leaving a titled card with an empty chart in it.
+                : 'No batch tracks a critical document yet, so compliance cannot be scored.'}
+            </Text>
           )}
         </Card>
       </Col>

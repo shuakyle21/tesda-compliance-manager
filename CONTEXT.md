@@ -33,6 +33,12 @@ _Avoid_: % complete, days elapsed, duration progress
 **Ineligible (scholar)**:
 A scholar with **≥5 absences**, excluded from the allowance. This is the only eligibility rule (no attendance-% rule). Note: stored as `max_absences = 4`, but copy always states the rule as "≥5".
 
+### Documents
+
+**Untracked (document)**:
+A required document the batch has **no record for at all** — its programme requirement catalog never listed it. A third state, equal to neither Verified nor Missing: excluded from every compliance percentage (numerator *and* denominator), and never satisfying a readiness gate. With nothing tracked, compliance reads **"—"**, not 0% and not 100%. The rule lives in one place, `modules/documents/domain/compliance.ts` — see [[ADR-004-untracked-document-semantics]].
+_Avoid_: Treating an absent record as Verified ("compliant by omission") or as Missing (asserts absence of a document nobody required)
+
 ### Billing
 
 **Billing track**:

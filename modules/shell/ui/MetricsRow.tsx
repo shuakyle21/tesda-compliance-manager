@@ -7,11 +7,29 @@
  */
 
 import { MetricCard } from '@/shared/ui/MetricCard';
-import { getMockMetrics } from '@/shared/mocks';
+import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
+import { MOCK_BATCHES, DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
 import type { DashboardMetrics } from '@/shared/types';
 
+/**
+ * Sub-copy for the Doc Compliance card. 'All verified' must not appear when
+ * there is nothing to verify (TES-74) — on a compliance tool that reads as a
+ * cleared checklist rather than an empty one. ADR-004 extends the same
+ * reasoning to untracked requirements: no tracked documents is "unknown", and
+ * a partially tracked set says how much it covers.
+ */
+function docComplianceSub(metrics: DashboardMetrics, hasBatches: boolean): string {
+  if (!hasBatches) return 'No batches';
+  if (metrics.docCompliancePct === null) return 'Document sync pending';
+  if (metrics.docMissing > 0) return `${metrics.docMissing} missing`;
+  if (metrics.docUntracked > 0) {
+    return `${metrics.docTracked} of ${metrics.docTracked + metrics.docUntracked} tracked`;
+  }
+  return 'All on file';
+}
+
 export function MetricsRow({
-  metrics = getMockMetrics(),
+  metrics = deriveDashboardMetrics(MOCK_BATCHES, DOCUMENT_REQUIREMENTS),
   hideBilling = false,
 }: {
   metrics?: DashboardMetrics;
@@ -58,11 +76,9 @@ export function MetricsRow({
       )}
       <MetricCard
         label="DOC COMPLIANCE"
-        value={`${metrics.docCompliancePct}%`}
-        // 'All verified' must not appear when there is nothing to verify (TES-74) —
-        // on a compliance tool that reads as a cleared checklist rather than an
-        // empty one.
-        sub={!hasBatches ? 'No batches' : metrics.docMissing > 0 ? `${metrics.docMissing} missing` : 'All verified'}
+        // null = nothing tracked → unknown, not 0% (ADR-004 / TES-94).
+        value={metrics.docCompliancePct === null ? '—' : `${metrics.docCompliancePct}%`}
+        sub={docComplianceSub(metrics, hasBatches)}
         iconName="file-check"
         variant={metrics.docMissing > 0 ? 'critical' : metrics.docPending > 0 ? 'warning' : 'neutral'}
       />

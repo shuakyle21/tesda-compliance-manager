@@ -12,6 +12,7 @@
 
 import { Icon } from '@/shared/ui/Icon';
 import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { summarizeDocCompliance } from '@/modules/documents/domain/compliance';
 import type { Batch, DocStatus } from '@/shared/types';
 
 const SEGMENTS: { key: DocStatus; label: string; color: string }[] = [
@@ -22,18 +23,22 @@ const SEGMENTS: { key: DocStatus; label: string; color: string }[] = [
 ];
 
 export function DocumentStatusDonut({ batches }: { batches: Batch[] }) {
-  const counts: Record<DocStatus, number> = { verified: 0, submitted: 0, pending: 0, missing: 0 };
-  for (const batch of batches) {
-    for (const req of DOCUMENT_REQUIREMENTS) {
-      const record = batch.documents[req.key];
-      if (record) counts[record.status] += 1;
-    }
-  }
+  // Untracked requirements (no record on the batch) are excluded from both the
+  // ring and the denominator — ADR-004: they are neither verified nor missing.
+  // With nothing tracked at all, `onFilePct` is null and the panel says so
+  // rather than drawing an empty ring labelled 0%.
+  const summary = summarizeDocCompliance(batches, DOCUMENT_REQUIREMENTS);
+  const counts: Record<DocStatus, number> = {
+    verified: summary.verified,
+    submitted: summary.submitted,
+    pending: summary.pending,
+    missing: summary.missing,
+  };
 
-  const total = Math.max(1, SEGMENTS.reduce((sum, seg) => sum + counts[seg.key], 0));
+  const total = Math.max(1, summary.tracked);
   // "Compliance" = docs that are in hand (verified + submitted); mirrors the
   // Figma centre value (e.g. 8/12 = 67%).
-  const compliancePct = Math.round(((counts.verified + counts.submitted) / total) * 100);
+  const compliancePct = summary.onFilePct;
 
   // Pre-compute donut arcs as percentages; each offset is 100 minus the sum
   // of the preceding segments' percentages (prefix sum, no mutation).
@@ -51,14 +56,24 @@ export function DocumentStatusDonut({ batches }: { batches: Batch[] }) {
           <Icon name="file-check" size={13} />
           Document Status Distribution
         </div>
-        <div className="dash-panel-meta">{total} required docs</div>
+        <div className="dash-panel-meta">
+          {summary.tracked} tracked{summary.untracked > 0 ? ` · ${summary.untracked} not tracked` : ''}
+        </div>
       </div>
 
       <div className="dash-panel-body">
         <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Donut */}
           <div style={{ position: 'relative', width: 150, height: 150, flexShrink: 0 }}>
-            <svg viewBox="0 0 42 42" width={150} height={150} role="img" aria-label={`${compliancePct}% document compliance`}>
+            <svg
+              viewBox="0 0 42 42"
+              width={150}
+              height={150}
+              role="img"
+              aria-label={compliancePct === null
+                ? 'Document compliance unavailable — no tracked documents'
+                : `${compliancePct}% document compliance`}
+            >
               <circle cx="21" cy="21" r="15.91549431" fill="none" stroke="var(--color-surface-alt)" strokeWidth="5" />
               {arcs.map((arc, i) => (
                 <circle
@@ -86,10 +101,10 @@ export function DocumentStatusDonut({ batches }: { batches: Batch[] }) {
               }}
             >
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 500, color: 'var(--color-text-secondary)', lineHeight: 1 }}>
-                {compliancePct}%
+                {compliancePct === null ? '—' : `${compliancePct}%`}
               </span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', marginTop: 4 }}>
-                verified
+                {compliancePct === null ? 'not tracked' : 'on file'}
               </span>
             </div>
           </div>

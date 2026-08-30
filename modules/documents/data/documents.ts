@@ -95,11 +95,12 @@ const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, so
  * `documents` keyed by `document_key`, the shape `Batch.documents` requires.
  * Backfilled against `requirements` so every catalog entry resolves to a real
  * `DocRecord` (status `'missing'`) rather than being absent from the map —
- * deciding "no row means missing" is this contract's job, not each caller's;
- * `DocumentsView.tsx` reads `.status` off the lookup unguarded, and compliance
- * percentages (`getMockMetrics`) silently miscount an absent key as neither
- * missing nor pending. A submitted row outside the catalog (a stale or
- * ad hoc upload) is still included, keyed by its own `document_key`.
+ * deciding "no row means missing" is this contract's job, not each caller's
+ * (ADR-004 D1). A key that is *still* absent after the backfill is one this
+ * batch's catalog never listed, and callers must read it as **untracked** via
+ * `modules/documents/domain/compliance.ts` — not as verified, not as missing.
+ * A submitted row outside the catalog (a stale or ad hoc upload) is still
+ * included, keyed by its own `document_key`.
  */
 function mapDocumentRows(
   rows: DocumentRow[],

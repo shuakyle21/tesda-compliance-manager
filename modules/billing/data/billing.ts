@@ -12,6 +12,7 @@
 import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks';
 import type { Batch, DocumentRequirement, Tenant } from '@/shared/types';
 import { billingGate, type BillingGate, type DocReadiness } from '@/modules/billing/domain/readiness';
+import { isDocOnFile } from '@/modules/documents/domain/compliance';
 import { tracksForProgram, type BillingTrack, isCfsp } from '@/modules/billing/domain/tracks';
 import type { StatementTenant } from '@/modules/billing/domain/statement';
 
@@ -43,17 +44,20 @@ const SUPPORTING_DOC_STAGES = new Set(['aou', 'ntp', 'tip', 'train']);
  * document counts as on file when it is `verified` OR `submitted` — ADR-001
  * §7.2.4 accepts uploaded manual daily attendance sheets as legitimate billing
  * evidence, so a submitted (uploaded) supporting doc satisfies the gate; only
- * `missing` / `pending` items hold it back. A batch with no document records
- * (e.g. a live row before the documents join lands) reads as 0 → gate closed.
+ * `missing` / `pending` items hold it back.
+ *
+ * Untracked documents (no record on the batch at all) count as **not on file**
+ * — ADR-004's gating rule, the deliberate opposite of its measurement rule: a
+ * readiness gate must never open on evidence nobody has recorded. So the
+ * denominator stays the full supporting set and an untracked batch reads 0 →
+ * gate closed.
  */
-const ON_FILE_STATUSES = new Set(['verified', 'submitted']);
-
 export function deriveDocReadiness(
   batch: Batch,
   requirements: DocumentRequirement[] = DOCUMENT_REQUIREMENTS,
 ): DocReadiness {
   const supporting = requirements.filter((r) => r.critical && SUPPORTING_DOC_STAGES.has(r.stage));
-  const verified = supporting.filter((r) => ON_FILE_STATUSES.has(batch.documents[r.key]?.status ?? '')).length;
+  const verified = supporting.filter((r) => isDocOnFile(batch, r.key)).length;
   return { verified, requiredTotal: supporting.length };
 }
 
