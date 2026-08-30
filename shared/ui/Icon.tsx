@@ -56,6 +56,7 @@ const ICONS = {
   play: '<polygon points="8 5 19 12 8 19" fill="currentColor" stroke="none"/>',
   database: '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6a8 3 0 0 0 16 0v-6"/><path d="M4 12v6a8 3 0 0 0 16 0v-6"/>',
   minus: '<path d="M5 12l14 0"/>',
+  'arrow-narrow-right': '<path d="M5 12h14"/><path d="M15 16l4 -4"/><path d="M15 8l4 4"/>',
 } as const;
 
 export type IconName = keyof typeof ICONS;

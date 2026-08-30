@@ -142,8 +142,8 @@ LAMR is represented as structured evidence, not only as a file upload. Each reco
 | `docs/MVP_PRD.md` | Earlier MVP scope document; `MASTER_PRD_SRS.md` is the product source of truth. |
 | `docs/GITHUB_PROJECTS_INTEGRATION.md` | GitHub Projects workflow notes. |
 | `docs/GITHUB_PROJECT_BACKLOG.md` | MVP backlog prepared for GitHub Issues and Projects. |
-| `DESIGN.md` | Product design direction and interface rules. |
-| `colors_and_type.css` | Design tokens and typography reference. |
+| `docs/DESIGN.md` | Product design direction and interface rules. |
+| `docs/design/colors_and_type.css` | Design tokens and typography reference. |
 
 ## Local Development
 

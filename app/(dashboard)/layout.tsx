@@ -18,10 +18,16 @@
  * here. `proxy.ts` forwards the path as the `x-pathname` header for this
  * reason; see that file's doc comment.
  *
+ * DASHBOARD METRICS DEDUP (design sync, 2026-08-23): `/dashboard` renders its
+ * own richer 6-tile KPI grid (`app/(dashboard)/dashboard/page.tsx`) — mounting
+ * this row there too doubled the metrics on the one route that has its own.
+ * Every other route still gets this row; it's their only KPI summary.
+ *
  * DOCS: https://nextjs.org/docs/app/building-your-application/routing/route-groups
  */
 
 import { headers } from 'next/headers';
+import { requireAuthenticatedUser } from '@/modules/auth/data/auth';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
@@ -29,19 +35,21 @@ import { Topbar } from '@/modules/shell/ui/Topbar';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  await requireAuthenticatedUser();
   const headerList = await headers();
   const pathname = headerList.get('x-pathname') ?? '';
   const isTrainerRoute = pathname.startsWith('/trainer');
+  const isDashboardRoute = pathname === '/dashboard';
 
   return (
     <NavDrawerProvider>
       <div className="app-layout">
-        <Sidebar />
+        <Sidebar isTrainerRoute={isTrainerRoute} />
         <div className="main-area">
           <MobileHeader />
           <main className="main-content">
-            <Topbar />
-            <MetricsRow hideBilling={isTrainerRoute} />
+            <Topbar isTrainerRoute={isTrainerRoute} />
+            {!isDashboardRoute && <MetricsRow hideBilling={isTrainerRoute} />}
             {children}
           </main>
         </div>

@@ -1,27 +1,38 @@
 'use client';
 
 /**
- * Shares the mobile sidebar-drawer open/close state between the off-canvas
- * <Sidebar> (close: scrim, X button, nav click, Esc) and the <MobileHeader>
- * hamburger (open). A client context so a server-rendered layout can still
- * wrap server-component children.
+ * Shares sidebar visibility state between the shell components that need it:
+ * the mobile off-canvas drawer (open/close, shared by <Sidebar> and
+ * <MobileHeader>'s hamburger) and the desktop collapse toggle (shared by
+ * <Sidebar>'s own collapse button and the expand button that has to live
+ * outside <aside> once it's `visibility: hidden`, per design-system.css's
+ * `.sidebar.collapsed` / `.sb-expand` rules). A client context so a
+ * server-rendered layout can still wrap server-component children.
  *
- * Behavior imported from the claude.ai/design project
+ * Drawer behavior imported from the claude.ai/design project
  * (87e4718b… · components/Sidebar.jsx `open`/`onClose`).
  */
 
 import { createContext, useCallback, useContext, useState } from 'react';
 
-type NavDrawerCtx = { open: boolean; openDrawer: () => void; closeDrawer: () => void };
+type NavDrawerCtx = {
+  open: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+};
 
 const NavDrawerContext = createContext<NavDrawerCtx | null>(null);
 
 export function NavDrawerProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const openDrawer = useCallback(() => setOpen(true), []);
   const closeDrawer = useCallback(() => setOpen(false), []);
+  const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
   return (
-    <NavDrawerContext.Provider value={{ open, openDrawer, closeDrawer }}>
+    <NavDrawerContext.Provider value={{ open, openDrawer, closeDrawer, collapsed, toggleCollapsed }}>
       {children}
     </NavDrawerContext.Provider>
   );

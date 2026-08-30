@@ -72,3 +72,4 @@ next-env.d.ts
 
 # Local agent scratch state
 .fallow/
+.nogic/
