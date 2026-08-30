@@ -277,301 +277,87 @@ export function SignInCard() {
         className={styles.mark}
       />
 
-      {view === "signin" ? (
-        <>
-          <h1 className={styles.title}>Sign in to TVI-CAMS</h1>
-          <p className={styles.sub}>
-            Welcome back. Sign in to continue to the Compliance &amp; Audit
-            dashboard.
-          </p>
+      {view === 'signin' && (
+        <SignInView
+          error={error}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          busy={busy}
+          disabled={disabled}
+          oauthBusy={oauthBusy}
+          isLoaded={isLoaded}
+          onSubmit={handleSignIn}
+          onGoogle={handleGoogle}
+          onForgot={() => {
+            setError(null);
+            setResetSent(false);
+            setView('forgot');
+          }}
+          onUseDemo={handleUseDemo}
+          onSignUp={() => setSignUpOpen(true)}
+        />
+      )}
 
-          {error && (
-            <p className={styles.error} role="alert">
-              {error}
-            </p>
-          )}
+      {view === 'mfa' && (
+        <MfaView
+          error={error}
+          code={code}
+          setCode={setCode}
+          useBackup={useBackup}
+          busy={busy}
+          disabled={disabled}
+          onSubmit={confirmMfa}
+          onToggleBackup={() => {
+            setError(null);
+            setCode('');
+            setUseBackup((v) => !v);
+          }}
+          onBack={() => {
+            setError(null);
+            setCode('');
+            setView('signin');
+          }}
+        />
+      )}
 
-          <button
-            type="button"
-            className={styles.oauth}
-            onClick={handleGoogle}
-            disabled={oauthBusy || !isLoaded}
-          >
-            <GoogleG />
-            {oauthBusy ? "Redirecting…" : "Continue with Google"}
-          </button>
+      {view === 'trust' && (
+        <TrustView
+          error={error}
+          code={code}
+          setCode={setCode}
+          busy={busy}
+          disabled={disabled}
+          onSubmit={confirmTrust}
+          onBack={() => {
+            setError(null);
+            setCode('');
+            signIn.reset();
+            setView('signin');
+          }}
+        />
+      )}
 
-          <div className={styles.divider}>
-            <span>or</span>
-          </div>
-
-          <form onSubmit={handleSignIn}>
-            <div className={styles.field}>
-              <div className={styles.labelRow}>
-                <label className={styles.label} htmlFor="email">
-                  Email address
-                </label>
-              </div>
-              <input
-                id="email"
-                type="email"
-                className={styles.input}
-                placeholder="you@school.ph"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div className={styles.field}>
-              <div className={styles.labelRow}>
-                <label className={styles.label} htmlFor="password">
-                  Password
-                </label>
-                <button
-                  type="button"
-                  className={styles.forgot}
-                  onClick={() => {
-                    setError(null);
-                    setResetSent(false);
-                    setView("forgot");
-                  }}
-                >
-                  Forgot password?
-                </button>
-              </div>
-              <input
-                id="password"
-                type="password"
-                className={`${styles.input} ${styles.mono}`}
-                placeholder="••••••••"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            <button type="submit" className={styles.submit} disabled={disabled}>
-              {busy ? "Signing in…" : "Continue"}
-            </button>
-          </form>
-
-          <button
-            type="button"
-            className={styles.demo}
-            onClick={handleUseDemo}
-            disabled={disabled}
-          >
-            <span>Use a demo account</span>
-            <span aria-hidden="true">›</span>
-          </button>
-
-          <p className={styles.foot}>
-            No account?{" "}
-            <button
-              type="button"
-              className={styles.footLink}
-              onClick={() => setSignUpOpen(true)}
-            >
-              Sign up
-            </button>
-          </p>
-        </>
-      ) : view === 'mfa' ? (
-        // ── MFA (second factor) view ────────────────────────────────────────
-        <>
-          <h1 className={styles.title}>Verify it&apos;s you</h1>
-          <p className={styles.sub}>
-            {useBackup
-              ? 'Enter one of your unused backup codes.'
-              : 'Enter the code from your authenticator app.'}
-          </p>
-
-          {error && <p className={styles.error} role="alert">{error}</p>}
-
-          <form onSubmit={confirmMfa}>
-            <div className={styles.field}>
-              <div className={styles.labelRow}>
-                <label className={styles.label} htmlFor="mfa-code">
-                  {useBackup ? 'Backup code' : 'Verification code'}
-                </label>
-              </div>
-              <input
-                id="mfa-code"
-                inputMode={useBackup ? 'text' : 'numeric'}
-                className={`${styles.input} ${styles.mono}`}
-                placeholder={useBackup ? 'xxxxx-xxxxx' : '123456'}
-                autoComplete="one-time-code"
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-            </div>
-            <button type="submit" className={styles.submit} disabled={disabled}>
-              {busy ? 'Verifying…' : 'Verify'}
-            </button>
-          </form>
-
-          <button
-            type="button"
-            className={styles.forgot}
-            onClick={() => { setError(null); setCode(''); setUseBackup((v) => !v); }}
-          >
-            {useBackup ? 'Use authenticator app instead' : 'Use a backup code instead'}
-          </button>
-
-          <button
-            type="button"
-            className={styles.back}
-            onClick={() => { setError(null); setCode(''); setView('signin'); }}
-          >
-            ‹ Back to sign in
-          </button>
-        </>
-      ) : view === 'trust' ? (
-        // ── Device trust (new device, no MFA) ───────────────────────────────
-        <>
-          <h1 className={styles.title}>Verify this device</h1>
-          <p className={styles.sub}>
-            For your security, enter the code we emailed you to confirm this
-            sign-in.
-          </p>
-
-          {error && <p className={styles.error} role="alert">{error}</p>}
-
-          <form onSubmit={confirmTrust}>
-            <div className={styles.field}>
-              <div className={styles.labelRow}>
-                <label className={styles.label} htmlFor="trust-code">
-                  Verification code
-                </label>
-              </div>
-              <input
-                id="trust-code"
-                inputMode="numeric"
-                className={`${styles.input} ${styles.mono}`}
-                placeholder="123456"
-                autoComplete="one-time-code"
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-            </div>
-            <button type="submit" className={styles.submit} disabled={disabled}>
-              {busy ? 'Verifying…' : 'Verify'}
-            </button>
-          </form>
-
-          <button
-            type="button"
-            className={styles.back}
-            onClick={() => { setError(null); setCode(''); signIn.reset(); setView('signin'); }}
-          >
-            ‹ Back to sign in
-          </button>
-        </>
-      ) : (
-        // ── Forgot-password view ───────────────────────────────────────────
-        <>
-          <h1 className={styles.title}>Reset your password</h1>
-          <p className={styles.sub}>
-            {resetSent
-              ? "Enter the code we emailed you and choose a new password."
-              : "Enter your account email and we’ll send a reset code."}
-          </p>
-
-          {error && (
-            <p className={styles.error} role="alert">
-              {error}
-            </p>
-          )}
-
-          {!resetSent ? (
-            <form onSubmit={requestReset}>
-              <div className={styles.field}>
-                <div className={styles.labelRow}>
-                  <label className={styles.label} htmlFor="reset-email">
-                    Email address
-                  </label>
-                </div>
-                <input
-                  id="reset-email"
-                  type="email"
-                  className={styles.input}
-                  placeholder="you@school.ph"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <button
-                type="submit"
-                className={styles.submit}
-                disabled={disabled}
-              >
-                {busy ? "Sending…" : "Send reset code"}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={confirmReset}>
-              <div className={styles.field}>
-                <div className={styles.labelRow}>
-                  <label className={styles.label} htmlFor="reset-code">
-                    Reset code
-                  </label>
-                </div>
-                <input
-                  id="reset-code"
-                  inputMode="numeric"
-                  className={`${styles.input} ${styles.mono}`}
-                  placeholder="123456"
-                  autoComplete="one-time-code"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                />
-              </div>
-              <div className={styles.field}>
-                <div className={styles.labelRow}>
-                  <label className={styles.label} htmlFor="new-password">
-                    New password
-                  </label>
-                </div>
-                <input
-                  id="new-password"
-                  type="password"
-                  className={`${styles.input} ${styles.mono}`}
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <button
-                type="submit"
-                className={styles.submit}
-                disabled={disabled}
-              >
-                {busy ? "Updating…" : "Reset password & sign in"}
-              </button>
-            </form>
-          )}
-
-          <button
-            type="button"
-            className={styles.back}
-            onClick={() => {
-              setError(null);
-              setView("signin");
-            }}
-          >
-            ‹ Back to sign in
-          </button>
-        </>
+      {view === 'forgot' && (
+        <ForgotView
+          error={error}
+          resetSent={resetSent}
+          email={email}
+          setEmail={setEmail}
+          code={code}
+          setCode={setCode}
+          password={password}
+          setPassword={setPassword}
+          busy={busy}
+          disabled={disabled}
+          onRequestReset={requestReset}
+          onConfirmReset={confirmReset}
+          onBack={() => {
+            setError(null);
+            setView('signin');
+          }}
+        />
       )}
 
       {/* "Secured by Clerk" badge — Figma node 743:2908. The prebuilt widget
@@ -590,6 +376,383 @@ export function SignInCard() {
           Escape, or "Go to sign in") returns to this card. */}
       <SignUpModal open={signUpOpen} onClose={() => setSignUpOpen(false)} />
     </div>
+  );
+}
+
+// ── View components ─────────────────────────────────────────────────────────
+// Split out of SignInCard's render (was CC 26 — a single ternary chain over
+// `view`) so each step's JSX and its own branches are independently
+// measured. Bindings each step used to read from SignInCard's scope are
+// passed as props; `tsc --noEmit` catches anything missed in the move.
+
+interface SignInViewProps {
+  error: string | null;
+  email: string;
+  setEmail: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  busy: boolean;
+  disabled: boolean;
+  oauthBusy: boolean;
+  isLoaded: boolean;
+  onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+  onGoogle: () => void;
+  onForgot: () => void;
+  onUseDemo: () => void;
+  onSignUp: () => void;
+}
+
+function SignInView({
+  error,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  busy,
+  disabled,
+  oauthBusy,
+  isLoaded,
+  onSubmit,
+  onGoogle,
+  onForgot,
+  onUseDemo,
+  onSignUp,
+}: SignInViewProps) {
+  return (
+    <>
+      <h1 className={styles.title}>Sign in to TVI-CAMS</h1>
+      <p className={styles.sub}>
+        Welcome back. Sign in to continue to the Compliance &amp; Audit
+        dashboard.
+      </p>
+
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+
+      <button
+        type="button"
+        className={styles.oauth}
+        onClick={onGoogle}
+        disabled={oauthBusy || !isLoaded}
+      >
+        <GoogleG />
+        {oauthBusy ? "Redirecting…" : "Continue with Google"}
+      </button>
+
+      <div className={styles.divider}>
+        <span>or</span>
+      </div>
+
+      <form onSubmit={onSubmit}>
+        <div className={styles.field}>
+          <div className={styles.labelRow}>
+            <label className={styles.label} htmlFor="email">
+              Email address
+            </label>
+          </div>
+          <input
+            id="email"
+            type="email"
+            className={styles.input}
+            placeholder="you@school.ph"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <div className={styles.labelRow}>
+            <label className={styles.label} htmlFor="password">
+              Password
+            </label>
+            <button type="button" className={styles.forgot} onClick={onForgot}>
+              Forgot password?
+            </button>
+          </div>
+          <input
+            id="password"
+            type="password"
+            className={`${styles.input} ${styles.mono}`}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <button type="submit" className={styles.submit} disabled={disabled}>
+          {busy ? "Signing in…" : "Continue"}
+        </button>
+      </form>
+
+      <button
+        type="button"
+        className={styles.demo}
+        onClick={onUseDemo}
+        disabled={disabled}
+      >
+        <span>Use a demo account</span>
+        <span aria-hidden="true">›</span>
+      </button>
+
+      <p className={styles.foot}>
+        No account?{" "}
+        <button type="button" className={styles.footLink} onClick={onSignUp}>
+          Sign up
+        </button>
+      </p>
+    </>
+  );
+}
+
+interface MfaViewProps {
+  error: string | null;
+  code: string;
+  setCode: (value: string) => void;
+  useBackup: boolean;
+  busy: boolean;
+  disabled: boolean;
+  onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+  onToggleBackup: () => void;
+  onBack: () => void;
+}
+
+function MfaView({
+  error,
+  code,
+  setCode,
+  useBackup,
+  busy,
+  disabled,
+  onSubmit,
+  onToggleBackup,
+  onBack,
+}: MfaViewProps) {
+  return (
+    <>
+      <h1 className={styles.title}>Verify it&apos;s you</h1>
+      <p className={styles.sub}>
+        {useBackup
+          ? 'Enter one of your unused backup codes.'
+          : 'Enter the code from your authenticator app.'}
+      </p>
+
+      {error && <p className={styles.error} role="alert">{error}</p>}
+
+      <form onSubmit={onSubmit}>
+        <div className={styles.field}>
+          <div className={styles.labelRow}>
+            <label className={styles.label} htmlFor="mfa-code">
+              {useBackup ? 'Backup code' : 'Verification code'}
+            </label>
+          </div>
+          <input
+            id="mfa-code"
+            inputMode={useBackup ? 'text' : 'numeric'}
+            className={`${styles.input} ${styles.mono}`}
+            placeholder={useBackup ? 'xxxxx-xxxxx' : '123456'}
+            autoComplete="one-time-code"
+            required
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+        </div>
+        <button type="submit" className={styles.submit} disabled={disabled}>
+          {busy ? 'Verifying…' : 'Verify'}
+        </button>
+      </form>
+
+      <button type="button" className={styles.forgot} onClick={onToggleBackup}>
+        {useBackup ? 'Use authenticator app instead' : 'Use a backup code instead'}
+      </button>
+
+      <button type="button" className={styles.back} onClick={onBack}>
+        ‹ Back to sign in
+      </button>
+    </>
+  );
+}
+
+interface TrustViewProps {
+  error: string | null;
+  code: string;
+  setCode: (value: string) => void;
+  busy: boolean;
+  disabled: boolean;
+  onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+  onBack: () => void;
+}
+
+function TrustView({
+  error,
+  code,
+  setCode,
+  busy,
+  disabled,
+  onSubmit,
+  onBack,
+}: TrustViewProps) {
+  return (
+    <>
+      <h1 className={styles.title}>Verify this device</h1>
+      <p className={styles.sub}>
+        For your security, enter the code we emailed you to confirm this
+        sign-in.
+      </p>
+
+      {error && <p className={styles.error} role="alert">{error}</p>}
+
+      <form onSubmit={onSubmit}>
+        <div className={styles.field}>
+          <div className={styles.labelRow}>
+            <label className={styles.label} htmlFor="trust-code">
+              Verification code
+            </label>
+          </div>
+          <input
+            id="trust-code"
+            inputMode="numeric"
+            className={`${styles.input} ${styles.mono}`}
+            placeholder="123456"
+            autoComplete="one-time-code"
+            required
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+        </div>
+        <button type="submit" className={styles.submit} disabled={disabled}>
+          {busy ? 'Verifying…' : 'Verify'}
+        </button>
+      </form>
+
+      <button type="button" className={styles.back} onClick={onBack}>
+        ‹ Back to sign in
+      </button>
+    </>
+  );
+}
+
+interface ForgotViewProps {
+  error: string | null;
+  resetSent: boolean;
+  email: string;
+  setEmail: (value: string) => void;
+  code: string;
+  setCode: (value: string) => void;
+  password: string;
+  setPassword: (value: string) => void;
+  busy: boolean;
+  disabled: boolean;
+  onRequestReset: (e: SubmitEvent<HTMLFormElement>) => void;
+  onConfirmReset: (e: SubmitEvent<HTMLFormElement>) => void;
+  onBack: () => void;
+}
+
+function ForgotView({
+  error,
+  resetSent,
+  email,
+  setEmail,
+  code,
+  setCode,
+  password,
+  setPassword,
+  busy,
+  disabled,
+  onRequestReset,
+  onConfirmReset,
+  onBack,
+}: ForgotViewProps) {
+  return (
+    <>
+      <h1 className={styles.title}>Reset your password</h1>
+      <p className={styles.sub}>
+        {resetSent
+          ? "Enter the code we emailed you and choose a new password."
+          : "Enter your account email and we’ll send a reset code."}
+      </p>
+
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+
+      {!resetSent ? (
+        <form onSubmit={onRequestReset}>
+          <div className={styles.field}>
+            <div className={styles.labelRow}>
+              <label className={styles.label} htmlFor="reset-email">
+                Email address
+              </label>
+            </div>
+            <input
+              id="reset-email"
+              type="email"
+              className={styles.input}
+              placeholder="you@school.ph"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <button type="submit" className={styles.submit} disabled={disabled}>
+            {busy ? "Sending…" : "Send reset code"}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={onConfirmReset}>
+          <div className={styles.field}>
+            <div className={styles.labelRow}>
+              <label className={styles.label} htmlFor="reset-code">
+                Reset code
+              </label>
+            </div>
+            <input
+              id="reset-code"
+              inputMode="numeric"
+              className={`${styles.input} ${styles.mono}`}
+              placeholder="123456"
+              autoComplete="one-time-code"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
+          <div className={styles.field}>
+            <div className={styles.labelRow}>
+              <label className={styles.label} htmlFor="new-password">
+                New password
+              </label>
+            </div>
+            <input
+              id="new-password"
+              type="password"
+              className={`${styles.input} ${styles.mono}`}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className={styles.submit} disabled={disabled}>
+            {busy ? "Updating…" : "Reset password & sign in"}
+          </button>
+        </form>
+      )}
+
+      <button type="button" className={styles.back} onClick={onBack}>
+        ‹ Back to sign in
+      </button>
+    </>
   );
 }
 
