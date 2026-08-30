@@ -11,7 +11,8 @@
     "lint": "eslint",
     "preview": "serve preview -s -l 5000",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "keywords": [
     "design-system",
@@ -43,6 +44,8 @@
     "swagger-ui-react": "^5.32.14"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.2.31",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/postcss": "^4",
     "@types/d3-axis": "^3.0.6",
