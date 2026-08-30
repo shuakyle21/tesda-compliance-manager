@@ -31,7 +31,7 @@ type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | '
 export const ACTIVITY_UNREAD = 3;
 
 const WORKSPACE: NavItem[] = [
-  { label: 'Dashboard', icon: 'chart-dots', href: '/dashboard' },
+  { label: 'Dashboard', icon: 'layout-dashboard', href: '/dashboard' },
   { label: 'Batch Cards', icon: 'folders', href: '/batch-cards' },
   { label: 'Table View', icon: 'file-text', href: '/table-view' },
   { label: 'Documents', icon: 'file-check', href: '/documents' },
