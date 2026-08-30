@@ -24,20 +24,19 @@ document?":
 | `TableView`, `DocumentsView` | absent ⇒ **TypeError** (unguarded `documents[key].status`) |
 | `AnalyticsView` | absent ⇒ **not verified** (plotted as a low compliance score) |
 | `billing/data/billing.ts`, `billing/domain/packets.ts` | absent ⇒ **missing** (gate closed) |
-| `AlertsPanel` | *no answer — see below* |
+| `AlertsPanel` | absent ⇒ skipped only if *no* document is tracked at all (not just no *critical* one) |
 
-**On `AlertsPanel`.** TES-94 names it as a third disagreeing site (skipping the
-missing-critical-docs check when `documents` is empty, so it emits no alert).
-No such check exists: on `main` and on this branch `AlertsPanel` renders
-`ALERTS_LOG` and nothing else, and its only commit is the TES-68 module move.
-The TES-93 change the issue describes is not in the tree. So there was nothing
-to reconcile there, and this ADR deliberately does **not** invent a
-missing-docs alert to reconcile it *to* — what an alert should say about an
-untracked document is a product decision about alerting, not about document
-semantics, and it belongs to whichever issue actually lands that check. When it
-does, D2/D4 already answer it: an untracked document is not evidence of
-non-compliance, so it must not raise a missing-docs alert; the *gate* it blocks
-is what surfaces (D4).
+**On `AlertsPanel`.** This ADR originally found no missing-critical-docs check
+to reconcile here, because TES-94 branched before TES-93 merged `AlertsPanel`'s
+rewrite to `main`. That premise is now stale: TES-93 is in this branch's
+history, and its `batchAlerts()` did carry its own ad hoc indexing
+(`b.documents[r.key]?.status === 'missing'`) guarded only by "is *any*
+document tracked" — the exact per-site reinvention this ADR exists to remove,
+and a narrower guard than D2/D4 require (a batch with one non-critical
+document tracked and zero critical ones would have slipped the old guard).
+`AlertsPanel` now routes through `summarizeBatchDocCompliance()` like every
+other measurement site: untracked keys are excluded from `missing`, and the
+row only fires once at least one *critical* requirement is actually tracked.
 
 Two facts sharpen the question:
 
@@ -48,8 +47,7 @@ Two facts sharpen the question:
    requirement with no submitted row resolves to `'missing'`. That decision
    stands; this ADR ratifies it rather than re-opening it. (TES-94's premise
    that "every live-fetched batch has an empty documents map by construction"
-   is therefore stale — the second of its two stale premises, alongside its
-   description of `AlertsPanel` above.)
+   is therefore stale.)
 2. **The remaining gap is a catalog mismatch, not a sync gap.** The UI iterates
    the 12-key mock catalog in `shared/mocks/seed.ts`, while live maps are keyed
    by the migration's 8 DB keys, and the two only partly overlap
@@ -103,6 +101,11 @@ to neither `verified` nor `missing`.**
   **"document sync pending"** for none. Never colour alone (RULES §4).
 - The dashboard's local `docsTracked` patch is gone — the KPI reads
   `metrics.docCompliancePct === null` instead.
+- `AlertsPanel`'s missing-critical-docs check (added by TES-93, merged into
+  this branch alongside `main`) now reads through
+  `summarizeBatchDocCompliance()` instead of indexing `batch.documents`
+  directly (D6) and its "is anything tracked" guard is now "is a *critical*
+  document tracked" — the narrower, correct guard D2/D4 call for.
 
 ## Related
 

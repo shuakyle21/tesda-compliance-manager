@@ -18,6 +18,12 @@
  * live, batch-identified sentence would read as real recency information —
  * worse than the static mock it replaced. Rows are sorted critical-first so
  * critical alerts are the ones kept when the list is cut down to `limit`.
+ *
+ * TES-94: missing-critical-docs detection now routes through
+ * `modules/documents/domain/compliance.ts` (ADR-004) instead of indexing
+ * `batch.documents` directly — untracked requirement keys are excluded from
+ * the count rather than read as "missing", and the guard checks whether a
+ * *critical* document is tracked, not just whether anything is.
  */
 
 import Link from 'next/link';
@@ -25,12 +31,13 @@ import { Icon, type IconName } from '@/shared/ui/Icon';
 import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
+import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import type { Batch } from '@/shared/types';
 
 type Tone = 'green' | 'amber' | 'red';
 type AlertRow = { text: string; tone: Tone };
 
-const CRITICAL_DOCS = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
+const CRITICAL_DOCS = criticalRequirements(DOCUMENT_REQUIREMENTS);
 const TONE_RANK: Record<Tone, number> = { red: 0, amber: 1, green: 2 };
 const TONE_ICON: Record<Tone, IconName> = { red: 'alert-triangle', amber: 'alert-circle', green: 'shield-check' };
 
@@ -48,12 +55,18 @@ function batchAlerts(b: Batch): AlertRow[] {
   if (!billDone && urgencyTier(b.daysToBilling) === 'critical') {
     rows.push({ tone: 'red', text: `${b.id} billing window opens in ${b.daysToBilling} days.` });
   }
-  // Only flag missing critical docs once this batch's documents are actually
-  // tracked — an empty `documents` map means "not synced yet", not "none
-  // missing" (see the docsTracked guard in page.tsx for the same distinction).
-  if (Object.keys(b.documents).length > 0) {
-    const missing = CRITICAL_DOCS.filter((r) => b.documents[r.key]?.status === 'missing').length;
-    if (missing > 0) rows.push({ tone: 'amber', text: `${b.id} missing ${missing} critical document${missing > 1 ? 's' : ''}.` });
+  // Only flag missing critical docs once this batch actually tracks at least
+  // one critical requirement — an untracked key (ADR-004) means "not synced
+  // yet", not "missing" (see the docsTracked guard in page.tsx for the same
+  // distinction). summarizeBatchDocCompliance() excludes untracked keys from
+  // both `missing` and its denominator, so this can't fire on a batch whose
+  // catalog just doesn't overlap the mock's critical-doc keys.
+  const docCompliance = summarizeBatchDocCompliance(b, CRITICAL_DOCS);
+  if (docCompliance.tracked > 0 && docCompliance.missing > 0) {
+    rows.push({
+      tone: 'amber',
+      text: `${b.id} missing ${docCompliance.missing} critical document${docCompliance.missing > 1 ? 's' : ''}.`,
+    });
   }
   if (b.ntpLag > 7) rows.push({ tone: 'red', text: `${b.id} NTP-to-start lag exceeded 7 days.` });
   return rows;

@@ -30,8 +30,15 @@
  * billing-deadline fields above, so a trainer-scoped caller must strip them
  * from this return value before it reaches a trainer route — this function
  * does not know its caller's role and does not do that stripping itself.
+ *
+ * Doc-compliance counting routes through `modules/documents/domain/compliance`
+ * (ADR-004 / TES-94) rather than indexing `batch.documents` directly: an
+ * untracked key is excluded from both the numerator and denominator, never
+ * silently counted as non-compliant, and `docCompliancePct` is `null` — not
+ * `0` — when nothing is tracked at all.
  */
 
+import { docRecordFor, isDocTracked } from '@/modules/documents/domain/compliance';
 import type { Batch, DashboardMetrics } from '@/shared/types';
 
 /**
@@ -54,24 +61,28 @@ export function getDashboardMetrics(
     ? batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0]
     : null;
 
-  // Critical-document compliance summary. Counted explicitly (not derived by
-  // subtraction from `critTotal`) so a `criticalDocumentKeys` entry with no
-  // matching key in `b.documents` — a caller/catalog mismatch, see this
-  // function's doc-comment above — falls out of the percentage instead of
-  // silently counting as compliant.
+  // Critical-document compliance summary (ADR-004): an untracked key is
+  // excluded from both the numerator and the denominator — never counted as
+  // compliant, and never dragging the percentage down as if it were missing.
   let missing = 0;
   let pending = 0;
   let compliant = 0;
+  let tracked = 0;
+  let untracked = 0;
   batches.forEach((b) => {
     criticalDocumentKeys.forEach((key) => {
-      const st = b.documents[key]?.status;
+      if (!isDocTracked(b, key)) {
+        untracked++;
+        return;
+      }
+      tracked++;
+      const st = docRecordFor(b, key)!.status;
       if (st === 'missing') missing++;
       else if (st === 'pending') pending++;
       else if (st === 'verified' || st === 'submitted') compliant++;
     });
   });
-  const critTotal = criticalDocumentKeys.length * totalBatches;
-  const docCompliancePct = critTotal ? Math.round((compliant / critTotal) * 100) : 0;
+  const docCompliancePct = tracked ? Math.round((compliant / tracked) * 100) : null;
 
   return {
     totalBatches,
@@ -83,5 +94,7 @@ export function getDashboardMetrics(
     docCompliancePct,
     docMissing: missing,
     docPending: pending,
+    docTracked: tracked,
+    docUntracked: untracked,
   };
 }
