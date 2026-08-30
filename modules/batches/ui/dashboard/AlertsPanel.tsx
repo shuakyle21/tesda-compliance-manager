@@ -3,7 +3,8 @@
  *
  * Figma source of truth: file vZKyWXSipBHmiQFuHl5e1O, node 8:4730.
  * Header with a red critical-count badge + "View all", then alert rows
- * (tone dot · one-line sentence).
+ * (tone icon · one-line sentence — never color alone, per the design system's
+ * status rule).
  *
  * TES-93: reconciled against the claude-design source (TVI-CAMS.dc.html
  * `dashVM()`) — alerts are derived live from the same `batches` already
@@ -16,11 +17,11 @@
  * `Date.now()` during render), and a fabricated relative stamp next to a
  * live, batch-identified sentence would read as real recency information —
  * worse than the static mock it replaced. Rows are sorted critical-first so
- * the header's red count always matches what's visible after `limit`.
+ * critical alerts are the ones kept when the list is cut down to `limit`.
  */
 
 import Link from 'next/link';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, type IconName } from '@/shared/ui/Icon';
 import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
@@ -31,12 +32,22 @@ type AlertRow = { text: string; tone: Tone };
 
 const CRITICAL_DOCS = DOCUMENT_REQUIREMENTS.filter((r) => r.critical);
 const TONE_RANK: Record<Tone, number> = { red: 0, amber: 1, green: 2 };
+const TONE_ICON: Record<Tone, IconName> = { red: 'alert-triangle', amber: 'alert-circle', green: 'shield-check' };
 
 function batchAlerts(b: Batch): AlertRow[] {
   const rows: AlertRow[] = [];
-  if (isBillingReady(b)) rows.push({ tone: 'green', text: `${b.id} reached 80%+ training progress — ready for billing.` });
+  // isBillingReady() is the threshold-only prep signal (see readiness.ts) —
+  // it does not check documents, so this row must not claim the batch is
+  // actually ready to bill. billingGate() is the compound gate for that claim.
+  if (isBillingReady(b)) rows.push({ tone: 'green', text: `${b.id} reached the billing progress threshold.` });
   if (b.bsrs) rows.push({ tone: 'green', text: `${b.id} BSRS approved — eligible for billing.` });
-  if (urgencyTier(b.daysToBilling) === 'critical') rows.push({ tone: 'red', text: `${b.id} billing window opens in ${b.daysToBilling} days.` });
+  // Same "billing stage already done" guard BatchTimeline uses to hide
+  // completed cohorts — without it, a finished batch's now-negative
+  // daysToBilling reads as a critical alert instead of disappearing.
+  const billDone = b.lifecycle.find((s) => s.key === 'bill')?.status === 'done';
+  if (!billDone && urgencyTier(b.daysToBilling) === 'critical') {
+    rows.push({ tone: 'red', text: `${b.id} billing window opens in ${b.daysToBilling} days.` });
+  }
   // Only flag missing critical docs once this batch's documents are actually
   // tracked — an empty `documents` map means "not synced yet", not "none
   // missing" (see the docsTracked guard in page.tsx for the same distinction).
@@ -99,8 +110,13 @@ export function AlertsPanel({ batches, limit = 5 }: { batches: Batch[]; limit?: 
                 borderBottom: i < alerts.length - 1 ? '0.5px solid var(--color-border-faint)' : 'none',
               }}
             >
-              <span style={{ width: 8, height: 8, borderRadius: 999, marginTop: 5, flexShrink: 0, background: `var(--color-${a.tone})` }} aria-hidden="true" />
-              <div style={{ minWidth: 0, fontSize: 12, color: 'var(--color-text-primary)', lineHeight: '16.8px' }}>{a.text}</div>
+              <span style={{ color: `var(--color-${a.tone})`, flexShrink: 0, marginTop: 2 }}>
+                <Icon name={TONE_ICON[a.tone]} size={14} />
+              </span>
+              <div style={{ minWidth: 0, fontSize: 12, color: 'var(--color-text-primary)', lineHeight: '16.8px' }}>
+                {a.tone === 'red' && <span style={{ fontWeight: 600 }}>Critical — </span>}
+                {a.text}
+              </div>
             </div>
           ))
         )}
