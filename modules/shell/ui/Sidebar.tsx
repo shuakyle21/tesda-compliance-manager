@@ -16,14 +16,22 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon, type IconName } from '@/shared/ui/Icon';
+import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { TENANTS } from '@/shared/mocks/seed';
 import type { Tenant } from '@/shared/types';
+import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
+import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
 import { useNavDrawer } from './NavDrawerProvider';
 
-type NavItem = { label: string; icon: IconName; href?: string };
+type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings'; badge?: number };
+
+// Static demo count, same fidelity as the design's own hardcoded `badge:3` —
+// there is no real unread-activity tracking yet. Exported so the Topbar bell
+// (which links to the same Activity Log) shows the same number.
+export const ACTIVITY_UNREAD = 3;
 
 const WORKSPACE: NavItem[] = [
-  { label: 'Dashboard', icon: 'chart-dots', href: '/dashboard' },
+  { label: 'Dashboard', icon: 'layout-dashboard', href: '/dashboard' },
   { label: 'Batch Cards', icon: 'folders', href: '/batch-cards' },
   { label: 'Table View', icon: 'file-text', href: '/table-view' },
   { label: 'Documents', icon: 'file-check', href: '/documents' },
@@ -33,7 +41,7 @@ const WORKSPACE: NavItem[] = [
   { label: 'Billing', icon: 'receipt', href: '/billing' },
   { label: 'Analytics', icon: 'chart-bar', href: '/analytics' },
   { label: 'Report', icon: 'file-invoice', href: '/report' },
-  { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
+  { label: 'Activity Log', icon: 'timeline', href: '/activity-log', badge: ACTIVITY_UNREAD },
 ];
 
 const ACCOUNT: NavItem[] = [
@@ -41,13 +49,26 @@ const ACCOUNT: NavItem[] = [
 ];
 
 const OPERATIONS: NavItem[] = [
-  { label: 'Import CSV', icon: 'download' }, // route not built yet
-  { label: 'Settings', icon: 'settings' }, // route not built yet
+  { label: 'Import records', icon: 'download', op: 'import' },
+  { label: 'Settings', icon: 'settings', op: 'settings' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  /**
+   * The only role signal a Server Component layout can derive today (no real
+   * role model until TES-34 — see layout.tsx's TRAINER OMISSION note). Mirrors
+   * the design's `ROLES[role].ops`: trainer gets Settings only, every other
+   * (assumed-coordinator) route gets both. Import CSV is an office-only
+   * operation — a trainer must not see it, the same boundary `hideBilling`
+   * already enforces for the metrics row.
+   */
+  isTrainerRoute?: boolean;
+}
+
+export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
   const pathname = usePathname();
-  const { open, closeDrawer } = useNavDrawer();
+  const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
+  const operations = isTrainerRoute ? OPERATIONS.filter((o) => o.op === 'settings') : OPERATIONS;
 
   // School selector (no tenant backend yet — switch updates local display).
   const [orgOpen, setOrgOpen] = useState(false);
@@ -56,6 +77,10 @@ export function Sidebar() {
   );
   const orgRef = useRef<HTMLDivElement>(null);
   const canSwitch = TENANTS.length > 1;
+
+  // Operations overlays (Import CSV / Settings) + their completion toast.
+  const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
+  const [toast, setToast] = useState<ToastData | null>(null);
 
   // Click-outside closes the school dropdown.
   useEffect(() => {
@@ -66,21 +91,21 @@ export function Sidebar() {
     return () => document.removeEventListener('mousedown', onDocClick);
   }, []);
 
-  // Esc closes the dropdown, then the drawer.
+  // Esc closes the dropdown, then the drawer (the op modals own their own Esc).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
+      if (e.key !== 'Escape' || activeOp) return;
       if (orgOpen) setOrgOpen(false);
       else if (open) closeDrawer();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [orgOpen, open, closeDrawer]);
+  }, [orgOpen, open, closeDrawer, activeOp]);
 
   return (
     <>
       <div className={`sidebar-scrim${open ? ' show' : ''}`} onClick={closeDrawer} aria-hidden="true" />
-      <aside className={`sidebar${open ? ' open' : ''}`} aria-label="Primary navigation">
+      <aside className={`sidebar${open ? ' open' : ''}${collapsed ? ' collapsed' : ''}`} aria-label="Primary navigation">
         {/* Brand */}
         <div className="sb-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -95,6 +120,9 @@ export function Sidebar() {
           </span>
           <button type="button" className="sb-close icon-btn" onClick={closeDrawer} aria-label="Close navigation">
             <Icon name="x" size={16} />
+          </button>
+          <button type="button" className="sb-collapse icon-btn" onClick={toggleCollapsed} aria-label="Collapse sidebar" title="Collapse sidebar">
+            <Icon name="layout-sidebar" size={16} />
           </button>
         </div>
 
@@ -156,8 +184,14 @@ export function Sidebar() {
           ))}
 
           <div className="sb-group-label">Operations</div>
-          {OPERATIONS.map((item) => (
-            <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
+          {operations.map((item) => (
+            <NavRow
+              key={item.label}
+              item={item}
+              active={item.href === pathname}
+              onNavigate={closeDrawer}
+              onOp={item.op ? () => { closeDrawer(); setActiveOp(item.op!); } : undefined}
+            />
           ))}
 
           <div className="sb-group-label">Account</div>
@@ -178,17 +212,50 @@ export function Sidebar() {
           </Link>
         </div>
       </aside>
+
+      {activeOp === 'import' && (
+        <ImportCsvModal
+          onClose={() => setActiveOp(null)}
+          onImported={(message) => {
+            setActiveOp(null);
+            setToast({ title: 'Import complete', message });
+          }}
+        />
+      )}
+      {activeOp === 'settings' && (
+        <SettingsModal
+          workspaceName={tenant.name}
+          workspaceMeta={`${tenant.code} · ${tenant.region}`}
+          userName="Karina Cruz"
+          userLabel="coordinator"
+          onClose={() => setActiveOp(null)}
+          onSaved={() => {
+            setActiveOp(null);
+            setToast({ title: 'Settings saved' });
+          }}
+        />
+      )}
+      {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </>
   );
 }
 
-function NavRow({ item, active, onNavigate }: { item: NavItem; active: boolean; onNavigate: () => void }) {
+function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boolean; onNavigate: () => void; onOp?: () => void }) {
   const inner = (
     <>
       <Icon name={item.icon} size={17} />
       <span>{item.label}</span>
+      {!!item.badge && <span className="sb-badge">{item.badge}</span>}
     </>
   );
+
+  if (onOp) {
+    return (
+      <button type="button" className="sb-nav-item" onClick={onOp}>
+        {inner}
+      </button>
+    );
+  }
 
   if (!item.href) {
     return (

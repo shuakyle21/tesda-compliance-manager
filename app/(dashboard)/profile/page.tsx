@@ -10,7 +10,7 @@
  *
  * Figma: Auth · Profile (node 741:2515, Screens page).
  */
-
+import { useClerk } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/modules/auth/data/auth';
 import { Icon } from '@/shared/ui/Icon';

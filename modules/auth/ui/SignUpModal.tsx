@@ -37,8 +37,9 @@ import {
   useRef,
   useState,
   type ClipboardEvent,
-  type FormEvent,
   type KeyboardEvent,
+  type MouseEvent,
+  type SubmitEvent,
 } from 'react';
 import styles from './sign-up-modal.module.css';
 
@@ -176,7 +177,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
     return Object.keys(next).length === 0;
   }
 
-  async function handleSubmitForm(e: FormEvent) {
+  async function handleSubmitForm(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isLoaded || busy) return;
     setError(null);
@@ -214,6 +215,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
         strategy: 'oauth_google',
         redirectUrl: '/sign-in/sso-callback',
         redirectUrlComplete: '/dashboard',
+        oidcPrompt: 'select_account'
       });
     } catch (err) {
       setError(clerkError(err));
@@ -252,7 +254,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
     codeRefs.current[Math.min(digits.length, 5)]?.focus();
   }
 
-  async function handleVerify(e: FormEvent) {
+  async function handleVerify(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isLoaded || busy) return;
     if (code.some((c) => c === '')) {
@@ -274,7 +276,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
     }
   }
 
-  async function handleResend(e: FormEvent) {
+  async function handleResend(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     if (!isLoaded || resent) return;
     try {
@@ -285,7 +287,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
     }
   }
 
-  function backToForm(e: FormEvent) {
+  function backToForm(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setCode(['', '', '', '', '', '']);
     setCodeError(false);

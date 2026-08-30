@@ -15,6 +15,7 @@ import type { CSSProperties } from 'react';
 
 const ICONS = {
   'layout-sidebar': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 4v16"/>',
+  'layout-dashboard': '<rect x="4" y="4" width="6" height="5" rx="1"/><rect x="4" y="13" width="6" height="7" rx="1"/><rect x="14" y="4" width="6" height="7" rx="1"/><rect x="14" y="15" width="6" height="5" rx="1"/>',
   folders: '<path d="M9 4h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M17 17v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h2"/>',
   users: '<circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>',
   user: '<path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>',
@@ -55,6 +56,7 @@ const ICONS = {
   play: '<polygon points="8 5 19 12 8 19" fill="currentColor" stroke="none"/>',
   database: '<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6a8 3 0 0 0 16 0v-6"/><path d="M4 12v6a8 3 0 0 0 16 0v-6"/>',
   minus: '<path d="M5 12l14 0"/>',
+  'arrow-narrow-right': '<path d="M5 12h14"/><path d="M15 16l4 -4"/><path d="M15 8l4 4"/>',
 } as const;
 
 export type IconName = keyof typeof ICONS;

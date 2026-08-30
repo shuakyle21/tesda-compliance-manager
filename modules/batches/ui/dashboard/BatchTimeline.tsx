@@ -70,7 +70,11 @@ function lifecycleStatus(batch: Batch, key: string): LifecycleStatus {
 }
 
 function ganttData(batches: Batch[]): GanttRow[] {
+  // Completed cohorts (billing stage already done) are hidden from the active
+  // timeline — matches the claude-design source's "completed cohorts are
+  // hidden" footnote (TES-93).
   return batches
+    .filter((b) => lifecycleStatus(b, 'bill') !== 'done')
     .map((b): GanttRow => {
       const aou = parseDate(b.aouDate);
       const ntp = parseDate(b.ntpDate);
@@ -310,7 +314,7 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
 
       <div className="tl-foot">
         <Icon name="info-circle" size={13} />
-        Positioned by milestone dates and lifecycle status · the red line marks today · scroll sideways to see the full window.
+        Positioned by milestone dates · the red line marks today · completed cohorts are hidden. Scroll sideways to see the full window.
       </div>
     </section>
   );

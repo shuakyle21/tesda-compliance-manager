@@ -1,6 +1,12 @@
 # modules/import-export — CSV Import and Export (FR-10)
 
 ## Implemented
+- `ui/ImportCsvModal.tsx` — the Import CSV overlay (design-sync port, TVI-CAMS.dc.html
+  `opModal.isImport`), opened from the Sidebar's Operations group. Idle → picking →
+  loading → success/missing/error state machine. Not yet wired to the real pipeline below —
+  it's still a canned three-sample picker (success / missing columns / unreadable file),
+  matching the design's own fidelity level rather than inventing a T2MIS/BSRS parser
+  contract nobody has designed.
 - `domain/csv.ts` — pure RFC 4180 CSV parser (no dependency; format is small enough not to justify one)
 - `domain/learnerImport.ts` — pure header/row validation and ULI-keyed reconciliation against existing learners
 - `data/learnerImport.ts` — `importLearnersCsv(batchId, csvText)`: fetch existing learners → reconcile → insert/update
@@ -16,5 +22,6 @@ Unverified: no Supabase env is configured in this environment, so the write path
 layer (parser, validator, reconciler) is unit-tested in `tests/unit/learner-import.test.ts`.
 
 ## Planned
-- `ui/` — import trigger + result summary (not yet built)
+- Wire `ImportCsvModal.tsx` to `importLearnersCsv` — replace the canned samples with an actual
+  file input and real result summary
 - Export triggers (the "Export" half of FR-10)
