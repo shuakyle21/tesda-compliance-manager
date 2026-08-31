@@ -69,6 +69,21 @@ function normalizeHeader(header: string): string {
   return HEADER_ALIASES[header] ?? header;
 }
 
+/** Required field: trimmed, empty string when absent. */
+function readField(record: Record<string, string>, key: string): string {
+  return record[key]?.trim() ?? '';
+}
+
+/** Optional field: trimmed, `null` when absent or blank. */
+function readOptionalField(record: Record<string, string>, key: string): string | null {
+  return record[key]?.trim() || null;
+}
+
+function readAssessmentResult(record: Record<string, string>): ImportAssessmentResult {
+  const key = record['assessment result']?.trim().toLowerCase() ?? '';
+  return ASSESSMENT_RESULT_ALIASES[key] ?? 'pending';
+}
+
 /** Parses raw CSV text into candidate learner rows. Row-level content
  * validation (blank names, bad ULI shape, duplicates) happens in {@link validateRows}. */
 export function parseLearnerCsv(text: string): LearnerCsvParseResult {
@@ -91,13 +106,13 @@ export function parseLearnerCsv(text: string): LearnerCsvParseResult {
 
   const parsedRows: ParsedLearnerRow[] = records.map((record, i) => ({
     rowNumber: i + 2, // +1 for 0-index, +1 for the header row
-    learnerNo: record['learner no']?.trim() || null,
-    uli: record['uli']?.trim() ?? '',
-    lastName: record['last name']?.trim() ?? '',
-    firstName: record['first name']?.trim() ?? '',
-    middleName: record['middle name']?.trim() || null,
-    extensionName: record['extension name']?.trim() || null,
-    assessmentResult: ASSESSMENT_RESULT_ALIASES[record['assessment result']?.trim().toLowerCase() ?? ''] ?? 'pending',
+    learnerNo: readOptionalField(record, 'learner no'),
+    uli: readField(record, 'uli'),
+    lastName: readField(record, 'last name'),
+    firstName: readField(record, 'first name'),
+    middleName: readOptionalField(record, 'middle name'),
+    extensionName: readOptionalField(record, 'extension name'),
+    assessmentResult: readAssessmentResult(record),
   }));
 
   return { status: 'ok', rows: parsedRows };
