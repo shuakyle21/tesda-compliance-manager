@@ -18,41 +18,19 @@ import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicato
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
-import type { Batch } from '@/shared/types';
+import type { Batch, LifecycleStage, UrgencyTier } from '@/shared/types';
 
-export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => void }) {
-  const [closing, setClosing] = useState(false);
+type BatchPropRow = { label: string; icon: IconName; value: ReactNode };
+type BillTone = { bg: string; fg: string; bd: string; icon: IconName };
 
-  const close = useCallback(() => {
-    setClosing(true);
-    setTimeout(onClose, 170);
-  }, [onClose]);
+function deriveBillTone(tier: UrgencyTier): BillTone {
+  if (tier === 'on-track') return { bg: 'var(--color-green-lt)', fg: 'var(--color-green-dk)', bd: 'var(--color-green)', icon: 'check' };
+  if (tier === 'warning') return { bg: 'var(--color-amber-lt)', fg: 'var(--color-amber-dk)', bd: 'var(--color-amber-border)', icon: 'clock' };
+  return { bg: 'var(--color-red-lt)', fg: 'var(--color-red-dk)', bd: 'var(--color-red-border)', icon: 'alert-triangle' };
+}
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
-    document.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [close]);
-
-  const isTwsp = batch.program === 'TWSP';
-  const tier = urgencyTier(batch.daysToBilling);
-  const billingReady = isBillingReady(batch);
-
-  const billTone = tier === 'on-track'
-    ? { bg: 'var(--color-green-lt)', fg: 'var(--color-green-dk)', bd: 'var(--color-green)', icon: 'check' as IconName }
-    : tier === 'warning'
-    ? { bg: 'var(--color-amber-lt)', fg: 'var(--color-amber-dk)', bd: 'var(--color-amber-border)', icon: 'clock' as IconName }
-    : { bg: 'var(--color-red-lt)', fg: 'var(--color-red-dk)', bd: 'var(--color-red-border)', icon: 'alert-triangle' as IconName };
-
-  const entre = (batch.lifecycle || []).find((s) => s.key === 'entre');
-  const daysLeft = Math.max(0, batch.totalDays - batch.currentDay);
-
-  const props: { label: string; icon: IconName; value: ReactNode }[] = [
+function buildBatchProps(batch: Batch, isTwsp: boolean, billingReady: boolean): BatchPropRow[] {
+  return [
     { label: 'Trainer', icon: 'user', value: (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <TrainerAvatar name={batch.trainer} size="sm" />
@@ -78,6 +56,110 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {batch.ntpDate} · Report {batch.reportDate}</span>
     ) },
   ];
+}
+
+function BatchModalHero({ batch, isTwsp, billingReady }: { batch: Batch; isTwsp: boolean; billingReady: boolean }) {
+  return (
+    <div className="nm-hero" style={{
+      background: isTwsp
+        ? 'linear-gradient(135deg, var(--color-blue-lt) 0%, var(--color-surface) 62%)'
+        : 'linear-gradient(135deg, var(--color-teal-lt) 0%, var(--color-surface) 62%)',
+    }}>
+      <div className="nm-hero-badges">
+        <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
+        <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
+        {billingReady ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
+        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.id}</span>
+      </div>
+      <div className="nm-title">{batch.name}</div>
+      <div className="nm-subtitle">{batch.qualification}</div>
+    </div>
+  );
+}
+
+function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
+  return (
+    <div className="nm-section">
+      <div className="nm-section-title" style={{ color: 'var(--color-purple)' }}>
+        <Icon name="briefcase" size={13} style={{ color: 'var(--color-purple)' }} />Entrepreneurship
+      </div>
+      <div className="nm-entre-grid">
+        <div className="nm-entre-card" style={{ background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)' }}>
+          <div className="nm-entre-cap" style={{ color: 'var(--color-purple)' }}>Schedule</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-purple-dk)' }}>{entre.date || 'TBD'}</div>
+          <div style={{ fontSize: 11, color: 'var(--color-purple)', marginTop: 3, opacity: 0.85 }}>Immediately after training</div>
+        </div>
+        <div className="nm-entre-card">
+          <div className="nm-entre-cap">Duration</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>3</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>training days</div>
+        </div>
+        <div className="nm-entre-card">
+          <div className="nm-entre-cap">Status</div>
+          {entre.status === 'done' && <StatusBadge variant="completed" iconName="check">COMPLETED</StatusBadge>}
+          {entre.status === 'active' && <StatusBadge variant="ongoing">IN PROGRESS</StatusBadge>}
+          {entre.status !== 'done' && entre.status !== 'active' && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', height: 20, padding: '0 8px',
+              borderRadius: 'var(--radius-md)', background: 'var(--color-purple-lt)', color: 'var(--color-purple-dk)',
+              fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, letterSpacing: '0.04em',
+            }}>PENDING</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BatchScholarsGrid({ batch }: { batch: Batch }) {
+  const dropoutColor = (batch.dropouts ?? 0) > 0 ? 'var(--color-red-dk)' : 'var(--color-text-muted)';
+  const stats = [
+    { label: 'Approved seats', value: batch.approvedSeats, color: 'var(--color-text-primary)' },
+    { label: 'Enrolled', value: batch.scholars, color: 'var(--color-blue-dk)' },
+    { label: 'Completers', value: batch.completers, color: 'var(--color-green-dk)' },
+    { label: 'Dropouts', value: batch.dropouts, color: dropoutColor },
+  ];
+  return (
+    <div className="nm-section">
+      <div className="nm-section-title"><Icon name="users" size={13} />Scholars</div>
+      <div className="nm-scholars-grid">
+        {stats.map((s) => (
+          <div key={s.label} className="nm-scholar-card">
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: s.color }}>{s.value}</div>
+            <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 5 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => void }) {
+  const [closing, setClosing] = useState(false);
+
+  const close = useCallback(() => {
+    setClosing(true);
+    setTimeout(onClose, 170);
+  }, [onClose]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [close]);
+
+  const isTwsp = batch.program === 'TWSP';
+  const tier = urgencyTier(batch.daysToBilling);
+  const billingReady = isBillingReady(batch);
+  const billTone = deriveBillTone(tier);
+  const entre = (batch.lifecycle || []).find((s) => s.key === 'entre');
+  const daysLeft = Math.max(0, batch.totalDays - batch.currentDay);
+  const props = buildBatchProps(batch, isTwsp, billingReady);
 
   return (
     <div className={`nm-backdrop${closing ? ' closing' : ''}`} onClick={close}>
@@ -93,20 +175,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <button className="nm-close" onClick={close} aria-label="Close"><Icon name="x" size={16} /></button>
           </div>
 
-          <div className="nm-hero" style={{
-            background: isTwsp
-              ? 'linear-gradient(135deg, var(--color-blue-lt) 0%, var(--color-surface) 62%)'
-              : 'linear-gradient(135deg, var(--color-teal-lt) 0%, var(--color-surface) 62%)',
-          }}>
-            <div className="nm-hero-badges">
-              <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
-              <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
-              {billingReady ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
-              <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.id}</span>
-            </div>
-            <div className="nm-title">{batch.name}</div>
-            <div className="nm-subtitle">{batch.qualification}</div>
-          </div>
+          <BatchModalHero batch={batch} isTwsp={isTwsp} billingReady={billingReady} />
 
           <div className="nm-props">
             {props.map((row) => (
@@ -145,37 +214,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <LifecyclePipeline steps={batch.lifecycle} />
           </div>
 
-          {entre && (
-            <div className="nm-section">
-              <div className="nm-section-title" style={{ color: 'var(--color-purple)' }}>
-                <Icon name="briefcase" size={13} style={{ color: 'var(--color-purple)' }} />Entrepreneurship
-              </div>
-              <div className="nm-entre-grid">
-                <div className="nm-entre-card" style={{ background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)' }}>
-                  <div className="nm-entre-cap" style={{ color: 'var(--color-purple)' }}>Schedule</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-purple-dk)' }}>{entre.date || 'TBD'}</div>
-                  <div style={{ fontSize: 11, color: 'var(--color-purple)', marginTop: 3, opacity: 0.85 }}>Immediately after training</div>
-                </div>
-                <div className="nm-entre-card">
-                  <div className="nm-entre-cap">Duration</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>3</div>
-                  <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>training days</div>
-                </div>
-                <div className="nm-entre-card">
-                  <div className="nm-entre-cap">Status</div>
-                  {entre.status === 'done' && <StatusBadge variant="completed" iconName="check">COMPLETED</StatusBadge>}
-                  {entre.status === 'active' && <StatusBadge variant="ongoing">IN PROGRESS</StatusBadge>}
-                  {entre.status !== 'done' && entre.status !== 'active' && (
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', height: 20, padding: '0 8px',
-                      borderRadius: 'var(--radius-md)', background: 'var(--color-purple-lt)', color: 'var(--color-purple-dk)',
-                      fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, letterSpacing: '0.04em',
-                    }}>PENDING</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          {entre && <BatchEntreSection entre={entre} />}
 
           <div className="nm-section">
             <div className="nm-section-title"><Icon name="receipt" size={13} />Billing</div>
@@ -192,22 +231,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             </div>
           </div>
 
-          <div className="nm-section">
-            <div className="nm-section-title"><Icon name="users" size={13} />Scholars</div>
-            <div className="nm-scholars-grid">
-              {[
-                { label: 'Approved seats', value: batch.approvedSeats, color: 'var(--color-text-primary)' },
-                { label: 'Enrolled', value: batch.scholars, color: 'var(--color-blue-dk)' },
-                { label: 'Completers', value: batch.completers, color: 'var(--color-green-dk)' },
-                { label: 'Dropouts', value: batch.dropouts, color: (batch.dropouts ?? 0) > 0 ? 'var(--color-red-dk)' : 'var(--color-text-muted)' },
-              ].map((s) => (
-                <div key={s.label} className="nm-scholar-card">
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: s.color }}>{s.value}</div>
-                  <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 5 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <BatchScholarsGrid batch={batch} />
 
           <div className="nm-section">
             <div className="nm-section-title"><Icon name="info-circle" size={13} />Remarks</div>

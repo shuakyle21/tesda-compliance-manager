@@ -20,24 +20,49 @@ export function LifecyclePipeline({ steps }: { steps: LifecycleStage[] }) {
   );
 }
 
-function Step({ step, index, isLast, dense }: { step: LifecycleStage; index: number; isLast: boolean; dense: boolean }) {
+interface StepFlags {
+  isDone: boolean;
+  isActive: boolean;
+  isOverdue: boolean;
+  isEntre: boolean;
+  entrePending: boolean;
+}
+
+function deriveStepFlags(step: LifecycleStage): StepFlags {
   const isDone = step.status === 'done';
   const isActive = step.status === 'active';
   const isOverdue = (step.status as string) === 'overdue';
   const isEntre = step.key === 'entre';
   const entrePending = isEntre && !isDone && !isActive && !isOverdue;
+  return { isDone, isActive, isOverdue, isEntre, entrePending };
+}
 
-  let circleStyle: { background: string; borderColor: string; color: string } = {
-    background: 'var(--color-surface)',
-    borderColor: 'var(--color-border-strong)',
-    color: 'var(--color-text-muted)',
-  };
-  if (entrePending) circleStyle = { background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)', color: 'var(--color-purple-dk)' };
-  if (isDone) circleStyle = { background: 'var(--color-green)', borderColor: 'var(--color-green)', color: 'white' };
-  if (isActive) circleStyle = isEntre
-    ? { background: 'var(--color-purple)', borderColor: 'var(--color-purple)', color: 'white' }
-    : { background: 'var(--color-blue)', borderColor: 'var(--color-blue)', color: 'white' };
-  if (isOverdue) circleStyle = { background: 'var(--color-red)', borderColor: 'var(--color-red)', color: 'white' };
+function deriveCircleStyle({ isDone, isActive, isOverdue, isEntre, entrePending }: StepFlags) {
+  if (isOverdue) return { background: 'var(--color-red)', borderColor: 'var(--color-red)', color: 'white' };
+  if (isActive) {
+    return isEntre
+      ? { background: 'var(--color-purple)', borderColor: 'var(--color-purple)', color: 'white' }
+      : { background: 'var(--color-blue)', borderColor: 'var(--color-blue)', color: 'white' };
+  }
+  if (isDone) return { background: 'var(--color-green)', borderColor: 'var(--color-green)', color: 'white' };
+  if (entrePending) return { background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)', color: 'var(--color-purple-dk)' };
+  return { background: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', color: 'var(--color-text-muted)' };
+}
+
+function StepIcon({ flags, index }: { flags: StepFlags; index: number }) {
+  const { isDone, isActive, isOverdue, isEntre, entrePending } = flags;
+  if (isDone) return <Icon name="check" size={12} />;
+  if (isActive && !isEntre) return <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19" /></svg>;
+  if (isActive && isEntre) return <Icon name="briefcase" size={11} />;
+  if (isOverdue) return <Icon name="alert-triangle" size={11} />;
+  if (entrePending) return <Icon name="briefcase" size={11} />;
+  return <>{index + 1}</>;
+}
+
+function Step({ step, index, isLast, dense }: { step: LifecycleStage; index: number; isLast: boolean; dense: boolean }) {
+  const flags = deriveStepFlags(step);
+  const { isDone, isActive, isEntre } = flags;
+  const circleStyle = deriveCircleStyle(flags);
 
   const lineColor = isDone ? 'var(--color-green)' : 'var(--color-border)';
   const labelSize = dense ? 9 : 10;
@@ -61,12 +86,7 @@ function Step({ step, index, isLast, dense }: { step: LifecycleStage; index: num
         ...circleStyle,
         animation: isActive ? 'pipeline-pulse 2s ease-in-out infinite' : 'none',
       }}>
-        {isDone && <Icon name="check" size={12} />}
-        {isActive && !isEntre && <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19" /></svg>}
-        {isActive && isEntre && <Icon name="briefcase" size={11} />}
-        {isOverdue && <Icon name="alert-triangle" size={11} />}
-        {entrePending && <Icon name="briefcase" size={11} />}
-        {!isDone && !isActive && !isOverdue && !isEntre && (index + 1)}
+        <StepIcon flags={flags} index={index} />
       </div>
       <div style={{ marginTop: 8, fontSize: labelSize, fontWeight: isEntre ? 600 : 500, textAlign: 'center', color: labelColor, letterSpacing: '0.02em', lineHeight: 1.2 }}>
         {step.label}
