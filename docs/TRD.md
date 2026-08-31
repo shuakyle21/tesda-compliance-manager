@@ -69,7 +69,7 @@ database via Row Level Security (RLS), keyed off the Clerk JWT.
 | --- | --- | --- | --- |
 | Primary data layer | Supabase Postgres (direct from Next server) | Schema, RLS, Storage, and seed data already exist in one migration; zero extra infra for a ~5-user internal tool. | No central business-logic service yet; logic lives in `lib/` and DB. |
 | Auth provider | Clerk | Already wired (`@clerk/nextjs`, ClerkProvider, proxy). Off-loads session/MFA/account UI. | Two identity stores to reconcile (Clerk user ↔ `profiles` row). |
-| Authorization | Supabase RLS keyed on Clerk JWT `sub` | Defense-in-depth: even if a query is wrong, the DB denies cross-tenant rows. Tenant isolation is a P0 success metric (100% scoped). | RLS helper functions add query cost; must keep JWT template correct. |
+| Authorization | Supabase RLS keyed on Clerk JWT `sub` | Defense-in-depth: even if a query is wrong, the DB denies cross-tenant rows. Tenant isolation is a P0 success metric (100% scoped). | RLS helper functions add query cost; must keep Clerk third-party auth enabled on both sides. |
 | App framework | Next.js 16 App Router + RSC | Server Components fetch role-scoped data server-side; secrets never reach the client. Matches existing `app/` tree. | RSC + client-island mental model; streaming/caching nuances. |
 | Future backend | Express.js on Node/TypeScript (recommended, **not** built) | Team's TypeScript/Node familiarity; same language as the app, so `modules/*/domain` business rules and `shared/types.ts` DTOs are reused directly instead of reimplemented in another language; conventional API/middleware/queue/report layer if the tool outgrows direct-Supabase. | Documented as future only; must not block MVP or appear "implemented". |
 
@@ -135,17 +135,22 @@ returned (PRD FR-01). The `modules/tenancy/domain/profile.ts` types (`Profile`,
 
 `lib/supabase/server.ts` is the implemented bridge:
 
-1. `auth()` (Clerk) yields `getToken({ template: 'supabase' })`.
-2. The Clerk-signed JWT is attached as `Authorization: Bearer <token>` on a
-   `supabase-js` client created with the **anon** key (never the service role).
+1. `auth()` (Clerk) yields `getToken()` — no template argument.
+2. The token is supplied through the `accessToken` client option (which re-fetches
+   on expiry) on a `supabase-js` client created with the **anon** key (never the
+   service role). A missing token throws rather than degrading to `anon`.
 3. Inside Postgres, RLS helper functions read the JWT:
    `app_private.current_clerk_user_id()` resolves the user from
    `auth.jwt() ->> 'sub'` (with `clerk_user_id` / `app_metadata.clerk_user_id`
    fallbacks).
 
-**Requirement:** a Clerk JWT template named exactly `supabase` must exist and
-include the Clerk user id as `sub`. This is an environment/config dependency
-(Section 14) and a top operational failure mode if misconfigured.
+**Requirement:** Clerk's native third-party auth integration must be enabled on
+both sides — Clerk (`dashboard.clerk.com/setup/supabase`) and Supabase
+(Authentication → Third-Party Auth), mirrored locally in
+`supabase/config.toml` `[auth.third_party.clerk]`. The plain session token
+already carries the Clerk user id as `sub`, which is all the RLS helpers read.
+Custom JWT templates are deprecated and must not be reintroduced. This is an
+environment/config dependency (Section 14) and a top operational failure mode.
 
 ### 3.3 Authorization (RLS) — implemented helper functions
 
@@ -499,7 +504,7 @@ mutations (re-render the Server Component path or revalidate).
 | --- | --- |
 | RLS | All tenant-owned tables RLS-enabled; cross-tenant reads/writes denied by `app_private.*` helpers. Viewer writes always denied; trainer writes limited to assigned batches/audience. |
 | Token handling | Service role key **never** in browser code or client bundle. Server uses anon key + Clerk bearer JWT (`lib/supabase/server.ts`). |
-| Clerk JWT validation | RLS reads `auth.jwt() ->> 'sub'`; the `supabase` JWT template must be present and correct. Treat a missing/invalid template as a hard failure (no data, not silent empty). |
+| Clerk JWT validation | RLS reads `auth.jwt() ->> 'sub'`; Clerk third-party auth must be enabled on both sides. Treat a missing/invalid token as a hard failure — throw, never a silent empty result. |
 | Field-level exposure | Trainer DTOs omit billing/financial/NTP-lag/BSRS fields server-side, not just hidden in CSS. |
 | Input validation | Validate all inputs server-side (file type/size, CSV headers/rows, date ranges, enums). Import must not inject unauthorized tenants. |
 | Error hygiene | Never return raw Supabase/SQL errors, table names, stack traces, or internal IDs to the UI. Map to friendly operational messages. |
@@ -578,13 +583,13 @@ Target: **WCAG 2.2 AA** (PRD success metric + `docs/UI_UX_MODAL_AUDIT.md`).
 ```text
 Vercel (Next.js 16)  ──HTTPS──▶  Supabase (hosted Postgres + Storage)
         │
-        └── Clerk (hosted auth, JWT template "supabase")
+        └── Clerk (hosted auth, native third-party auth integration)
 ```
 
 - **Frontend:** Vercel, zero-config Next.js build.
 - **Database/Storage:** Supabase hosted project; schema applied via the migration
   in `supabase/migrations/`. New migrations are additive and reviewed.
-- **Identity:** Clerk hosted; requires a JWT template named `supabase`.
+- **Identity:** Clerk hosted; requires third-party auth enabled with Supabase (no JWT template).
 
 ### Environment variables
 

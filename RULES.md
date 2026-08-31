@@ -22,7 +22,9 @@ reviewing, or merging code.
 2. **Never manually filter by tenant in JS.** RLS scopes rows. A JS-side tenant filter is a bug
    even when it returns the right answer — it signals the query was written assuming no RLS. **[review]**
 3. **The service-role key must never reach client code.** Server-side clients use the anon key
-   plus the Clerk JWT (template named exactly `supabase`) as a bearer token. **[review]**
+   plus the Clerk session token, supplied through the `accessToken` callback (never a
+   hand-set `Authorization` header, and never a JWT template — those were deprecated
+   1 Apr 2025). A missing token must throw, never silently query as `anon`. **[review]**
 4. **Viewer is read-only and must be server-denied on writes.** Not just hidden. **[review]**
 5. **Trainer-facing DTOs omit billing deadline, billing preparation, NTP lag, BSRS, and financial
    fields server-side** — not CSS-hidden. **[review]**

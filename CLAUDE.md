@@ -19,16 +19,26 @@ pnpm dev              # Next.js dev server
 pnpm build            # production build
 pnpm lint             # ESLint (flat config; static dirs below are globally ignored)
 pnpm exec tsc --noEmit # typecheck (strict) — no dedicated script
+pnpm test             # Vitest unit suite (tests/unit/)
 pnpm preview          # serve the static design preview bundle on :5000
 ```
 
-Package manager is **pnpm** (`packageManager` field in `package.json`; `pnpm-lock.yaml` is the committed lockfile — do not add `package-lock.json`/`yarn.lock`). There is **no test runner yet** — `pnpm test` is a placeholder (`echo "No tests defined."`). Standing up Vitest + real-Supabase integration tests is Phase 0.4 of `docs/IMPLEMENTATION_PLAN.md`; when tests exist, mappers and module `domain/` layers must be unit-tested with fixed as-of dates, and RLS/tenant-isolation tests run against real Supabase (no mocks).
+Package manager is **pnpm** (`packageManager` field in `package.json`; `pnpm-lock.yaml` is the committed lockfile — do not add `package-lock.json`/`yarn.lock`).
+
+**Node 22+ is required.** Vitest 4 bundles rolldown, which calls `util.styleText` with an
+array argument; on Node 21 or older that throws `ERR_INVALID_ARG_VALUE` at startup and the
+suite will not run at all. The failure looks nothing like a test failure — it is a bundler
+stack trace before any test loads.
+
+Vitest is stood up (`pnpm test`, specs in `tests/unit/`). Mappers and module `domain/`
+layers are unit-tested with fixed as-of dates. Real-Supabase RLS/tenant-isolation
+integration tests are still outstanding and must run against the real project (no mocks).
 
 ## Architecture
 
 Single **Next.js 16 App Router** app (React 19, TS strict, Tailwind v4) talking directly to **Supabase** (Postgres + Storage), with **Clerk** as identity. No separate backend; Express.js (Node/TypeScript) is documented as the future-only backend direction — do not build it or treat it as present.
 
-**Auth chain:** `proxy.ts` (Clerk middleware, protects everything except `/sign-in`, `/sign-up`) → `lib/supabase/server.ts` attaches the Clerk JWT (template named exactly `supabase`) as a bearer token on an **anon-key** client → Postgres RLS (`app_private.*` helper functions from the migration) makes every authorization decision. **RLS is the security boundary; UI hiding is usability only.** The service-role key must never reach client code.
+**Auth chain:** `proxy.ts` (Clerk middleware, protects everything except `/sign-in`, `/sign-up`) → `lib/supabase/server.ts` attaches the Clerk session token via the `accessToken` callback on an **anon-key** client (Clerk's native third-party auth integration — JWT templates were deprecated 1 Apr 2025; this schema needs no custom claims because RLS reads only `sub`) → Postgres RLS (`app_private.*` helper functions from the migration) makes every authorization decision. **RLS is the security boundary; UI hiding is usability only.** The service-role key must never reach client code.
 
 **Code layout — domain modules (DDD-influenced, TES-68).** Code is grouped by domain, not by file type:
 
