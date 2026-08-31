@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TVI-CAMS — Data Contract</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f5f5f5;--ink:#2d3142;--muted:#4f5d75;--soft:#7a8399;--accent:#eb6c36;--rule:rgba(45,49,66,0.12);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Geist',system-ui,sans-serif;padding:3rem 2rem;}
+  .wrap{max-width:960px;margin:0 auto}
+  .eyebrow{font-family:'Geist Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem}
+  h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:1.75rem;margin:0 0 .5rem}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 2rem;max-width:60ch}
+  svg{width:100%;height:auto;display:block}
+  footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:8px;letter-spacing:.1em;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<p class="eyebrow">TVI-CAMS / Architecture</p>
+<h1>Data contract</h1>
+<p class="sub">Every entity contract runs fetch → map → derive and returns a discriminated snapshot, so a Server Component maps state straight to UI. The three states are not interchangeable.</p>
+
+<svg viewBox="0 0 880 600" role="img" aria-labelledby="datacontract-title datacontract-desc">
+<title id="datacontract-title">TVI-CAMS data contract pipeline and snapshot states</title>
+<desc id="datacontract-desc">A module data layer fetches rows through row-level security, maps them from generated database types to UI domain types, and derives computed values. It returns one of three snapshot states: ok with rows, sync-failed which must show a banner, or unconfigured which silently falls back to the mock dataset.</desc>
+
+<defs>
+  <marker id="dc-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+</defs>
+
+<rect width="100%" height="100%" fill="#f5f5f5"/>
+
+<!-- connectors -->
+<line x1="288" y1="148" x2="336" y2="148" stroke="#4f5d75" stroke-width="1" marker-end="url(#dc-arrow)"/>
+<line x1="544" y1="148" x2="592" y2="148" stroke="#4f5d75" stroke-width="1" marker-end="url(#dc-arrow)"/>
+<line x1="696" y1="192" x2="696" y2="284" stroke="#4f5d75" stroke-width="1" marker-end="url(#dc-arrow)"/>
+
+<rect x="708" y="222" width="72" height="12" rx="2" fill="#f5f5f5"/>
+<text x="712" y="231" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">RETURNS</text>
+
+<!-- 1 fetch -->
+<rect x="88" y="112" width="200" height="80" rx="6" fill="#f5f5f5"/>
+<rect x="88" y="112" width="200" height="80" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="100" y="120" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="122" y="129" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">1 · I/O</text>
+<text x="188" y="154" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">fetch</text>
+<text x="188" y="174" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">RLS scopes rows</text>
+
+<!-- 2 map -->
+<rect x="336" y="112" width="208" height="80" rx="6" fill="#f5f5f5"/>
+<rect x="336" y="112" width="208" height="80" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="348" y="120" width="56" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="376" y="129" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">2 · PURE</text>
+<text x="440" y="154" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">map</text>
+<text x="440" y="174" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">DB row → domain type</text>
+
+<!-- 3 derive -->
+<rect x="592" y="112" width="208" height="80" rx="6" fill="#f5f5f5"/>
+<rect x="592" y="112" width="208" height="80" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="604" y="120" width="64" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="636" y="129" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">3 · COMPUTED</text>
+<text x="696" y="154" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">derive</text>
+<text x="696" y="174" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">lifecycle, urgency, dates</text>
+
+<!-- snapshot container -->
+<rect x="88" y="288" width="712" height="160" rx="6" fill="#f5f5f5"/>
+<rect x="88" y="288" width="712" height="160" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+<rect x="100" y="298" width="72" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+<text x="136" y="307" fill="#4f5d75" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">SNAPSHOT</text>
+<text x="192" y="308" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif">Discriminated union — the caller must handle all three</text>
+
+<!-- state: ok -->
+<rect x="112" y="332" width="216" height="96" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="220" y="360" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">ok</text>
+<text x="220" y="382" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">live rows, render them</text>
+<text x="220" y="402" fill="#7a8399" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">empty is a REAL answer —</text>
+<text x="220" y="416" fill="#7a8399" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">never swap in mocks here</text>
+
+<!-- state: sync-failed — FOCAL -->
+<rect x="344" y="332" width="216" height="96" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+<text x="452" y="360" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">sync-failed</text>
+<text x="452" y="382" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">configured, but errored</text>
+<text x="452" y="402" fill="#eb6c36" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">MUST surface the banner</text>
+<text x="452" y="416" fill="#7a8399" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">never leak the raw error</text>
+
+<!-- state: unconfigured -->
+<rect x="576" y="332" width="200" height="96" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+<text x="676" y="360" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist Mono',monospace" text-anchor="middle">unconfigured</text>
+<text x="676" y="382" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">no Supabase env</text>
+<text x="676" y="402" fill="#7a8399" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">falls back to mocks,</text>
+<text x="676" y="416" fill="#7a8399" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">silently, by design</text>
+
+<!-- legend -->
+<line x1="32" y1="484" x2="848" y2="484" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<text x="32" y="504" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".14em">LEGEND</text>
+<rect x="120" y="494" width="16" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+<text x="144" y="504" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace">MOST OFTEN MISHANDLED</text>
+<rect x="352" y="494" width="16" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="376" y="504" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace">PIPELINE STAGE / LIVE STATE</text>
+<rect x="600" y="494" width="16" height="12" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+<text x="624" y="504" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace">DEV-ONLY FALLBACK</text>
+<text x="32" y="546" fill="#7a8399" font-size="9" font-family="'Geist Mono',monospace">Only a module data/ layer may import lib/supabase/database.types.ts. Components receive domain types only.</text>
+</svg>
+
+<footer>TVI-CAMS · verified against modules/batches/data/batches.ts (reference contract) · 2026-09-01</footer>
+</div>
+</body>
+</html>
