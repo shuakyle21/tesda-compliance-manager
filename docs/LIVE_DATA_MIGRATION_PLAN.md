@@ -1,5 +1,23 @@
 # Live-Data Migration Plan — mock fixtures → real Clerk + Supabase
 
+> **Status update — 2026-09-01. Phase 1 (code half) is DONE.**
+> `lib/supabase/server.ts` and `lib/supabase/client.ts` now use Clerk's native
+> third-party auth integration: `getToken()` with no template, supplied through the
+> `accessToken` client option, throwing when no token exists instead of silently
+> querying as `anon`. `tests/unit/supabase-server.test.ts` (7 tests, previously 4 red)
+> is green. `supabase/config.toml` `[auth.third_party.clerk]` is enabled for local dev.
+> The A1 and A10 findings below are resolved in code; the diagnosis is kept as history.
+>
+> **Still required, and neither can be done from code:** enable the integration in the
+> Clerk dashboard (`dashboard.clerk.com/setup/supabase`) and in the Supabase dashboard
+> (Authentication → Third-Party Auth). Until both are on, the token is issued but the
+> hosted project will not trust it.
+>
+> Appendix A's seeding phase also landed: 5 batches / 89 learners / 40 documents are in
+> the project (migration `20260831120000_seed_dev_operational_data.sql`).
+
+
+
 **Status:** Draft for review · **Date:** 2026-08-31 · **Audience:** solo junior developer
 
 **Supersedes** the "no Supabase env vars" premise in the TES-82 cutover map, which is stale.
