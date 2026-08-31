@@ -524,3 +524,426 @@ the Express backend (documented as future-only — do not build it).
 **Sequencing note:** Phase 1c and Phase 4 are related. 1c stops the URL from choosing your role;
 4 builds the flow that assigns the real one. Between them, your single hand-inserted membership row
 is the only thing granting anyone access — see step 18.
+
+---
+---
+
+# Appendix A — Per-module inventory and per-entity contract gaps
+
+**Added 2026-08-31.** Extends §1 and §4 of this plan with a module-by-module inventory of what
+reads mocks, and a per-entity table of the schema/mapper work each screen needs. It does **not**
+restate §1.3–§1.5 or the Phase 1 auth fix — those stand as written. Section references below
+(§1.2, §4 Phase 1b, step 17, …) point back into the plan above.
+
+---
+
+## A.0 Check this first — is the reference data actually there?
+
+The canonical migration seeds reference data **idempotently**, at
+`supabase/migrations/20260528160300_create_tenant_scoped_schema.sql:766-835`:
+
+- `tenants` — AKB, J3ED, NEN (the same three schools, with the same codes, as mock `TENANTS`)
+- `scholarship_programs` — TWSP, CFSP
+- `program_document_requirements` — **8 keys**, cross-joined to both programs
+- `program_billing_rules` — 80% threshold per program
+- `storage.buckets` — `compliance-evidence`, private, 50 MB cap
+
+All three migrations are recorded as applied (`list_migrations`: `20260528160300`,
+`20260705070510`, `20260717054607`). But `list_tables` reports `tenants: 0`,
+`scholarship_programs: 0`, `program_document_requirements: 0` alongside
+`profile_tenant_memberships: 1` — which is foreign-key impossible. Those are `reltuples`
+planner estimates on tables that have never been `analyze`d, so at least one number is wrong.
+This appendix cannot settle it: `execute_sql` is denied to agents (rule 36).
+
+**You run one query, and it changes the size of Phase 3:**
+
+```sql
+select
+  (select count(*) from public.tenants)                        as tenants,
+  (select count(*) from public.scholarship_programs)           as programs,
+  (select count(*) from public.program_document_requirements)  as requirements,
+  (select count(*) from public.profile_tenant_memberships)     as memberships;
+```
+
+| If | Then |
+|---|---|
+| requirements = 16 (8 keys × 2 programs) | Reference data is live. Phase 3 shrinks to `batches`, `learners`, `documents`, `activity_log`. Step 17's doc-key reconciliation becomes an **additive migration against existing rows**, not a seed edit. |
+| requirements = 0 | `mapDocumentsMap` has nothing to backfill from, so **every document on every batch resolves to `untracked`** (ADR-004) and compliance renders "—" rather than a percentage. Seeding the catalog moves from "nice" to "the screen is blank without it." |
+
+---
+
+## A.1 Module-by-module inventory
+
+The single most useful fact in this appendix: **five data contracts are fully written and wired to
+nothing.** Only `getBatchesSnapshot` has a caller outside its own `data/` directory.
+
+```
+                        contract exists?   route wired?   reads mocks?
+batches      ████████████    yes              YES (2)        yes (fallback)
+documents    ████████░░░░    yes              no             yes (100%)
+activity     ████████░░░░    yes              no             yes (100%)
+learners     ████████░░░░    yes              no             n/a (unreachable)
+metrics      ██████░░░░░░    derive-only      no             yes (100%)
+billing      ████░░░░░░░░    derive-only      YES            yes (mock reference data)
+analytics    ░░░░░░░░░░░░    no               no             yes (100%)
+reports      ░░░░░░░░░░░░    no               no             yes (100%)
+tenancy      ░░░░░░░░░░░░    no               no             yes (100%)
+attendance   ░░░░░░░░░░░░    NO TABLE         README only    —
+lamr         ░░░░░░░░░░░░    tables, no code  README only    —
+settings     ░░░░░░░░░░░░    no               UI only        —
+notifications░░░░░░░░░░░░    no               README only    —
+```
+
+### The detail
+
+| Module | Data contract | Consumed by | Mock reads | Status |
+|---|---|---|---|---|
+| **batches** | `modules/batches/data/batches.ts` — the reference implementation | `app/(dashboard)/dashboard/page.tsx:221`, `app/(dashboard)/billing/page.tsx:57` | fallback in both routes | **Live-capable.** Blocked only by §Phase 1. |
+| **batches (learners)** | `modules/batches/data/learners.ts` → `getBatchLearnersSnapshot(batchId)` | **nothing** | — | Written, **unwired**. Roster only exists as `Batch.scholars_list` from mock enrichment. |
+| **batches (metrics)** | `modules/batches/data/metrics.ts` → `getDashboardMetrics` (pure derive) | **nothing** — the dashboard uses `modules/batches/domain/metrics.ts` instead | — | Duplicate of the domain function. Decide which survives. |
+| **documents** | `modules/documents/data/documents.ts` → `getDocumentRequirementsSnapshot`, `getBatchDocumentsSnapshot` | **nothing** | `app/(dashboard)/documents/page.tsx:6`, `DocumentsView.tsx:20`, `TableView.tsx:20`, `DocumentStatusDonut.tsx:14`, `AlertsPanel.tsx:31` | Written, **unwired**. `/documents` is 100% mock. |
+| **activity** | `modules/activity/data/activity.ts` → `getActivitySnapshot(limit)` | **nothing** | `app/(dashboard)/activity-log/page.tsx:9` | Written, **unwired**. |
+| **billing** | `modules/billing/data/billing.ts` — derive-only, **imports mock reference data** (`billing.ts:12`) | `app/(dashboard)/billing/page.tsx:88` | `DOCUMENT_REQUIREMENTS`, `TENANTS` from `shared/mocks` | Live batches + mock reference data. **See A.3 — the gate cannot open.** |
+| **analytics** | none | `app/(dashboard)/analytics/page.tsx:11` | `MOCK_BATCHES`, `DOCUMENT_REQUIREMENTS` | 100% mock. Charts are derive-over-`Batch[]`, so it goes live for free once the route swaps. |
+| **reports** | none | `app/(dashboard)/report/page.tsx:10-11`, `ReportView.tsx:24` | `MOCK_BATCHES` + `TENANTS` | 100% mock. Uses `ALL_BATCHES` scope (includes completed cohorts). |
+| **tenancy** | `modules/tenancy/domain/profile.ts` only (pure) | — | `Sidebar.tsx:20`, `profile/page.tsx:18`, `report`, `billing` all read mock `TENANTS` | **No fetch layer at all.** The `tenants` table is never queried by any code. |
+| **shell** | none | `MetricsRow.tsx:11` reads `MOCK_BATCHES` directly | yes | A `shared`-adjacent component reading fixtures — the chrome shows mock KPIs on every screen, including live ones. |
+| **attendance** (FR-07) | **no table, no code** | 4 placeholder routes under `app/(dashboard)/trainer/` | — | See A.4. |
+| **lamr** (FR-08) | 4 tables exist (`lamr_reports`/`_outcomes`/`_activities`/`_entries`), **zero TypeScript** | — | — | Schema ahead of code — the only module in that direction. |
+| **import-export** | `modules/import-export/data/learnerImport.ts` | `ImportCsvModal` | — | Write path; live-capable, untested against real RLS. |
+| **settings / notifications** | none | `SettingsModal` is UI-only | — | Out of scope for this migration. |
+| **auth** | `modules/auth/data/{auth,role,provisioning}.ts` | layout, dashboard, billing | — | Live. `role.ts` is the §Phase 1c escalation surface. |
+
+### Doc drift found while inventorying
+
+The four trainer routes are placeholders whose copy still says **"Laravel must verify the trainer
+is assigned to this batch"** (`trainer/classes/[batchId]/attendance/page.tsx:24`). Laravel was
+never implemented. Fix the copy when these routes get built, or now — it is the same class of trap
+as the `proxy.ts` drift noted in §1.5.
+
+---
+
+## A.2 The trap nobody has hit yet: `Batch` is mostly unfillable
+
+`mapBatchRow` (`modules/batches/data/batches.ts:180-229`) already defaults a large share of the
+`Batch` type because the schema has no column for it. **These fields render as empty or zero the
+moment §Phase 1 succeeds** — the app will look *more* broken right after the fix, and that is
+expected, not a regression.
+
+| `Batch` field | Source today | Disposition |
+|---|---|---|
+| `id`, `tenantId`, `name`, `qualification`, `ncLevel`, `trainer`, `trainerId`, `scholars`, `trainingStart`, `trainingEnd`, `status`, `bsrs`, `progressPct`, `updatedAt` | real columns | ✅ done |
+| `program` | join on `scholarship_programs.code` | ✅ done |
+| `lifecycle[]` | derived from the single `current_stage` enum | ⚠️ **stage dates are all `''`.** Real per-stage dates need `activity_log` reconstruction. `LifecyclePipeline` will render bare labels. |
+| `documents{}` | embedded `documents(*)` + requirement backfill | ⚠️ correct, but keyed to the 8 DB keys — see A.3 |
+| `billingDeadline`, `daysToBilling` | **stands in with `end_date`** | 🔴 add a real `billing_deadline` column, or hedge the label (§Phase 6 step 28). Still true as of today. |
+| `ntpLag` | `0` | needs `ntp_date` column |
+| `tipDate` | `''` | needs `tip_date` column |
+| `duration`, `currentDay`, `totalDays` | `0` | 🔴 **needs the attendance/sessions table — see A.4** |
+| `trainingDays`, `trainingDaySchedule` | `''` / `[]` | needs a schedule column (or a `batch_schedule` table) |
+| `notes` | `''` | add a `notes` column (trivial) |
+| `remark` | `official_system_reference` | ⚠️ mismatched semantics — the mock `remark` is a coordinator-facing summary sentence; the column is an external system reference. Pick one. |
+| `entreStart`, `entreEnd` | absent | ENTRE is UI-only per the enum bridge. Decide: real dates, or drop from the type. |
+| `approvedSeats`, `completers`, `dropouts` | absent | derivable from `learners` once seeded (`is_active`, `assessment_result`) |
+| `aouDate`, `ntpDate`, `reportDate`, `assessedDate` | absent | needs either columns or `activity_log` reconstruction |
+| `egace` (`EgaceCounts`) | mock enrichment | derivable from `learners.assessment_result` **except** `employed` — no employment column exists |
+| `employmentFollowUp`, `followUpDue`, `followUpReportDate` | mock enrichment | 🔴 no schema at all. `learners` has no employment fields; `ScholarRow` declares 10 of them (`employmentStatus`, `dateEmployed`, `occupation`, `employer`, `salary`, …). |
+| `scholars_list` (`ScholarRow[]`) | mock enrichment | `mapLearnerRow` supplies ~8 of `ScholarRow`'s 28 fields. Sex, DOB, age, civil status, education, nationality, client class, contact, email have **no columns**. |
+| `competencies`, `competenciesDone`, `currentCompetency` | mock enrichment | maps onto `lamr_outcomes` / `lamr_activities` — the tables exist, the code does not |
+| `hoursPerDay`, `remainingDays`, `remainingHours`, `scheduleAdjustments` | mock enrichment | 🔴 attendance-dependent — see A.4 |
+
+**Screens that will empty out:** `BatchModal` (schedule, competencies, notes, remark tabs),
+`EgaceOutcomes`, `ProgressTrend`, the trainer-curriculum views, `ReportView`'s roster export.
+
+**Recommendation:** rather than adding ~15 columns at once, split `Batch` in the type layer —
+a `Batch` core that the schema genuinely backs, and an explicitly optional enrichment block that
+UI must handle as absent. This is a split *within* `shared/types.ts`, not the per-module type split
+that RULES.md rule 16 defers — rule 16 is about moving types into `modules/`, which would break
+`shared/mocks/seed.ts`. Restructuring the interface in place does not. That is cheaper than pretending every field will arrive, and it makes
+"this data does not exist yet" a compile-time fact instead of a blank card.
+
+---
+
+## A.3 🔴 The document-key mismatch makes billing non-functional on live data
+
+The plan's step 17 calls this "reconcile before seeding." It is worse than imprecision. The
+arithmetic, traced end to end:
+
+```
+mock DOCUMENT_REQUIREMENTS (shared/mocks/seed.ts:50-63)     12 keys
+DB program_document_requirements (migration :789-798)        8 keys
+
+deriveDocReadiness (modules/billing/data/billing.ts:55-62)
+  supporting = requirements.filter(critical && stage ∈ {aou,ntp,tip,train})
+             = aou, ntp, tip_report, training_sched, master_list, attendance   → requiredTotal = 6
+                                     ^^^^^^^^^^^^^^  ^^^^^^^^^^^
+                                     MOCK-ONLY       MOCK-ONLY  (DB has `training_schedule`; no master_list at all)
+
+  verified = supporting.filter(isDocOnFile)
+  isDocOnFile(untracked) === false        ← ADR-004 gating rule, deliberate
+
+  on a live batch (admin/coordinator): max verified = 4  (aou, ntp, tip_report, attendance)
+  on a live batch (trainer):             max verified = 4  — same four; `attendance` is seeded
+                                         audience='trainer', and the documents SELECT policy
+                                         narrows by audience ONLY on the trainer branch
+                                         (`audience in ('trainer','all')`). admin/coordinator go
+                                         through `can_manage_tenant` and see every audience.
+
+billingGate (modules/billing/domain/readiness.ts:53)
+  docsVerified = verified >= requiredTotal   →   4 >= 6   →   FALSE, always
+  ready = thresholdMet && docsVerified       →   FALSE, always
+```
+
+**No live batch can ever pass the billing gate**, regardless of its documents, because two
+requirements in the denominator can never appear in the numerator. Every card reads
+"4 of 6 documents" forever and no `.docx` can be generated. This is a *silent* failure — the gate
+closing looks exactly like a batch that is genuinely not ready.
+
+**Fix before Phase 3, not during it.** Three options:
+
+1. **Extend the DB catalog** (additive migration): add `master_list`, and rename or alias
+   `training_schedule` → `training_sched`. Keeps the mock catalog as the vocabulary of record.
+2. **Retire the mock catalog** as the default argument: `deriveDocReadiness` and
+   `getDashboardMetrics` take the live requirement list, fetched via
+   `getDocumentRequirementsSnapshot`. Cleaner, and it removes a `shared/mocks` import from a
+   `data/` layer.
+3. **Both** — extend the DB catalog to the 12-key vocabulary *and* stop defaulting to the mock
+   array. This is the recommendation: the 12 keys are the compliance vocabulary the product
+   documents, and the 8 were a first-pass seed.
+
+**Also amends §Phase 1b step 6.** Deleting `&& snapshot.batches.length > 0` in
+`app/(dashboard)/billing/page.tsx:62-63` is necessary but not sufficient: on the `ok` branch,
+`modules/billing/data/billing.ts:12` still imports mock `DOCUMENT_REQUIREMENTS` and `TENANTS`.
+And `resolveTenant(batch.tenantId)` (`billing.ts:65`) looks a **live tenant UUID** up in an array
+keyed `tnt_akb` / `tnt_j3ed` / `tnt_nenita` → no match → the fallback `t?.name ?? tenantId`
+**prints the raw UUID as the school name in the billing statement header.** That is RULES.md rule
+6 (never leak internal IDs to the UI), reached on the live path. Give `tenancy` a real fetch layer
+in the same change.
+
+---
+
+## A.4 Two entities that need schema, not mappers
+
+Both touch facts that `RULES.md` lists as locked, so neither can be quietly deferred.
+
+### Attendance (FR-07) — no table exists
+
+`modules/attendance/` is a README. There is no attendance, session, or schedule table anywhere in
+the migration history. But:
+
+- **Locked fact:** `progress = sessions_held / total_sessions`, total = nominal hours ÷ 8,
+  snapshotted on the batch.
+- **Locked fact:** a scholar with **≥5 absences is ineligible**.
+- **The schema contradicts both:** `batches.progress_percent` is a stored `integer` with a
+  `check between 0 and 100`, written by whoever inserts the row. It is not derived from anything.
+  `learners` has no absence column, so ineligibility is uncomputable.
+
+So today, progress on live data is *asserted*, not measured — and the eligibility rule is
+unenforced. Minimum additive migration:
+
+```
+batches:  + total_sessions integer     (nominal_hours / 8, snapshotted per the locked fact)
+          + sessions_held integer      (or derive from the sessions table)
+          + nominal_hours integer
+
+attendance_sessions(id, tenant_id, batch_id, session_date, session_no, held boolean,
+                    recorded_by, recorded_at, …)
+attendance_entries (id, tenant_id, session_id, learner_id, present boolean, excused boolean, …)
+```
+
+Then `progress_percent` becomes a generated/derived value, and absences become
+`count(*) where not present`. Until that lands, keep `progress_percent` but **label it as entered,
+not measured** — the same hedge §Phase 6 step 28 applies to `billingDeadline`.
+
+### Billing packets (ADR-003) — no table exists
+
+ADR-003 locks the packet lifecycle `draft → ready → generated → submitted → settled` with derived
+packet identity and derived due dates. `modules/billing/domain/packets.ts` computes packets purely
+from a `Batch`, so today a packet has **no persistent state** — nothing records that a document was
+generated, submitted, or settled, and a page reload forgets it. That is fine while billing is
+read-only, and it stops being fine the first time someone clicks Generate.
+
+ADR-003 upholds **NoLedger**, so this is deliberately *not* a full billing ledger. What is still
+needed is minimal state on the derived identity:
+
+```
+billing_packets(id, tenant_id, batch_id, track, packet_state, generated_at, generated_by,
+                submitted_at, settled_at, document_storage_path, …)
+                unique (tenant_id, batch_id, track)
+```
+
+Write the ADR-003 amendment (or a short ADR-005) *before* the migration — the projection is
+derived, and persisting a slice of a derived thing is exactly the decision an ADR should record.
+
+---
+
+## A.5 Per-screen snapshot handling
+
+Each route below needs the same three (soon four, per §3.1) branches. This is the checklist for
+the wiring phase in A.6.
+
+| Route | Contract to call | `ok` | `sync-failed` | `unconfigured` | Also needs |
+|---|---|---|---|---|---|
+| `/dashboard` | `getBatchesSnapshot` ✅ wired | render | ⚠️ **banner is swallowed** by the empty-state early return (§A11, `:195-207`) | mocks, silent | `no-tenant-access`; six-state pass |
+| `/billing` | `getBatchesSnapshot` ✅ wired | ⚠️ **falls to mocks when empty** (§A9) | ⚠️ swallowed at `:96` | mocks, silent | A.3 catalog fix + real tenant fetch |
+| `/documents` | `getBatchesSnapshot` + `getDocumentRequirementsSnapshot` | — | — | — | 🔴 no snapshot handling at all — pure mock import |
+| `/table-view` | `getBatchesSnapshot` + requirements | — | — | — | 🔴 none |
+| `/batch-cards` | `getBatchesSnapshot` | — | — | — | 🔴 none |
+| `/analytics` | `getBatchesSnapshot` + requirements | — | — | — | 🔴 none. Charts derive; empty state matters most here (a chart of nothing is a lie) |
+| `/report` | `getBatchesSnapshot` (all-batches scope) + tenants | — | — | — | 🔴 none. Needs a completed-cohort scope the contract does not expose |
+| `/activity-log` | `getActivitySnapshot` | — | — | — | 🔴 none |
+| `/profile` | tenancy fetch (does not exist) | — | — | — | 🔴 none |
+| `MetricsRow` (all screens) | must take data as props | — | — | — | 🔴 reads `MOCK_BATCHES` inside a shell component |
+| `Sidebar` | tenancy fetch (does not exist) | — | — | — | 🔴 reads mock `TENANTS` |
+
+`RULES.md` rule 24 requires **six** states on every data screen: loading, empty, no-results,
+error/sync-failed, permission-denied, stale-data. Today only `/dashboard` has a `loading.tsx`, and
+there is no `error.tsx` anywhere (§A14). Wiring a route without its states just moves the lie.
+
+---
+
+## A.6 Where this lands in the roadmap
+
+Insert one phase; amend two.
+
+```
+Phase 1   auth chain repair                    ← unchanged, still first
+Phase 1b  stop the app from lying              ← AMEND with A.3's tenant-UUID leak
+Phase 1c  close the ?role= escalation          ← unchanged
+Phase 2   no-tenant-access state               ← unchanged
+Phase 2b  ★ NEW: reconcile the document-key catalog   (A.3)  — half a day
+Phase 2c  ★ NEW: wire the five unwired contracts       (A.1)  — 1–2 days
+Phase 3   seed batches / learners / documents  ← AMEND with A.0 and A.7
+Phase 4   tenant-assignment flow               ← unchanged, still the real blocker
+Phase 4b  ★ NEW: tenancy fetch layer                   (A.3)  — half a day
+Phase 5   retire the mock *fallback paths*     ← keep shared/mocks itself (A.7)
+Phase 6   hardening + the A.4 schema work
+```
+
+**Numbering note.** §4 above uses one running step sequence (1–34) and that stays the canonical
+checklist. The phases added here carry no step numbers — 2b, 2c and 4b are *sequencing
+constraints* slotted between existing phases, not a second numbering scheme. Cross-references in
+this appendix ("§Phase 1b step 6", "step 15", "step 18") point at §4's numbers.
+
+**Phase 2b — reconcile document keys (half a day).** Must precede any seeding. Without it billing
+is dead on live data (A.3) and every compliance percentage is computed against the wrong
+denominator.
+
+**Phase 2c — wire the five unwired contracts (1–2 days).** The cheapest real progress in this
+plan: `/documents`, `/activity-log`, `/table-view`, `/batch-cards` are each a route-file edit away
+from live. Three rules for this phase:
+
+1. **It sits after Phase 1/1b, not before.** With the token broken, every one of these returns
+   `sync-failed` and falls back to mocks — reproducing the exact "mocks rendered as live" failure
+   Phase 1b exists to kill. Wiring first would multiply the bug across four more screens.
+2. **Each route ships with its sync-failed banner and empty state in the same commit.** Never wire
+   a contract and defer the states.
+3. **One route per PR.** Each is independently shippable and independently revertible.
+
+`/analytics`, `/report`, `/profile`, `MetricsRow` and `Sidebar` need contracts written first
+(analytics and report derive from `Batch[]`, so they mostly need the route to receive a snapshot;
+profile and Sidebar need the tenancy fetch from Phase 4b).
+
+---
+
+## A.7 Seeding strategy
+
+Per `CLAUDE.md`, **`shared/mocks` stays** — it is the `unconfigured` fallback for an environment
+with no Supabase env, and it is the fixture source for the Vitest harness. Phase 5 removes the
+*fallback wiring in routes that also have live data*, not the dataset. Do not delete
+`shared/mocks/seed.ts`.
+
+**Order** is dictated by foreign keys; the plan's §Phase 3 step-15 list is correct and unchanged.
+Three things it does not yet say:
+
+**1. Batch identity — resolve before writing any INSERT.** Locked fact: *one RQM code = one
+batch*, and NTP authorization lives on the batch. `mapBatchRow` sets `Batch.id = row.batch_code`,
+so `batch_code` is both the RQM code and the string rendered in card titles and the URL. Mock
+batches are `BAT-1`, `BAT-2`, `BAT-3` — not RQM codes. Seeding them verbatim contradicts the
+locked fact; seeding real codes
+(`RQM3-2026-CFSP-1263-0009`) turns every short UI label into a 25-character string the cards were
+never designed for. **Recommendation:** seed the real RQM code into `batch_code`, add a separate
+short `display_label` column (or reuse `batch_section`), and have `mapBatchRow` prefer the label
+for `name` while `id` stays the RQM code. Decide this before the seed, not after — `batch_code`
+carries a unique constraint and is referenced by `Batch.id` everywhere.
+
+**2. Documents point at storage objects that do not exist.** Mock `DocRecord.url` values are
+`storage://akb/aou-bat1` — a pseudo-scheme with nothing behind it. The `compliance-evidence`
+bucket exists and is private, and its RLS policies key on
+`(storage.foldername(name))[1]::uuid` — **the first path segment must be the tenant UUID.** So a
+seeded document row either:
+- sets `storage_path = null` and `external_url = null` → `mapDocumentRow` yields
+  `url: null, source: null`, which is honest; or
+- gets a real uploaded object at `<tenant_uuid>/<batch_id>/<document_key>.pdf`.
+
+Prefer the first for the initial seed. A `storage_path` pointing at a missing object produces a
+download button that 404s — a compliance tool claiming evidence it does not hold.
+
+**3. Idempotency and the one irreplaceable row.** As §Phase 3 step 18 says: no `truncate`. Use
+deterministic UUIDs (`gen_random_uuid()` is *not* deterministic — hardcode literals, or derive
+them, so a re-run is a no-op) and `on conflict do nothing`. The single hand-inserted
+`profile_tenant_memberships` row is currently the only thing granting anyone access, and nothing in
+the app can recreate it until Phase 4.
+
+```
+seed order (FK-dictated)
+
+  tenants ──┬─────────────────────────────────────────┐   already seeded by the migration
+            │                                         │   (verify with A.0's query)
+  scholarship_programs ──┬── program_document_requirements
+                         └── program_billing_rules
+            │            │
+            ▼            ▼
+  profiles (webhook-created — do NOT seed)
+            │
+            ▼
+  profile_tenant_memberships   ⚠ protect the existing row
+            │
+            ▼
+  batches ──┬── learners ── (lamr_entries, later)
+            ├── documents  ⚠ storage_path = null unless a real object exists
+            └── activity_log
+```
+
+---
+
+## A.8 Risk register — additions
+
+Extends §5; does not replace it.
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| **Billing gate can never open on live data** (A.3) | **Confirmed by arithmetic** | Billing screen is decorative; no `.docx` generatable | Phase 2b, before any seeding |
+| **Tenant UUID printed as the school name** on billing statements (A.3) | **High** once Phase 1 lands | RULES.md rule 6 breach on a document-shaped surface | Phase 4b tenancy fetch, or a null-safe fallback in the same commit as Phase 1b |
+| Screens empty out right after the auth fix (A.2) | **Certain** | Looks like a regression; invites a rushed schema sprint | Pre-announce it; split `Batch` into core + optional enrichment |
+| `progress_percent` is asserted, not measured (A.4) | **Confirmed** | Billing threshold and dashboard KPIs rest on a hand-entered number, against a locked formula | Hedge the label now; attendance schema in Phase 6 |
+| Packet state lost on reload (A.4) | Medium | First "Generate" click has nowhere to record itself | ADR amendment + `billing_packets` before wiring any generate action |
+| Wiring the five contracts before Phase 1 | Medium | Multiplies the "mocks as live" bug across four more screens | Phase 2c ordering rule 1 |
+| Reference data absent (A.0) | Unknown | Every document reads untracked; compliance shows "—" everywhere | Run A.0's query first |
+| Mock `remark` vs `official_system_reference` semantics (A.2) | Medium | A coordinator reads an external system reference where a summary sentence belongs | Pick one meaning; the mapper currently picks silently |
+| Deleting `shared/mocks` in Phase 5 | Medium | Loses the `unconfigured` fallback and the future test fixtures | A.7 — remove fallback *wiring*, keep the dataset |
+
+---
+
+## A.9 Trade-offs in this appendix's recommendations
+
+**Phase 2c (wire the unwired contracts) before Phase 3 (seed).** You gain four screens that
+correctly say "no data yet" instead of confidently showing fiction, and you prove the contracts
+work against a real (empty) database before any rows exist to confuse the diagnosis. You give up
+the satisfaction of seeing data — the app looks emptier for a week.
+
+**Extending the DB catalog to 12 keys rather than trimming the mock catalog to 8.** You gain the
+compliance vocabulary the product actually documents, and `master_list` / `trainer_qual` are real
+TESDA artifacts, not fixture inventions. You give up a smaller schema, and you take on a
+migration that must run before seeding.
+
+**Splitting `Batch` into core + optional enrichment (A.2).** You gain compile-time honesty about
+what the database can supply, and every consumer is forced to handle absence. You give up ~20
+call-site edits, and `shared/mocks/seed.ts` must keep constructing the full shape — which is fine,
+since it is a fixture.
+
+**Deferring the attendance schema to Phase 6.** You gain a much shorter path to a working app.
+You give up, for that period, the ability to compute the locked progress formula or the ≥5-absence
+eligibility rule — so both must be *labelled* as unmeasured, not silently rendered as facts. For a
+compliance tool that hedge is the whole point; an unhedged number here is the single most
+expensive thing in this document.
