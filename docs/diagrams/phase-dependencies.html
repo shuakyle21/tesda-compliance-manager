@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase Dependencies</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --color-paper:#f5f5f5; --color-ink:#2d3142; --color-muted:#4f5d75; --color-accent:#eb6c36;
+    --font-sans:'Geist', system-ui, sans-serif; --font-serif:'Instrument Serif', serif; --font-mono:'Geist Mono', ui-monospace, monospace;
+  }
+  body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink);
+         min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+  .frame { max-width: 1200px; width: 100%; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em;
+             text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+  h1 { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 400;
+       letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+  svg { width: 100%; min-width: 900px; display: block; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <p class="eyebrow">Dependency graph &middot; TVI-CAMS</p>
+  <h1>Why the phases run in this order</h1>
+
+  <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="phasedeps-title phasedeps-desc">
+    <title id="phasedeps-title">Why the phases run in this order</title>
+    <desc id="phasedeps-desc">Eight migration phases arranged in four dependency ranks. Repairing the auth chain gates everything; seeding and tenant assignment each converge on two prerequisites, and retiring the mocks converges on both of those, which is why the sequence cannot be flattened into a simple list.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+    </defs>
+    <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+    <!-- ARROWS -->
+    <path d="M 460,112 V 136 Q 460,144 452,144 H 228 Q 220,144 220,152 V 176" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="112" x2="500" y2="176" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <path d="M 540,112 V 136 Q 540,144 548,144 H 772 Q 780,144 780,152 V 176" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <path d="M 220,232 V 256 Q 220,264 228,264 H 264 Q 272,264 272,272 V 296" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <path d="M 500,232 V 256 Q 500,264 492,264 H 336 Q 328,264 328,272 V 296" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <path d="M 780,232 V 256 Q 780,264 772,264 H 708 Q 700,264 700,272 V 296" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="696" y="246" width="88" height="12" rx="2" fill="#f5f5f5"/>
+    <text x="740" y="255" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">NO WRITES FIRST</text>
+
+    <line x1="380" y1="324" x2="620" y2="324" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="468" y="306" width="64" height="12" rx="2" fill="#f5f5f5"/>
+    <text x="500" y="315" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SEED FIRST</text>
+
+    <path d="M 300,352 V 376 Q 300,384 308,384 H 464 Q 472,384 472,392 V 416" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <path d="M 700,352 V 376 Q 700,384 692,384 H 536 Q 528,384 528,392 V 416" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="580" y1="444" x2="700" y2="444" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <!-- RANK 0 -->
+    <rect x="420" y="56" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="420" y="56" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="428" y="64" width="24" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="440" y="73" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P1</text>
+    <rect x="540" y="64" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="556" y="73" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">0 PRE</text>
+    <text x="500" y="94" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Repair auth chain</text>
+    <text x="500" y="106" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">half a day</text>
+
+    <!-- RANK 1 -->
+    <rect x="140" y="176" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="140" y="176" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="148" y="184" width="32" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="164" y="193" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P1B</text>
+    <rect x="260" y="184" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="276" y="193" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1 PRE</text>
+    <text x="220" y="214" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Stop the app lying</text>
+    <text x="220" y="226" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">promoted by review</text>
+
+    <rect x="420" y="176" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="420" y="176" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="428" y="184" width="24" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="440" y="193" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P2</text>
+    <rect x="540" y="184" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="556" y="193" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1 PRE</text>
+    <text x="500" y="214" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Honest empty state</text>
+    <text x="500" y="226" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">no-tenant-access</text>
+
+    <rect x="700" y="176" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="700" y="176" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="708" y="184" width="32" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="724" y="193" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P1C</text>
+    <rect x="820" y="184" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="836" y="193" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1 PRE</text>
+    <text x="780" y="214" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Close escalation</text>
+    <text x="780" y="226" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">promoted by review</text>
+
+    <!-- RANK 2 -->
+    <rect x="220" y="296" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="220" y="296" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="228" y="304" width="24" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="240" y="313" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P3</text>
+    <rect x="340" y="304" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="356" y="313" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">2 PRE</text>
+    <text x="300" y="334" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Seed real data</text>
+    <text x="300" y="346" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">1-2 days &middot; you run it</text>
+
+    <rect x="620" y="296" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="620" y="296" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="628" y="304" width="24" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="640" y="313" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P4</text>
+    <rect x="740" y="304" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="756" y="313" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">2 PRE</text>
+    <text x="700" y="334" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Tenant assignment</text>
+    <text x="700" y="346" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">2-3 days</text>
+
+    <!-- RANK 3 -->
+    <rect x="420" y="416" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="420" y="416" width="160" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="428" y="424" width="24" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="440" y="433" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P5</text>
+    <rect x="540" y="424" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="556" y="433" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">2 PRE</text>
+    <text x="500" y="454" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Retire the mocks</text>
+    <text x="500" y="466" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">+ RLS isolation tests</text>
+
+    <rect x="700" y="416" width="160" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="700" y="416" width="160" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="708" y="424" width="24" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+    <text x="720" y="433" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">P6</text>
+    <rect x="820" y="424" width="32" height="12" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="836" y="433" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1 PRE</text>
+    <text x="780" y="454" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Hardening</text>
+    <text x="780" y="466" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ongoing</text>
+
+    <!-- editorial aside -->
+    <text x="60" y="418" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', serif">Three phases converge on</text>
+    <text x="60" y="438" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', serif">two prerequisites each &mdash;</text>
+    <text x="60" y="458" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', serif">which a flat list hides.</text>
+
+    <!-- LEGEND -->
+    <line x1="30" y1="520" x2="970" y2="520" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+    <text x="30" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+    <rect x="120" y="528" width="16" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <text x="144" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">PHASE</text>
+    <rect x="248" y="528" width="16" height="10" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+    <text x="272" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">LEAF &mdash; NOTHING WAITS ON IT</text>
+    <rect x="528" y="528" width="32" height="10" rx="2" fill="rgba(45,49,66,0.05)"/>
+    <text x="568" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">N PRE &mdash; PREREQUISITES THAT MUST LAND FIRST</text>
+  </svg>
+</div>
+</body>
+</html>

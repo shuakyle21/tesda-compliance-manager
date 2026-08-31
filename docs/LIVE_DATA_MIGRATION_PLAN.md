@@ -32,6 +32,18 @@ against.
 
 ---
 
+## 0.1 Diagrams
+
+Three self-contained HTML diagrams accompany this plan. Open them in a browser.
+
+| Diagram | Answers | File |
+|---|---|---|
+| Where the auth chain breaks | Why the app falls back to mocks, and how the same break can instead read as "no batches" | [`diagrams/auth-chain-break.html`](diagrams/auth-chain-break.html) |
+| Four reasons a screen shows zero batches | What "empty" can actually mean, and which state each case *should* return | [`diagrams/four-causes-of-empty.html`](diagrams/four-causes-of-empty.html) |
+| Why the phases run in this order | The prerequisite fan-in a numbered list flattens away | [`diagrams/phase-dependencies.html`](diagrams/phase-dependencies.html) |
+
+---
+
 ## 1. Current-state assessment
 
 ### 1.1 The intended auth chain

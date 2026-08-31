@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auth Chain Break</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --color-paper:  #f5f5f5;
+    --color-ink:    #2d3142;
+    --color-muted:  #4f5d75;
+    --color-accent: #eb6c36;
+    --font-sans:  'Geist', system-ui, sans-serif;
+    --font-serif: 'Instrument Serif', serif;
+    --font-mono:  'Geist Mono', ui-monospace, monospace;
+  }
+  body { font-family: var(--font-sans); background: var(--color-paper); color: var(--color-ink);
+         min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+  .frame { max-width: 1200px; width: 100%; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em;
+             text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.5rem; }
+  h1 { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem); font-weight: 400;
+       letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1.5rem; }
+  svg { width: 100%; min-width: 900px; display: block; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <p class="eyebrow">Architecture &middot; TVI-CAMS</p>
+  <h1>Where the auth chain breaks &mdash; and why it reads as &ldquo;no data&rdquo;</h1>
+
+  <svg viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="authbreak-title authbreak-desc">
+    <title id="authbreak-title">Where the auth chain breaks</title>
+    <desc id="authbreak-desc">The Clerk-to-Supabase request path, showing that the call for a JWT template named supabase has no template to return, and that the two possible outcomes both mislead: one falls back to mock data behind a sync-failed banner, the other queries Postgres as the anonymous role and returns zero rows with no error, which the dashboard reports as "No assigned batches".</desc>
+    <defs>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+    </defs>
+
+    <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+    <!-- ARROWS (drawn before boxes) -->
+    <line x1="500" y1="112" x2="500" y2="152" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <rect x="508" y="126" width="84" height="12" rx="2" fill="#f5f5f5"/>
+    <text x="512" y="135" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.06em">SESSION TOKEN</text>
+
+    <path d="M 468,208 V 236 Q 468,244 460,244 H 272 Q 264,244 264,252 V 264" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <path d="M 532,208 V 236 Q 532,244 540,244 H 728 Q 736,244 736,252 V 264" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <line x1="264" y1="320" x2="264" y2="376" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="736" y1="320" x2="736" y2="376" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="736" y1="432" x2="736" y2="488" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+    <line x1="736" y1="544" x2="736" y2="600" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <!-- NODES -->
+    <!-- 1. Clerk (external) -->
+    <rect x="400" y="56" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="400" y="56" width="200" height="56" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+    <rect x="408" y="64" width="36" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.35)" stroke-width="0.8"/>
+    <text x="426" y="73" fill="#7a8399" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CLERK</text>
+    <text x="500" y="92" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Signed-in session</text>
+    <text x="500" y="106" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">sub = clerk_user_id</text>
+
+    <!-- 2. FOCAL: the break -->
+    <rect x="400" y="152" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="400" y="152" width="200" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+    <rect x="408" y="160" width="40" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+    <text x="428" y="169" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BREAK</text>
+    <text x="500" y="188" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Supabase server client</text>
+    <text x="500" y="202" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">getToken({template})</text>
+
+    <!-- break annotation -->
+    <text x="380" y="182" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.10em">NO SUCH TEMPLATE EXISTS</text>
+
+    <!-- 3. throws -->
+    <rect x="164" y="264" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="164" y="264" width="200" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="172" y="272" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="194" y="281" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CASE A</text>
+    <text x="264" y="300" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">getToken throws</text>
+    <text x="264" y="314" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">no such template</text>
+
+    <!-- 4. returns null -->
+    <rect x="636" y="264" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="636" y="264" width="200" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="644" y="272" width="44" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="666" y="281" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CASE B</text>
+    <text x="736" y="300" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">getToken returns null</text>
+    <text x="736" y="314" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">no token, no throw</text>
+
+    <!-- 5. sync-failed (state) -->
+    <rect x="164" y="376" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="164" y="376" width="200" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="172" y="384" width="40" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+    <text x="192" y="393" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">STATE</text>
+    <text x="264" y="412" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">sync-failed</text>
+    <text x="264" y="426" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">banner over mock rows</text>
+
+    <!-- 6. no auth header -->
+    <rect x="636" y="376" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="636" y="376" width="200" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <rect x="644" y="384" width="36" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+    <text x="662" y="393" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">REQ</text>
+    <text x="736" y="412" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">No Authorization header</text>
+    <text x="736" y="426" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">postgrest role: anon</text>
+
+    <!-- 7. RLS denies -->
+    <rect x="636" y="488" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="636" y="488" width="200" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="644" y="496" width="32" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+    <text x="660" y="505" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">RLS</text>
+    <text x="736" y="524" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Every policy denies</text>
+    <text x="736" y="538" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">0 rows &middot; no error</text>
+
+    <!-- 8. FOCAL: the false conclusion -->
+    <rect x="636" y="600" width="200" height="56" rx="6" fill="#f5f5f5"/>
+    <rect x="636" y="600" width="200" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+    <rect x="644" y="608" width="28" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+    <text x="658" y="617" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">UI</text>
+    <text x="736" y="636" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">&ldquo;No assigned batches&rdquo;</text>
+    <text x="736" y="650" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">status: ok &middot; batches: []</text>
+
+    <!-- editorial aside -->
+    <text x="164" y="614" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', serif">A broken auth chain, reported to</text>
+    <text x="164" y="634" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', serif">the user as a fact about their data.</text>
+
+    <!-- LEGEND -->
+    <line x1="30" y1="692" x2="970" y2="692" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+    <text x="30" y="708" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+    <rect x="120" y="700" width="16" height="10" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+    <text x="144" y="708" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">CAUSE AND CONSEQUENCE</text>
+    <rect x="360" y="700" width="16" height="10" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+    <text x="384" y="708" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">EXTERNAL</text>
+    <rect x="520" y="700" width="16" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+    <text x="544" y="708" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">CODE PATH</text>
+    <rect x="684" y="700" width="16" height="10" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+    <text x="708" y="708" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">RESULTING STATE</text>
+  </svg>
+</div>
+</body>
+</html>
