@@ -291,37 +291,38 @@ export const SNAPSHOTS: Snapshot[] = [
     return n;
   }
 
-  BATCHES.forEach((b) => {
+  function applyScheduleProgress(b: Batch) {
     const sched = b.trainingDaySchedule || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     const start = parse(b.trainingStart);
     const end = parse(b.trainingEnd);
+    if (!start || !end) return;
 
-    if (start && end) {
-      const total = countDays(start, end, sched);
-      const elapsed = TODAY < start ? 0 : Math.min(total, countDays(start, TODAY > end ? end : TODAY, sched));
-      b.totalDays = total;
-      b.currentDay = elapsed;
-      b.progressPct = Math.round((elapsed / total) * 100);
-      if (b.remark) b.remark = b.remark.replace(/Day \d+ of \d+/g, `Day ${elapsed} of ${total}`);
+    const total = countDays(start, end, sched);
+    const elapsed = TODAY < start ? 0 : Math.min(total, countDays(start, TODAY > end ? end : TODAY, sched));
+    b.totalDays = total;
+    b.currentDay = elapsed;
+    b.progressPct = Math.round((elapsed / total) * 100);
+    if (b.remark) b.remark = b.remark.replace(/Day \d+ of \d+/g, `Day ${elapsed} of ${total}`);
 
-      const ed: Date[] = []; const cur = new Date(end);
-      while (ed.length < 3) { cur.setDate(cur.getDate() + 1); if (isTrainingDay(cur, sched)) ed.push(new Date(cur)); }
-      b.entreStart = fmt(ed[0]);
-      b.entreEnd = fmt(ed[2]);
+    const ed: Date[] = []; const cur = new Date(end);
+    while (ed.length < 3) { cur.setDate(cur.getDate() + 1); if (isTrainingDay(cur, sched)) ed.push(new Date(cur)); }
+    b.entreStart = fmt(ed[0]);
+    b.entreEnd = fmt(ed[2]);
 
-      let entreStatus: 'done' | 'active' | 'pending' = 'pending';
-      if (TODAY > ed[2]) entreStatus = 'done';
-      else if (TODAY >= ed[0]) entreStatus = 'active';
+    let entreStatus: 'done' | 'active' | 'pending' = 'pending';
+    if (TODAY > ed[2]) entreStatus = 'done';
+    else if (TODAY >= ed[0]) entreStatus = 'active';
 
-      if (b.lifecycle && !b.lifecycle.some((s) => s.key === 'entre')) {
-        const idx = b.lifecycle.findIndex((s) => s.key === 'train');
-        b.lifecycle.splice(idx + 1, 0, {
-          key: 'entre', label: 'ENTRE', status: entreStatus,
-          date: `${b.entreStart} – ${b.entreEnd}`,
-        });
-      }
+    if (b.lifecycle && !b.lifecycle.some((s) => s.key === 'entre')) {
+      const idx = b.lifecycle.findIndex((s) => s.key === 'train');
+      b.lifecycle.splice(idx + 1, 0, {
+        key: 'entre', label: 'ENTRE', status: entreStatus,
+        date: `${b.entreStart} – ${b.entreEnd}`,
+      });
     }
+  }
 
+  function applyBatchDefaults(b: Batch) {
     const aou = (b.lifecycle || []).find((s) => s.key === 'aou');
     const ntp = (b.lifecycle || []).find((s) => s.key === 'ntp');
     if (b.approvedSeats == null) b.approvedSeats = b.scholars;
@@ -333,6 +334,11 @@ export const SNAPSHOTS: Snapshot[] = [
       const tp = parse(b.tipDate);
       if (tp) { const r = new Date(tp); r.setDate(r.getDate() + 7); b.reportDate = fmt(r); } else b.reportDate = '—';
     }
+  }
+
+  BATCHES.forEach((b) => {
+    applyScheduleProgress(b);
+    applyBatchDefaults(b);
   });
 })();
 
@@ -364,69 +370,83 @@ const OUTCOME_TARGETS: Record<string, { graduate: number; assessed: number; cert
     'BAT-2': { assessed: '06/05/2026', followUpDue: 'Dec 22, 2026', reported: '06/02/2026' },
   };
 
-  BATCHES.forEach((b) => {
-    const t = OUTCOME_TARGETS[b.id] || { graduate: 0, assessed: 0, certified: 0, employed: 0 };
-    const cd = COHORT_DATES[b.id] || ({} as { assessed?: string; followUpDue?: string; reported?: string });
-    b.assessedDate = cd.assessed || '';
-    b.followUpReportDate = cd.reported || '';
-    b.followUpDue = cd.followUpDue || null;
-    const n = b.scholars;
+  type OutcomeTarget = { graduate: number; assessed: number; certified: number; employed: number };
+
+  function deriveScholarOutcomes(i: number, t: OutcomeTarget) {
+    const isGrad = i < t.graduate;
+    const isAssessed = i < t.assessed;
+    const isCertified = i < t.certified;
+    const isEmployed = i < t.employed;
+    const assessmentResult = isCertified ? 'Competent' : (isAssessed ? 'Not Yet Competent' : '');
+    const trainingStatus = isGrad ? 'Graduate' : (t.graduate > 0 ? 'Discontinued' : 'Enrolled');
+    return { isGrad, isAssessed, isCertified, isEmployed, assessmentResult, trainingStatus };
+  }
+
+  function deriveEmploymentStatus(i: number, isCertified: boolean, isEmployed: boolean): string {
+    if (!isCertified) return EMPLOYMENT_STATUSES.na;
+    if (isEmployed) return (i % 5 === 2) ? EMPLOYMENT_STATUSES.self : EMPLOYMENT_STATUSES.wage;
+    return (i % 4 === 3) ? EMPLOYMENT_STATUSES.unemployed : EMPLOYMENT_STATUSES.awaiting;
+  }
+
+  function buildEmploymentFields(b: Batch, i: number, employed: boolean, employmentStatus: string) {
+    if (!employed) return { dateEmployed: '', occupation: '', employer: '', empClassification: '', salary: '' };
+    const isSelf = employmentStatus === EMPLOYMENT_STATUSES.self;
+    return {
+      dateEmployed: b.followUpReportDate || '',
+      occupation: OCC[i % OCC.length],
+      employer: isSelf ? 'Self-employed' : EMP[i % EMP.length],
+      empClassification: isSelf ? 'Self-employment' : 'Wage employment',
+      salary: String(9000 + (i % 6) * 1500),
+    };
+  }
+
+  function buildScholarRow(b: Batch, i: number, t: OutcomeTarget): ScholarRow {
+    const female = i % 2 === 1;
+    const ln = LN[(i + b.id.charCodeAt(4) * 3) % LN.length];
+    const fn = (female ? FN_F : FN_M)[i % 10];
+    const mi = LN[(i + 7) % LN.length][0] + '.';
+    const { isGrad, isAssessed, isCertified, isEmployed, assessmentResult, trainingStatus } = deriveScholarOutcomes(i, t);
+    const employmentStatus = deriveEmploymentStatus(i, isCertified, isEmployed);
+    const employed = employmentStatus === EMPLOYMENT_STATUSES.wage || employmentStatus === EMPLOYMENT_STATUSES.self;
+    const empFields = buildEmploymentFields(b, i, employed, employmentStatus);
+
+    return {
+      seq: i + 1,
+      lastName: ln.toUpperCase(),
+      firstName: fn.toUpperCase(),
+      middleInit: mi.toUpperCase(),
+      extName: '',
+      uli: initials(fn) + ln[0] + '-' + String(10 + (i * 7) % 89) + '-' + String(100 + (i * 13) % 899) + '-12063-' + String(1 + i).padStart(3, '0'),
+      sex: female ? 'Female' : 'Male',
+      dob: ['0' + ((i % 9) + 1), String(10 + (i * 3) % 18).padStart(2, '0'), String(2002 + (i % 6))].join('/'),
+      age: 19 + (i % 9),
+      civilStatus: CIVIL[i % CIVIL.length],
+      education: EDUC[i % EDUC.length],
+      nationality: 'Filipino',
+      clientClass: 'Farmers and Fishermen',
+      scholarshipType: b.program === 'TWSP'
+        ? 'Training for Work Scholarship Program (TWSP)'
+        : 'Community-Based Training for Enterprise Development (CFSP)',
+      contact: '09' + String(10 + (i * 7) % 89) + '-' + String(100 + (i * 31) % 899) + '-' + String(1000 + (i * 137) % 8999),
+      email: (fn.split(/\s+/)[0] + ln).toLowerCase().replace(/[^a-z]/g, '') + '@gmail.com',
+      trainingStatus,
+      dateStarted: b.trainingStart,
+      dateFinished: isGrad ? b.trainingEnd : '',
+      dateAssessed: isAssessed ? b.assessedDate || '' : '',
+      assessmentResult,
+      empStatusBefore: 'Unemployed',
+      employmentStatus,
+      ...empFields,
+    };
+  }
+
+  function buildRoster(b: Batch, t: OutcomeTarget): ScholarRow[] {
     const roster: ScholarRow[] = [];
-    for (let i = 0; i < n; i++) {
-      const female = i % 2 === 1;
-      const ln = LN[(i + b.id.charCodeAt(4) * 3) % LN.length];
-      const fn = (female ? FN_F : FN_M)[i % 10];
-      const mi = LN[(i + 7) % LN.length][0] + '.';
-      const isGrad = i < t.graduate;
-      const isAssessed = i < t.assessed;
-      const isCertified = i < t.certified;
-      const isEmployed = i < t.employed;
+    for (let i = 0; i < b.scholars; i++) roster.push(buildScholarRow(b, i, t));
+    return roster;
+  }
 
-      const assessmentResult = isCertified ? 'Competent' : (isAssessed ? 'Not Yet Competent' : '');
-      const trainingStatus = isGrad ? 'Graduate' : (t.graduate > 0 ? 'Discontinued' : 'Enrolled');
-
-      let employmentStatus: string = EMPLOYMENT_STATUSES.na;
-      if (isCertified) {
-        if (isEmployed) employmentStatus = (i % 5 === 2) ? EMPLOYMENT_STATUSES.self : EMPLOYMENT_STATUSES.wage;
-        else employmentStatus = (i % 4 === 3) ? EMPLOYMENT_STATUSES.unemployed : EMPLOYMENT_STATUSES.awaiting;
-      }
-      const employed = employmentStatus === EMPLOYMENT_STATUSES.wage || employmentStatus === EMPLOYMENT_STATUSES.self;
-
-      roster.push({
-        seq: i + 1,
-        lastName: ln.toUpperCase(),
-        firstName: fn.toUpperCase(),
-        middleInit: mi.toUpperCase(),
-        extName: '',
-        uli: initials(fn) + ln[0] + '-' + String(10 + (i * 7) % 89) + '-' + String(100 + (i * 13) % 899) + '-12063-' + String(1 + i).padStart(3, '0'),
-        sex: female ? 'Female' : 'Male',
-        dob: ['0' + ((i % 9) + 1), String(10 + (i * 3) % 18).padStart(2, '0'), String(2002 + (i % 6))].join('/'),
-        age: 19 + (i % 9),
-        civilStatus: CIVIL[i % CIVIL.length],
-        education: EDUC[i % EDUC.length],
-        nationality: 'Filipino',
-        clientClass: 'Farmers and Fishermen',
-        scholarshipType: b.program === 'TWSP'
-          ? 'Training for Work Scholarship Program (TWSP)'
-          : 'Community-Based Training for Enterprise Development (CFSP)',
-        contact: '09' + String(10 + (i * 7) % 89) + '-' + String(100 + (i * 31) % 899) + '-' + String(1000 + (i * 137) % 8999),
-        email: (fn.split(/\s+/)[0] + ln).toLowerCase().replace(/[^a-z]/g, '') + '@gmail.com',
-        trainingStatus,
-        dateStarted: b.trainingStart,
-        dateFinished: isGrad ? b.trainingEnd : '',
-        dateAssessed: isAssessed ? b.assessedDate || '' : '',
-        assessmentResult,
-        empStatusBefore: 'Unemployed',
-        employmentStatus,
-        dateEmployed: employed ? (b.followUpReportDate || '') : '',
-        occupation: employed ? OCC[i % OCC.length] : '',
-        employer: employed ? (employmentStatus === EMPLOYMENT_STATUSES.self ? 'Self-employed' : EMP[i % EMP.length]) : '',
-        empClassification: employed ? (employmentStatus === EMPLOYMENT_STATUSES.self ? 'Self-employment' : 'Wage employment') : '',
-        salary: employed ? String(9000 + (i % 6) * 1500) : '',
-      });
-    }
-    b.scholars_list = roster;
-
+  function applyEgaceAndFollowUp(b: Batch, roster: ScholarRow[]) {
     const count = (pred: (s: ScholarRow) => boolean) => roster.filter(pred).length;
     b.egace = {
       enrolled: roster.length,
@@ -445,6 +465,18 @@ const OUTCOME_TARGETS: Record<string, { graduate: number; assessed: number; cert
       rate: certifiedCount ? Math.round(b.egace.employed / certifiedCount * 100) : 0,
       reported: count((s) => s.employmentStatus !== EMPLOYMENT_STATUSES.na && s.assessmentResult === 'Competent'),
     } : null;
+  }
+
+  BATCHES.forEach((b) => {
+    const t = OUTCOME_TARGETS[b.id] || { graduate: 0, assessed: 0, certified: 0, employed: 0 };
+    const cd = COHORT_DATES[b.id] || ({} as { assessed?: string; followUpDue?: string; reported?: string });
+    b.assessedDate = cd.assessed || '';
+    b.followUpReportDate = cd.reported || '';
+    b.followUpDue = cd.followUpDue || null;
+
+    const roster = buildRoster(b, t);
+    b.scholars_list = roster;
+    applyEgaceAndFollowUp(b, roster);
   });
 })();
 
