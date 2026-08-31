@@ -86,10 +86,15 @@ export function mapProfileRow(row: ProfileRowWithTenants): Profile {
  * `BatchesSnapshot` plus one addition:
  *   - `ok`           — a profile row exists; mapped and ready to use.
  *   - `not-found`    — the caller is authenticated with Clerk but has no
- *                      `profiles` row yet. Distinct from an error: this is
- *                      the expected state for a brand-new sign-in, and it's
- *                      what the not-yet-built upsert-on-sign-in step (Phase 1
- *                      feature 2) will look for to know when to provision one.
+ *                      `profiles` row yet. In practice this should be brief:
+ *                      the Clerk `user.created` webhook
+ *                      (`app/api/webhooks/clerk/route.ts` →
+ *                      `modules/auth/data/provisioning.ts`) provisions the row
+ *                      via a service-role client before the user ever reaches
+ *                      an authenticated request. Kept as a distinct status
+ *                      rather than folded into `sync-failed` for the case
+ *                      where a request outraces the webhook, or the webhook
+ *                      failed — both are "no access yet", not an error.
  *   - `sync-failed`  — Supabase is configured but the query failed.
  *   - `unconfigured` — no Supabase env in this environment.
  */
@@ -120,50 +125,3 @@ export async function getProfileSnapshot(clerkUserId: string): Promise<ProfileSn
   }
 }
 
-/**
- * A brand-new profiles row starts with no tenant and the least-privileged
- * role, matching the rest of the app's "unknown → fall back to the
- * least-privileged variant" convention (see modules/auth/data/role.ts).
- * Tenant assignment and any role upgrade past this are admin actions, done
- * later, not part of signing in — see the "Users can insert their own
- * profile" migration this depends on for the matching write-side rule.
- */
-const DEFAULT_ROLE_FOR_NEW_PROFILE: DbProfileRole = 'viewer';
-
-/**
- * Ensures a `profiles` row exists for this Clerk user, creating one with no
- * tenant membership if this is their first sign-in. Idempotent: called again
- * for an existing profile, it just returns that profile unchanged.
- *
- * Only inserts — never touches `profile_tenant_memberships` or upgrades an
- * existing row's role. A user assigned to zero tenants after this is a valid,
- * expected state (a real person waiting on an admin to grant access), not an
- * error; callers should treat `tenants: []` in the returned `AuthProfile` as
- * "no access yet", not as `sync-failed`.
- */
-export async function ensureProfile(
-  clerkUserId: string,
-  email: string | null,
-  fullName: string | null,
-): Promise<ProfileSnapshot> {
-  const existing = await getProfileSnapshot(clerkUserId);
-  if (existing.status !== 'not-found') return existing;
-
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from('profiles').insert({
-      clerk_user_id: clerkUserId,
-      email,
-      full_name: fullName,
-      role: DEFAULT_ROLE_FOR_NEW_PROFILE,
-    });
-
-    if (error) return { status: 'sync-failed', error: error.message };
-  } catch (err) {
-    return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
-  }
-
-  // Re-fetch so the caller gets the same shape (with memberships joined)
-  // whether the profile already existed or was just created above.
-  return getProfileSnapshot(clerkUserId);
-}
