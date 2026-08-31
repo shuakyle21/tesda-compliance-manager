@@ -62,22 +62,25 @@ const ROLE_CAPS: Record<UserRole, string[]> = {
   viewer: ['View batches & documents (audit only)'],
 };
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+// ── Derived view model ───────────────────────────────────────────────────────
 
-export default async function ProfilePage() {
-  const clerkUser = await getCurrentUser();
-  if (!clerkUser) redirect('/sign-in');
+type ClerkProfileUser = Awaited<ReturnType<typeof getCurrentUser>>;
 
+function deriveRole(clerkUser: NonNullable<ClerkProfileUser>): UserRole {
   const rawRole = (clerkUser.publicMetadata?.role as string | undefined)?.toLowerCase() ?? 'viewer';
-  const role: UserRole = (rawRole as UserRole) in ROLE_BLURB ? (rawRole as UserRole) : 'viewer';
+  return (rawRole as UserRole) in ROLE_BLURB ? (rawRole as UserRole) : 'viewer';
+}
 
+function deriveIdentity(clerkUser: NonNullable<ClerkProfileUser>) {
   const firstName = clerkUser.firstName ?? '';
   const lastName = clerkUser.lastName ?? '';
   const name = clerkUser.fullName ?? ([firstName, lastName].filter(Boolean).join(' ') || 'Unknown');
   const email = clerkUser.emailAddresses[0]?.emailAddress ?? '';
   const initials = [firstName[0], lastName[0]].filter(Boolean).join('').toUpperCase() || name[0]?.toUpperCase() || '?';
-  const userId = clerkUser.id;
+  return { name, email, initials, userId: clerkUser.id };
+}
 
+function deriveActivityLabels(clerkUser: NonNullable<ClerkProfileUser>) {
   const memberSince = clerkUser.createdAt
     ? new Date(clerkUser.createdAt).toLocaleDateString('en-PH', { month: 'long', year: 'numeric' })
     : 'January 2026';
@@ -88,11 +91,128 @@ export default async function ProfilePage() {
       }) + ' PHT'
     : '14:02 PHT';
 
-  const hasGoogle = clerkUser.externalAccounts?.some((a) => a.provider === 'google') ?? false;
+  return { memberSince, lastActiveTime };
+}
 
-  const roleColor = ROLE_COLOR[role];
-  const roleBlurb = ROLE_BLURB[role];
-  const roleCaps = ROLE_CAPS[role];
+function deriveHasGoogle(clerkUser: NonNullable<ClerkProfileUser>): boolean {
+  return clerkUser.externalAccounts?.some((a) => a.provider === 'google') ?? false;
+}
+
+/** Pure Clerk-user → display-value translation, kept out of the JSX. */
+function deriveProfileView(clerkUser: NonNullable<ClerkProfileUser>) {
+  const role = deriveRole(clerkUser);
+  return {
+    role,
+    roleColor: ROLE_COLOR[role],
+    roleBlurb: ROLE_BLURB[role],
+    roleCaps: ROLE_CAPS[role],
+    ...deriveIdentity(clerkUser),
+    ...deriveActivityLabels(clerkUser),
+    hasGoogle: deriveHasGoogle(clerkUser),
+  };
+}
+
+function SchoolAccessCard({
+  tenants,
+  activeTenantId,
+}: {
+  tenants: typeof TENANTS;
+  activeTenantId: string;
+}) {
+  return (
+    <PCard icon="folders" title={`School access · ${tenants.length}`}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {tenants.map((t, i) => (
+          <div key={t.id} style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '9px 10px',
+            background: t.id === activeTenantId ? 'var(--color-surface-alt)' : 'transparent',
+            border: '1px solid var(--color-border-faint)',
+            borderRadius: 'var(--radius-md)',
+          }}>
+            <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 26, height: 26, fontSize: 9.5 }}>
+              {t.code.slice(0, 3)}
+            </span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: 12.5, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                {t.name}
+              </span>
+              <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
+                {t.region} · {t.type}
+              </span>
+            </span>
+            {t.id === activeTenantId && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9.5, color: 'var(--color-blue-dk)', letterSpacing: '0.04em' }}>
+                ACTIVE
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      {tenants.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 10, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-teal-dk)' }}>
+          <Icon name="shield-check" size={11} />
+          Registrar access across {tenants.length} schools
+        </div>
+      )}
+    </PCard>
+  );
+}
+
+function ConnectedAccountsCard({ hasGoogle, email }: { hasGoogle: boolean; email: string }) {
+  return (
+    <PCard icon="external-link" title="Connected accounts">
+      <SecRow
+        icon="external-link"
+        title="Google"
+        desc={hasGoogle ? email : 'Not connected'}
+        status={hasGoogle ? 'Connected' : 'Off'}
+        statusTone={hasGoogle ? 'green' : 'amber'}
+        last
+      />
+
+      <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--color-border-faint)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <Icon name="timeline" size={13} style={{ color: 'var(--color-text-secondary)' }} />
+          <span style={{
+            fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
+            letterSpacing: '0.05em', textTransform: 'uppercase',
+            color: 'var(--color-text-muted)',
+          }}>
+            Active sessions
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+          <span style={{ width: 7, height: 7, borderRadius: 9999, background: 'var(--color-green)', flexShrink: 0 }} aria-hidden="true" />
+          <span style={{ flex: 1 }}>This device · Chrome on macOS</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
+            Quezon City · now
+          </span>
+        </div>
+      </div>
+    </PCard>
+  );
+}
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function ProfilePage() {
+  const clerkUser = await getCurrentUser();
+  if (!clerkUser) redirect('/sign-in');
+
+  const {
+    role,
+    roleColor,
+    roleBlurb,
+    roleCaps,
+    name,
+    email,
+    initials,
+    userId,
+    memberSince,
+    lastActiveTime,
+    hasGoogle,
+  } = deriveProfileView(clerkUser);
 
   // Mock tenant data — real tenant resolution lands with TES-34.
   const tenants = TENANTS;
@@ -183,42 +303,7 @@ export default async function ProfilePage() {
         </PCard>
 
         {/* School access */}
-        <PCard icon="folders" title={`School access · ${tenants.length}`}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {tenants.map((t, i) => (
-              <div key={t.id} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '9px 10px',
-                background: t.id === activeTenant.id ? 'var(--color-surface-alt)' : 'transparent',
-                border: '1px solid var(--color-border-faint)',
-                borderRadius: 'var(--radius-md)',
-              }}>
-                <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 26, height: 26, fontSize: 9.5 }}>
-                  {t.code.slice(0, 3)}
-                </span>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: 12.5, fontWeight: 500, color: 'var(--color-text-primary)' }}>
-                    {t.name}
-                  </span>
-                  <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
-                    {t.region} · {t.type}
-                  </span>
-                </span>
-                {t.id === activeTenant.id && (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9.5, color: 'var(--color-blue-dk)', letterSpacing: '0.04em' }}>
-                    ACTIVE
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-          {tenants.length > 1 && (
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 10, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-teal-dk)' }}>
-              <Icon name="shield-check" size={11} />
-              Registrar access across {tenants.length} schools
-            </div>
-          )}
-        </PCard>
+        <SchoolAccessCard tenants={tenants} activeTenantId={activeTenant.id} />
 
         {/* Security & sign-in */}
         <PCard icon="shield-check" title="Security & sign-in" action={<ManagedByClerk />}>
@@ -250,36 +335,7 @@ export default async function ProfilePage() {
         </PCard>
 
         {/* Connected accounts + sessions */}
-        <PCard icon="external-link" title="Connected accounts">
-          <SecRow
-            icon="external-link"
-            title="Google"
-            desc={hasGoogle ? email : 'Not connected'}
-            status={hasGoogle ? 'Connected' : 'Off'}
-            statusTone={hasGoogle ? 'green' : 'amber'}
-            last
-          />
-
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--color-border-faint)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              <Icon name="timeline" size={13} style={{ color: 'var(--color-text-secondary)' }} />
-              <span style={{
-                fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
-                letterSpacing: '0.05em', textTransform: 'uppercase',
-                color: 'var(--color-text-muted)',
-              }}>
-                Active sessions
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--color-text-secondary)' }}>
-              <span style={{ width: 7, height: 7, borderRadius: 9999, background: 'var(--color-green)', flexShrink: 0 }} aria-hidden="true" />
-              <span style={{ flex: 1 }}>This device · Chrome on macOS</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-                Quezon City · now
-              </span>
-            </div>
-          </div>
-        </PCard>
+        <ConnectedAccountsCard hasGoogle={hasGoogle} email={email} />
 
         {/* Access & permissions — spans both columns */}
         <div style={{ gridColumn: '1 / -1' }}>

@@ -39,6 +39,7 @@ import {
   type ClipboardEvent,
   type KeyboardEvent,
   type MouseEvent,
+  type RefObject,
   type SubmitEvent,
 } from 'react';
 import styles from './sign-up-modal.module.css';
@@ -47,6 +48,7 @@ const REQUIRE_INVITE_CODE = process.env.NEXT_PUBLIC_REQUIRE_INVITE_CODE === 'tru
 
 type Step = 'form' | 'verify' | 'done';
 type FieldKey = 'firstName' | 'lastName' | 'email' | 'password' | 'invite';
+type FieldProps = (key: FieldKey) => { className: string; 'aria-invalid'?: true };
 
 /** Clerk error param names → our field keys, for inline field errors. */
 const PARAM_TO_FIELD: Record<string, FieldKey> = {
@@ -86,6 +88,299 @@ function splitClerkErrors(err: unknown): {
     else if (!general) general = message;
   }
   return { fields, general };
+}
+
+function SignUpFormStep({
+  error,
+  oauthBusy,
+  isLoaded,
+  onGoogle,
+  onSubmit,
+  disabled,
+  busy,
+  firstName,
+  onFirstNameChange,
+  lastName,
+  onLastNameChange,
+  email,
+  onEmailChange,
+  password,
+  onPasswordChange,
+  showPw,
+  onToggleShowPw,
+  invite,
+  onInviteChange,
+  fieldErrors,
+  fieldProps,
+  onSwitchToSignIn,
+}: {
+  error: string | null;
+  oauthBusy: boolean;
+  isLoaded: boolean;
+  onGoogle: () => void;
+  onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+  disabled: boolean;
+  busy: boolean;
+  firstName: string;
+  onFirstNameChange: (value: string) => void;
+  lastName: string;
+  onLastNameChange: (value: string) => void;
+  email: string;
+  onEmailChange: (value: string) => void;
+  password: string;
+  onPasswordChange: (value: string) => void;
+  showPw: boolean;
+  onToggleShowPw: () => void;
+  invite: string;
+  onInviteChange: (value: string) => void;
+  fieldErrors: Partial<Record<FieldKey, string>>;
+  fieldProps: FieldProps;
+  onSwitchToSignIn: () => void;
+}) {
+  return (
+    <>
+      <h1 className={styles.title}>Create your account</h1>
+      <p className={styles.sub}>Set up access to the Compliance &amp; Audit dashboard.</p>
+
+      {error && <p className={styles.error} role="alert">{error}</p>}
+
+      <button
+        type="button"
+        className={styles.oauth}
+        onClick={onGoogle}
+        disabled={oauthBusy || !isLoaded}
+      >
+        <GoogleG />
+        {oauthBusy ? 'Redirecting…' : 'Continue with Google'}
+      </button>
+
+      <div className={styles.divider}><span>or</span></div>
+
+      <form onSubmit={onSubmit} noValidate>
+        <div className={styles.nameGrid}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="su-first-name">First name</label>
+            <input
+              {...fieldProps('firstName')}
+              id="su-first-name"
+              type="text"
+              placeholder="Maria"
+              autoComplete="given-name"
+              value={firstName}
+              onChange={(e) => onFirstNameChange(e.target.value)}
+            />
+            {fieldErrors.firstName && (
+              <span className={styles.fieldError}>{fieldErrors.firstName}</span>
+            )}
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="su-last-name">Last name</label>
+            <input
+              {...fieldProps('lastName')}
+              id="su-last-name"
+              type="text"
+              placeholder="Santos"
+              autoComplete="family-name"
+              value={lastName}
+              onChange={(e) => onLastNameChange(e.target.value)}
+            />
+            {fieldErrors.lastName && (
+              <span className={styles.fieldError}>{fieldErrors.lastName}</span>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="su-email">Email address</label>
+          <input
+            {...fieldProps('email')}
+            id="su-email"
+            type="email"
+            placeholder="you@school.ph"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => onEmailChange(e.target.value)}
+          />
+          {fieldErrors.email && (
+            <span className={styles.fieldError}>{fieldErrors.email}</span>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="su-password">Password</label>
+          <div className={styles.pwWrap}>
+            <input
+              {...fieldProps('password')}
+              className={`${fieldProps('password').className} ${styles.pwInput}`}
+              id="su-password"
+              type={showPw ? 'text' : 'password'}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => onPasswordChange(e.target.value)}
+            />
+            <button
+              type="button"
+              className={styles.eye}
+              aria-label={showPw ? 'Hide password' : 'Show password'}
+              onClick={onToggleShowPw}
+            >
+              {showPw ? <IconEyeOff size={14} stroke={2} /> : <IconEye size={14} stroke={2} />}
+            </button>
+          </div>
+          {fieldErrors.password ? (
+            <span className={styles.fieldError}>{fieldErrors.password}</span>
+          ) : (
+            <span className={styles.helper}>8+ characters, at least one number.</span>
+          )}
+        </div>
+
+        {REQUIRE_INVITE_CODE && (
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="su-invite">Invite code</label>
+            <input
+              {...fieldProps('invite')}
+              className={`${fieldProps('invite').className} ${styles.inviteInput}`}
+              id="su-invite"
+              type="text"
+              placeholder="TFS-NEG-XXXX"
+              autoComplete="off"
+              value={invite}
+              onChange={(e) => onInviteChange(e.target.value)}
+            />
+            {fieldErrors.invite ? (
+              <span className={styles.fieldError}>{fieldErrors.invite}</span>
+            ) : (
+              <span className={styles.helper}>Issued by your school administrator.</span>
+            )}
+          </div>
+        )}
+
+        {/* Clerk's smart bot protection renders its (usually invisible)
+            CAPTCHA challenge into this node during signUp.create(). */}
+        <div id="clerk-captcha" />
+
+        <button type="submit" className={styles.primary} disabled={disabled}>
+          {busy ? 'Creating account…' : 'Continue'}
+        </button>
+      </form>
+
+      <p className={styles.switchLine}>
+        Already have an account?{' '}
+        <button type="button" className={styles.link} onClick={onSwitchToSignIn}>Sign in</button>
+      </p>
+    </>
+  );
+}
+
+function SignUpVerifyStep({
+  error,
+  email,
+  code,
+  codeRefs,
+  codeError,
+  disabled,
+  busy,
+  resent,
+  onDigitChange,
+  onCodeKeyDown,
+  onCodePaste,
+  onSubmit,
+  onResend,
+  onBackToForm,
+}: {
+  error: string | null;
+  email: string;
+  code: string[];
+  codeRefs: RefObject<Array<HTMLInputElement | null>>;
+  codeError: boolean;
+  disabled: boolean;
+  busy: boolean;
+  resent: boolean;
+  onDigitChange: (index: number, raw: string) => void;
+  onCodeKeyDown: (index: number, e: KeyboardEvent<HTMLInputElement>) => void;
+  onCodePaste: (e: ClipboardEvent<HTMLInputElement>) => void;
+  onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+  onResend: (e: MouseEvent<HTMLButtonElement>) => void;
+  onBackToForm: (e: MouseEvent<HTMLButtonElement>) => void;
+}) {
+  return (
+    <>
+      <h1 className={styles.title}>Verify your email</h1>
+      <p className={styles.sub}>
+        Enter the 6-digit code sent to{' '}
+        <span className={styles.emailEcho}>{email.trim() || 'you@school.ph'}</span>
+      </p>
+
+      {error && <p className={styles.error} role="alert">{error}</p>}
+
+      <form onSubmit={onSubmit} noValidate>
+        <div className={styles.codeRow}>
+          {code.map((value, i) => (
+            <input
+              key={i}
+              ref={(el) => {
+                codeRefs.current[i] = el;
+              }}
+              className={styles.codeInput}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              autoComplete={i === 0 ? 'one-time-code' : 'off'}
+              aria-label={`Digit ${i + 1}`}
+              value={value}
+              onChange={(e) => onDigitChange(i, e.target.value)}
+              onKeyDown={(e) => onCodeKeyDown(i, e)}
+              onPaste={onCodePaste}
+            />
+          ))}
+        </div>
+
+        {codeError && (
+          <p className={styles.codeError} role="alert">
+            Incorrect code — check the email and try again.
+          </p>
+        )}
+
+        <button type="submit" className={styles.primary} disabled={disabled}>
+          {busy ? 'Verifying…' : 'Verify'}
+        </button>
+      </form>
+
+      <p className={styles.switchLine}>
+        Didn&rsquo;t receive it?{' '}
+        <button type="button" className={styles.link} onClick={onResend}>
+          {resent ? 'Code re-sent' : 'Resend code'}
+        </button>
+      </p>
+      <p className={styles.switchLine}>
+        <button
+          type="button"
+          className={`${styles.link} ${styles.mutedLink}`}
+          onClick={onBackToForm}
+        >
+          Use a different email
+        </button>
+      </p>
+    </>
+  );
+}
+
+function SignUpDoneStep({ onClose }: { onClose: () => void }) {
+  return (
+    <div className={styles.doneWrap}>
+      <span className={styles.doneCircle}>
+        <IconCheck size={20} stroke={2} />
+      </span>
+      <h1 className={styles.doneTitle}>Account created</h1>
+      <p className={styles.sub}>
+        Your registrar will assign your school and role. You can sign in now.
+      </p>
+      <button type="button" className={styles.primary} onClick={onClose}>
+        Go to sign in
+      </button>
+    </div>
+  );
 }
 
 export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -295,7 +590,7 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
     setStep('form');
   }
 
-  const fieldProps = (key: FieldKey) =>
+  const fieldProps: FieldProps = (key) =>
     fieldErrors[key]
       ? { className: `${styles.input} ${styles.inputInvalid}`, 'aria-invalid': true as const }
       : { className: styles.input };
@@ -319,215 +614,52 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
           <Image src="/assets/mark.svg" alt="" width={40} height={40} className={styles.mark} />
 
           {step === 'form' && (
-            <>
-              <h1 className={styles.title}>Create your account</h1>
-              <p className={styles.sub}>Set up access to the Compliance &amp; Audit dashboard.</p>
-
-              {error && <p className={styles.error} role="alert">{error}</p>}
-
-              <button
-                type="button"
-                className={styles.oauth}
-                onClick={handleGoogle}
-                disabled={oauthBusy || !isLoaded}
-              >
-                <GoogleG />
-                {oauthBusy ? 'Redirecting…' : 'Continue with Google'}
-              </button>
-
-              <div className={styles.divider}><span>or</span></div>
-
-              <form onSubmit={handleSubmitForm} noValidate>
-                <div className={styles.nameGrid}>
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="su-first-name">First name</label>
-                    <input
-                      {...fieldProps('firstName')}
-                      id="su-first-name"
-                      type="text"
-                      placeholder="Maria"
-                      autoComplete="given-name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                    {fieldErrors.firstName && (
-                      <span className={styles.fieldError}>{fieldErrors.firstName}</span>
-                    )}
-                  </div>
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="su-last-name">Last name</label>
-                    <input
-                      {...fieldProps('lastName')}
-                      id="su-last-name"
-                      type="text"
-                      placeholder="Santos"
-                      autoComplete="family-name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                    {fieldErrors.lastName && (
-                      <span className={styles.fieldError}>{fieldErrors.lastName}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="su-email">Email address</label>
-                  <input
-                    {...fieldProps('email')}
-                    id="su-email"
-                    type="email"
-                    placeholder="you@school.ph"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  {fieldErrors.email && (
-                    <span className={styles.fieldError}>{fieldErrors.email}</span>
-                  )}
-                </div>
-
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="su-password">Password</label>
-                  <div className={styles.pwWrap}>
-                    <input
-                      {...fieldProps('password')}
-                      className={`${fieldProps('password').className} ${styles.pwInput}`}
-                      id="su-password"
-                      type={showPw ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      autoComplete="new-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      className={styles.eye}
-                      aria-label={showPw ? 'Hide password' : 'Show password'}
-                      onClick={() => setShowPw((v) => !v)}
-                    >
-                      {showPw ? <IconEyeOff size={14} stroke={2} /> : <IconEye size={14} stroke={2} />}
-                    </button>
-                  </div>
-                  {fieldErrors.password ? (
-                    <span className={styles.fieldError}>{fieldErrors.password}</span>
-                  ) : (
-                    <span className={styles.helper}>8+ characters, at least one number.</span>
-                  )}
-                </div>
-
-                {REQUIRE_INVITE_CODE && (
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="su-invite">Invite code</label>
-                    <input
-                      {...fieldProps('invite')}
-                      className={`${fieldProps('invite').className} ${styles.inviteInput}`}
-                      id="su-invite"
-                      type="text"
-                      placeholder="TFS-NEG-XXXX"
-                      autoComplete="off"
-                      value={invite}
-                      onChange={(e) => setInvite(e.target.value)}
-                    />
-                    {fieldErrors.invite ? (
-                      <span className={styles.fieldError}>{fieldErrors.invite}</span>
-                    ) : (
-                      <span className={styles.helper}>Issued by your school administrator.</span>
-                    )}
-                  </div>
-                )}
-
-                {/* Clerk's smart bot protection renders its (usually invisible)
-                    CAPTCHA challenge into this node during signUp.create(). */}
-                <div id="clerk-captcha" />
-
-                <button type="submit" className={styles.primary} disabled={disabled}>
-                  {busy ? 'Creating account…' : 'Continue'}
-                </button>
-              </form>
-
-              <p className={styles.switchLine}>
-                Already have an account?{' '}
-                <button type="button" className={styles.link} onClick={onClose}>Sign in</button>
-              </p>
-            </>
+            <SignUpFormStep
+              error={error}
+              oauthBusy={oauthBusy}
+              isLoaded={isLoaded}
+              onGoogle={handleGoogle}
+              onSubmit={handleSubmitForm}
+              disabled={disabled}
+              busy={busy}
+              firstName={firstName}
+              onFirstNameChange={setFirstName}
+              lastName={lastName}
+              onLastNameChange={setLastName}
+              email={email}
+              onEmailChange={setEmail}
+              password={password}
+              onPasswordChange={setPassword}
+              showPw={showPw}
+              onToggleShowPw={() => setShowPw((v) => !v)}
+              invite={invite}
+              onInviteChange={setInvite}
+              fieldErrors={fieldErrors}
+              fieldProps={fieldProps}
+              onSwitchToSignIn={onClose}
+            />
           )}
 
           {step === 'verify' && (
-            <>
-              <h1 className={styles.title}>Verify your email</h1>
-              <p className={styles.sub}>
-                Enter the 6-digit code sent to{' '}
-                <span className={styles.emailEcho}>{email.trim() || 'you@school.ph'}</span>
-              </p>
-
-              {error && <p className={styles.error} role="alert">{error}</p>}
-
-              <form onSubmit={handleVerify} noValidate>
-                <div className={styles.codeRow}>
-                  {code.map((value, i) => (
-                    <input
-                      key={i}
-                      ref={(el) => {
-                        codeRefs.current[i] = el;
-                      }}
-                      className={styles.codeInput}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      autoComplete={i === 0 ? 'one-time-code' : 'off'}
-                      aria-label={`Digit ${i + 1}`}
-                      value={value}
-                      onChange={(e) => setDigit(i, e.target.value)}
-                      onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                      onPaste={handleCodePaste}
-                    />
-                  ))}
-                </div>
-
-                {codeError && (
-                  <p className={styles.codeError} role="alert">
-                    Incorrect code — check the email and try again.
-                  </p>
-                )}
-
-                <button type="submit" className={styles.primary} disabled={disabled}>
-                  {busy ? 'Verifying…' : 'Verify'}
-                </button>
-              </form>
-
-              <p className={styles.switchLine}>
-                Didn&rsquo;t receive it?{' '}
-                <button type="button" className={styles.link} onClick={handleResend}>
-                  {resent ? 'Code re-sent' : 'Resend code'}
-                </button>
-              </p>
-              <p className={styles.switchLine}>
-                <button
-                  type="button"
-                  className={`${styles.link} ${styles.mutedLink}`}
-                  onClick={backToForm}
-                >
-                  Use a different email
-                </button>
-              </p>
-            </>
+            <SignUpVerifyStep
+              error={error}
+              email={email}
+              code={code}
+              codeRefs={codeRefs}
+              codeError={codeError}
+              disabled={disabled}
+              busy={busy}
+              resent={resent}
+              onDigitChange={setDigit}
+              onCodeKeyDown={handleCodeKeyDown}
+              onCodePaste={handleCodePaste}
+              onSubmit={handleVerify}
+              onResend={handleResend}
+              onBackToForm={backToForm}
+            />
           )}
 
-          {step === 'done' && (
-            <div className={styles.doneWrap}>
-              <span className={styles.doneCircle}>
-                <IconCheck size={20} stroke={2} />
-              </span>
-              <h1 className={styles.doneTitle}>Account created</h1>
-              <p className={styles.sub}>
-                Your registrar will assign your school and role. You can sign in now.
-              </p>
-              <button type="button" className={styles.primary} onClick={onClose}>
-                Go to sign in
-              </button>
-            </div>
-          )}
+          {step === 'done' && <SignUpDoneStep onClose={onClose} />}
 
           <div className={styles.footer}>
             <span>Secured by</span>
