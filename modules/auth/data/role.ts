@@ -27,22 +27,37 @@ export function isOfficeRole(role: string | null): role is OfficeRole {
   return role === 'admin' || role === 'coordinator' || role === 'viewer';
 }
 
+/** `role` narrowed to a `ResolvedRole`, or `null` if it's neither an office role nor trainer. */
+function asResolvedRole(role: string | null): ResolvedRole {
+  return isOfficeRole(role) || role === 'trainer' ? role : null;
+}
+
 /**
- * Resolves the acting role from the `?role=` preview override first, then Clerk
- * metadata. Returns `null` when neither answers — callers must fall back to the
+ * Resolves the acting role with this precedence:
+ *   1. `?role=` preview override — a dev/demo affordance, stays available
+ *      even once real identity exists.
+ *   2. `dbRole` — the real role from the caller's `profiles` row (via
+ *      `modules/tenancy/data`'s `getProfileSnapshot`). Passed in rather than
+ *      fetched here because a module's `data/` is private to it; the caller
+ *      (an `app/` route) fetches both and passes the result down.
+ *   3. Clerk `publicMetadata.role` — pre-dates the real resolver, kept as a
+ *      last-resort fallback for a signed-in user with no `profiles` row yet.
+ * Returns `null` when none answer — callers must fall back to the
  * least-privileged variant (viewer), not to a write-enabled one.
- *
- * The `?role=` override is a preview affordance that stays until the real
- * tenant/role resolver lands (TES-34).
  */
-export async function resolveRouteRole(params: RouteSearchParams): Promise<ResolvedRole> {
-  const queryRole = firstParam(params.role);
-  if (isOfficeRole(queryRole) || queryRole === 'trainer') return queryRole;
+export async function resolveRouteRole(
+  params: RouteSearchParams,
+  dbRole?: UserRole | null,
+): Promise<ResolvedRole> {
+  const fromQuery = asResolvedRole(firstParam(params.role));
+  if (fromQuery) return fromQuery;
+
+  const fromDb = asResolvedRole(dbRole ?? null);
+  if (fromDb) return fromDb;
 
   const user = await getCurrentUser().catch(() => null);
   const metadataRole =
     typeof user?.publicMetadata?.role === 'string' ? user.publicMetadata.role.toLowerCase() : null;
 
-  if (isOfficeRole(metadataRole) || metadataRole === 'trainer') return metadataRole;
-  return null;
+  return asResolvedRole(metadataRole);
 }

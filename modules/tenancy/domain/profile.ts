@@ -1,27 +1,22 @@
-export const profileRoles = [
-  "Admin",
-  "Coordinator",
-  "Trainer",
-  "Viewer",
-] as const;
+import type { Tenant, UserRole } from '@/shared/types';
 
-export type ProfileRole = (typeof profileRoles)[number];
-
-export type TenantMembership = {
-  tenantId: string;
-  tenantName: string;
-};
-
-export type Profile = {
+/**
+ * A signed-in person's identity: their role and which tenants they belong to.
+ * Shape matches what `modules/tenancy/data/tenancy.ts`'s mapper produces —
+ * this file used to define its own disconnected `ProfileRole`/`TenantMembership`
+ * (a capitalized enum with no DB or UI counterpart, and nothing importing it).
+ * `role` reuses the same `UserRole` the rest of the app already resolves
+ * against (`modules/auth/data/role.ts`), rather than a second role vocabulary.
+ */
+export interface Profile {
   clerkUserId: string;
-  role: ProfileRole;
-  tenantMemberships: TenantMembership[];
-};
-
-export function isProfileRole(role: string): role is ProfileRole {
-  return (profileRoles as readonly string[]).includes(role);
+  fullName: string | null;
+  email: string | null;
+  role: UserRole;
+  tenants: Tenant[];
+  defaultTenantId: string | null;
 }
 
 export function hasTenantMembership(profile: Profile, tenantId: string): boolean {
-  return profile.tenantMemberships.some((membership) => membership.tenantId === tenantId);
+  return profile.tenants.some((tenant) => tenant.id === tenantId);
 }

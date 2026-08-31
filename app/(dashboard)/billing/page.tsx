@@ -17,7 +17,9 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { MOCK_BATCHES } from '@/shared/mocks';
 import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks/seed';
 import { getBatchesSnapshot } from '@/modules/batches/data/batches';
+import { getAuthUserId } from '@/modules/auth/data/auth';
 import { firstParam, resolveRouteRole } from '@/modules/auth/data/role';
+import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
@@ -42,7 +44,18 @@ function formatAsOf(value: string | null): string {
 
 export default async function BillingPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const role = await resolveRouteRole(params);
+
+  // Real role/tenant identity (Phase 1 of the live-data cutover): fetched
+  // here, not inside resolveRouteRole, because a module's data/ is private
+  // to it — role.ts (auth) can't import tenancy.ts (tenancy) directly, so
+  // this app/ route fetches both and passes the result down. `null` when
+  // unsigned-in, not-found (no profiles row yet), or Supabase isn't
+  // configured — resolveRouteRole falls through to its other sources.
+  const clerkUserId = await getAuthUserId();
+  const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
+  const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
+
+  const role = await resolveRouteRole(params, dbRole);
 
   // Trainer DTOs must omit billing entirely — server-denied, never CSS-hidden
   // (ADR-001 §9 Scope, and the load-bearing role rule in CLAUDE.md).
