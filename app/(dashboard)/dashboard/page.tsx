@@ -28,7 +28,7 @@ import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot } from '@/modules/batches/data/batches';
 import { getCurrentUser } from '@/modules/auth/data/auth';
-import type { UserRole } from '@/shared/types';
+import type { Batch, UserRole } from '@/shared/types';
 
 type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -97,6 +97,109 @@ function isDataStale(asOf: Date | null): boolean {
   return asOf ? Date.now() - asOf.getTime() > DATA_STALE_AFTER_MS : false;
 }
 
+function pluralize(count: number, singular = 'batch', plural = 'batches'): string {
+  return count === 1 ? singular : plural;
+}
+
+// ---------------------------------------------------------------------------
+// Render-derivation helpers — pulled out of DashboardPage's body (was CC 35,
+// almost entirely independent ternary/&&/|| expressions with no shared state
+// machine) so each derivation is named and separately measured, following
+// the formatDataStamp/isDataStale convention this file already established.
+// ---------------------------------------------------------------------------
+
+function selectDashboardBatches(
+  snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>,
+  dashboardRole: DashboardRole,
+  mockBatches: typeof MOCK_BATCHES,
+) {
+  const mockScoped = dashboardRole === 'viewer'
+    ? mockBatches
+    : mockBatches.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
+  return snapshot.status === 'ok' ? snapshot.batches : mockScoped;
+}
+
+function buildTrendSeries(trendPoints: typeof SNAPSHOTS, trendDocTotal: number) {
+  if (!trendPoints.length) return [];
+  return [
+    { varName: '--color-blue', label: 'Avg training progress', values: trendPoints.map((s) => s.progressPct) },
+    { varName: '--color-green', label: 'Doc compliance', values: trendPoints.map((s) => Math.round((s.docsComplete / trendDocTotal) * 100)) },
+  ];
+}
+
+interface DashboardViewState {
+  isDenied: boolean;
+  isEmpty: boolean;
+  syncFailed: boolean;
+  isStale: boolean;
+  dataAsOfLabel: string | null;
+  syncFailedMessage: string;
+}
+
+function deriveDashboardViewState(
+  forcedState: string | null,
+  snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>,
+  batchCount: number,
+): DashboardViewState {
+  const dataAsOfDate = snapshot.status === 'ok' && snapshot.dataAsOf ? new Date(snapshot.dataAsOf) : null;
+  // A real stamp when we have live data; null on the cached/mock path so copy
+  // can fall back gracefully instead of printing a fake precise timestamp.
+  const dataAsOfLabel = dataAsOfDate ? formatDataStamp(dataAsOfDate) : null;
+
+  return {
+    // TODO(#32): wire to real role resolver
+    isDenied: forcedState === 'denied',
+    isEmpty: forcedState === 'empty' || batchCount === 0,
+    syncFailed: forcedState === 'sync-failed' || snapshot.status === 'sync-failed',
+    isStale: forcedState === 'stale' || isDataStale(dataAsOfDate),
+    dataAsOfLabel,
+    syncFailedMessage: dataAsOfLabel ? ` from ${dataAsOfLabel}` : '',
+  };
+}
+
+function docComplianceVariant(criticalMissing: number, criticalPending: number): 'critical' | 'warning' | 'neutral' {
+  if (criticalMissing) return 'critical';
+  if (criticalPending) return 'warning';
+  return 'neutral';
+}
+
+// The percentage covers tracked requirements only (ADR-004), so say so
+// rather than implying a cleared checklist.
+function docComplianceSubtext(
+  docsTracked: boolean,
+  criticalMissing: number,
+  docTracked: number,
+  docUntracked: number,
+): string {
+  if (!docsTracked) return 'document sync pending';
+  if (criticalMissing) return `${criticalMissing} critical missing`;
+  if (docUntracked > 0) return `${docTracked} of ${docTracked + docUntracked} tracked`;
+  return 'All critical docs on file';
+}
+
+function billingUrgencyVariant(daysToEarliestBilling: number): 'critical' | 'warning' | 'neutral' {
+  if (daysToEarliestBilling <= 6) return 'critical';
+  if (daysToEarliestBilling <= 21) return 'warning';
+  return 'neutral';
+}
+
+function earliestBillingSubtext(earliestBatchId: string | undefined, daysToEarliestBilling: number): string {
+  if (!earliestBatchId) return 'No batches';
+  // Infinity is the "no known deadline" sentinel from daysUntil(); sound for
+  // sorting/urgency, but never printable copy.
+  return Number.isFinite(daysToEarliestBilling)
+    ? `${earliestBatchId} · ${daysToEarliestBilling} days left`
+    : `${earliestBatchId} · no deadline set`;
+}
+
+function billingReadySubtext(dashboardRole: DashboardRole): string {
+  return dashboardRole === 'viewer' ? 'read-only visibility' : 'billing prep queue';
+}
+
+function billingReadyVariant(billingReadyCount: number): 'warning' | 'neutral' {
+  return billingReadyCount ? 'warning' : 'neutral';
+}
+
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const role = await resolveDashboardRole(params);
@@ -116,10 +219,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // manual tenant filter). `sync-failed`/`unconfigured` → fall back to the mock
   // snapshot, applying the role filter the database would otherwise enforce.
   const snapshot = await getBatchesSnapshot();
-  const mockScoped = dashboardRole === 'viewer'
-    ? MOCK_BATCHES
-    : MOCK_BATCHES.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
-  const batches = snapshot.status === 'ok' ? snapshot.batches : mockScoped;
+  const batches = selectDashboardBatches(snapshot, dashboardRole, MOCK_BATCHES);
   const metrics = deriveDashboardMetrics(batches, DOCUMENT_REQUIREMENTS);
   const criticalMissing = metrics.docMissing;
   const criticalPending = metrics.docPending;
@@ -135,12 +235,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // animation + hover crosshair) never has to import the mock seed dataset.
   const trendDocTotal = Math.max(1, DOCUMENT_REQUIREMENTS.length);
   const trendPoints = SNAPSHOTS.slice(0, 6);
-  const trendSeries = trendPoints.length
-    ? [
-        { varName: '--color-blue', label: 'Avg training progress', values: trendPoints.map((s) => s.progressPct) },
-        { varName: '--color-green', label: 'Doc compliance', values: trendPoints.map((s) => Math.round((s.docsComplete / trendDocTotal) * 100)) },
-      ]
-    : [];
+  const trendSeries = buildTrendSeries(trendPoints, trendDocTotal);
 
   // ---- Dashboard states (TES-8 AC6) ----
   // `?state=` remains a manual preview override for every state. Beyond that:
@@ -149,24 +244,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   //   - denied:      still preview-only — derives from the tenant/role resolver,
   //                  which does not exist yet (blocked by TES-34 / #32).
   const forcedState = firstParam(params.state);
-
-  const dataAsOfDate = snapshot.status === 'ok' && snapshot.dataAsOf
-    ? new Date(snapshot.dataAsOf)
-    : null;
-  // A real stamp when we have live data; null on the cached/mock path so copy
-  // can fall back gracefully instead of printing a fake precise timestamp.
-  const dataAsOfLabel = dataAsOfDate ? formatDataStamp(dataAsOfDate) : null;
-
-  const isDenied = forcedState === 'denied'; // TODO(#32): wire to real role resolver
-  const isEmpty = forcedState === 'empty' || batches.length === 0;
-  const syncFailed = forcedState === 'sync-failed' || snapshot.status === 'sync-failed';
-  const isStale = forcedState === 'stale' || isDataStale(dataAsOfDate);
+  const { isDenied, isEmpty, syncFailed, isStale, dataAsOfLabel, syncFailedMessage } =
+    deriveDashboardViewState(forcedState, snapshot, batches.length);
 
   const header = (
     <div className="page-head">
       <h1>Dashboard</h1>
       <span className="subline">
-        {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {metrics.activeBatches === 1 ? 'batch' : 'batches'}
+        {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {pluralize(metrics.activeBatches)}
         {' · '}Data as of {dataAsOfLabel ?? DATA_AS_OF_FALLBACK}
         {isStale && (
           <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
@@ -212,7 +297,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
 
       {syncFailed && (
         <InfoCallout variant="warning">
-          Sync with Supabase failed — showing the last cached snapshot{dataAsOfLabel ? ` from ${dataAsOfLabel}` : ''}.
+          Sync with Supabase failed — showing the last cached snapshot{syncFailedMessage}.
           <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
         </InfoCallout>
       )}
@@ -221,7 +306,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         <InfoCallout variant="warning">
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <span style={{ flex: 1, minWidth: 240 }}>
-              {criticalMissing} critical document missing across {batches.length} {batches.length === 1 ? 'batch' : 'batches'}.
+              {criticalMissing} critical document missing across {batches.length} {pluralize(batches.length)}.
               {' '}Document audit is required before billing release.
             </span>
             <Link
@@ -260,37 +345,23 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         <MetricCard
           label="Doc Compliance"
           value={docsTracked ? `${metrics.docCompliancePct}%` : '—'}
-          sub={!docsTracked
-            ? 'document sync pending'
-            : criticalMissing
-              ? `${criticalMissing} critical missing`
-              // The percentage covers tracked requirements only (ADR-004), so
-              // say so rather than implying a cleared checklist.
-              : metrics.docUntracked > 0
-                ? `${metrics.docTracked} of ${metrics.docTracked + metrics.docUntracked} tracked`
-                : 'All critical docs on file'}
+          sub={docComplianceSubtext(docsTracked, criticalMissing, metrics.docTracked, metrics.docUntracked)}
           iconName="file-check"
-          variant={criticalMissing ? 'critical' : criticalPending ? 'warning' : 'neutral'}
+          variant={docComplianceVariant(criticalMissing, criticalPending)}
         />
         <MetricCard
           label="Earliest Billing"
           value={metrics.earliestBillingDeadline || '—'}
-          sub={!earliestBatch
-            ? 'No batches'
-            // Infinity is the "no known deadline" sentinel from daysUntil();
-            // sound for sorting/urgency, but never printable copy.
-            : Number.isFinite(metrics.daysToEarliestBilling)
-              ? `${earliestBatch.id} · ${metrics.daysToEarliestBilling} days left`
-              : `${earliestBatch.id} · no deadline set`}
+          sub={earliestBillingSubtext(earliestBatch?.id, metrics.daysToEarliestBilling)}
           iconName="receipt"
-          variant={metrics.daysToEarliestBilling <= 6 ? 'critical' : metrics.daysToEarliestBilling <= 21 ? 'warning' : 'neutral'}
+          variant={billingUrgencyVariant(metrics.daysToEarliestBilling)}
         />
         <MetricCard
           label="Billing-Ready"
           value={billingReady.length}
-          sub={dashboardRole === 'viewer' ? 'read-only visibility' : 'billing prep queue'}
+          sub={billingReadySubtext(dashboardRole)}
           iconName="send"
-          variant={billingReady.length ? 'warning' : 'neutral'}
+          variant={billingReadyVariant(billingReady.length)}
         />
       </section>
 
@@ -334,37 +405,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         </DashboardPanel>
 
         <DashboardPanel title={SUMMARY_CARDS[2].title} icon={SUMMARY_CARDS[2].icon}>
-          {earliestBatch ? (
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>
-                <span>{earliestBatch.id}</span>
-                <span>3/7</span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginTop: 10 }}>
-                {earliestBatch.lifecycle.map((stage) => (
-                  <span
-                    key={stage.key}
-                    title={`${stage.label}: ${stage.status}`}
-                    style={{
-                      height: 8,
-                      borderRadius: 999,
-                      background:
-                        stage.status === 'done' ? 'var(--color-green)'
-                          : stage.status === 'active' ? 'var(--color-blue)'
-                            : 'var(--color-border-faint)',
-                    }}
-                  />
-                ))}
-              </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
-                <LegendDot label="Done" color="var(--color-green)" />
-                <LegendDot label="Active" color="var(--color-blue)" />
-                <LegendDot label="Pending" color="var(--color-border-strong)" />
-              </div>
-            </div>
-          ) : (
-            <p className="t-body">No active lifecycle data.</p>
-          )}
+          <LifecyclePanel earliestBatch={earliestBatch} />
         </DashboardPanel>
       </section>
 
@@ -453,5 +494,39 @@ function LegendDot({ label, color }: { label: string; color: string }) {
       <span style={{ width: 10, height: 6, borderRadius: 999, background: color }} />
       {label}
     </span>
+  );
+}
+
+function LifecyclePanel({ earliestBatch }: { earliestBatch: Batch | undefined }) {
+  if (!earliestBatch) return <p className="t-body">No active lifecycle data.</p>;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>
+        <span>{earliestBatch.id}</span>
+        <span>3/7</span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginTop: 10 }}>
+        {earliestBatch.lifecycle.map((stage) => (
+          <span
+            key={stage.key}
+            title={`${stage.label}: ${stage.status}`}
+            style={{
+              height: 8,
+              borderRadius: 999,
+              background:
+                stage.status === 'done' ? 'var(--color-green)'
+                  : stage.status === 'active' ? 'var(--color-blue)'
+                    : 'var(--color-border-faint)',
+            }}
+          />
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
+        <LegendDot label="Done" color="var(--color-green)" />
+        <LegendDot label="Active" color="var(--color-blue)" />
+        <LegendDot label="Pending" color="var(--color-border-strong)" />
+      </div>
+    </div>
   );
 }
