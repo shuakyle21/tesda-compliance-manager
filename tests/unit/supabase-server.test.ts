@@ -96,6 +96,21 @@ describe('createSupabaseServerClient', () => {
     await expect(accessToken()).resolves.toBe('a-real-token');
   });
 
+  it('throws the exported sentinel, so callers can tell "not signed in" from "token rejected"', async () => {
+    // These two failures look identical at the query site but mean opposite
+    // things: one is "sign in", the other is "your Supabase dashboard is not
+    // configured". /api/debug/auth-check matches on this exact constant, so
+    // drifting the message silently turns that diagnostic into a liar.
+    authMock.mockResolvedValue({ getToken: vi.fn().mockResolvedValue(null) });
+
+    const { createSupabaseServerClient, NO_CLERK_TOKEN_MESSAGE } =
+      await import('@/lib/supabase/server');
+    await createSupabaseServerClient();
+    const { accessToken } = createClientMock.mock.calls[0][2];
+
+    await expect(accessToken()).rejects.toThrow(NO_CLERK_TOKEN_MESSAGE);
+  });
+
   it('throws instead of silently querying as anon when there is no token (A10)', async () => {
     authMock.mockResolvedValue({ getToken: vi.fn().mockResolvedValue(null) });
 
