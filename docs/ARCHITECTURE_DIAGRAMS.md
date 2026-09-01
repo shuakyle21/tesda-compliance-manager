@@ -220,7 +220,7 @@ flowchart TB
 
 - RLS is the security boundary (UI hiding is usability only)
 - Service-role key never reaches client code
-- Clerk JWT template named "supabase" attaches as bearer token
+- Clerk session token supplied via the `accessToken` callback (native third-party auth)
 - Tenant context lives in URL path segment
 - Role-based access control (admin, coordinator, trainer, viewer)
 

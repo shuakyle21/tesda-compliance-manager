@@ -323,9 +323,20 @@ enabled = false
 
 # Use Clerk as a third-party provider alongside Supabase Auth.
 [auth.third_party.clerk]
-enabled = false
-# Obtain from https://clerk.com/setup/supabase
-# domain = "example.clerk.accounts.dev"
+# Clerk's native third-party auth integration. This replaces the deprecated
+# "supabase" JWT template (Clerk deprecated those on 1 Apr 2025). The schema
+# needs no custom claims: app_private.current_clerk_user_id() reads only
+# auth.jwt() ->> 'sub', and looks role/tenant up from profiles and
+# profile_tenant_memberships in the database.
+#
+# This block configures LOCAL `supabase start` only. The hosted project is
+# configured separately at Authentication -> Third-Party Auth in the Supabase
+# dashboard, and must be kept in step with this value.
+#
+# Domain is the Clerk Frontend API host, encoded in the publishable key and
+# therefore public. This is the DEV instance; production uses a different host.
+enabled = true
+domain = "first-gannet-1.clerk.accounts.dev"
 
 # OAuth server configuration
 [auth.oauth_server]
