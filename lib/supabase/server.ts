@@ -2,6 +2,13 @@ import { createClient } from '@supabase/supabase-js';
 import { auth } from '@clerk/nextjs/server';
 import type { Database } from './database.types';
 
+/**
+ * Thrown by the `accessToken` callback when Clerk issues no session token.
+ * Exported so callers can tell "not signed in" apart from "Supabase rejected
+ * the token" — the two look alike at the query site but mean opposite things.
+ */
+export const NO_CLERK_TOKEN_MESSAGE = 'No Clerk session token available for the Supabase request.';
+
 export function isSupabaseConfigured(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -40,7 +47,7 @@ export async function createSupabaseServerClient() {
         // compliance tool that silent degradation is the dangerous outcome, so
         // the caller's try/catch should surface it as `sync-failed` instead.
         if (!token) {
-          throw new Error('No Clerk session token available for the Supabase request.');
+          throw new Error(NO_CLERK_TOKEN_MESSAGE);
         }
 
         return token;

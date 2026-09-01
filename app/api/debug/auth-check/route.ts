@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
+import {
+  createSupabaseServerClient,
+  isSupabaseConfigured,
+  NO_CLERK_TOKEN_MESSAGE,
+} from '@/lib/supabase/server';
 
 /**
  * Manual proof-of-chain for the Clerk → Supabase → RLS path.
@@ -30,18 +34,22 @@ export async function GET() {
     });
   }
 
-  let supabase;
-  try {
-    supabase = await createSupabaseServerClient();
-  } catch {
+  // NOTE: createSupabaseServerClient() does NOT throw for a missing token.
+  // The throw is lazy -- it fires inside the accessToken callback when the
+  // query runs, so it surfaces here as a query error, not a constructor error.
+  // Matching on the exported sentinel is what separates "not signed in" from
+  // "Supabase rejected the token"; without it every signed-out request reports
+  // a dashboard misconfiguration that does not exist.
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from('profiles').select('id').maybeSingle();
+
+  if (error?.message?.includes(NO_CLERK_TOKEN_MESSAGE)) {
     return NextResponse.json({
       verdict: 'no-clerk-session',
       meaning: 'Clerk did not issue a session token for this request.',
       nextStep: 'Are you signed in? Visit /sign-in first, then reload this route.',
     });
   }
-
-  const { data, error } = await supabase.from('profiles').select('id').maybeSingle();
 
   if (error) {
     return NextResponse.json({
