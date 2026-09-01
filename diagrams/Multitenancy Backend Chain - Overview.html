@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TVI-CAMS · Multitenancy Backend Chain</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1160px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+    p.sub {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--color-muted);
+      margin-bottom: 1.5rem;
+      max-width: 640px;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · TVI-CAMS</p>
+    <h1>Multitenancy backend chain — overview</h1>
+    <p class="sub">How a dashboard request resolves tenant-scoped authorization end to end. Every node names its file origin. Detail on the seven <code>app_private.*</code> RLS helper functions lives in the companion dependency diagram.</p>
+
+    <svg viewBox="0 0 940 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mt-overview-title mt-overview-desc">
+      <title id="mt-overview-title">TVI-CAMS multitenancy backend chain</title>
+      <desc id="mt-overview-desc">Architecture diagram showing a request moving from the browser through Clerk middleware, a Next.js Server Component, a module data layer, and lib/supabase/server.ts, which exchanges a Clerk session token for a JWT-bearing Supabase client, into Postgres where Row Level Security — not the application layer — enforces tenant and role access before returning scoped rows.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== Zones (drawn first) ===== -->
+      <!-- Zone A: Clerk external -->
+      <rect x="544" y="448" width="272" height="120" rx="8"
+            fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <rect x="616" y="452" width="128" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="680" y="461" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">CLERK · EXTERNAL AUTH</text>
+
+      <!-- Zone B: Supabase Postgres (RLS boundary) -->
+      <rect x="128" y="552" width="344" height="240" rx="8"
+            fill="rgba(235,108,54,0.03)" stroke="rgba(235,108,54,0.25)" stroke-width="0.8" stroke-dasharray="4,4"/>
+      <rect x="196" y="556" width="208" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="565" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">SUPABASE POSTGRES · RLS BOUNDARY</text>
+
+      <!-- ===== Arrows (behind boxes) ===== -->
+      <!-- A1 Browser -> proxy.ts -->
+      <line x1="300" y1="104" x2="300" y2="144" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+      <rect x="272" y="112" width="56" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="122" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS</text>
+
+      <!-- A2 proxy.ts -> Server Component -->
+      <line x1="300" y1="208" x2="300" y2="248" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="272" y="216" width="56" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="226" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">NEXT()</text>
+
+      <!-- A3 Server Component -> Data layer -->
+      <line x1="300" y1="320" x2="300" y2="360" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="272" y="328" width="56" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="338" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CALLS</text>
+
+      <!-- A4 Data layer -> lib/supabase/server.ts -->
+      <line x1="300" y1="440" x2="300" y2="480" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="272" y="448" width="56" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="458" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CALLS</text>
+
+      <!-- A5 lib/supabase/server.ts -> Clerk (request token) -->
+      <line x1="440" y1="500" x2="544" y2="500" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+      <rect x="452" y="480" width="76" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="490" y="490" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.05em">GET TOKEN</text>
+
+      <!-- A6 Clerk -> lib/supabase/server.ts (dashed return) -->
+      <path d="M 544,516 H 440" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <rect x="464" y="522" width="32" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="480" y="532" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">JWT</text>
+
+      <!-- A7 lib/supabase/server.ts -> Postgres RLS (primary flow) -->
+      <line x1="300" y1="544" x2="300" y2="584" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <rect x="260" y="552" width="80" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="562" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.05em">RLS QUERY</text>
+
+      <!-- A8 Postgres RLS -> Tables -->
+      <line x1="300" y1="672" x2="300" y2="712" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="272" y="680" width="56" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="300" y="690" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SCOPE</text>
+
+      <!-- A9 Return: Postgres RLS -> Server Component (dashed, routed left) -->
+      <path d="M 160,628 H 88 Q 80,628 80,620 V 292 Q 80,284 88,284 H 160"
+            fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <rect x="16" y="446" width="64" height="12" rx="2" fill="#f5f5f5"/>
+      <text x="48" y="456" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.05em">SNAPSHOT</text>
+
+      <!-- ===== Nodes ===== -->
+
+      <!-- N1 Browser Request -->
+      <rect x="160" y="40" width="280" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="40" width="280" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+      <rect x="168" y="48" width="28" height="12" rx="2" fill="transparent" stroke="rgba(122,131,153,0.40)" stroke-width="0.8"/>
+      <text x="182" y="57" fill="#7a8399" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="300" y="76" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Browser request</text>
+      <text x="300" y="92" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">/(dashboard)/&lt;tenant&gt;/…</text>
+
+      <!-- N2 proxy.ts -->
+      <rect x="160" y="144" width="280" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="144" width="280" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="168" y="152" width="30" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="183" y="161" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">MW</text>
+      <text x="300" y="180" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">clerkMiddleware()</text>
+      <text x="300" y="196" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">proxy.ts</text>
+
+      <!-- N3 Server Component -->
+      <rect x="160" y="248" width="280" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="248" width="280" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="168" y="256" width="30" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="183" y="265" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SRV</text>
+      <text x="300" y="284" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Server Component</text>
+      <text x="300" y="300" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">app/(dashboard)/&lt;route&gt;/page.tsx</text>
+      <text x="300" y="312" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">fetch + compose only</text>
+
+      <!-- N4 Module data layer -->
+      <rect x="160" y="360" width="280" height="80" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="360" width="280" height="80" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="168" y="368" width="34" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="185" y="377" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DATA</text>
+      <text x="300" y="396" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">getProfileSnapshot()</text>
+      <text x="300" y="412" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">modules/tenancy/data/tenancy.ts</text>
+      <text x="300" y="426" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">peers: batches.ts · documents.ts · activity.ts</text>
+
+      <!-- N5 lib/supabase/server.ts (FOCAL) -->
+      <rect x="160" y="480" width="280" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="480" width="280" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <rect x="168" y="488" width="30" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+      <text x="183" y="497" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">LIB</text>
+      <text x="300" y="516" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">createSupabaseServerClient()</text>
+      <text x="300" y="532" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">lib/supabase/server.ts</text>
+
+      <!-- N6 Clerk session (external) -->
+      <rect x="560" y="480" width="216" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="560" y="480" width="216" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <rect x="568" y="488" width="30" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.22)" stroke-width="0.8"/>
+      <text x="583" y="497" fill="#7a8399" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+      <text x="668" y="512" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">auth().getToken()</text>
+      <text x="668" y="528" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">@clerk/nextjs/server</text>
+
+      <!-- N7 Postgres RLS (FOCAL boundary) -->
+      <rect x="160" y="584" width="280" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="584" width="280" height="88" rx="6" fill="rgba(235,108,54,0.06)" stroke="#eb6c36" stroke-width="1.2" stroke-dasharray="4,4"/>
+      <rect x="168" y="592" width="28" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+      <text x="182" y="601" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SEC</text>
+      <text x="300" y="618" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Postgres — Row Level Security</text>
+      <text x="300" y="634" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">app_private.* helper functions</text>
+      <text x="300" y="648" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">supabase/migrations/20260528160300_…</text>
+      <text x="300" y="662" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">.sql :339–700 · see detail diagram</text>
+
+      <!-- N8 RLS-guarded tables -->
+      <rect x="160" y="712" width="280" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="160" y="712" width="280" height="64" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+      <rect x="168" y="720" width="24" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.50)" stroke-width="0.8"/>
+      <text x="180" y="729" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DB</text>
+      <text x="300" y="748" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">RLS-guarded tables</text>
+      <text x="300" y="764" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">profiles · tenants · profile_tenant_memberships · batches</text>
+
+      <!-- ===== Annotation callout ===== -->
+      <text x="908" y="40" fill="#eb6c36" font-size="14" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="end">RLS enforces.</text>
+      <text x="908" y="58" fill="#eb6c36" font-size="14" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="end">The UI role check is usability only.</text>
+      <path d="M 820 66 Q 660 300 440 628" fill="none" stroke="rgba(235,108,54,0.50)" stroke-width="1" stroke-dasharray="4,3"/>
+      <circle cx="440" cy="628" r="2" fill="#eb6c36"/>
+
+      <!-- ===== Legend ===== -->
+      <line x1="40" y1="812" x2="900" y2="812" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="40" y="828" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+
+      <rect x="40" y="844" width="14" height="10" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="60" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Focal integration</text>
+
+      <rect x="188" y="844" width="14" height="10" rx="2" fill="rgba(235,108,54,0.06)" stroke="#eb6c36" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="208" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Security boundary (RLS)</text>
+
+      <rect x="368" y="844" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="388" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">App code</text>
+
+      <rect x="472" y="844" width="14" height="10" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="492" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">External (Clerk)</text>
+
+      <rect x="600" y="844" width="14" height="10" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+      <text x="620" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Store</text>
+
+      <line x1="664" y1="850" x2="692" y2="850" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <text x="700" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Primary flow</text>
+
+      <line x1="796" y1="850" x2="824" y2="850" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <text x="832" y="852" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Return</text>
+    </svg>
+  </div>
+</body>
+</html>

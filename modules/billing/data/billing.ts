@@ -1,14 +1,3 @@
-/**
- * Billing derivation layer (FR-09).
- *
- * Billing has no table of its own yet — it is *derived* from a batch plus the
- * document matrix and the tenant record. This layer owns that derivation so the
- * route stays a thin fetch-and-compose shell and the UI receives ready-to-render
- * cards. It reads the mock reference datasets (document requirements, tenants)
- * from `shared/mocks`; when the real `billing_records` table lands (ADR-001 §11)
- * a Supabase fetch slots in here behind the same return shape.
- */
-
 import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks';
 import type { Batch, DocumentRequirement, Tenant } from '@/shared/types';
 import { billingGate, type BillingGate, type DocReadiness } from '@/modules/billing/domain/readiness';
