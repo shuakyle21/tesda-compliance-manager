@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "createdAt": "2026-09-01T13:52:48.521Z",
+        "reason": "User confirmed Geist is intentional — diagram-design skill default skin"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "createdAt": "2026-09-01T13:52:48.578Z",
+        "reason": "User confirmed Geist Mono is intentional — diagram-design skill default skin"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "createdAt": "2026-09-01T13:52:48.617Z",
+        "reason": "User confirmed Instrument Serif is intentional — diagram-design skill default skin"
+      }
+    ]
+  }
+}
