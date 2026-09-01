@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TVI-CAMS — Authorization Chain</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f5f5f5;--ink:#2d3142;--muted:#4f5d75;--soft:#7a8399;--accent:#eb6c36;--link:#2e5aa8;--rule:rgba(45,49,66,0.12);}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Geist',system-ui,sans-serif;padding:3rem 2rem;}
+  .wrap{max-width:960px;margin:0 auto}
+  .eyebrow{font-family:'Geist Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 .5rem}
+  h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:1.75rem;margin:0 0 .5rem}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 2rem;max-width:60ch}
+  svg{width:100%;height:auto;display:block}
+  footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--rule);font-family:'Geist Mono',monospace;font-size:8px;letter-spacing:.1em;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<p class="eyebrow">TVI-CAMS / Architecture</p>
+<h1>Authorization chain</h1>
+<p class="sub">Where authentication is actually enforced, and where authorization is decided. The middleware is not a gate — a common and dangerous misreading of this stack.</p>
+
+<svg viewBox="0 0 880 800" role="img" aria-labelledby="authchain-title authchain-desc">
+<title id="authchain-title">TVI-CAMS authorization chain</title>
+<desc id="authchain-desc">A request passes through Clerk middleware, which only stamps a pathname header and does not block anything. The dashboard layout's requireAuthenticatedUser call is the actual authentication gate. Module data layers then query Supabase through a server client that supplies the Clerk session token via an accessToken callback, and Postgres row-level security makes every authorization decision.</desc>
+
+<defs>
+  <marker id="ac-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+  <marker id="ac-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+</defs>
+
+<rect width="100%" height="100%" fill="#f5f5f5"/>
+
+<!-- connectors first (behind boxes) -->
+<line x1="340" y1="160" x2="340" y2="204" stroke="#4f5d75" stroke-width="1" marker-end="url(#ac-arrow)"/>
+<line x1="340" y1="272" x2="340" y2="316" stroke="#4f5d75" stroke-width="1" marker-end="url(#ac-arrow)"/>
+<line x1="340" y1="384" x2="340" y2="428" stroke="#eb6c36" stroke-width="1" marker-end="url(#ac-arrow-accent)"/>
+<line x1="340" y1="496" x2="340" y2="540" stroke="#4f5d75" stroke-width="1" marker-end="url(#ac-arrow)"/>
+<line x1="340" y1="608" x2="340" y2="652" stroke="#4f5d75" stroke-width="1" marker-end="url(#ac-arrow)"/>
+<!-- side branch: no session -->
+<line x1="460" y1="352" x2="556" y2="352" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#ac-arrow)"/>
+
+<!-- arrow labels: vertical segments get side placement, 12px clear of the stroke -->
+<rect x="352" y="170" width="72" height="12" rx="2" fill="#f5f5f5"/>
+<text x="356" y="179" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">REQUEST</text>
+<rect x="352" y="282" width="96" height="12" rx="2" fill="#f5f5f5"/>
+<text x="356" y="291" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">HEADER ONLY</text>
+<rect x="352" y="394" width="104" height="12" rx="2" fill="#f5f5f5"/>
+<text x="356" y="403" fill="#eb6c36" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">AUTHENTICATED</text>
+<rect x="352" y="506" width="88" height="12" rx="2" fill="#f5f5f5"/>
+<text x="356" y="515" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">FETCH+MAP</text>
+<rect x="352" y="618" width="88" height="12" rx="2" fill="#f5f5f5"/>
+<text x="356" y="627" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">BEARER sub</text>
+<rect x="472" y="324" width="88" height="12" rx="2" fill="#f5f5f5"/>
+<text x="476" y="333" fill="#7a8399" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".06em">NO SESSION</text>
+
+<!-- 1. browser -->
+<rect x="220" y="96" width="240" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="220" y="96" width="240" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+<rect x="228" y="102" width="44" height="12" rx="2" fill="transparent" stroke="rgba(122,131,153,0.40)" stroke-width="0.8"/>
+<text x="250" y="111" fill="#7a8399" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">CLIENT</text>
+<text x="340" y="134" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Browser request</text>
+<text x="340" y="150" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">/dashboard</text>
+
+<!-- 2. proxy.ts -->
+<rect x="220" y="208" width="240" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="220" y="208" width="240" height="64" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+<rect x="228" y="214" width="72" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.30)" stroke-width="0.8"/>
+<text x="264" y="223" fill="#4f5d75" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">NOT A GATE</text>
+<text x="340" y="246" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">proxy.ts</text>
+<text x="340" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">sets x-pathname only</text>
+
+<!-- 3. layout.tsx — FOCAL -->
+<rect x="220" y="320" width="240" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="220" y="320" width="240" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+<rect x="228" y="326" width="60" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+<text x="258" y="335" fill="#eb6c36" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">THE GATE</text>
+<text x="340" y="358" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">(dashboard)/layout.tsx</text>
+<text x="340" y="374" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">requireAuthenticatedUser()</text>
+
+<!-- side: redirect -->
+<rect x="556" y="320" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="556" y="320" width="200" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+<text x="656" y="352" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Redirect</text>
+<text x="656" y="368" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">/sign-in</text>
+
+<!-- 4. module data -->
+<rect x="220" y="432" width="240" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="220" y="432" width="240" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="228" y="438" width="40" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="248" y="447" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">DATA</text>
+<text x="340" y="470" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">modules/&lt;domain&gt;/data/</text>
+<text x="340" y="486" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">7 of 14 modules</text>
+
+<!-- 5. server client -->
+<rect x="220" y="544" width="240" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="220" y="544" width="240" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="228" y="550" width="60" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+<text x="258" y="559" fill="#2d3142" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">ANON KEY</text>
+<text x="340" y="582" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">lib/supabase/server.ts</text>
+<text x="340" y="598" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">accessToken: getToken()</text>
+
+<!-- 6. RLS — FOCAL -->
+<rect x="220" y="656" width="240" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="220" y="656" width="240" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+<rect x="228" y="662" width="88" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+<text x="272" y="671" fill="#eb6c36" font-size="7" font-family="'Geist Mono',monospace" text-anchor="middle" letter-spacing=".08em">SECURITY EDGE</text>
+<text x="340" y="694" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist',sans-serif" text-anchor="middle">Postgres RLS</text>
+<text x="340" y="710" fill="#4f5d75" font-size="9" font-family="'Geist Mono',monospace" text-anchor="middle">app_private.* helpers</text>
+
+<!-- legend -->
+<line x1="32" y1="748" x2="848" y2="748" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+<text x="32" y="768" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace" letter-spacing=".14em">LEGEND</text>
+<rect x="120" y="758" width="16" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+<text x="144" y="768" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace">ENFORCEMENT POINT</text>
+<rect x="320" y="758" width="16" height="12" rx="2" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="344" y="768" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace">PASS-THROUGH, NO CHECK</text>
+<rect x="560" y="758" width="16" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="584" y="768" fill="#4f5d75" font-size="8" font-family="'Geist Mono',monospace">APPLICATION CODE</text>
+</svg>
+
+<footer>TVI-CAMS · verified against proxy.ts, app/(dashboard)/layout.tsx, lib/supabase/server.ts · 2026-09-01</footer>
+</div>
+</body>
+</html>
