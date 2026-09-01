@@ -69,6 +69,7 @@ _Avoid_: Assignment, tenant link
 
 **Resolved role**:
 The lowercase role value (`'admin' | 'coordinator' | 'trainer' | 'viewer'`) the app trusts for a request — sourced from the profile's `role` column, matching the `public.profile_role` Postgres enum exactly. `ProfileRole` in `modules/tenancy/domain/profile.ts` must use this same lowercase vocabulary, not its own capitalized set.
+**Admin** is the school's proprietor; **coordinator** is staff running batches day to day; **viewer** is read-only; **trainer** sees only their own batches and no billing. Admin and coordinator are indistinguishable in every current policy — each check pairs them — so today the difference records who someone *is*, not what they may do.
 _Avoid_: Capitalized role labels as a type (`'Admin'`, etc.) — those are display copy, not the domain value
 
 **Denied**:
