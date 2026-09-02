@@ -76,3 +76,6 @@ next-env.d.ts
 # Local agent scratch state
 .fallow/
 .nogic/
+
+# OpenWiki transient run state (checkpoints an in-progress generation; not meant to be committed)
+openwiki/.run.json
