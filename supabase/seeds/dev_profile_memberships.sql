@@ -26,13 +26,24 @@ begin;
 -- ---------------------------------------------------------------------------
 -- 1. Profiles for the real Clerk users
 -- ---------------------------------------------------------------------------
--- clerk_user_id is UNIQUE, so this is safely re-runnable. Roles are the
--- load-bearing part: `role` drives trainer field omission and viewer
+-- clerk_user_id is UNIQUE, so the profile upsert is safely re-runnable.
+-- Memberships need the explicit delete below to be re-runnable -- see there.
+--
+-- Roles per ADR-005 decisions 2 and 4. `role` drives trainer field omission and viewer
 -- write-denial, so an over-generous role here silently widens what the app
--- will show. Start least-privileged and widen deliberately.
+-- shows.
+--   demo      = viewer      -- least privilege. viewer is NOT denied billing,
+--                              only read-only, so it can still read every
+--                              screen the isolation assertion checks.
+--   the humans = admin      -- the school's proprietor. Note that `admin` and
+--                              `coordinator` are indistinguishable in every
+--                              current policy (each check pairs them), so this
+--                              records who someone IS, not what they may do --
+--                              and these rows will silently gain any future
+--                              admin-only capability.
 insert into public.profiles (clerk_user_id, full_name, email, role, is_active)
 values
-  ('user_3IMAGVRr7TnY3avksz6FbpIfPXj', 'TVI-CAMS Demo',       'demo@tvicams.app',        'coordinator', true),
+  ('user_3IMAGVRr7TnY3avksz6FbpIfPXj', 'TVI-CAMS Demo',       'demo@tvicams.app',        'viewer',      true),
   ('user_3FLVb1HfpRn9G7eYFQJKkpclhhm', 'Joshua Klyne Pudadera','klynejoshua13@gmail.com', 'admin',       true),
   ('user_3FJecAYAxYEtyjNlidloQeo7U8G', 'Nenita',               'nenitarmo@gmail.com',     'admin',       true)
 on conflict (clerk_user_id) do update set
@@ -48,20 +59,47 @@ on conflict (clerk_user_id) do update set
 -- Tenants are resolved by `code`, never by hardcoded UUID -- the UUIDs differ
 -- per environment and this file should stay portable.
 --
--- Mirrors the mock USERS shape: an admin per school, plus one coordinator with
--- visibility across all three (the "Karina Cruz" role in shared/mocks/seed.ts).
+-- One membership per profile (ADR-005 decision 1) -- NOT the mock USERS shape, which
+-- has a coordinator spanning all three schools ("Karina Cruz"). Multi-membership
+-- stays out of scope per CONTEXT.md: can_access_tenant grants on ANY membership
+-- and ignores is_default, while the Sidebar switcher is cosmetic, so a second
+-- membership merges tenants into one unscoped list rather than making them
+-- switchable. `is_default` is therefore redundant here -- with a single row the
+-- `find(is_default) ?? [0]` fallback always resolves to it -- and is set true
+-- for forward compatibility only.
+-- Converge to exactly the grants in the CTE below. `on conflict do update` alone cannot
+-- do this: it can add and amend rows but never remove one, so if an earlier
+-- draft of this script was applied (it granted the developer J3ED and NEN),
+-- those rows would survive a re-run -- and can_access_tenant grants on ANY
+-- membership, which is the exact harm decision 1 exists to prevent. Scoped to the three
+-- clerk_user_ids this script manages, so the two orphaned rows noted at the
+-- bottom are left untouched.
+delete from public.profile_tenant_memberships m
+using public.profiles p
+where m.profile_id = p.id
+  and p.clerk_user_id in (
+    'user_3IMAGVRr7TnY3avksz6FbpIfPXj',
+    'user_3FLVb1HfpRn9G7eYFQJKkpclhhm',
+    'user_3FJecAYAxYEtyjNlidloQeo7U8G'
+  );
+
 with assignment (clerk_user_id, tenant_code, is_default) as (
   values
     -- demo: AKB ONLY, deliberately. An all-tenants demo account makes tenant
     -- isolation untestable -- and 100% tenant scoping is a P0 metric in the
     -- PRD. Scoped to one tenant, this account doubles as the isolation test:
-    -- it must see DEV-AKB-001 and must NOT see the other four batches.
+    -- it must see exactly ONE batch (DEV-AKB-001) and must NOT see the other
+    -- four: DEV-J3ED-001, DEV-J3ED-002, DEV-NEN-001, DEV-NEN-002. A scoping
+    -- regression shows five.
+    --
+    -- Note the verification query below CANNOT confirm this on its own: it
+    -- joins through profile_tenant_memberships, so a tenant nobody is a member
+    -- of never appears in its output. J3ED has no member here by design, so its
+    -- two batches are invisible to that check. Verify in the app, signed in.
     ('user_3IMAGVRr7TnY3avksz6FbpIfPXj', 'AKB',  true),
-    -- developer: admin across all three
+    -- developer: AKB only. The draft granted all three; ADR-005 rejected that.
     ('user_3FLVb1HfpRn9G7eYFQJKkpclhhm', 'AKB',  true),
-    ('user_3FLVb1HfpRn9G7eYFQJKkpclhhm', 'J3ED', false),
-    ('user_3FLVb1HfpRn9G7eYFQJKkpclhhm', 'NEN',  false),
-    -- Nenita: admin of her own school only
+    -- Nenita: her own school only
     ('user_3FJecAYAxYEtyjNlidloQeo7U8G', 'NEN',  true)
 )
 insert into public.profile_tenant_memberships (profile_id, tenant_id, is_default)
@@ -85,17 +123,22 @@ order by p.email, t.code;
 commit;
 
 -- ===========================================================================
--- OPEN DECISIONS -- resolve these before running
+-- DECISIONS -- settled in ADR-005, and one item still open
 -- ===========================================================================
 --
--- 1. ROLES. Drafted as: demo=coordinator, klynejoshua13=admin, nenitarmo=admin.
---    `role` is load-bearing, not cosmetic -- it governs trainer field omission
---    (billing deadline, NTP lag, BSRS, financials) and viewer write-denial.
---    Confirm each one. If you want to exercise the trainer view, one of these
---    should be `trainer` instead, since that path has the weakest server-side
---    enforcement today and is the one most worth testing.
+-- Settled (docs/adr/ADR-005-demo-account-tenant-scoping.md):
+--   1.  One tenant membership per profile. The draft's three-tenant grant for
+--       the developer is removed.
+--   2.  demo@tvicams.app = viewer, AKB only.
+--   3.  The demo account is INTERNAL ONLY -- development and isolation testing.
+--       Not for a panel, evaluator, or TESDA reviewer. Two reasons, both
+--       recorded in the ADR: the `?role=` preview override outranks the
+--       database role, so demo's `viewer` is not enforced against anyone who
+--       edits the URL; and 8 of 10 dashboard routes still render MOCK_BATCHES
+--       for all three schools regardless of RLS.
+--   4.  The human accounts keep `admin`, defined as the school's proprietor.
 --
--- 2. TWO ORPHANED PROFILE ROWS, deliberately left alone:
+-- STILL OPEN -- two orphaned profile rows, deliberately left alone:
 --       user_3FKZdxAzFzE5fIWK9uUKElsZONq  admin,  1 membership (AKB, default)
 --       user_2g7np7Hrk0SN6kj5EDMLDaKNL0S  viewer, 0 memberships
 --    Neither Clerk ID exists in the current instance. They grant access to
@@ -105,8 +148,19 @@ commit;
 --    makes the memberships table lie about who can reach AKB.
 --    Deleting them is a separate, deliberate change. Not folded in here.
 --
--- 3. SCOPE (resolved). demo is scoped to AKB only, so it doubles as the tenant
---    isolation test: it must see exactly 1 batch (DEV-AKB-001) and must not see
---    the 4 batches belonging to J3ED and NEN. Widen it later only if a demo
---    genuinely needs the full portfolio -- and if you do, keep a single-tenant
---    account around, because isolation cannot be proven without one.
+-- AFTER RUNNING, verify the isolation assertion in the app, not just in SQL:
+--    sign in as demo@tvicams.app and open /dashboard -- exactly one batch
+--    (DEV-AKB-001) must be listed, and neither NEN batch. A scoping regression
+--    shows five. Check /dashboard rather than /billing: billing's mock fallback
+--    made zero rows indistinguishable from all rows until ADR-005 decision 5
+--    removed it, so a stale deployment there would hide the very failure this
+--    assertion is meant to catch.
+--
+--    CAVEAT -- the assertion is only meaningful when Supabase is configured and
+--    the snapshot returns `ok`. On the fallback path (`unconfigured` or
+--    `sync-failed`) app/(dashboard)/dashboard/page.tsx hands a `viewer` the
+--    FULL unscoped mock set, while narrowing it for every other role -- and an
+--    unresolved role also defaults to viewer. So demo, now a viewer, is exactly
+--    the role that sees all schools' mock data there. Seeing five batches on
+--    that path is the mock fallback, not a scoping regression. Confirm the
+--    "Data as of" stamp is present before trusting the count.

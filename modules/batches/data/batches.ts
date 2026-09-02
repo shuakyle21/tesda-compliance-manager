@@ -247,6 +247,31 @@ export type BatchesSnapshot =
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
+/**
+ * Which batches should a route render, given a snapshot and a fallback set?
+ *
+ * The rule: **`ok` is authoritative, including when it is empty.** A tenant
+ * with no batches, or a correctly scoped user who can see none, is a real
+ * answer and must render the empty state. Only a snapshot that carries no data
+ * at all — `unconfigured` (no Supabase env) or `sync-failed` — may fall back to
+ * the caller's set.
+ *
+ * This exists as one function because it previously existed as two. The
+ * dashboard and billing routes each inlined their own copy and the copies
+ * drifted: billing added `&& snapshot.batches.length > 0`, which sent an empty
+ * `ok` result to the mock dataset. That leaked mock financials for every school
+ * to a user scoped to one, and made zero rows indistinguishable from all rows —
+ * defeating the tenant-isolation assertion on the only live billing screen.
+ * See docs/adr/ADR-005-demo-account-tenant-scoping.md, decision 5.
+ *
+ * `fallback` is passed in rather than imported so this stays pure and the
+ * caller keeps control of scoping (the dashboard narrows its mock set by role
+ * before calling).
+ */
+export function selectBatchesForDisplay(snapshot: BatchesSnapshot, fallback: Batch[]): Batch[] {
+  return snapshot.status === 'ok' ? snapshot.batches : fallback;
+}
+
 /** Freshest `updated_at` across the loaded rows, or null when there are none. */
 function latestUpdatedAt(batches: Batch[]): string | null {
   return batches.reduce<string | null>(

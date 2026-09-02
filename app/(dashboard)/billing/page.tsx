@@ -16,7 +16,7 @@ import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { MOCK_BATCHES } from '@/shared/mocks';
 import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks/seed';
-import { getBatchesSnapshot } from '@/modules/batches/data/batches';
+import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { firstParam, resolveRouteRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
@@ -72,8 +72,8 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
 
   // `unconfigured` falls back to the seed dataset silently; `sync-failed` is a
   // real failure and must surface the banner (module data-layer contract).
-  const batches: Batch[] =
-    snapshot.status === 'ok' && snapshot.batches.length > 0 ? snapshot.batches : MOCK_BATCHES;
+  // An `ok` snapshot is authoritative even when empty — see ADR-005 §5.
+  const batches: Batch[] = selectBatchesForDisplay(snapshot, MOCK_BATCHES);
 
   const syncFailed = snapshot.status === 'sync-failed' || forcedState === 'sync-failed';
   const stale = forcedState === 'stale';
