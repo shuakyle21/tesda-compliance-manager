@@ -82,21 +82,26 @@ below on the one live screen where it matters most.
 
 ## The isolation assertion
 
-The dev seed creates **three** batches, not five:
+The dev seed mirrors `shared/mocks/seed.ts` (`BATCHES`) row for row — **five**
+batches, matching `ALL_BATCHES`:
 
-| Tenant | Batch | Course |
-| --- | --- | --- |
-| AKB | `DEV-AKB-001` | Cookery NC II |
-| NEN | `DEV-NEN-001` | Rice Machinery Operations NC II |
-| NEN | `DEV-NEN-002` | Rice Machinery Operations NC II |
-| J3ED | *(none)* | — |
+| Tenant | Batch | Course | Status |
+| --- | --- | --- | --- |
+| AKB | `DEV-AKB-001` | Cookery NC II | ongoing |
+| J3ED | `DEV-J3ED-001` | Agri Crops Production NC I | ongoing |
+| J3ED | `DEV-J3ED-002` | Agri Crops Production NC I | completed |
+| NEN | `DEV-NEN-001` | Rice Machinery Operations NC II | ongoing |
+| NEN | `DEV-NEN-002` | Rice Machinery Operations NC II | ongoing |
 
 So the assertion the demo account exists to prove is: **signed in as demo, on
 `/dashboard`, exactly one batch is visible — `DEV-AKB-001` — and neither NEN
-batch appears.** A scoping regression shows three.
+nor J3ED batch appears.** A scoping regression shows more than one.
 
-(The seed's own comment claimed "the other four batches". That count came from
-the mock dataset and is wrong for live data.)
+(`MOCK_BATCHES` filters out `status: 'completed'`, so it holds four of these
+five rows — `DEV-J3ED-002` is the one completed batch it excludes. The seed's
+"four batches" framing tracked `MOCK_BATCHES`, not `ALL_BATCHES`; both counts
+now hold for live data, since the seed was brought in line with the full mock
+dataset.)
 
 ## Consequences
 
