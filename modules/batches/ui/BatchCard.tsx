@@ -18,11 +18,20 @@ import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
-import type { Batch } from '@/shared/types';
+import type { Batch, UrgencyTier } from '@/shared/types';
+
+function cardChrome(billingReady: boolean, clickable: boolean) {
+  return {
+    border: billingReady ? 'var(--color-green)' : 'var(--color-border)',
+    boxShadow: billingReady ? '0 0 0 3px var(--color-green-lt), var(--shadow-sm)' : 'var(--shadow-sm)',
+    cursor: clickable ? 'pointer' : 'default',
+  };
+}
 
 export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => void }) {
   const tier = urgencyTier(batch.daysToBilling);
   const billingReady = isBillingReady(batch);
+  const chrome = cardChrome(billingReady, Boolean(onClick));
 
   const onEnter = (e: MouseEvent<HTMLDivElement>) => {
     e.currentTarget.style.boxShadow = billingReady
@@ -44,11 +53,11 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
       onMouseLeave={onLeave}
       style={{
         background: 'var(--color-surface)',
-        border: `1px solid ${billingReady ? 'var(--color-green)' : 'var(--color-border)'}`,
+        border: `1px solid ${chrome.border}`,
         borderRadius: 'var(--radius-lg)',
-        boxShadow: billingReady ? '0 0 0 3px var(--color-green-lt), var(--shadow-sm)' : 'var(--shadow-sm)',
+        boxShadow: chrome.boxShadow,
         overflow: 'hidden',
-        cursor: onClick ? 'pointer' : 'default',
+        cursor: chrome.cursor,
         transition: 'box-shadow 150ms var(--ease-standard), background 150ms var(--ease-standard)',
       }}
     >
@@ -56,16 +65,7 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
 
       {/* Header */}
       <div style={{ padding: '14px 16px 10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <StatusBadge variant={batch.program === 'TWSP' ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
-          <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
-          {billingReady
-            ? <BillingReadyBadge pulse />
-            : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
-          <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>
-            {batch.id}
-          </span>
-        </div>
+        <CardHeaderBadges batch={batch} billingReady={billingReady} />
         <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', marginTop: 8 }}>
           {batch.name}
         </div>
@@ -103,28 +103,7 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
           </Field>
         </Col>
 
-        <Col borderLeft>
-          <Field label="NTP → Start lag">
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: batch.ntpLag === 0 ? 'var(--color-green-dk)' : 'var(--color-text-primary)' }}>
-              {batch.ntpLag === 0 ? 'Same-day' : `${batch.ntpLag} days`}
-            </span>
-          </Field>
-          <Field label="Billing deadline" style={{ marginTop: 10 }}>
-            <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500,
-              color: tier === 'critical' ? 'var(--color-red-dk)'
-                : tier === 'warning' ? 'var(--color-amber-dk)'
-                : 'var(--color-text-primary)',
-            }}>
-              {batch.billingDeadline}
-            </span>
-          </Field>
-          <Field label="BSRS" style={{ marginTop: 10 }}>
-            <StatusBadge variant={batch.bsrs ? 'approved' : 'not-approved'} iconName={batch.bsrs ? 'shield-check' : 'shield-off'}>
-              {batch.bsrs ? 'APPROVED' : 'NOT APPROVED'}
-            </StatusBadge>
-          </Field>
-        </Col>
+        <BillingCol batch={batch} tier={tier} />
       </div>
 
       {/* Lifecycle pipeline */}
@@ -143,6 +122,49 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
         {batch.remark}
       </div>
     </div>
+  );
+}
+
+function CardHeaderBadges({ batch, billingReady }: { batch: Batch; billingReady: boolean }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <StatusBadge variant={batch.program === 'TWSP' ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
+      <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
+      {billingReady
+        ? <BillingReadyBadge pulse />
+        : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
+      <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>
+        {batch.id}
+      </span>
+    </div>
+  );
+}
+
+function BillingCol({ batch, tier }: { batch: Batch; tier: UrgencyTier }) {
+  const ntpSameDay = batch.ntpLag === 0;
+  return (
+    <Col borderLeft>
+      <Field label="NTP → Start lag">
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: ntpSameDay ? 'var(--color-green-dk)' : 'var(--color-text-primary)' }}>
+          {ntpSameDay ? 'Same-day' : `${batch.ntpLag} days`}
+        </span>
+      </Field>
+      <Field label="Billing deadline" style={{ marginTop: 10 }}>
+        <span style={{
+          fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500,
+          color: tier === 'critical' ? 'var(--color-red-dk)'
+            : tier === 'warning' ? 'var(--color-amber-dk)'
+            : 'var(--color-text-primary)',
+        }}>
+          {batch.billingDeadline}
+        </span>
+      </Field>
+      <Field label="BSRS" style={{ marginTop: 10 }}>
+        <StatusBadge variant={batch.bsrs ? 'approved' : 'not-approved'} iconName={batch.bsrs ? 'shield-check' : 'shield-off'}>
+          {batch.bsrs ? 'APPROVED' : 'NOT APPROVED'}
+        </StatusBadge>
+      </Field>
+    </Col>
   );
 }
 
