@@ -65,6 +65,30 @@ type Phase = {
 type Milestone = { label: string; at: Date; status: LifecycleStatus };
 type GanttRow = { id: string; program: string; pct: number; phases: Phase[]; milestones: Milestone[] };
 
+/**
+ * Milestone diamond styling per lifecycle status, keyed so a new
+ * `LifecycleStatus` variant fails compilation here until its treatment is
+ * chosen (same contract as `DB_TO_UI_STAGE` in the batches mapper). Holds CSS
+ * variable *names*, resolved against the host via `cssVar` at draw time —
+ * matching how `Phase` above carries `fillVar`/`strokeVar`/`fgVar`.
+ *
+ * `word` is the status text in the milestone's <title>, i.e. the accessible
+ * tree: status must read as text, never colour alone (RULES.md §4).
+ * `dash: null` is deliberate — d3's `.attr(name, null)` *removes* the
+ * attribute, which is not the same as setting it to 'none'.
+ */
+export const MILESTONE_TONE: Record<LifecycleStatus, {
+  fillVar: string;
+  strokeVar: string;
+  labelVar: string;
+  dash: string | null;
+  word: string;
+}> = {
+  done:    { fillVar: '--color-blue',    strokeVar: '--color-blue',          labelVar: '--color-text-secondary', dash: null,  word: 'done' },
+  active:  { fillVar: '--color-amber',   strokeVar: '--color-amber',         labelVar: '--color-text-secondary', dash: null,  word: 'in progress' },
+  pending: { fillVar: '--color-surface', strokeVar: '--color-border-strong', labelVar: '--color-text-muted',     dash: '2 2', word: 'pending' },
+};
+
 function lifecycleStatus(batch: Batch, key: string): LifecycleStatus {
   return batch.lifecycle.find((s) => s.key === key)?.status ?? 'pending';
 }
@@ -248,19 +272,19 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
             const mx = x(m.at);
             const low = mx - lastLab < 70;
             if (!low) lastLab = mx;
-            const done = m.status === 'done', active = m.status === 'active';
+            const tone = MILESTONE_TONE[m.status];
             const dateLabel = timeFormat('%b %e, %Y')(m.at);
             const mg = g.append('g').attr('transform', `translate(${mx},${mY})`)
               .on('mousemove', (ev) => show(ev, `<b>${escapeHtml(m.label)}</b><br>${escapeHtml(dateLabel)}`))
               .on('mouseleave', hide);
-            mg.append('title').text(`${m.label}: ${dateLabel} — ${done ? 'done' : active ? 'in progress' : 'pending'}`);
+            mg.append('title').text(`${m.label}: ${dateLabel} — ${tone.word}`);
             mg.append('rect').attr('x', -4.5).attr('y', -4.5).attr('width', 9).attr('height', 9).attr('transform', 'rotate(45)')
-              .attr('fill', done ? cssVar(host, '--color-blue') : active ? cssVar(host, '--color-amber') : cssVar(host, '--color-surface'))
-              .attr('stroke', done ? cssVar(host, '--color-blue') : active ? cssVar(host, '--color-amber') : cssVar(host, '--color-border-strong'))
+              .attr('fill', cssVar(host, tone.fillVar))
+              .attr('stroke', cssVar(host, tone.strokeVar))
               .attr('stroke-width', 1.2)
-              .attr('stroke-dasharray', done || active ? null : '2 2');
+              .attr('stroke-dasharray', tone.dash);
             mg.append('text').attr('x', low ? -6 : 8).attr('y', low ? 16 : 3).attr('text-anchor', low ? 'end' : 'start')
-              .attr('fill', done || active ? cssVar(host, '--color-text-secondary') : cssVar(host, '--color-text-muted'))
+              .attr('fill', cssVar(host, tone.labelVar))
               .style('font-family', 'var(--font-sans)').style('font-size', '9px').style('font-weight', '600')
               .style('letter-spacing', '0.03em').style('pointer-events', 'none').text(m.label);
           });
