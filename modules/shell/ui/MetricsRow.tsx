@@ -28,6 +28,33 @@ function docComplianceSub(metrics: DashboardMetrics, hasBatches: boolean): strin
   return 'All on file';
 }
 
+function docComplianceVariant(metrics: DashboardMetrics): 'critical' | 'warning' | 'neutral' {
+  if (metrics.docMissing > 0) return 'critical';
+  if (metrics.docPending > 0) return 'warning';
+  return 'neutral';
+}
+
+function avgProgressVariant(hasBatches: boolean, avgProgress: number): 'warning' | 'neutral' {
+  if (!hasBatches) return 'neutral';
+  return avgProgress < 60 ? 'warning' : 'neutral';
+}
+
+function billingSub(hasBatches: boolean, daysToEarliestBilling: number): string {
+  return hasBatches ? `${daysToEarliestBilling} days remaining` : 'No batches';
+}
+
+/**
+ * `hasBatches` guard is load-bearing (TES-74): with no batches,
+ * daysToEarliestBilling is 0, which would otherwise style an empty state
+ * as a critical billing deadline — a red card raising an alarm about a
+ * deadline that does not exist.
+ */
+function billingVariant(hasBatches: boolean, daysToEarliestBilling: number): 'critical' | 'warning' | 'neutral' {
+  if (!hasBatches) return 'neutral';
+  if (daysToEarliestBilling <= 6) return 'critical';
+  return daysToEarliestBilling <= 21 ? 'warning' : 'neutral';
+}
+
 export function MetricsRow({
   metrics = deriveDashboardMetrics(MOCK_BATCHES, DOCUMENT_REQUIREMENTS),
   hideBilling = false,
@@ -59,19 +86,15 @@ export function MetricsRow({
         value={`${metrics.avgProgress}%`}
         sub="On plan for Q2"
         iconName="chart-dots"
-        variant={!hasBatches ? 'neutral' : metrics.avgProgress < 60 ? 'warning' : 'neutral'}
+        variant={avgProgressVariant(hasBatches, metrics.avgProgress)}
       />
       {!hideBilling && (
         <MetricCard
           label="EARLIEST BILLING"
           value={metrics.earliestBillingDeadline}
-          sub={hasBatches ? `${metrics.daysToEarliestBilling} days remaining` : 'No batches'}
+          sub={billingSub(hasBatches, metrics.daysToEarliestBilling)}
           iconName="receipt"
-          // `hasBatches` guard is load-bearing (TES-74): with no batches,
-          // daysToEarliestBilling is 0, which would otherwise style an empty state
-          // as a critical billing deadline — a red card raising an alarm about a
-          // deadline that does not exist.
-          variant={!hasBatches ? 'neutral' : metrics.daysToEarliestBilling <= 6 ? 'critical' : metrics.daysToEarliestBilling <= 21 ? 'warning' : 'neutral'}
+          variant={billingVariant(hasBatches, metrics.daysToEarliestBilling)}
         />
       )}
       <MetricCard
@@ -80,7 +103,7 @@ export function MetricsRow({
         value={metrics.docCompliancePct === null ? '—' : `${metrics.docCompliancePct}%`}
         sub={docComplianceSub(metrics, hasBatches)}
         iconName="file-check"
-        variant={metrics.docMissing > 0 ? 'critical' : metrics.docPending > 0 ? 'warning' : 'neutral'}
+        variant={docComplianceVariant(metrics)}
       />
     </div>
   );
