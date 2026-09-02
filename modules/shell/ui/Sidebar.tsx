@@ -12,7 +12,7 @@
  * Uses the existing `.sidebar` / `sb-*` / `dropdown` design-system classes.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon, type IconName } from '@/shared/ui/Icon';
@@ -72,35 +72,24 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
 
   // School selector (no tenant backend yet — switch updates local display).
   const [orgOpen, setOrgOpen] = useState(false);
+  const closeOrg = useCallback(() => setOrgOpen(false), []);
   const [tenant, setTenant] = useState<Tenant>(
     () => TENANTS.find((t) => t.id === 'tnt_j3ed') ?? TENANTS[0],
   );
-  const orgRef = useRef<HTMLDivElement>(null);
-  const canSwitch = TENANTS.length > 1;
 
-  // Operations overlays (Import CSV / Settings) + their completion toast.
+  // Operations overlays (Import CSV / Settings); their completion toast lives in <SidebarOverlays>.
   const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
-  const [toast, setToast] = useState<ToastData | null>(null);
-
-  // Click-outside closes the school dropdown.
-  useEffect(() => {
-    const onDocClick = (e: MouseEvent) => {
-      if (orgRef.current && !orgRef.current.contains(e.target as Node)) setOrgOpen(false);
-    };
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
-  }, []);
 
   // Esc closes the dropdown, then the drawer (the op modals own their own Esc).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || activeOp) return;
-      if (orgOpen) setOrgOpen(false);
+      if (orgOpen) closeOrg();
       else if (open) closeDrawer();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [orgOpen, open, closeDrawer, activeOp]);
+  }, [orgOpen, open, closeDrawer, closeOrg, activeOp]);
 
   return (
     <>
@@ -133,48 +122,13 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
           <Icon name="refresh" size={13} style={{ marginLeft: 'auto', color: 'var(--color-text-muted)' }} />
         </button>
 
-        {/* School switcher */}
-        <div ref={orgRef} className="sb-org-wrap">
-          <button
-            type="button"
-            className={`sb-org${canSwitch ? '' : ' locked'}`}
-            onClick={() => canSwitch && setOrgOpen((o) => !o)}
-            aria-haspopup={canSwitch ? 'true' : undefined}
-            aria-expanded={canSwitch ? orgOpen : undefined}
-          >
-            <span className="org-mark">{tenant.code.slice(0, 3)}</span>
-            <span className="sb-org-text">
-              <span className="sb-org-name">{tenant.name}</span>
-              <span className="sb-org-meta">{canSwitch ? `${TENANTS.length} schools · registrar` : tenant.region}</span>
-            </span>
-            <Icon name={canSwitch ? 'chevron-down' : 'shield-check'} size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
-          </button>
-
-          {orgOpen && canSwitch && (
-            <div className="dropdown sb-org-dd">
-              <div className="dd-section">Registrar · your schools</div>
-              {TENANTS.map((t, i) => (
-                <button
-                  type="button"
-                  key={t.id}
-                  className={`dd-item${t.id === tenant.id ? ' active' : ''}`}
-                  onClick={() => { setTenant(t); setOrgOpen(false); }}
-                >
-                  <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 22, height: 22, fontSize: 9 }}>
-                    {t.code.slice(0, 3)}
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    <span style={{ display: 'block', fontSize: 13, fontWeight: 500, lineHeight: 1.2 }}>{t.name}</span>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
-                      {t.region} · {t.type}
-                    </span>
-                  </span>
-                  {t.id === tenant.id && <Icon name="check" size={14} style={{ color: 'var(--color-blue-dk)' }} />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <SchoolSwitcher
+          tenant={tenant}
+          open={orgOpen}
+          onToggle={() => setOrgOpen((o) => !o)}
+          onClose={closeOrg}
+          onSelect={setTenant}
+        />
 
         {/* Navigation */}
         <nav className="sb-nav">
@@ -213,11 +167,95 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
         </div>
       </aside>
 
+      <SidebarOverlays activeOp={activeOp} tenant={tenant} onClose={() => setActiveOp(null)} />
+    </>
+  );
+}
+
+/**
+ * School selector (no tenant backend yet — switching updates local display).
+ * Controlled: `open`/`tenant` stay in <Sidebar> because its Esc handler must
+ * close this dropdown *before* the drawer, and the Settings modal reads the
+ * selected tenant. Click-outside dismissal is owned here.
+ */
+function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
+  tenant: Tenant;
+  open: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+  onSelect: (t: Tenant) => void;
+}) {
+  const orgRef = useRef<HTMLDivElement>(null);
+  const canSwitch = TENANTS.length > 1;
+
+  // Click-outside closes the school dropdown.
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (orgRef.current && !orgRef.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [onClose]);
+
+  return (
+    <div ref={orgRef} className="sb-org-wrap">
+      <button
+        type="button"
+        className={`sb-org${canSwitch ? '' : ' locked'}`}
+        onClick={() => canSwitch && onToggle()}
+        aria-haspopup={canSwitch ? 'true' : undefined}
+        aria-expanded={canSwitch ? open : undefined}
+      >
+        <span className="org-mark">{tenant.code.slice(0, 3)}</span>
+        <span className="sb-org-text">
+          <span className="sb-org-name">{tenant.name}</span>
+          <span className="sb-org-meta">{canSwitch ? `${TENANTS.length} schools · registrar` : tenant.region}</span>
+        </span>
+        <Icon name={canSwitch ? 'chevron-down' : 'shield-check'} size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
+      </button>
+
+      {open && canSwitch && (
+        <div className="dropdown sb-org-dd">
+          <div className="dd-section">Registrar · your schools</div>
+          {TENANTS.map((t, i) => (
+            <button
+              type="button"
+              key={t.id}
+              className={`dd-item${t.id === tenant.id ? ' active' : ''}`}
+              onClick={() => { onSelect(t); onClose(); }}
+            >
+              <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 22, height: 22, fontSize: 9 }}>
+                {t.code.slice(0, 3)}
+              </span>
+              <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                <span style={{ display: 'block', fontSize: 13, fontWeight: 500, lineHeight: 1.2 }}>{t.name}</span>
+                <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
+                  {t.region} · {t.type}
+                </span>
+              </span>
+              {t.id === tenant.id && <Icon name="check" size={14} style={{ color: 'var(--color-blue-dk)' }} />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Operations overlays (Import CSV / Settings) and their completion toast. */
+function SidebarOverlays({ activeOp, tenant, onClose }: {
+  activeOp: 'import' | 'settings' | null;
+  tenant: Tenant;
+  onClose: () => void;
+}) {
+  const [toast, setToast] = useState<ToastData | null>(null);
+  return (
+    <>
       {activeOp === 'import' && (
         <ImportCsvModal
-          onClose={() => setActiveOp(null)}
+          onClose={onClose}
           onImported={(message) => {
-            setActiveOp(null);
+            onClose();
             setToast({ title: 'Import complete', message });
           }}
         />
@@ -228,9 +266,9 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
           workspaceMeta={`${tenant.code} · ${tenant.region}`}
           userName="Karina Cruz"
           userLabel="coordinator"
-          onClose={() => setActiveOp(null)}
+          onClose={onClose}
           onSaved={() => {
-            setActiveOp(null);
+            onClose();
             setToast({ title: 'Settings saved' });
           }}
         />
