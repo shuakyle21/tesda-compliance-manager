@@ -26,7 +26,7 @@ import {
 } from '@/shared/mocks';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
-import { getBatchesSnapshot } from '@/modules/batches/data/batches';
+import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getCurrentUser } from '@/modules/auth/data/auth';
 import type { Batch, UserRole } from '@/shared/types';
 
@@ -116,7 +116,7 @@ function selectDashboardBatches(
   const mockScoped = dashboardRole === 'viewer'
     ? mockBatches
     : mockBatches.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
-  return snapshot.status === 'ok' ? snapshot.batches : mockScoped;
+  return selectBatchesForDisplay(snapshot, mockScoped);
 }
 
 function buildTrendSeries(trendPoints: typeof SNAPSHOTS, trendDocTotal: number) {
