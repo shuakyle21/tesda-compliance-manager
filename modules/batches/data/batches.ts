@@ -71,12 +71,12 @@ function mapDocumentRow(row: DocumentRow): DocRecord {
 }
 
 function mapDocumentsMap(
-  documentRows: DocumentRow[],
-  requirementRows: RequirementRow[],
+  documentRows: DocumentRow[] | null,
+  requirementRows: RequirementRow[] | null | undefined,
 ): Record<string, DocRecord> {
   const map: Record<string, DocRecord> = {};
-  for (const req of requirementRows) map[req.document_key] = MISSING_DOC;
-  for (const row of documentRows) map[row.document_key] = mapDocumentRow(row);
+  for (const req of requirementRows ?? []) map[req.document_key] = MISSING_DOC;
+  for (const row of documentRows ?? []) map[row.document_key] = mapDocumentRow(row);
   return map;
 }
 
@@ -174,6 +174,24 @@ function toDisplayDate(dateIso: string | null, withYear = true): string {
   });
 }
 
+/** Same `?? ''` default repeated across most of mapBatchRow's string fields below. */
+function orEmpty(value: string | null | undefined): string {
+  return value ?? '';
+}
+
+/**
+ * Same `?? 0` default repeated across mapBatchRow's count fields. These are typed
+ * non-null by the contract, but a null slipping through at runtime would feed NaN
+ * into roster totals and progress bars.
+ */
+function orZero(value: number | null | undefined): number {
+  return value ?? 0;
+}
+
+function batchDisplayName(code: string, section: string | null): string {
+  return section ? `${code} (${section})` : code;
+}
+
 // ---------------------------------------------------------------------------
 // Mapper — pure, no I/O. Unit-test this against a fixture row.
 // ---------------------------------------------------------------------------
@@ -182,16 +200,14 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     // Direct from the contract:
     id: row.batch_code, // human code (e.g. "BAT-2") for display continuity
     tenantId: row.tenant_id,
-    name: row.batch_section ? `${row.batch_code} (${row.batch_section})` : row.batch_code,
+    name: batchDisplayName(row.batch_code, row.batch_section),
     qualification: row.qualification_title, // closes the TES-60 gap (AC1)
-    program: row.scholarship_programs?.code ?? '',
-    ncLevel: row.nc_level ?? '',
-    trainer: row.trainer_name ?? '',
-    trainerId: row.trainer_profile_id ?? '',
-    // `?? 0`: these are typed non-null by the contract, but a null slipping
-    // through at runtime would feed NaN into roster totals and progress bars.
-    scholars: row.learner_count ?? 0,
-    progressPct: row.progress_percent ?? 0,
+    program: orEmpty(row.scholarship_programs?.code),
+    ncLevel: orEmpty(row.nc_level),
+    trainer: orEmpty(row.trainer_name),
+    trainerId: orEmpty(row.trainer_profile_id),
+    scholars: orZero(row.learner_count),
+    progressPct: orZero(row.progress_percent),
     trainingStart: toDisplayDate(row.start_date, false),
     trainingEnd: toDisplayDate(row.end_date),
     status: normalizeStatus(row.status),
@@ -210,8 +226,8 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
 
     // Closed (TES-30): joined + backfilled from the embedded selects below.
     documents: mapDocumentsMap(
-      row.documents ?? [],
-      row.scholarship_programs?.program_document_requirements ?? [],
+      row.documents,
+      row.scholarship_programs?.program_document_requirements,
     ),
 
     // TODO(contract): fields the UI type requires but the contract does not yet
@@ -224,7 +240,7 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     totalDays: 0,
     ntpLag: 0,
     tipDate: '',
-    remark: row.official_system_reference ?? '',
+    remark: orEmpty(row.official_system_reference),
   };
 }
 
