@@ -112,6 +112,10 @@ const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, so
  * `modules/documents/domain/compliance.ts` — not as verified, not as missing.
  * A submitted row outside the catalog (a stale or ad hoc upload) is still
  * included, keyed by its own `document_key`.
+ *
+ * @param rows - The document rows from the database
+ * @param requirements - The requirement definitions
+ * @returns Keyed map of document records
  */
 function mapDocumentRows(
   rows: DocumentRow[],

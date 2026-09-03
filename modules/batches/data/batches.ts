@@ -112,7 +112,11 @@ const DB_TO_UI_STAGE: Record<DbLifecycleStage, LifecycleStageKey | null> = {
   blocked: null,
 };
 
-/** Canonical UI pipeline order used to derive a lifecycle array from one stage. */
+/**
+ * Canonical UI pipeline order used to derive a lifecycle array from one stage.
+ *
+ * Defines the standard sequence of lifecycle stages displayed in the UI.
+ */
 const UI_PIPELINE: { key: LifecycleStageKey; label: string }[] = [
   { key: 'aou', label: 'AOU' },
   { key: 'ntp', label: 'NTP' },
