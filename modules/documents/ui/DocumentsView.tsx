@@ -52,6 +52,42 @@ function cellTitle(doc: DocRecord | null, status: string, isWriter: boolean): st
   return isWriter ? 'Click to attach' : 'Document not yet provided';
 }
 
+type CompletenessTier = 'untracked' | 'on-track' | 'warning' | 'critical';
+
+type CompletenessSummary = {
+  ok: number;
+  total: number;
+  untracked: number;
+  pct: number | null;
+  missing: number;
+  tier: CompletenessTier;
+};
+
+const TIER_BORDER_COLOR: Record<CompletenessTier, string> = {
+  untracked: 'var(--color-border-strong)',
+  critical: 'var(--color-red)',
+  warning: 'var(--color-amber)',
+  'on-track': 'var(--color-green)',
+};
+
+function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
+  return program === 'TWSP' ? 'twsp' : 'cfsp';
+}
+
+/** 'untracked' has no fill variant — an unknown score renders as the empty
+ * track (width 0), with the pct/sub labels carrying the meaning in words. */
+function completenessBarClassName(tier: CompletenessTier): string {
+  return tier === 'on-track' || tier === 'untracked' ? '' : tier;
+}
+
+function completenessPctLabel(pct: number | null): string {
+  return pct === null ? '—' : `${pct}%`;
+}
+
+function completenessSubLabel(c: CompletenessSummary): string {
+  return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
+}
+
 export function DocumentsView({ batches }: { batches: Batch[] }) {
   // Verification overrides keyed `${batchId}:${docKey}`.
   const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
