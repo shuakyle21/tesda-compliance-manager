@@ -93,7 +93,33 @@ function lifecycleStatus(batch: Batch, key: string): LifecycleStatus {
   return batch.lifecycle.find((s) => s.key === key)?.status ?? 'pending';
 }
 
-function ganttData(batches: Batch[]): GanttRow[] {
+/**
+ * Each `buildXPhase` returns a phase or `null` when its date pair isn't
+ * available on this batch — `ganttData` filters the nulls out. One function
+ * per phase, not one branch per phase, so each phase's shape stays a single
+ * self-contained unit instead of a shared if/else-if chain.
+ */
+function buildPrepPhase(aou: Date | null, ntp: Date | null): Phase | null {
+  if (!aou || !ntp) return null;
+  return { key: 'prep', label: 'Preparation', s: aou, e: ntp, fillVar: '--color-surface-alt', strokeVar: '--color-border', fgVar: '--color-text-muted' };
+}
+
+function buildTrainPhase(ts: Date | null, te: Date | null, b: Batch): Phase | null {
+  if (!ts || !te) return null;
+  return { key: 'train', label: 'Training', s: ts, e: te, fillVar: '--color-amber-lt', strokeVar: '--color-amber-border', fgVar: '--color-amber-dk', pct: b.progressPct, detail: `Day ${b.currentDay}/${b.totalDays}` };
+}
+
+function buildEntrePhase(es: Date | null, ee: Date | null): Phase | null {
+  if (!es || !ee) return null;
+  return { key: 'entre', label: 'ENTRE', s: es, e: ee, fillVar: '--color-purple-lt', strokeVar: '--color-purple', fgVar: '--color-purple-dk' };
+}
+
+function buildBillPhase(billStart: Date | null, bill: Date | null, b: Batch): Phase | null {
+  if (!billStart || !bill || bill.getTime() <= billStart.getTime()) return null;
+  return { key: 'bill', label: 'Billing window', s: billStart, e: bill, fillVar: '--color-green-lt', strokeVar: '--color-green-border', fgVar: '--color-green-dk', detail: b.daysToBilling != null ? `${b.daysToBilling} days remaining` : undefined };
+}
+
+export function ganttData(batches: Batch[]): GanttRow[] {
   // Completed cohorts (billing stage already done) are hidden from the active
   // timeline — matches the claude-design source's "completed cohorts are
   // hidden" footnote (TES-93).
@@ -109,20 +135,12 @@ function ganttData(batches: Batch[]): GanttRow[] {
       const ee = parseDate(b.entreEnd);
       const bill = parseDate(b.billingDeadline);
 
-      const phases: Phase[] = [];
-      if (aou && ntp) {
-        phases.push({ key: 'prep', label: 'Preparation', s: aou, e: ntp, fillVar: '--color-surface-alt', strokeVar: '--color-border', fgVar: '--color-text-muted' });
-      }
-      if (ts && te) {
-        phases.push({ key: 'train', label: 'Training', s: ts, e: te, fillVar: '--color-amber-lt', strokeVar: '--color-amber-border', fgVar: '--color-amber-dk', pct: b.progressPct, detail: `Day ${b.currentDay}/${b.totalDays}` });
-      }
-      if (es && ee) {
-        phases.push({ key: 'entre', label: 'ENTRE', s: es, e: ee, fillVar: '--color-purple-lt', strokeVar: '--color-purple', fgVar: '--color-purple-dk' });
-      }
-      const billStart = ee ?? te;
-      if (billStart && bill && bill.getTime() > billStart.getTime()) {
-        phases.push({ key: 'bill', label: 'Billing window', s: billStart, e: bill, fillVar: '--color-green-lt', strokeVar: '--color-green-border', fgVar: '--color-green-dk', detail: b.daysToBilling != null ? `${b.daysToBilling} days remaining` : undefined });
-      }
+      const phases: Phase[] = [
+        buildPrepPhase(aou, ntp),
+        buildTrainPhase(ts, te, b),
+        buildEntrePhase(es, ee),
+        buildBillPhase(ee ?? te, bill, b),
+      ].filter((p): p is Phase => p !== null);
 
       const milestoneDefs: [string, Date | null, string][] = [
         ['AOU', aou, 'aou'],
@@ -151,6 +169,31 @@ function cssVar(el: Element, name: string): string {
 // caller starts feeding this a free-text field (e.g. a batch/program name).
 function escapeHtml(value: string | number): string {
   return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+}
+
+/** Initial rect width for the draw-on-bar entrance: animated bars start at 0
+ * and grow to `target`; reduced motion renders at `target` immediately. */
+function motionInitialWidth(target: number, reduceMotion: boolean): number {
+  return reduceMotion ? target : 0;
+}
+
+function motionDuration(baseMs: number, reduceMotion: boolean): number {
+  return reduceMotion ? 0 : baseMs;
+}
+
+function phaseTitleText(p: Phase, dateRange: string): string {
+  return `${p.label}: ${dateRange}${p.detail ? ` — ${p.detail}` : ''}`;
+}
+
+function phaseBarLabel(p: Phase): string {
+  return p.key === 'train' && p.detail ? `TRAINING · ${p.detail}` : p.label.toUpperCase();
+}
+
+/** Width of the training phase's in-progress overlay bar, or null when this
+ * phase isn't training or has no progress percentage to show. */
+function trainProgressWidth(p: Phase, x0: number, x1: number): number | null {
+  if (p.key !== 'train' || p.pct == null) return null;
+  return ((x1 - x0) * Math.min(100, p.pct)) / 100;
 }
 
 export function BatchTimeline({ batches }: { batches: Batch[] }) {
@@ -245,20 +288,20 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
           const bar = g.append('g').style('cursor', 'default')
             .on('mousemove', (ev) => show(ev, `<b>${escapeHtml(p.label)}</b><br>${escapeHtml(dateRange)}${p.detail ? `<br>${escapeHtml(p.detail)}` : ''}`))
             .on('mouseleave', hide);
-          bar.append('title').text(`${p.label}: ${dateRange}${p.detail ? ` — ${p.detail}` : ''}`);
+          bar.append('title').text(phaseTitleText(p, dateRange));
           const rect = bar.append('rect').attr('x', x0).attr('y', bandY).attr('height', bandH).attr('rx', 4)
-            .attr('fill', cssVar(host, p.fillVar)).attr('stroke', cssVar(host, p.strokeVar)).attr('width', reduceMotion ? x1 - x0 : 0);
+            .attr('fill', cssVar(host, p.fillVar)).attr('stroke', cssVar(host, p.strokeVar)).attr('width', motionInitialWidth(x1 - x0, reduceMotion));
           if (!reduceMotion) rect.transition().duration(400).ease(easeCubicOut).attr('width', x1 - x0);
-          if (p.key === 'train' && p.pct != null) {
-            const fw = ((x1 - x0) * Math.min(100, p.pct)) / 100;
+          const fw = trainProgressWidth(p, x0, x1);
+          if (fw !== null) {
             bar.append('rect').attr('x', x0).attr('y', bandY).attr('height', bandH).attr('rx', 4)
-              .attr('fill', cssVar(host, '--color-amber')).attr('opacity', 0.22).attr('width', reduceMotion ? fw : 0)
-              .transition().duration(reduceMotion ? 0 : 500).ease(easeCubicOut).attr('width', fw);
+              .attr('fill', cssVar(host, '--color-amber')).attr('opacity', 0.22).attr('width', motionInitialWidth(fw, reduceMotion))
+              .transition().duration(motionDuration(500, reduceMotion)).ease(easeCubicOut).attr('width', fw);
           }
           if (x1 - x0 > 62) {
             bar.append('text').attr('x', x0 + 8).attr('y', bandY + 15).attr('fill', cssVar(host, p.fgVar))
               .style('font-family', 'var(--font-mono)').style('font-size', '9.5px').style('pointer-events', 'none')
-              .text(p.key === 'train' && p.detail ? `TRAINING · ${p.detail}` : p.label.toUpperCase());
+              .text(phaseBarLabel(p));
           }
         });
 
