@@ -78,9 +78,10 @@ const SUMMARY_CARDS: { title: string; icon: IconName; meta?: string }[] = [
 // threshold, not the data itself.
 const DATA_STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24h
 
-// Shown when running on the cached/mock snapshot (no live `updated_at` to read),
-// e.g. in environments where Supabase isn't configured.
-const DATA_AS_OF_FALLBACK = 'cached snapshot';
+// Shown whenever there's no live `updated_at` to read — either the mock/cached
+// fallback (Supabase unconfigured or sync failed) or an `ok` snapshot with no
+// batch rows to stamp. Deliberately doesn't say "cached": it isn't always.
+const DATA_AS_OF_FALLBACK = 'unknown';
 
 // "Jun 19, 2026 · 14:02"-style stamp from a real timestamp.
 function formatDataStamp(date: Date): string {
@@ -246,6 +247,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const forcedState = firstParam(params.state);
   const { isDenied, isEmpty, syncFailed, isStale, dataAsOfLabel, syncFailedMessage } =
     deriveDashboardViewState(forcedState, snapshot, batches.length);
+  // `syncFailed` can be true via the `?state=` preview override while the
+  // real snapshot is still `ok` (live rows) — only claim "cached" when the
+  // rows actually came from the mock/cached fallback, not the live table.
+  const isShowingCachedFallback = snapshot.status !== 'ok';
 
   const header = (
     <div className="page-head">
@@ -297,7 +302,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
 
       {syncFailed && (
         <InfoCallout variant="warning">
-          Sync with Supabase failed — showing the last cached snapshot{syncFailedMessage}.
+          Sync with Supabase failed — showing{' '}
+          {isShowingCachedFallback ? `the last cached snapshot${syncFailedMessage}` : 'the currently loaded data'}.
           <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
         </InfoCallout>
       )}
