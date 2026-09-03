@@ -15,12 +15,16 @@ const ONES = [
 ];
 const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
-/** 0–99 in words. */
+/**
+ * Converts a number from 0–99 to words (e.g., 42 → "Forty Two").
+ */
 function twoDigits(n: number): string {
   return n < 20 ? ONES[n] : TENS[Math.floor(n / 10)] + (n % 10 ? ' ' + ONES[n % 10] : '');
 }
 
-/** 0–999 in words. */
+/**
+ * Converts a number from 0–999 to words (e.g., 342 → "Three Hundred Forty Two").
+ */
 function threeDigits(n: number): string {
   const hundreds = n >= 100 ? ONES[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' : '') : '';
   return hundreds + (n % 100 ? twoDigits(n % 100) : '');

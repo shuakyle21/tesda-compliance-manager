@@ -65,27 +65,44 @@ export type LearnerCsvParseResult =
   | { status: 'missing-columns'; missing: string[] }
   | { status: 'empty' };
 
+/**
+ * Normalizes a CSV header to the canonical key, applying aliases for common
+ * variations (e.g., "surname" → "last name").
+ */
 function normalizeHeader(header: string): string {
   return HEADER_ALIASES[header] ?? header;
 }
 
-/** Required field: trimmed, empty string when absent. */
+/**
+ * Reads a required field from a record. Returns the trimmed value, or an
+ * empty string when absent.
+ */
 function readField(record: Record<string, string>, key: string): string {
   return record[key]?.trim() ?? '';
 }
 
-/** Optional field: trimmed, `null` when absent or blank. */
+/**
+ * Reads an optional field from a record. Returns the trimmed value, or `null`
+ * when absent or blank.
+ */
 function readOptionalField(record: Record<string, string>, key: string): string | null {
   return record[key]?.trim() || null;
 }
 
+/**
+ * Reads the assessment result field from a record and normalizes it to the
+ * internal enum (competent, not_yet_competent, pending). Unrecognized values
+ * fall back to 'pending'.
+ */
 function readAssessmentResult(record: Record<string, string>): ImportAssessmentResult {
   const key = record['assessment result']?.trim().toLowerCase() ?? '';
   return ASSESSMENT_RESULT_ALIASES[key] ?? 'pending';
 }
 
-/** Parses raw CSV text into candidate learner rows. Row-level content
- * validation (blank names, bad ULI shape, duplicates) happens in {@link validateRows}. */
+/**
+ * Parses raw CSV text into candidate learner rows. Row-level content
+ * validation (blank names, bad ULI shape, duplicates) happens in {@link validateRows}.
+ */
 export function parseLearnerCsv(text: string): LearnerCsvParseResult {
   const rows = parseCsvRows(text);
   if (rows.length <= 1) return { status: 'empty' };
@@ -118,10 +135,14 @@ export function parseLearnerCsv(text: string): LearnerCsvParseResult {
   return { status: 'ok', rows: parsedRows };
 }
 
-/** Splits parsed rows into ones fit to write and ones rejected with a reason.
+/**
+ * Validates parsed learner rows, splitting them into valid rows (fit to write)
+ * and errors (rejected with a reason). Checks for missing required fields
+ * (name, ULI), invalid ULI format, and duplicate ULIs within the file.
  * A raw `assessment result` cell that didn't match a known alias silently
- * fell back to 'pending' during parse — validated here isn't the place to
- * catch that (parseLearnerCsv already normalized it), only structural rules are. */
+ * fell back to 'pending' during parse — this validator only enforces structural
+ * rules, not value normalization.
+ */
 export function validateRows(rows: ParsedLearnerRow[]): { valid: ParsedLearnerRow[]; errors: RowError[] } {
   const errors: RowError[] = [];
   const valid: ParsedLearnerRow[] = [];
@@ -157,9 +178,12 @@ export interface ReconciledRow {
   existingId: string | null; // null = insert; set = update that learner row
 }
 
-/** Matches validated rows against the batch's existing learners by ULI —
- * the permanent learner key — not by learner_no, which is only unique
- * per-batch in the schema and isn't guaranteed present in a source report. */
+/**
+ * Matches validated learner rows against the batch's existing learners by ULI
+ * (the permanent learner key), not by learner_no which is only unique per-batch
+ * and isn't guaranteed present in a source report. Returns reconciled rows with
+ * existingId set for updates and null for inserts.
+ */
 export function reconcileWithExisting(rows: ParsedLearnerRow[], existing: ExistingLearner[]): ReconciledRow[] {
   const byUli = new Map(existing.filter((l) => l.uli).map((l) => [l.uli as string, l.id]));
   return rows.map((row) => ({ row, existingId: byUli.get(row.uli) ?? null }));

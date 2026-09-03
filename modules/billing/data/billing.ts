@@ -50,13 +50,21 @@ export function deriveDocReadiness(
   return { verified, requiredTotal: supporting.length };
 }
 
-/** Resolve the school context the statement header needs from the tenant record. */
+/**
+ * Resolves the minimal school context (name and region) needed for the statement
+ * header from a tenant ID. Falls back to the tenant ID itself for the name and
+ * an empty region when the tenant is not found.
+ */
 export function resolveTenant(tenantId: string, tenants: Tenant[] = TENANTS): StatementTenant {
   const t = tenants.find((x) => x.id === tenantId);
   return { name: t?.name ?? tenantId, region: t?.region ?? '' };
 }
 
-/** Build one billing card (gate + tracks + tenant context) for a batch. */
+/**
+ * Builds one billing card for a batch, computing the readiness gate, applicable
+ * billing tracks (program-aware), and tenant context. This is the projection the
+ * Billing screen renders in the card grid.
+ */
 export function buildBillingCard(batch: Batch): BillingCard {
   const docs = deriveDocReadiness(batch);
   return {

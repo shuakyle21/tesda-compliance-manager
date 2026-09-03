@@ -59,6 +59,11 @@ type BatchRowWithProgram = BatchRow & {
  */
 const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
 
+/**
+ * Maps a raw document row from the database to the UI domain DocRecord type.
+ * Resolves the most recent timestamp (verification > submission > update) and
+ * derives the source label from storage path or external URL.
+ */
 function mapDocumentRow(row: DocumentRow): DocRecord {
   return {
     status: row.status,
@@ -70,6 +75,12 @@ function mapDocumentRow(row: DocumentRow): DocRecord {
   };
 }
 
+/**
+ * Builds a complete document map for a batch, backfilling missing requirements
+ * with `MISSING_DOC` so every catalog entry resolves to a real DocRecord. Closes
+ * the `TODO(join)` gap by ensuring "no row means missing" is this contract's
+ * decision, not each caller's.
+ */
 function mapDocumentsMap(
   documentRows: DocumentRow[],
   requirementRows: RequirementRow[],
@@ -112,6 +123,10 @@ const UI_PIPELINE: { key: LifecycleStageKey; label: string }[] = [
   { key: 'bill', label: 'Billing' },
 ];
 
+/**
+ * Normalizes the database batch status to the UI status type. Maps 'blocked' to
+ * 'pending' since the UI has no blocked state yet.
+ */
 function normalizeStatus(status: DbBatchStatus): Batch['status'] {
   // UI has no 'blocked' state; surface it as 'pending' (needs attention) until
   // the UI gains a blocked tier. TODO(contract): align the two status unions.
@@ -143,7 +158,7 @@ function deriveLifecycle(currentStage: DbLifecycleStage): LifecycleStage[] {
 }
 
 /**
- * Whole days from today to `dateIso` (placeholder for a real billing deadline).
+ * Calculates whole days from today to `dateIso` (placeholder for a real billing deadline).
  * A missing date returns Infinity — the established "no known deadline" sentinel
  * that sorts last and never triggers urgency tiers. An *unparseable* date is
  * treated the same way: without the guard, `new Date('garbage').getTime()` is
@@ -157,7 +172,7 @@ function daysUntil(dateIso: string | null): number {
 }
 
 /**
- * ISO date → the UI's display convention. `Batch` stores dates as pre-formatted
+ * Converts ISO date to the UI's display convention. `Batch` stores dates as pre-formatted
  * display strings (see lib/data/seed.ts: "Jun 18, 2026"; training start drops
  * the year: "Apr 21"). Passing raw ISO through would render "2026-06-18" in the
  * cards and silently defeat deriveDashboardMetrics' `, YYYY`-trimming regex.
@@ -247,7 +262,11 @@ export type BatchesSnapshot =
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
-/** Freshest `updated_at` across the loaded rows, or null when there are none. */
+/**
+ * Returns the freshest `updated_at` timestamp across all loaded batch rows,
+ * or null when there are none. Used to derive the "Data as of" timestamp for
+ * the dashboard.
+ */
 function latestUpdatedAt(batches: Batch[]): string | null {
   return batches.reduce<string | null>(
     (max, b) => (b.updatedAt && (!max || b.updatedAt > max) ? b.updatedAt : max),
@@ -255,6 +274,13 @@ function latestUpdatedAt(batches: Batch[]): string | null {
   );
 }
 
+/**
+ * Fetches all batches for the caller's tenant via RLS-scoped query. Returns a
+ * discriminated snapshot so the caller can distinguish unconfigured (no Supabase
+ * env → silent mock fallback) from sync-failed (configured but errored → show
+ * the sync-failed banner). Includes embedded joins for scholarship programs,
+ * document requirements, and submitted documents.
+ */
 export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 

@@ -11,12 +11,17 @@ import { EMPLOYMENT_STATUSES } from '@/shared/vocab';
 type EmploymentStatuses = typeof EMPLOYMENT_STATUSES;
 export type EmploymentScholar = { batch: Batch; s: NonNullable<Batch['scholars_list']>[number] };
 
-/** Batches with an employment follow-up window open. */
+/**
+ * Filters batches to those with an employment follow-up window currently open.
+ */
 export function selectEmploymentCohorts(rows: Batch[]): Batch[] {
   return rows.filter((b) => b.employmentFollowUp);
 }
 
-/** Certified (assessment-passed) scholars across the given cohorts. */
+/**
+ * Selects certified (assessment-passed) scholars from the given cohorts.
+ * Only scholars with "Competent" assessment result are included.
+ */
 export function selectCertifiedScholars(cohorts: Batch[]): EmploymentScholar[] {
   const empScholars: EmploymentScholar[] = [];
   cohorts.forEach((b) => {
@@ -27,7 +32,10 @@ export function selectCertifiedScholars(cohorts: Batch[]): EmploymentScholar[] {
   return empScholars;
 }
 
-/** Rolls up certified scholars into employed / awaiting / unemployed counts. */
+/**
+ * Computes employment totals from a list of certified scholars. Rolls them up
+ * into certified, employed (wage + self-employed), awaiting, and unemployed counts.
+ */
 export function computeEmploymentTotals(scholars: EmploymentScholar[], ES: EmploymentStatuses) {
   const empTotals = { certified: 0, employed: 0, awaiting: 0, unemployed: 0 };
   scholars.forEach((r) => {
@@ -39,12 +47,19 @@ export function computeEmploymentTotals(scholars: EmploymentScholar[], ES: Emplo
   return empTotals;
 }
 
-/** Employed count as a percentage of certified scholars. */
+/**
+ * Calculates the employment rate as a percentage of certified scholars who are
+ * employed. Returns 0 when there are no certified scholars.
+ */
 export function employmentRate(empTotals: { certified: number; employed: number }): number {
   return empTotals.certified ? Math.round((empTotals.employed / empTotals.certified) * 100) : 0;
 }
 
-/** Badge tone for an employment status. */
+/**
+ * Returns the badge tone (color) for an employment status. Maps wage-employed
+ * to green, self-employed to teal, awaiting to amber, unemployed to red, and
+ * unknown statuses to neutral.
+ */
 export function empTone(status: string, ES: EmploymentStatuses): string {
   if (status === ES.wage) return 'green';
   if (status === ES.self) return 'teal';

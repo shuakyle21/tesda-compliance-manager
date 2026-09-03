@@ -76,18 +76,28 @@ export function tsfAmount(batch: Batch): number {
   return batch.totalDays * TSF_DAY_RATE * batch.scholars;
 }
 
-/** Peso formatting used by both the tiles and the queue rows. */
+/**
+ * Formats a peso amount with thousands separators (e.g., "₱184,000.00").
+ * Used by both the summary tiles and the queue rows.
+ */
 export function formatPeso(amount: number): string {
   return `₱${amount.toLocaleString('en-PH')}`;
 }
 
-/** Compact peso for the summary tiles — ₱184K rather than ₱184,000. */
+/**
+ * Formats a peso amount in compact notation for summary tiles.
+ * Amounts >= 1M show as "₱1.2M", >= 1K show as "₱184K", otherwise full amount.
+ */
 export function formatPesoCompact(amount: number): string {
   if (amount >= 1_000_000) return `₱${(amount / 1_000_000).toFixed(1)}M`;
   if (amount >= 1_000) return `₱${Math.round(amount / 1_000)}K`;
   return `₱${amount}`;
 }
 
+/**
+ * Derives a human-readable due label from the days-to-due count.
+ * Negative values show as "Nd past due", zero as "Due today", etc.
+ */
 function dueLabelFor(daysToDue: number): string {
   if (daysToDue < 0) return `${Math.abs(daysToDue)}d past due`;
   if (daysToDue === 0) return 'Due today';
@@ -159,11 +169,19 @@ export function buildPacket(
   };
 }
 
-/** True when a live packet has passed its derived due date (ADR-003 P5). */
+/**
+ * Returns true when a live packet has passed its derived due date (ADR-003 P5).
+ * Settled packets are never overdue regardless of their due date.
+ */
 export function isOverdue(packet: BillingPacket): boolean {
   return packet.state !== 'settled' && packet.daysToDue < 0;
 }
 
+/**
+ * Builds billing packets for a set of batches. Each batch produces one packet,
+ * numbered sequentially. The school code for each tenant is resolved from the
+ * provided `schoolCodes` map, falling back to "—" when not found.
+ */
 export function buildPackets(
   batches: Batch[],
   requirements: DocumentRequirement[],

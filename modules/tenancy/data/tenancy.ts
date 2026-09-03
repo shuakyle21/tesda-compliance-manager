@@ -40,6 +40,11 @@ const DB_TO_UI_ROLE: Record<DbProfileRole, UserRole> = {
   viewer: 'viewer',
 };
 
+/**
+ * Maps a raw tenant row to the UI domain Tenant type. Some fields (color, plan,
+ * activeBatches, totalScholars) are UI-only decorations that the seed mock
+ * invents but the DB does not yet carry; they are defaulted here.
+ */
 function mapTenantRow(row: TenantRow): Tenant {
   return {
     id: row.id,
@@ -104,6 +109,13 @@ export type ProfileSnapshot =
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
+/**
+ * Fetches the profile record for a Clerk user, including tenant memberships
+ * and the default tenant. Returns a discriminated snapshot: `ok` when found,
+ * `not-found` when the user is authenticated but has no profile row yet
+ * (webhook racing or failed), `sync-failed` on query error, or `unconfigured`
+ * when Supabase is not configured.
+ */
 export async function getProfileSnapshot(clerkUserId: string): Promise<ProfileSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 

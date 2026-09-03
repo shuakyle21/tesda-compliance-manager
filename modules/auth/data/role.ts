@@ -18,16 +18,28 @@ export type ResolvedRole = OfficeRole | 'trainer' | null;
 
 export type RouteSearchParams = Record<string, string | string[] | undefined>;
 
+/**
+ * Extracts the first value from a search param (which may be a single string,
+ * an array, or undefined) and normalizes it to lowercase. Returns null when
+ * the param is absent or empty.
+ */
 export function firstParam(value: string | string[] | undefined): string | null {
   if (Array.isArray(value)) return value[0]?.toLowerCase() ?? null;
   return value?.toLowerCase() ?? null;
 }
 
+/**
+ * Type guard: returns true when the role is an office role (admin, coordinator,
+ * or viewer), as opposed to trainer or null.
+ */
 export function isOfficeRole(role: string | null): role is OfficeRole {
   return role === 'admin' || role === 'coordinator' || role === 'viewer';
 }
 
-/** `role` narrowed to a `ResolvedRole`, or `null` if it's neither an office role nor trainer. */
+/**
+ * Narrows a role string to a `ResolvedRole`, or `null` if it's neither an
+ * office role nor trainer.
+ */
 function asResolvedRole(role: string | null): ResolvedRole {
   return isOfficeRole(role) || role === 'trainer' ? role : null;
 }

@@ -42,10 +42,10 @@ const ACTION_TO_TONE: Record<ActivityAction, ActivityEvent['tone']> = {
 };
 
 /**
- * ISO timestamp -> the mock's relative-display convention ("today · 14:02",
+ * Converts an ISO timestamp to the relative-display convention ("today · 14:02",
  * "yesterday", "N days ago"). Mirrors `toDisplayDate` in batches.ts: an
- * unparseable timestamp falls back to '' rather than propagating NaN/"Invalid
- * Date" into the UI.
+ * unparseable timestamp falls back to an empty string rather than propagating
+ * NaN/"Invalid Date" into the UI.
  */
 function toRelativeWhen(createdAtIso: string): string {
   const created = new Date(createdAtIso);
@@ -68,6 +68,12 @@ function toRelativeWhen(createdAtIso: string): string {
 // ---------------------------------------------------------------------------
 // Mapper — pure, no I/O.
 // ---------------------------------------------------------------------------
+
+/**
+ * Maps a raw activity log row (with joined profile) to the UI domain
+ * ActivityEvent type. Derives the relative "when" timestamp and tone from the
+ * action, and falls back to "System" when no acting profile is present.
+ */
 export function mapActivityLogRow(row: ActivityLogRowWithProfile): ActivityEvent {
   return {
     id: row.id,
