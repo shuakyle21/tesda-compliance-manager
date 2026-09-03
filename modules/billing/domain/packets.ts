@@ -140,6 +140,10 @@ export function buildPacket(
 
   const unsatisfied = docs.filter((d) => !d.satisfied);
   const belowThreshold = batch.progressPct < PACKET_READY_THRESHOLD;
+  // An empty catalog means the requirement list couldn't be loaded, not that
+  // nothing is required — an unevaluated checklist must never read as
+  // satisfied (mirrors billingGate's `requiredTotal > 0` guard).
+  const requirementsUnavailable = requirements.length === 0;
 
   const blockers: string[] = [];
   if (belowThreshold) {
@@ -147,7 +151,9 @@ export function buildPacket(
       `Training progress is ${batch.progressPct}% — the final tranche unlocks at ${PACKET_READY_THRESHOLD}%.`,
     );
   }
-  if (unsatisfied.length > 0) {
+  if (requirementsUnavailable) {
+    blockers.push('Document requirement catalog unavailable — supporting documents could not be verified.');
+  } else if (unsatisfied.length > 0) {
     blockers.push(
       `${unsatisfied.length} supporting ${unsatisfied.length === 1 ? 'document is' : 'documents are'} not yet on file: ${unsatisfied
         .map((d) => d.label)

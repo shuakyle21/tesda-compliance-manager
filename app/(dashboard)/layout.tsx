@@ -6,9 +6,9 @@
  * Topbar → MetricsRow → content (Figma node 8:4330 "Aside - Primary navigation").
  * The `(dashboard)` route group keeps URLs clean (/batch-cards, not /dashboard/...).
  *
- * SERVER vs CLIENT: this is a Server Component. MetricsRow derives its numbers
- * from the mock data layer at render time; Sidebar is the only client island
- * (it reads the pathname to highlight the active nav item).
+ * SERVER vs CLIENT: this is a Server Component. This layout fetches the live
+ * batches snapshot and derives MetricsRow's numbers at render time; Sidebar is
+ * the only client island (it reads the pathname to highlight the active nav item).
  *
  * TRAINER OMISSION: this layout mounts MetricsRow once for every route under
  * `(dashboard)`, including `/trainer/*`. Trainer-facing surfaces must omit
@@ -33,6 +33,8 @@ import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
 import { Topbar } from '@/modules/shell/ui/Topbar';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
+import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
+import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireAuthenticatedUser();
@@ -40,6 +42,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const pathname = headerList.get('x-pathname') ?? '';
   const isTrainerRoute = pathname.startsWith('/trainer');
   const isDashboardRoute = pathname === '/dashboard';
+
+  // `/dashboard` computes its own richer metrics tile grid itself; skip the
+  // fetch here for that one route (see DASHBOARD METRICS DEDUP above).
+  // No live per-program document-requirement catalog exists yet (TES-34-
+  // adjacent gap) — an empty catalog reads as "Document sync pending" per
+  // ADR-004, never as a fabricated compliance percentage.
+  const metrics = isDashboardRoute
+    ? null
+    : deriveDashboardMetrics(selectBatchesForDisplay(await getBatchesSnapshot()), []);
 
   return (
     <NavDrawerProvider>
@@ -49,7 +60,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <MobileHeader />
           <main className="main-content">
             <Topbar isTrainerRoute={isTrainerRoute} />
-            {!isDashboardRoute && <MetricsRow hideBilling={isTrainerRoute} />}
+            {metrics && <MetricsRow metrics={metrics} hideBilling={isTrainerRoute} />}
             {children}
           </main>
         </div>

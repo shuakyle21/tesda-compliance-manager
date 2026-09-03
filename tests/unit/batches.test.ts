@@ -176,36 +176,29 @@ describe('mapBatchRow — days-to-billing (as-of date sensitive)', () => {
 // exists. Not restated here: the same argument in two places drifts the way the
 // two inlined copies of this logic did.
 //
-// The load-bearing case is the second test: `ok` is authoritative even when it
-// carries zero rows.
+// The load-bearing case is the first test: `ok` is authoritative even when it
+// carries zero rows. `unconfigured`/`sync-failed` never substitute mock data
+// (RULES.md rule 19) — both render empty instead.
 // ---------------------------------------------------------------------------
 describe('selectBatchesForDisplay', () => {
-  const fallback = [mapBatchRow(fixtureRow({ id: 'mock-1', batch_code: 'MOCK-1' }))];
-
-  it('returns live batches when the snapshot is ok and non-empty', () => {
-    const live = [mapBatchRow(fixtureRow({ id: 'live-1', batch_code: 'LIVE-1' }))];
-    const result = selectBatchesForDisplay(
-      { status: 'ok', batches: live, dataAsOf: null },
-      fallback,
-    );
-    expect(result.map((b) => b.id)).toEqual(['LIVE-1']);
-  });
-
-  it('returns an empty list — NOT the fallback — when ok carries zero rows', () => {
-    const result = selectBatchesForDisplay(
-      { status: 'ok', batches: [], dataAsOf: null },
-      fallback,
-    );
+  it('returns an empty list — not a substitute — when ok carries zero rows', () => {
+    const result = selectBatchesForDisplay({ status: 'ok', batches: [], dataAsOf: null });
     expect(result).toEqual([]);
   });
 
-  it('falls back when the snapshot is unconfigured', () => {
-    const result = selectBatchesForDisplay({ status: 'unconfigured' }, fallback);
-    expect(result.map((b) => b.id)).toEqual(['MOCK-1']);
+  it('returns live batches when the snapshot is ok and non-empty', () => {
+    const live = [mapBatchRow(fixtureRow({ id: 'live-1', batch_code: 'LIVE-1' }))];
+    const result = selectBatchesForDisplay({ status: 'ok', batches: live, dataAsOf: null });
+    expect(result.map((b) => b.id)).toEqual(['LIVE-1']);
   });
 
-  it('falls back when the snapshot is sync-failed', () => {
-    const result = selectBatchesForDisplay({ status: 'sync-failed', error: 'boom' }, fallback);
-    expect(result.map((b) => b.id)).toEqual(['MOCK-1']);
+  it('renders empty — never mock data — when the snapshot is unconfigured', () => {
+    const result = selectBatchesForDisplay({ status: 'unconfigured' });
+    expect(result).toEqual([]);
+  });
+
+  it('renders empty — never mock data — when the snapshot is sync-failed', () => {
+    const result = selectBatchesForDisplay({ status: 'sync-failed', error: 'boom' });
+    expect(result).toEqual([]);
   });
 });

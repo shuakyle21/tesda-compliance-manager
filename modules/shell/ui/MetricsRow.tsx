@@ -2,13 +2,11 @@
  * STEP 7b — Shell Component: MetricsRow
  *
  * Renders the 5-card KPI summary in the `.metrics` grid (5 → 3 → 2 → 1 columns
- * responsive, from design-system.css). Server Component — derives metrics from
- * the mock data layer at render time. Mirrors the prototype's App.jsx metrics.
+ * responsive, from design-system.css). Presentational — the caller (the
+ * dashboard shell layout) fetches the live snapshot and derives `metrics`.
  */
 
 import { MetricCard } from '@/shared/ui/MetricCard';
-import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
-import { MOCK_BATCHES, DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
 import type { DashboardMetrics } from '@/shared/types';
 
 /**
@@ -94,14 +92,14 @@ function billingVariant(hasBatches: boolean, daysToEarliestBilling: number): 'cr
  * App.jsx metrics. Trainer-facing routes hide the billing card via the
  * `hideBilling` prop (server-side omission, not CSS).
  *
- * @param metrics - The dashboard metrics to display (defaults to derived from mock batches)
+ * @param metrics - The dashboard metrics to display, derived by the caller from a live snapshot
  * @param hideBilling - Whether to hide the billing deadline card (for trainer routes)
  */
 export function MetricsRow({
-  metrics = deriveDashboardMetrics(MOCK_BATCHES, DOCUMENT_REQUIREMENTS),
+  metrics,
   hideBilling = false,
 }: {
-  metrics?: DashboardMetrics;
+  metrics: DashboardMetrics;
   /**
    * Trainer-facing routes must omit billing figures server-side, not via CSS
    * (CLAUDE.md role rules). This row is mounted once by the shared `(dashboard)`
@@ -110,9 +108,6 @@ export function MetricsRow({
    */
   hideBilling?: boolean;
 }) {
-  // Derived from the injected metrics, never from the mock array (TES-74). Reading
-  // MOCK_BATCHES here made the empty state unreachable for any caller passing real
-  // data, since the mock set is never empty.
   const hasBatches = metrics.totalBatches > 0;
   return (
     <div className={hideBilling ? 'metrics metrics-4' : 'metrics'}>

@@ -268,8 +268,9 @@ export type BatchesSnapshot =
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
-export function selectBatchesForDisplay(snapshot: BatchesSnapshot, fallback: Batch[]): Batch[] {
-  return snapshot.status === 'ok' ? snapshot.batches : fallback;
+/** Never substitutes mock data — an unconfigured or sync-failed snapshot renders empty. */
+export function selectBatchesForDisplay(snapshot: BatchesSnapshot): Batch[] {
+  return snapshot.status === 'ok' ? snapshot.batches : [];
 }
 
 /** Freshest `updated_at` across the loaded rows, or null when there are none. */

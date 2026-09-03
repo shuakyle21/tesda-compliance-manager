@@ -11,9 +11,8 @@
  */
 
 import { Icon } from '@/shared/ui/Icon';
-import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
 import { summarizeDocCompliance } from '@/modules/documents/domain/compliance';
-import type { Batch, DocStatus } from '@/shared/types';
+import type { Batch, DocStatus, DocumentRequirement } from '@/shared/types';
 
 const SEGMENTS: { key: DocStatus; label: string; color: string }[] = [
   { key: 'verified', label: 'Verified', color: 'var(--color-green)' },
@@ -22,12 +21,18 @@ const SEGMENTS: { key: DocStatus; label: string; color: string }[] = [
   { key: 'missing', label: 'Missing', color: 'var(--color-red)' },
 ];
 
-export function DocumentStatusDonut({ batches }: { batches: Batch[] }) {
+export function DocumentStatusDonut({
+  batches,
+  documentRequirements,
+}: {
+  batches: Batch[];
+  documentRequirements: DocumentRequirement[];
+}) {
   // Untracked requirements (no record on the batch) are excluded from both the
   // ring and the denominator — ADR-004: they are neither verified nor missing.
   // With nothing tracked at all, `onFilePct` is null and the panel says so
   // rather than drawing an empty ring labelled 0%.
-  const summary = summarizeDocCompliance(batches, DOCUMENT_REQUIREMENTS);
+  const summary = summarizeDocCompliance(batches, documentRequirements);
   const counts: Record<DocStatus, number> = {
     verified: summary.verified,
     submitted: summary.submitted,

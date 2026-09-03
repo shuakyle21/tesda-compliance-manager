@@ -14,21 +14,16 @@ import { Icon, type IconName } from '@/shared/ui/Icon';
 import { MetricCard } from '@/shared/ui/MetricCard';
 import { EgaceOutcomes } from '@/modules/batches/ui/dashboard/EgaceOutcomes';
 import { DocumentStatusDonut } from '@/modules/batches/ui/dashboard/DocumentStatusDonut';
-import { ProgressTrend } from '@/modules/batches/ui/dashboard/ProgressTrend';
+import { ProgressTrend, type TrendSeries } from '@/modules/batches/ui/dashboard/ProgressTrend';
 import { BatchTimeline } from '@/modules/batches/ui/dashboard/BatchTimeline';
 import { AlertsPanel } from '@/modules/batches/ui/dashboard/AlertsPanel';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import {
-  MOCK_ACTIVITY,
-  MOCK_BATCHES,
-  DOCUMENT_REQUIREMENTS,
-  SNAPSHOTS,
-} from '@/shared/mocks';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
+import { getActivitySnapshot } from '@/modules/activity/data/activity';
 import { getCurrentUser } from '@/modules/auth/data/auth';
-import type { Batch, UserRole } from '@/shared/types';
+import type { Batch, DocumentRequirement, UserRole } from '@/shared/types';
 
 type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -107,25 +102,6 @@ function pluralize(count: number, singular = 'batch', plural = 'batches'): strin
 // machine) so each derivation is named and separately measured, following
 // the formatDataStamp/isDataStale convention this file already established.
 // ---------------------------------------------------------------------------
-
-function selectDashboardBatches(
-  snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>,
-  dashboardRole: DashboardRole,
-  mockBatches: typeof MOCK_BATCHES,
-) {
-  const mockScoped = dashboardRole === 'viewer'
-    ? mockBatches
-    : mockBatches.filter((batch) => dashboardRole === 'coordinator' || batch.tenantId === 'tnt_j3ed');
-  return selectBatchesForDisplay(snapshot, mockScoped);
-}
-
-function buildTrendSeries(trendPoints: typeof SNAPSHOTS, trendDocTotal: number) {
-  if (!trendPoints.length) return [];
-  return [
-    { varName: '--color-blue', label: 'Avg training progress', values: trendPoints.map((s) => s.progressPct) },
-    { varName: '--color-green', label: 'Doc compliance', values: trendPoints.map((s) => Math.round((s.docsComplete / trendDocTotal) * 100)) },
-  ];
-}
 
 interface DashboardViewState {
   isDenied: boolean;
@@ -242,12 +218,18 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const roleCopy = ROLE_COPY[dashboardRole];
 
   // ---- Live load (TES-8 AC6) ----
-  // Attempt the real Supabase fetch. `ok` → live rows (already RLS-scoped, so no
-  // manual tenant filter). `sync-failed`/`unconfigured` → fall back to the mock
-  // snapshot, applying the role filter the database would otherwise enforce.
+  // Attempt the real Supabase fetch. `ok` → live rows (already RLS-scoped, so
+  // no manual tenant filter). `sync-failed`/`unconfigured` render empty —
+  // never mock data (RULES.md rule 19).
   const snapshot = await getBatchesSnapshot();
-  const batches = selectDashboardBatches(snapshot, dashboardRole, MOCK_BATCHES);
-  const metrics = deriveDashboardMetrics(batches, DOCUMENT_REQUIREMENTS);
+  const batches: Batch[] = selectBatchesForDisplay(snapshot);
+  // No live per-program document-requirement catalog exists yet
+  // (TES-34-adjacent gap) — an empty catalog reads as "unknown"/"pending"
+  // per ADR-004, never as a fabricated compliance percentage. Shared with
+  // DocumentStatusDonut/AlertsPanel below so every doc-derived reading on
+  // this page degrades the same way.
+  const documentRequirements: DocumentRequirement[] = [];
+  const metrics = deriveDashboardMetrics(batches, documentRequirements);
   const criticalMissing = metrics.docMissing;
   const criticalPending = metrics.docPending;
   // ADR-004: a null percentage means *nothing* is tracked — unknown, not 0%
@@ -257,12 +239,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
-  // Progress & Compliance Trend (last 6 weeks) — computed server-side so the
-  // ProgressTrend client component (needs 'use client' for its D3 draw-on
-  // animation + hover crosshair) never has to import the mock seed dataset.
-  const trendDocTotal = Math.max(1, DOCUMENT_REQUIREMENTS.length);
-  const trendPoints = SNAPSHOTS.slice(0, 6);
-  const trendSeries = buildTrendSeries(trendPoints, trendDocTotal);
+  // Recent Activity panel (6 most recent events) — never mock data.
+  const activitySnapshot = await getActivitySnapshot(6);
+  const recentActivity = activitySnapshot.status === 'ok' ? activitySnapshot.events : [];
+
+  // Progress & Compliance Trend (last 6 weeks): no live weekly-snapshot data
+  // source exists yet, so this always renders ProgressTrend's own "No trend
+  // data yet." empty state rather than fabricating history.
+  const trendSeries: TrendSeries[] = [];
 
   // ---- Dashboard states (TES-8 AC6) ----
   // `?state=` remains a manual preview override for every state. Beyond that:
@@ -350,7 +334,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         aria-label="Document status and progress trend"
         style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) minmax(0, 2fr)', gap: 16 }}
       >
-        <DocumentStatusDonut batches={batches} />
+        <DocumentStatusDonut batches={batches} documentRequirements={documentRequirements} />
         <ProgressTrend series={trendSeries} />
       </section>
 
@@ -359,7 +343,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       <BatchTimeline batches={batches} />
 
       <section className="dash-main-grid" aria-label="Dashboard summaries">
-        <AlertsPanel batches={batches} />
+        <AlertsPanel batches={batches} documentRequirements={documentRequirements} />
 
         <DashboardPanel title={SUMMARY_CARDS[1].title} icon={SUMMARY_CARDS[1].icon}>
           <div className="dash-program-grid">
@@ -398,23 +382,27 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
           <Link href="/activity-log" className="dash-link">View all</Link>
         </div>
         <div className="dash-panel-body">
-          <div className="activity">
-            {MOCK_ACTIVITY.slice(0, 6).map((event) => (
-              <div key={event.id} className="activity-item">
-                <span className={`activity-dot ${event.tone}`} />
-                <div className="activity-body">
-                  <div style={{ fontSize: 13, color: 'var(--color-text-primary)', lineHeight: '19px' }}>
-                    <span className="who">{event.who}</span>
-                    <span style={{ marginLeft: 6, fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                      · {event.role}
-                    </span>
-                    <span style={{ color: 'var(--color-text-secondary)' }}> - {event.text}</span>
+          {recentActivity.length === 0 ? (
+            <p className="t-body">No recent activity yet.</p>
+          ) : (
+            <div className="activity">
+              {recentActivity.map((event) => (
+                <div key={event.id} className="activity-item">
+                  <span className={`activity-dot ${event.tone}`} />
+                  <div className="activity-body">
+                    <div style={{ fontSize: 13, color: 'var(--color-text-primary)', lineHeight: '19px' }}>
+                      <span className="who">{event.who}</span>
+                      <span style={{ marginLeft: 6, fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+                        · {event.role}
+                      </span>
+                      <span style={{ color: 'var(--color-text-secondary)' }}> - {event.text}</span>
+                    </div>
+                    <div className="meta">{event.when}</div>
                   </div>
-                  <div className="meta">{event.when}</div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

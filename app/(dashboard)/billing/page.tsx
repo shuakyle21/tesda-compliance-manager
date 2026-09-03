@@ -14,8 +14,6 @@
 
 import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { MOCK_BATCHES } from '@/shared/mocks';
-import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks/seed';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { firstParam, resolveRouteRole } from '@/modules/auth/data/role';
@@ -23,7 +21,7 @@ import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
-import type { Batch } from '@/shared/types';
+import type { Batch, DocumentRequirement } from '@/shared/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -70,10 +68,11 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   const snapshot = await getBatchesSnapshot();
   const forcedState = firstParam(params.state);
 
-  // `unconfigured` falls back to the seed dataset silently; `sync-failed` is a
-  // real failure and must surface the banner (module data-layer contract).
-  // An `ok` snapshot is authoritative even when empty — see ADR-005 §5.
-  const batches: Batch[] = selectBatchesForDisplay(snapshot, MOCK_BATCHES);
+  // `unconfigured`/`sync-failed` render empty rather than substituting mock
+  // data; `sync-failed` additionally surfaces the banner below (module
+  // data-layer contract). An `ok` snapshot is authoritative even when
+  // empty — see ADR-005 §5.
+  const batches: Batch[] = selectBatchesForDisplay(snapshot);
 
   const syncFailed = snapshot.status === 'sync-failed' || forcedState === 'sync-failed';
   const stale = forcedState === 'stale';
@@ -92,13 +91,21 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
 
   const visible = forcedState === 'empty' ? [] : batches;
 
-  const schoolCodes = Object.fromEntries(TENANTS.map((t) => [t.id, t.code]));
-  const packets = buildPackets(visible, DOCUMENT_REQUIREMENTS, schoolCodes);
+  // No live source exists yet for either the per-tenant school-code map or a
+  // per-program document-requirement catalog (the latter needs a program id
+  // that `Batch` doesn't carry — TES-34-adjacent gap). Both degrade safely:
+  // `buildPackets` prints "—" for an unresolved school code, and an empty
+  // requirements catalog reads as "not yet verified", never as "ready" (see
+  // packets.ts's `requirementsUnavailable` guard and readiness.ts's
+  // `requiredTotal > 0` guard) — so this never fabricates a passing gate.
+  const schoolCodes: Record<string, string> = {};
+  const documentRequirements: DocumentRequirement[] = [];
+  const packets = buildPackets(visible, documentRequirements, schoolCodes);
 
   // Statement-preview inputs: one card per active batch (gate + tracks + tenant
   // header context). The queue row is the ADR-003 projection; the card is what
   // `buildStatement` derives the actual document from — same batches, two views.
-  const cards = buildBillingCards(visible);
+  const cards = buildBillingCards(visible, documentRequirements);
 
   const latestUpdate = visible
     .map((b) => b.updatedAt)
