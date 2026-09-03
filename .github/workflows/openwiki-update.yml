@@ -3,7 +3,8 @@ name: OpenWiki Update
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * *"
+    # 22:00 UTC = 6:00 AM PHT, inside the 5pm-8am PHT off-peak window.
+    - cron: "0 22 * * *"
 
 permissions:
   contents: write
