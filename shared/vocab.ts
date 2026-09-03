@@ -2,20 +2,19 @@
  * Shared vocabulary — fixed TESDA terminology, not data.
  *
  * These tables are closed sets defined by the TESDA program itself. They are not
- * rows, they will never be fetched, and they do not vary by tenant — so unlike
- * everything in `shared/mocks/`, replacing the mock layer with live Supabase data
- * leaves them untouched.
+ * rows, they will never be fetched, and they do not vary by tenant — unaffected
+ * by the mock-data retirement (`shared/mocks/` was removed entirely).
  *
- * WHY NOT `shared/mocks/` (where they used to live, TES-74): `mocks/` is the
- * `unconfigured` fallback dataset. Filing fixed vocabulary there made every
- * consumer read as if it depended on mock data, and hid the real coupling behind
- * a large import count. `shared/mocks/seed.ts` is now a *consumer* of this file
- * (it uses EMPLOYMENT_STATUSES to generate scholar rows), which is the honest
- * direction: vocabulary is an input to the fixtures, not an output of them.
+ * WHY NOT `shared/mocks/` (where they used to live, TES-74, before its removal):
+ * `mocks/` was the `unconfigured` fallback dataset. Filing fixed vocabulary there
+ * made every consumer read as if it depended on mock data, and hid the real
+ * coupling behind a large import count — vocabulary is an input to fixtures, not
+ * an output of them.
  *
  * WHY NOT a module `domain/`: `shared/` may not import `modules/`
- * (eslint.config.mjs, `import/no-restricted-paths`), and `seed.ts` consumes
- * EMPLOYMENT_STATUSES — so a module home would invert into a boundary violation.
+ * (eslint.config.mjs, `import/no-restricted-paths`), and `modules/reports/ui`
+ * consumes `EMPLOYMENT_STATUSES` — so a module home would invert into a
+ * boundary violation.
  * EGACE_STAGES stays here alongside it because it has consumers in two modules
  * (batches/ui, reports/ui); homing it in either would invent a cross-module
  * dependency that does not exist today. Its `EgaceStage` type is in

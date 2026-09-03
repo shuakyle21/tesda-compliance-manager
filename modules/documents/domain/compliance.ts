@@ -16,12 +16,11 @@
  *   - **Absent key** → **untracked**: neither verified nor missing. It is
  *     excluded from compliance measurement entirely (out of numerator *and*
  *     denominator), because the caller is asking about a requirement this
- *     batch's catalog never claimed. This case is real, not hypothetical: the
- *     UI iterates the 12-key mock catalog in `shared/mocks/seed.ts` while live
- *     maps are keyed by the migration's 8 DB keys, and the two only partly
- *     overlap (`training_sched` vs `training_schedule`). Merging those
- *     catalogs is a separate change — see the note in
- *     `modules/documents/data/documents.ts`.
+ *     batch's catalog never claimed. This case is real, not hypothetical: a caller's
+ *     requirement catalog and a batch's own tracked document keys can
+ *     legitimately diverge (a requirement added after the batch started, a
+ *     per-program catalog that doesn't cover every batch uniformly) — see the
+ *     note in `modules/documents/data/documents.ts`.
  *   - **Nothing tracked at all** → compliance is **unknown**, expressed as
  *     `null`, never `0` and never `100`. Callers render "—", not a percentage.
  *

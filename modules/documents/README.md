@@ -11,5 +11,7 @@ Per-batch document requirements, statuses, and evidence uploads.
 
 ## Planned
 - Evidence upload against Supabase Storage (the `DocumentsView` verify flow is still local state)
-- `DOCUMENT_REQUIREMENTS` currently seeds from `shared/mocks/seed.ts` (12 mock keys) while live maps
-  use the migration's 8 DB keys — reconciling the two catalogs is deliberately a separate change
+- `getDocumentRequirementsSnapshot(programId)` is scoped per scholarship program; no page currently
+  has a program id to call it with, so every caller of `DocumentsView`/`TableView`/`AlertsPanel`/
+  `DocumentStatusDonut` passes an empty `documentRequirements` catalog today (renders as "unknown"
+  per ADR-004, never a fabricated figure) — wiring the program id through is a separate change

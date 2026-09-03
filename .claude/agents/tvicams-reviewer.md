@@ -72,17 +72,17 @@ ESLint enforces the import direction, so only flag what it cannot see:
 - **`domain/` doing I/O.** It must be pure. Rule 14.
 - **A `shared/ui` component that has started reading data or encoding business
   rules** — it belongs in its owning module. Rule 15.
-- **A per-module split of `shared/types.ts`** without first relocating
-  `shared/mocks/seed.ts` out of `shared/`. Rule 16.
 
 ### 3. Data layer (RULES.md §3)
 
 - **fetch → map → derive.** Compare against the reference implementation
   `modules/batches/data/batches.ts`. Rule 17.
-- **Discriminated snapshots.** `ok` / `sync-failed` / `unconfigured`.
-  `unconfigured` falls back to mocks silently; `sync-failed` *must* surface the
-  sync-failed banner — a swallowed `sync-failed` is a real defect, because the
-  user then reads stale data as current. Rule 19.
+- **Discriminated snapshots.** `ok` / `sync-failed` / `unconfigured`. Neither
+  may substitute mock or fabricated data — both render an honest empty state;
+  `sync-failed` *must* additionally surface the sync-failed banner. Check
+  guard-clause ordering explicitly: an "is it empty?" check placed before the
+  sync-failed check will silently swallow the banner whenever a failure
+  yields zero rows (a real regression this repo hit once already). Rule 19.
 - **After a migration:** `database.types.ts` regenerated, then affected mappers
   and domain types updated. Rule 20.
 

@@ -28,14 +28,9 @@ type DocumentRow = Database['public']['Tables']['documents']['Row'];
 // Icon is a presentation concern the contract does not carry (no DB column) —
 // looked up by `document_key`. These 8 keys are the ones the migration's own
 // seed data uses (supabase/migrations/..._create_tenant_scoped_schema.sql,
-// the `requirements` CTE ~line 789) — NOT the 12-key catalog in
-// shared/mocks/seed.ts's `DOCUMENT_REQUIREMENTS`, which is a separately
-// authored mock fixture with only partial key overlap (e.g. `training_sched`
-// vs DB `training_schedule`, `billing_rpt` vs DB `billing_report`). Do not
-// merge the two sets here — that would silently paper over the mismatch
-// instead of surfacing it. A key outside this set falls back to a generic
-// icon rather than failing; `document_key` is per-program configured data,
-// not a closed enum, so unlike `DB_TO_UI_STAGE` in batches.ts this is
+// the `requirements` CTE ~line 789). A key outside this set falls back to a
+// generic icon rather than failing; `document_key` is per-program configured
+// data, not a closed enum, so unlike `DB_TO_UI_STAGE` in batches.ts this is
 // deliberately a Partial map, not total.
 // ---------------------------------------------------------------------------
 const DOCUMENT_ICONS: Partial<Record<string, string>> = {

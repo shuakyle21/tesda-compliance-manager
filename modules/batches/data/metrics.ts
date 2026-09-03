@@ -1,22 +1,17 @@
 /**
- * Dashboard metrics contract (TES-30) — the real, non-mock home for the 5-card
- * dashboard summary computation. `shared/mocks/index.ts`'s `getMockMetrics`
- * keeps its own copy for the mock-fallback path (`shared/` cannot import
- * `modules/`, per the import-direction rule); this is the "real" counterpart
- * the sibling-contracts scope item asked for.
+ * Dashboard metrics contract (TES-30) — the home for the 5-card dashboard
+ * summary computation.
  *
  * Derive-only: no I/O, pure function over whatever `Batch[]` the caller
- * already loaded (live or mock) — mirrors `modules/batches/domain/urgency.ts`'s
- * shape more than `batches.ts`'s fetch/map layers, but lives at this path per
- * the TES-30 issue text.
+ * already loaded — mirrors `modules/batches/domain/urgency.ts`'s shape more
+ * than `batches.ts`'s fetch/map layers, but lives at this path per the TES-30
+ * issue text.
  *
  * Deliberately takes `criticalDocumentKeys` as a parameter instead of
- * importing a requirement catalog: the mock `DOCUMENT_REQUIREMENTS` (12 keys,
- * `shared/mocks/seed.ts`) and the live `program_document_requirements` table
- * use different key sets (see `modules/documents/data/documents.ts`'s note on
- * `training_sched` vs `training_schedule`, `billing_rpt` vs `billing_report`).
- * Hardcoding either catalog here would silently make this function correct for
- * only one of the two batch sources it needs to serve.
+ * importing a requirement catalog: no single flat catalog exists — the live
+ * `program_document_requirements` table is scoped per scholarship program
+ * (see `modules/documents/data/documents.ts`) — so hardcoding one here would
+ * make this function correct for only one program at a time.
  *
  * Billing-deadline caveat: `earliestBillingDeadline` / `daysToEarliestBilling`
  * read `Batch.billingDeadline` / `daysToBilling`, which `batches.ts` currently
