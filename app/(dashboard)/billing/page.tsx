@@ -12,6 +12,7 @@
  * is `modules/billing/data`.
  */
 
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
@@ -84,6 +85,29 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
           iconName="shield-off"
           heading="You do not have access to billing"
           sub="Billing figures are limited to coordinators and admins for this school. Contact a coordinator to request access."
+        />
+      </div>
+    );
+  }
+
+  // A real sync failure yields zero batches (no mock fallback), which would
+  // otherwise satisfy the "no batches to bill yet" empty state below and hide
+  // the retry banner behind a misleading message. Check this first so a
+  // failed fetch always reads as a failure (RULES.md rule 19). The
+  // `?state=sync-failed` preview override on a real non-empty snapshot still
+  // falls through to `BillingQueueView`'s inline `syncFailed` banner below,
+  // unaffected.
+  if (syncFailed && batches.length === 0) {
+    return (
+      <div className="page">
+        <div className="page-head">
+          <h1 className="page-title">Billing</h1>
+        </div>
+        <EmptyState
+          iconName="refresh"
+          heading="Couldn't reach Supabase"
+          sub="Billing data isn't available right now. Try again in a moment."
+          action={<Link href="/billing" className="btn primary" style={{ marginTop: 12 }}>Retry</Link>}
         />
       </div>
     );

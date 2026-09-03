@@ -17,17 +17,27 @@ import { BatchModal } from '@/modules/batches/ui/BatchModal';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
-import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
-import type { Batch } from '@/shared/types';
+import type { Batch, DocumentRequirement } from '@/shared/types';
 
-export function TableView({ batches }: { batches: Batch[] }) {
+export function TableView({
+  batches,
+  documentRequirements,
+}: {
+  batches: Batch[];
+  // Injected by the route rather than read from a module-level catalog: the
+  // real requirement catalog is per scholarship program, so only the caller
+  // can resolve it. An empty catalog renders "—" (ADR-004 "unknown"), never a
+  // fabricated compliance figure.
+  documentRequirements: DocumentRequirement[];
+}) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
   const [open, setOpen] = useState<Batch | null>(null);
 
   const filtered = useMemo(() => filterBatches(batches, query, program), [batches, query, program]);
+  const crit = useMemo(() => criticalRequirements(documentRequirements), [documentRequirements]);
 
   return (
     <div>
@@ -65,7 +75,9 @@ export function TableView({ batches }: { batches: Batch[] }) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((b, i) => <TableRow key={b.id} batch={b} odd={i % 2 === 0} onClick={() => setOpen(b)} />)}
+                {filtered.map((b, i) => (
+                  <TableRow key={b.id} batch={b} criticalRequirements={crit} odd={i % 2 === 0} onClick={() => setOpen(b)} />
+                ))}
               </tbody>
             </table>
           </div>
@@ -87,7 +99,17 @@ function Th({ children, align }: { children: React.ReactNode; align?: 'left' | '
   );
 }
 
-function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick: () => void }) {
+function TableRow({
+  batch,
+  criticalRequirements: crit,
+  odd,
+  onClick,
+}: {
+  batch: Batch;
+  criticalRequirements: DocumentRequirement[];
+  odd: boolean;
+  onClick: () => void;
+}) {
   const cellStyle: CSSProperties = {
     padding: '0 12px', height: 44,
     fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--color-text-primary)',
@@ -100,8 +122,8 @@ function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick
   // is keyed by the batch's *own* requirement catalog, which need not cover
   // every key in the catalog being iterated — indexing it unguarded threw a
   // TypeError on any batch missing one (TES-94). Untracked keys count toward
-  // neither `ok` nor `missing`; with nothing tracked the cell reads "—".
-  const crit = criticalRequirements(DOCUMENT_REQUIREMENTS);
+  // neither `ok` nor `missing`; with nothing tracked the cell reads "—", which
+  // is also what an unresolved (empty) catalog renders.
   const docs = summarizeBatchDocCompliance(batch, crit);
   const docColor = docs.tracked === 0
     ? 'var(--color-text-muted)'

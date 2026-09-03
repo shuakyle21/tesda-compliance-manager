@@ -274,6 +274,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
     return <DeniedView header={header} />;
   }
 
+  // A real sync failure yields zero batches (no mock fallback), which would
+  // otherwise satisfy the empty guard below and hide the retry banner behind
+  // a misleading "no batches — import one" message. Check this first so a
+  // failed fetch always reads as a failure, never as an empty tenant
+  // (RULES.md rule 19: sync-failed must surface the banner). The
+  // `?state=sync-failed` preview override with a real non-empty snapshot
+  // still falls through to the inline SyncFailedCallout below, unaffected.
+  if (syncFailed && batches.length === 0) {
+    return <SyncFailedView header={header} message={syncFailedMessage} />;
+  }
+
   // Empty — no assigned batches; surface the next administrative action.
   if (isEmpty) {
     return <EmptyBatchesView header={header} />;
@@ -462,6 +473,20 @@ function EmptyBatchesView({ header }: { header: React.ReactNode }) {
         heading="No assigned batches"
         sub="Once a batch is imported or assigned to you, its readiness, lifecycle, and documents appear here."
         action={<Link href="/batch-cards" className="btn primary" style={{ marginTop: 12 }}>Import a batch</Link>}
+      />
+    </div>
+  );
+}
+
+function SyncFailedView({ header, message }: { header: React.ReactNode; message: string }) {
+  return (
+    <div className="dashboard-view">
+      {header}
+      <EmptyState
+        iconName="refresh"
+        heading="Couldn't reach Supabase"
+        sub={`Batch data isn't available right now${message}. Try again in a moment.`}
+        action={<Link href="/dashboard" className="btn primary" style={{ marginTop: 12 }}>Retry</Link>}
       />
     </div>
   );

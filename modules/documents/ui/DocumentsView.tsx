@@ -17,7 +17,6 @@ import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
-import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
 import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
 import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
 
@@ -33,7 +32,21 @@ const UNTRACKED_LABEL = 'Not tracked';
 // Single demo identity — an admin (proprietor) who can verify documents.
 const CURRENT_USER = 'Pia Buenaventura';
 
-export function DocumentsView({ batches }: { batches: Batch[] }) {
+export function DocumentsView({
+  batches,
+  documentRequirements,
+  syncFailed = false,
+}: {
+  batches: Batch[];
+  /**
+   * The requirement catalog driving the matrix rows. Supplied by the route —
+   * this view never falls back to a bundled catalog, so an unavailable one
+   * renders the honest "requirements unavailable" state below rather than an
+   * invented checklist.
+   */
+  documentRequirements: DocumentRequirement[];
+  syncFailed?: boolean;
+}) {
   // Verification overrides keyed `${batchId}:${docKey}`.
   const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
@@ -58,7 +71,7 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
   const completeness = useMemo(() => batches.map((b) => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
     // batch tracks none of them, so the card reads "—" rather than 0%.
-    const crit = criticalRequirements(DOCUMENT_REQUIREMENTS);
+    const crit = criticalRequirements(documentRequirements);
     const records = crit.map((r) => docOf(b, r.key));
     const tracked = records.filter((d): d is DocRecord => d !== null);
     const ok = tracked.filter((d) => d.status === 'verified').length;
@@ -67,13 +80,32 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
     const untracked = crit.length - tracked.length;
     const tier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, tier };
-  }), [batches, overrides]);
+  }), [batches, documentRequirements, overrides]);
 
   if (!batches.length) {
     return (
       <div>
         <Header />
+        <SyncFailedCallout syncFailed={syncFailed} />
         <EmptyState heading="No batches found" sub="Try adjusting your filters." />
+      </div>
+    );
+  }
+
+  // No requirement catalog means no rows to audit against. Rendering the grid
+  // with headers and zero rows would read as "this batch requires nothing",
+  // and every completeness card would show a bare "—"; one honest state is
+  // clearer (ADR-004 — unknown is not zero).
+  if (!documentRequirements.length) {
+    return (
+      <div>
+        <Header />
+        <SyncFailedCallout syncFailed={syncFailed} />
+        <EmptyState
+          iconName="file-off"
+          heading="Document requirements unavailable"
+          sub="The requirement checklist for these batches has not loaded, so document status cannot be audited yet."
+        />
       </div>
     );
   }
@@ -112,6 +144,7 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
   return (
     <div>
       <Header />
+      <SyncFailedCallout syncFailed={syncFailed} />
       <InfoCallout variant="info">
         Document audit follows TESDA Circular 014-2026. Critical documents are required for billing release; missing items block the BSRS submission.
       </InfoCallout>
@@ -172,7 +205,7 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
           ))}
         </div>
 
-        {DOCUMENT_REQUIREMENTS.map((req) => (
+        {documentRequirements.map((req) => (
           <div key={req.key} className="doc-row" style={gridStyle}>
             <div className={'cell label-cell' + (req.critical ? ' critical' : '')}>
               <Icon name={req.icon as never} size={14} style={{ color: 'var(--color-text-muted)' }} />
@@ -222,6 +255,15 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
       )}
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </div>
+  );
+}
+
+function SyncFailedCallout({ syncFailed }: { syncFailed: boolean }) {
+  if (!syncFailed) return null;
+  return (
+    <InfoCallout variant="warning">
+      Sync with the compliance database failed, so no document status is shown. Reload to try again.
+    </InfoCallout>
   );
 }
 

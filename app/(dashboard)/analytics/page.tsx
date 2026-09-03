@@ -4,19 +4,41 @@
  * analytics_tremor_decision project memory for why this module alone departs
  * from the app's hand-rolled chart primitives).
  *
- * Stays a Server Component: it only fetches/derives MOCK_BATCHES and hands
- * them to the client-rendered AnalyticsView.
+ * Stays a Server Component: it only fetches the live batch snapshot and hands
+ * the rows to the client-rendered AnalyticsView.
  */
 
-import { MOCK_BATCHES, DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { AnalyticsView } from '@/modules/analytics/ui/AnalyticsView';
+import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { Icon } from '@/shared/ui/Icon';
+import type { Batch, DocumentRequirement } from '@/shared/types';
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  // `unconfigured`/`sync-failed` chart nothing rather than substituting mock
+  // data; `sync-failed` additionally surfaces the banner below (module
+  // data-layer contract). An `ok` snapshot is authoritative even when empty —
+  // see ADR-005 §5.
+  const snapshot = await getBatchesSnapshot();
+  const batches: Batch[] = selectBatchesForDisplay(snapshot);
+
+  // No live per-program document-requirement catalog exists yet: the real
+  // contract (`getDocumentRequirementsSnapshot`) is scoped per scholarship
+  // program and needs a program id that `Batch` doesn't carry
+  // (TES-34-adjacent gap). An empty catalog leaves the document-compliance
+  // chart in its "cannot be scored" state per ADR-004, never at a fabricated
+  // percentage.
+  const documentRequirements: DocumentRequirement[] = [];
+
   return (
     <div>
       <Header />
-      <AnalyticsView batches={MOCK_BATCHES} documentRequirements={DOCUMENT_REQUIREMENTS} />
+      {snapshot.status === 'sync-failed' && (
+        <InfoCallout variant="warning">
+          Sync with the compliance database failed, so no charts can be drawn. Reload to try again.
+        </InfoCallout>
+      )}
+      <AnalyticsView batches={batches} documentRequirements={documentRequirements} />
     </div>
   );
 }
