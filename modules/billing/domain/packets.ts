@@ -76,18 +76,28 @@ export function tsfAmount(batch: Batch): number {
   return batch.totalDays * TSF_DAY_RATE * batch.scholars;
 }
 
-/** Peso formatting used by both the tiles and the queue rows. */
+/**
+ * Formats a peso amount with thousands separators (e.g., "₱184,000").
+ * Used by both the summary tiles and the queue rows.
+ */
 export function formatPeso(amount: number): string {
   return `₱${amount.toLocaleString('en-PH')}`;
 }
 
-/** Compact peso for the summary tiles — ₱184K rather than ₱184,000. */
+/**
+ * Formats a peso amount in compact notation for summary tiles.
+ * Amounts >= 1M show as "₱1.2M", >= 1K show as "₱184K", otherwise full amount.
+ */
 export function formatPesoCompact(amount: number): string {
   if (amount >= 1_000_000) return `₱${(amount / 1_000_000).toFixed(1)}M`;
   if (amount >= 1_000) return `₱${Math.round(amount / 1_000)}K`;
   return `₱${amount}`;
 }
 
+/**
+ * Derives a human-readable due label from the days-to-due count.
+ * Negative values show as "Nd past due", zero as "Due today", etc.
+ */
 function dueLabelFor(daysToDue: number): string {
   if (daysToDue < 0) return `${Math.abs(daysToDue)}d past due`;
   if (daysToDue === 0) return 'Due today';
@@ -96,12 +106,18 @@ function dueLabelFor(daysToDue: number): string {
 }
 
 /**
- * Builds the packet projection for one batch.
+ * Build the packet projection for one batch.
  *
  * `state` is derived rather than read, because ADR-003 P2/P3 puts `generated` in
  * `billing_records` (table not yet migrated) and makes `submitted`/`settled`
  * user-asserted marks with no store yet. Completed batches therefore stand in
  * as `settled` — a prototype portrayal of the target, per ADR-002.
+ *
+ * @param batch - The batch to build a packet for
+ * @param requirements - The document requirement catalog
+ * @param schoolCode - The school code for display
+ * @param sequence - The packet sequence number for generating the ref
+ * @returns Complete billing packet projection
  */
 export function buildPacket(
   batch: Batch,
@@ -159,11 +175,19 @@ export function buildPacket(
   };
 }
 
-/** True when a live packet has passed its derived due date (ADR-003 P5). */
+/**
+ * Returns true when a live packet has passed its derived due date (ADR-003 P5).
+ * Settled packets are never overdue regardless of their due date.
+ */
 export function isOverdue(packet: BillingPacket): boolean {
   return packet.state !== 'settled' && packet.daysToDue < 0;
 }
 
+/**
+ * Builds billing packets for a set of batches. Each batch produces one packet,
+ * numbered sequentially. The school code for each tenant is resolved from the
+ * provided `schoolCodes` map, falling back to "—" when not found.
+ */
 export function buildPackets(
   batches: Batch[],
   requirements: DocumentRequirement[],
@@ -186,9 +210,15 @@ export interface PacketSummary {
 }
 
 /**
- * The four summary tiles (ADR-003 P6). Every figure is a sum over the
- * projection, not a stored aggregate — and `settled` is an *observation* total
- * (what someone marked), never a reconciliation.
+ * Summarize packets into the four billing queue tiles.
+ *
+ * Computes ready, pending, overdue, and settled totals with counts. Every
+ * figure is a sum over the projection, not a stored aggregate — and `settled`
+ * is an *observation* total (what someone marked), never a reconciliation
+ * (ADR-003 P6).
+ *
+ * @param packets - The packets to summarize
+ * @returns Summary with amounts and counts for each state
  */
 export function summarizePackets(packets: BillingPacket[]): PacketSummary {
   const sum = (list: BillingPacket[]) => list.reduce((total, p) => total + p.amount, 0);
@@ -210,7 +240,16 @@ export function summarizePackets(packets: BillingPacket[]): PacketSummary {
   };
 }
 
-/** Free-text filter across the fields the queue's search box advertises. */
+/**
+ * Filter packets by free-text search query.
+ *
+ * Searches across ref, batch name, qualification, school code, and program
+ * (case-insensitive) — the fields the queue's search box advertises.
+ *
+ * @param packets - The packets to filter
+ * @param query - The search query
+ * @returns Filtered packets matching the query
+ */
 export function filterPackets(packets: BillingPacket[], query: string): BillingPacket[] {
   const q = query.trim().toLowerCase();
   if (!q) return packets;

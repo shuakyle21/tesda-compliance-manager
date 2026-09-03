@@ -9,6 +9,12 @@ import type { Database } from './database.types';
  */
 export const NO_CLERK_TOKEN_MESSAGE = 'No Clerk session token available for the Supabase request.';
 
+/**
+ * Returns true when Supabase environment variables are configured. Data-layer
+ * functions check this before attempting to create a client, returning an
+ * `unconfigured` snapshot (silent mock fallback) when false rather than
+ * throwing an error.
+ */
 export function isSupabaseConfigured(): boolean {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

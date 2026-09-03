@@ -72,21 +72,29 @@ export interface StatementTenant {
 
 // --- formatting helpers ----------------------------------------------------
 
-/** 15390 → "₱15,390.00". */
+/**
+ * Formats a number as a peso amount with two decimal places (e.g., 15390 → "₱15,390.00").
+ */
 export function formatPeso(n: number): string {
   return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-/** ScholarRow → "DELA CRUZ, Juan P." (uppercase last, title-ish first). */
+/**
+ * Formats a scholar's name for the billing statement roster: "DELA CRUZ, Juan P."
+ * (uppercase last name, first name as provided, middle initial when present).
+ */
 function scholarName(s: ScholarRow): string {
   const mi = s.middleInit ? ` ${s.middleInit.trim()}` : '';
   return `${s.lastName.toUpperCase()}, ${s.firstName}${mi}`.trim();
 }
 
 /**
- * Synthesized RQM code (ADR-001 structure `RQM<tranche>-<year>-<program>-<institution>-<seq>`).
+ * Synthesizes an RQM code (ADR-001 structure `RQM<tranche>-<year>-<program>-<institution>-<seq>`).
  * Deterministic from the batch code so the same batch always shows the same
- * authorization; clearly a prototype value until `rqm_code` is on the contract.
+ * authorization. This is a prototype value until `rqm_code` is on the contract.
+ *
+ * @param batch - The batch to generate an RQM code for
+ * @returns RQM code like "RQM3-2026-CFSP-1263-0001"
  */
 function rqmCode(batch: Batch): string {
   const seq = (batch.id.match(/\d+/)?.[0] ?? '0').padStart(4, '0');
@@ -94,12 +102,17 @@ function rqmCode(batch: Batch): string {
   return `RQM3-2026-${program}-1263-${seq}`;
 }
 
-/** "Apr 21 – Jun 8, 2026 (360 hrs)". */
+/**
+ * Formats the training period for the statement header (e.g., "Apr 21 – Jun 8, 2026 (360 hrs)").
+ */
 function trainingPeriod(batch: Batch): string {
   const hrs = nominalHoursFor(batch.qualification);
   return `${batch.trainingStart} – ${batch.trainingEnd} (${hrs} hrs)`;
 }
 
+/**
+ * Returns the full program banner for the statement cover (CFSP or TWSP).
+ */
 function programBanner(program: string): string {
   return isCfsp(program)
     ? 'Coconut Farmers Scholarship Program (CFSP)'
@@ -109,9 +122,17 @@ function programBanner(program: string): string {
 // --- builder ---------------------------------------------------------------
 
 /**
- * Build the statement for a batch + track. Falls back to an empty roster
- * gracefully (the modal shows a zero-row table, never a crash) when a batch has
- * no `scholars_list` yet.
+ * Build a complete billing statement for a batch and track combination.
+ *
+ * Generates all components: header info, column definitions, per-scholar rows,
+ * summary lines, and grand total with amount-in-words. Falls back to an empty
+ * roster gracefully (the modal shows a zero-row table) when a batch has no
+ * `scholars_list` yet.
+ *
+ * @param batch - The batch to bill
+ * @param trackId - The billing track (training_cost, tsf_allowance, or entrepreneurship)
+ * @param tenant - The school context for the statement header
+ * @returns Complete billing statement ready for preview or generation
  */
 export function buildStatement(
   batch: Batch,
@@ -153,6 +174,10 @@ type Header = Omit<
   'subtitle' | 'columns' | 'rows' | 'summary' | 'totalLabel' | 'grandTotal' | 'grandTotalLabel' | 'grandWords'
 >;
 
+/**
+ * Finalizes a billing statement by combining the header with the computed
+ * columns, rows, summary, and grand total. Adds the amount-in-words footer.
+ */
 function finalize(
   header: Header,
   subtitle: string,
@@ -174,7 +199,10 @@ function finalize(
   };
 }
 
-// Training Cost — flat per-scholar cost (matches the source docx exactly).
+/**
+ * Builds the Training Cost statement (flat per-scholar cost).
+ * Matches the source docx exactly.
+ */
 function buildTrainingCost(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
   const unit = trainingCostFor(batch.qualification);
   const columns: StatementColumn[] = [
@@ -194,7 +222,10 @@ function buildTrainingCost(batch: Batch, roster: ScholarRow[], header: Header): 
   return finalize(header, `${formatPeso(unit)} per scholar · ${roster.length} pax`, columns, rows, summary, grandTotal);
 }
 
-// TSF / Allowance — TSF days + (CFSP) New Normal + Insurance per scholar.
+/**
+ * Builds the TSF / Allowance statement. Includes TSF days plus (CFSP only)
+ * New Normal Assistance and Accident Insurance per scholar.
+ */
 function buildTsfAllowance(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
   const cfsp = isCfsp(batch.program);
   const days = tsfDaysFor(batch.qualification);
@@ -240,7 +271,10 @@ function buildTsfAllowance(batch: Batch, roster: ScholarRow[], header: Header): 
   return finalize(header, `${formatPeso(perScholar)} per scholar · ${n} pax`, columns, rows, summary, grandTotal);
 }
 
-// Entrepreneurship — ₱800 per scholar, CFSP only (single payment on delivery).
+/**
+ * Builds the Entrepreneurship statement. ₱800 per scholar, CFSP only
+ * (single payment on delivery).
+ */
 function buildEntrepreneurship(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
   const columns: StatementColumn[] = [
     { key: 'no', label: 'No.', align: 'left', mono: true },

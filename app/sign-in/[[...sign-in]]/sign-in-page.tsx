@@ -53,6 +53,39 @@ export function SignInCard() {
   const [busy, setBusy] = useState(false);
   const [oauthBusy, setOauthBusy] = useState(false);
 
+  // Shared by handleSignIn and confirmReset: both land here right after a
+  // Clerk verification step succeeds (password auth / reset-password submit),
+  // and both must resolve signIn.status the same way — finalize, hand off to
+  // a second factor, hand off to a device-trust challenge, or bail with the
+  // generic message. Was duplicated verbatim in both handlers; extracted so
+  // there's one place to change this dance, not two kept in sync by hand.
+  async function resolveAfterVerification() {
+    if (signIn.status === 'complete') {
+      const { error: finalizeError } = await signIn.finalize({
+        navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
+      });
+      if (finalizeError) setError(clerkError(finalizeError));
+      return;
+    }
+    if (signIn.status === 'needs_second_factor') {
+      setCode('');
+      setUseBackup(false);
+      setView('mfa');
+      return;
+    }
+    if (signIn.status === 'needs_client_trust') {
+      const { error: sendError } = await signIn.mfa.sendEmailCode();
+      if (sendError) {
+        setError(clerkError(sendError));
+        return;
+      }
+      setCode('');
+      setView('trust');
+      return;
+    }
+    setError('Additional verification is required to finish signing in.');
+  }
+
   // Email + password
   async function handleSignIn(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -71,30 +104,7 @@ export function SignInCard() {
         setError(clerkError(signInError));
         return;
       }
-      if (signIn.status === 'complete') {
-        const { error: finalizeError } = await signIn.finalize({
-          navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
-        });
-        if (finalizeError) setError(clerkError(finalizeError));
-        return;
-      }
-      if (signIn.status === 'needs_second_factor') {
-        setCode('');
-        setUseBackup(false);
-        setView('mfa');
-        return;
-      }
-      if (signIn.status === 'needs_client_trust') {
-        const { error: sendError } = await signIn.mfa.sendEmailCode();
-        if (sendError) {
-          setError(clerkError(sendError));
-          return;
-        }
-        setCode('');
-        setView('trust');
-        return;
-      }
-      setError('Additional verification is required to finish signing in.');
+      await resolveAfterVerification();
     } catch (err) {
       setError(clerkError(err));
     } finally {
@@ -219,30 +229,7 @@ export function SignInCard() {
       }
       // The password was already changed at this point — a non-"complete" status
       // from here on is the next step (e.g. MFA), not a failed reset.
-      if (signIn.status === 'complete') {
-        const { error: finalizeError } = await signIn.finalize({
-          navigate: ({ decorateUrl }) => router.push(decorateUrl(redirectUrl)),
-        });
-        if (finalizeError) setError(clerkError(finalizeError));
-        return;
-      }
-      if (signIn.status === 'needs_second_factor') {
-        setCode('');
-        setUseBackup(false);
-        setView('mfa');
-        return;
-      }
-      if (signIn.status === 'needs_client_trust') {
-        const { error: sendError } = await signIn.mfa.sendEmailCode();
-        if (sendError) {
-          setError(clerkError(sendError));
-          return;
-        }
-        setCode('');
-        setView('trust');
-        return;
-      }
-      setError('Additional verification is required to finish signing in.');
+      await resolveAfterVerification();
     } catch (err) {
       setError(clerkError(err));
     } finally {

@@ -1,3 +1,17 @@
+/**
+ * Clerk middleware proxy — the authentication boundary for the entire app.
+ *
+ * Protects every route except `/sign-in` and `/sign-up` (the matcher excludes
+ * those paths). Clerk's middleware injects the session context, which
+ * `lib/supabase/server.ts` reads via `auth()` to attach the JWT to every
+ * Supabase query — so RLS can make every authorization decision. See CLAUDE.md
+ * "Auth chain" for the full flow.
+ *
+ * The `x-pathname` header injection is a Next.js App Router convention: route
+ * segments can read `headers().get('x-pathname')` to learn the full request
+ * path, which is otherwise unavailable in Server Components.
+ */
+
 import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 

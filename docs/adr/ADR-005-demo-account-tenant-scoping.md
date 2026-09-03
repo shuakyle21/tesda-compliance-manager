@@ -82,26 +82,33 @@ below on the one live screen where it matters most.
 
 ## The isolation assertion
 
-The dev seed mirrors `shared/mocks/seed.ts` (`BATCHES`) row for row — **five**
-batches, matching `ALL_BATCHES`:
+The dev seed creates **five** batches:
 
-| Tenant | Batch | Course | Status |
-| --- | --- | --- | --- |
-| AKB | `DEV-AKB-001` | Cookery NC II | ongoing |
-| J3ED | `DEV-J3ED-001` | Agri Crops Production NC I | ongoing |
-| J3ED | `DEV-J3ED-002` | Agri Crops Production NC I | completed |
-| NEN | `DEV-NEN-001` | Rice Machinery Operations NC II | ongoing |
-| NEN | `DEV-NEN-002` | Rice Machinery Operations NC II | ongoing |
+| Tenant | Batch | Course |
+| --- | --- | --- |
+| AKB | `DEV-AKB-001` | Cookery NC II |
+| J3ED | `DEV-J3ED-001` | Agri Crops Production NC I |
+| J3ED | `DEV-J3ED-002` | Agri Crops Production NC I |
+| NEN | `DEV-NEN-001` | Rice Machinery Operations NC II |
+| NEN | `DEV-NEN-002` | Rice Machinery Operations NC II |
 
 So the assertion the demo account exists to prove is: **signed in as demo, on
-`/dashboard`, exactly one batch is visible — `DEV-AKB-001` — and neither NEN
-nor J3ED batch appears.** A scoping regression shows more than one.
+`/dashboard`, exactly one batch is visible — `DEV-AKB-001` — and the other four
+do not appear.** A scoping regression shows five.
 
-(`MOCK_BATCHES` filters out `status: 'completed'`, so it holds four of these
-five rows — `DEV-J3ED-002` is the one completed batch it excludes. The seed's
-"four batches" framing tracked `MOCK_BATCHES`, not `ALL_BATCHES`; both counts
-now hold for live data, since the seed was brought in line with the full mock
-dataset.)
+Two caveats on how to run it:
+
+- The seed's verification query cannot confirm this by itself. It joins through
+  `profile_tenant_memberships`, so a tenant nobody is a member of never appears
+  in its output — and J3ED has no member by design. Verify in the app, signed
+  in, not in SQL.
+- The assertion is only meaningful on the `ok` path. On `unconfigured` or
+  `sync-failed`, `app/(dashboard)/dashboard/page.tsx` hands a `viewer` the full
+  unscoped mock set while narrowing it for every other role, and an unresolved
+  role also defaults to `viewer`. Demo is now a viewer, so it is precisely the
+  role that sees every school's mock data there. Four batches on that path is
+  the `MOCK_BATCHES` fallback, which excludes the completed `DEV-J3ED-002`;
+  `ALL_BATCHES` contains all five seeded batches. It is not a regression.
 
 ## Consequences
 

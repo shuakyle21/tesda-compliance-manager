@@ -12,6 +12,12 @@
 import { criticalRequirements, summarizeDocCompliance } from '@/modules/documents/domain/compliance';
 import type { Batch, DashboardMetrics, DocumentRequirement } from '@/shared/types';
 
+/**
+ * Derives the 5-card dashboard metrics from a batch set and requirement catalog.
+ * All numbers are computed from the inputs (never hardcoded), so they cannot
+ * drift from the underlying records. Document compliance routes through the
+ * compliance domain module to apply the ADR-004 untracked-exclusion rule.
+ */
 export function deriveDashboardMetrics(
   batches: readonly Batch[],
   requirements: readonly DocumentRequirement[],
