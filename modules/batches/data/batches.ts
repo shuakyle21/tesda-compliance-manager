@@ -243,30 +243,16 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Fetch — server-only. RLS (Clerk JWT) scopes rows to the caller's tenant, so
-// "assigned batches" filtering happens in the database, not here.
-// ---------------------------------------------------------------------------
-
-/**
- * Outcome of a dashboard batch load. The data layer owns error *shaping* so the
- * dashboard server component can map each state straight to UI (TES-8 AC6, #65):
- *   - `ok`           — live rows; `dataAsOf` is the freshest row's `updated_at`.
- *   - `sync-failed`  — Supabase is configured but the query failed → real
- *                      sync-failed callout.
- *   - `unconfigured` — no Supabase env in this environment → caller falls back
- *                      to the cached/mock snapshot *silently* (no false alarm).
- */
 export type BatchesSnapshot =
   | { status: 'ok'; batches: Batch[]; dataAsOf: string | null }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
-/**
- * Returns the freshest `updated_at` timestamp across all loaded batch rows,
- * or null when there are none. Used to derive the "Data as of" timestamp for
- * the dashboard.
- */
+export function selectBatchesForDisplay(snapshot: BatchesSnapshot, fallback: Batch[]): Batch[] {
+  return snapshot.status === 'ok' ? snapshot.batches : fallback;
+}
+
+/** Freshest `updated_at` across the loaded rows, or null when there are none. */
 function latestUpdatedAt(batches: Batch[]): string | null {
   return batches.reduce<string | null>(
     (max, b) => (b.updatedAt && (!max || b.updatedAt > max) ? b.updatedAt : max),
@@ -274,13 +260,6 @@ function latestUpdatedAt(batches: Batch[]): string | null {
   );
 }
 
-/**
- * Fetches all batches for the caller's tenant via RLS-scoped query. Returns a
- * discriminated snapshot so the caller can distinguish unconfigured (no Supabase
- * env → silent mock fallback) from sync-failed (configured but errored → show
- * the sync-failed banner). Includes embedded joins for scholarship programs,
- * document requirements, and submitted documents.
- */
 export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
@@ -301,11 +280,6 @@ export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
   }
 }
 
-/**
- * Throwing convenience wrapper over {@link getBatchesSnapshot} for callers that
- * just want the rows (the original foundational contract). The dashboard uses
- * the snapshot directly so it can distinguish unconfigured from failed.
- */
 export async function getBatches(): Promise<Batch[]> {
   const snap = await getBatchesSnapshot();
   if (snap.status === 'ok') return snap.batches;

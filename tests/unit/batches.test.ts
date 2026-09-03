@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mapBatchRow } from '@/modules/batches/data/batches';
+import { mapBatchRow, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 
 // batches.ts keeps its join-row type module-private; derive the fixture's
 // shape from the function signature instead of duplicating it by hand.
@@ -167,5 +167,45 @@ describe('mapBatchRow — days-to-billing (as-of date sensitive)', () => {
   it('stands in billingDeadline with end_date until a real column exists', () => {
     const batch = mapBatchRow(fixtureRow({ end_date: '2026-06-18' }));
     expect(batch.billingDeadline).toBe('Jun 18, 2026');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// selectBatchesForDisplay — see the docstring on the function itself, and
+// docs/adr/ADR-005-demo-account-tenant-scoping.md decision 5, for why this rule
+// exists. Not restated here: the same argument in two places drifts the way the
+// two inlined copies of this logic did.
+//
+// The load-bearing case is the second test: `ok` is authoritative even when it
+// carries zero rows.
+// ---------------------------------------------------------------------------
+describe('selectBatchesForDisplay', () => {
+  const fallback = [mapBatchRow(fixtureRow({ id: 'mock-1', batch_code: 'MOCK-1' }))];
+
+  it('returns live batches when the snapshot is ok and non-empty', () => {
+    const live = [mapBatchRow(fixtureRow({ id: 'live-1', batch_code: 'LIVE-1' }))];
+    const result = selectBatchesForDisplay(
+      { status: 'ok', batches: live, dataAsOf: null },
+      fallback,
+    );
+    expect(result.map((b) => b.id)).toEqual(['LIVE-1']);
+  });
+
+  it('returns an empty list — NOT the fallback — when ok carries zero rows', () => {
+    const result = selectBatchesForDisplay(
+      { status: 'ok', batches: [], dataAsOf: null },
+      fallback,
+    );
+    expect(result).toEqual([]);
+  });
+
+  it('falls back when the snapshot is unconfigured', () => {
+    const result = selectBatchesForDisplay({ status: 'unconfigured' }, fallback);
+    expect(result.map((b) => b.id)).toEqual(['MOCK-1']);
+  });
+
+  it('falls back when the snapshot is sync-failed', () => {
+    const result = selectBatchesForDisplay({ status: 'sync-failed', error: 'boom' }, fallback);
+    expect(result.map((b) => b.id)).toEqual(['MOCK-1']);
   });
 });
