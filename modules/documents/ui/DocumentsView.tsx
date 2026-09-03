@@ -84,7 +84,7 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
     const pct = tracked.length ? Math.round((ok / tracked.length) * 100) : null;
     const missing = tracked.filter((d) => d.status === 'missing').length;
     const untracked = crit.length - tracked.length;
-    const tier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
+    const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, tier };
   }), [batches, overrides]);
 
@@ -141,28 +141,25 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
           return (
             <div key={b.id} style={{
               padding: 12, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-              borderLeft: '3px solid ' + (c.tier === 'untracked' ? 'var(--color-border-strong)' : c.tier === 'critical' ? 'var(--color-red)' : c.tier === 'warning' ? 'var(--color-amber)' : 'var(--color-green)'),
+              borderLeft: '3px solid ' + TIER_BORDER_COLOR[c.tier],
               borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{b.id}</span>
-                <StatusBadge variant={b.program === 'TWSP' ? 'twsp' : 'cfsp'}>{b.program}</StatusBadge>
+                <StatusBadge variant={programBadgeVariant(b.program)}>{b.program}</StatusBadge>
               </div>
               <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {b.name.replace(/ · Batch \d+$/, '')}
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 4 }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' }}>
-                  {c.pct === null ? '—' : `${c.pct}%`}
+                  {completenessPctLabel(c.pct)}
                 </span>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-                  {c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`}
+                  {completenessSubLabel(c)}
                 </span>
               </div>
-              {/* 'untracked' has no fill variant — an unknown score renders as
-                  the empty track (width 0), with the "—" and the "not tracked"
-                  line above carrying the meaning in words. */}
-              <div className={'completeness-bar ' + (c.tier === 'on-track' || c.tier === 'untracked' ? '' : c.tier)}>
+              <div className={'completeness-bar ' + completenessBarClassName(c.tier)}>
                 <span style={{ width: (c.pct ?? 0) + '%' }} />
               </div>
               {c.missing > 0 && (
