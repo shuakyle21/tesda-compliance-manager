@@ -8,7 +8,7 @@
  */
 
 import { useMemo, useState, type CSSProperties, type MouseEvent } from 'react';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
@@ -17,7 +17,8 @@ import { BatchModal } from '@/modules/batches/ui/BatchModal';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
-import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
+import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks';
+import { criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
@@ -99,17 +100,27 @@ function Th({ children, align }: { children: React.ReactNode; align?: 'left' | '
   );
 }
 
-function TableRow({
-  batch,
-  criticalRequirements: crit,
-  odd,
-  onClick,
-}: {
-  batch: Batch;
-  criticalRequirements: DocumentRequirement[];
-  odd: boolean;
-  onClick: () => void;
-}) {
+function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
+  return program === 'TWSP' ? 'twsp' : 'cfsp';
+}
+
+function docCellColor(docs: DocComplianceSummary): string {
+  if (docs.tracked === 0) return 'var(--color-text-muted)';
+  if (docs.missing > 0) return 'var(--color-red-dk)';
+  return (docs.verifiedPct ?? 0) >= 90 ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
+}
+
+function docCellIcon(docs: DocComplianceSummary): IconName {
+  if (docs.tracked === 0) return 'info-circle';
+  return docs.missing > 0 ? 'alert-triangle' : 'check';
+}
+
+function docCellTitle(docs: DocComplianceSummary): string | undefined {
+  if (docs.untracked === 0) return undefined;
+  return `${docs.untracked} required document${docs.untracked === 1 ? '' : 's'} not tracked for this batch`;
+}
+
+function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick: () => void }) {
   const cellStyle: CSSProperties = {
     padding: '0 12px', height: 44,
     fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--color-text-primary)',
@@ -125,11 +136,7 @@ function TableRow({
   // neither `ok` nor `missing`; with nothing tracked the cell reads "—", which
   // is also what an unresolved (empty) catalog renders.
   const docs = summarizeBatchDocCompliance(batch, crit);
-  const docColor = docs.tracked === 0
-    ? 'var(--color-text-muted)'
-    : docs.missing > 0
-      ? 'var(--color-red-dk)'
-      : (docs.verifiedPct ?? 0) >= 90 ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
+  const docColor = docCellColor(docs);
 
   const onEnter = (e: MouseEvent<HTMLTableRowElement>) => {
     e.currentTarget.querySelectorAll('td').forEach((td) => { (td as HTMLElement).style.background = 'var(--color-surface-raised)'; });
@@ -146,7 +153,7 @@ function TableRow({
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.qualification}</div>
       </td>
       <td style={cellStyle}>
-        <StatusBadge variant={batch.program === 'TWSP' ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
+        <StatusBadge variant={programBadgeVariant(batch.program)}>{batch.program}</StatusBadge>
       </td>
       <td style={cellStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -162,9 +169,9 @@ function TableRow({
       <td style={cellStyle}>
         <span
           style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 11, color: docColor }}
-          title={docs.untracked > 0 ? `${docs.untracked} required document${docs.untracked === 1 ? '' : 's'} not tracked for this batch` : undefined}
+          title={docCellTitle(docs)}
         >
-          <Icon name={docs.tracked === 0 ? 'info-circle' : docs.missing > 0 ? 'alert-triangle' : 'check'} size={11} />
+          <Icon name={docCellIcon(docs)} size={11} />
           {docs.tracked === 0 ? '—' : `${docs.verified}/${docs.tracked}`}
         </span>
       </td>

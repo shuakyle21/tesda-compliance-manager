@@ -11,7 +11,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -32,21 +32,26 @@ const UNTRACKED_LABEL = 'Not tracked';
 // Single demo identity — an admin (proprietor) who can verify documents.
 const CURRENT_USER = 'Pia Buenaventura';
 
-export function DocumentsView({
-  batches,
-  documentRequirements,
-  syncFailed = false,
-}: {
-  batches: Batch[];
-  /**
-   * The requirement catalog driving the matrix rows. Supplied by the route —
-   * this view never falls back to a bundled catalog, so an unavailable one
-   * renders the honest "requirements unavailable" state below rather than an
-   * invented checklist.
-   */
-  documentRequirements: DocumentRequirement[];
-  syncFailed?: boolean;
-}) {
+/** Cell icon per doc status; 'missing' and 'na' both read as file-off. */
+const CELL_STATUS_ICON: Record<string, IconName> = {
+  verified: 'check',
+  submitted: 'clock',
+  pending: 'clock',
+  missing: 'file-off',
+  na: 'file-off',
+};
+
+function cellIcon(doc: DocRecord | null, status: string): IconName {
+  return doc ? CELL_STATUS_ICON[status] : 'info-circle';
+}
+
+function cellTitle(doc: DocRecord | null, status: string, isWriter: boolean): string {
+  if (!doc) return 'This batch does not track this document. Its programme requirement catalog has no entry for it.';
+  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${doc.updated} · ${doc.source}`;
+  return isWriter ? 'Click to attach' : 'Document not yet provided';
+}
+
+export function DocumentsView({ batches }: { batches: Batch[] }) {
   // Verification overrides keyed `${batchId}:${docKey}`.
   const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
@@ -78,7 +83,7 @@ export function DocumentsView({
     const pct = tracked.length ? Math.round((ok / tracked.length) * 100) : null;
     const missing = tracked.filter((d) => d.status === 'missing').length;
     const untracked = crit.length - tracked.length;
-    const tier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
+    const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, tier };
   }), [batches, documentRequirements, overrides]);
 
@@ -155,28 +160,25 @@ export function DocumentsView({
           return (
             <div key={b.id} style={{
               padding: 12, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-              borderLeft: '3px solid ' + (c.tier === 'untracked' ? 'var(--color-border-strong)' : c.tier === 'critical' ? 'var(--color-red)' : c.tier === 'warning' ? 'var(--color-amber)' : 'var(--color-green)'),
+              borderLeft: '3px solid ' + TIER_BORDER_COLOR[c.tier],
               borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{b.id}</span>
-                <StatusBadge variant={b.program === 'TWSP' ? 'twsp' : 'cfsp'}>{b.program}</StatusBadge>
+                <StatusBadge variant={programBadgeVariant(b.program)}>{b.program}</StatusBadge>
               </div>
               <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {b.name.replace(/ · Batch \d+$/, '')}
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 4 }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' }}>
-                  {c.pct === null ? '—' : `${c.pct}%`}
+                  {completenessPctLabel(c.pct)}
                 </span>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-                  {c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`}
+                  {completenessSubLabel(c)}
                 </span>
               </div>
-              {/* 'untracked' has no fill variant — an unknown score renders as
-                  the empty track (width 0), with the "—" and the "not tracked"
-                  line above carrying the meaning in words. */}
-              <div className={'completeness-bar ' + (c.tier === 'on-track' || c.tier === 'untracked' ? '' : c.tier)}>
+              <div className={'completeness-bar ' + completenessBarClassName(c.tier)}>
                 <span style={{ width: (c.pct ?? 0) + '%' }} />
               </div>
               {c.missing > 0 && (
@@ -226,11 +228,9 @@ export function DocumentsView({
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
                     disabled={!doc}
-                    title={!doc
-                      ? 'This batch does not track this document. Its programme requirement catalog has no entry for it.'
-                      : doc.updated ? `${STATUS_LABEL[s]} · updated ${doc.updated} · ${doc.source}` : (isWriter ? 'Click to attach' : 'Document not yet provided')}
+                    title={cellTitle(doc, s, isWriter)}
                   >
-                    <Icon name={!doc ? 'info-circle' : s === 'verified' ? 'check' : s === 'submitted' ? 'clock' : s === 'pending' ? 'clock' : 'file-off'} size={11} />
+                    <Icon name={cellIcon(doc, s)} size={11} />
                     {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
                   {doc?.updated && (
