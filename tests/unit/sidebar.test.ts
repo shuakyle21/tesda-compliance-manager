@@ -27,9 +27,25 @@ vi.mock('@/modules/shell/ui/NavDrawerProvider', () => ({ useNavDrawer: hooks.use
 import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
-import { TENANTS } from '@/shared/mocks/seed';
 import type { Tenant } from '@/shared/types';
 import { Toast } from '@/shared/ui/Toast';
+
+/**
+ * Local fixture. The Sidebar has no live tenant list (TES-34) and no longer
+ * reads a mock catalog, so a resolved tenant is only ever something a caller
+ * hands the private components directly — the Sidebar itself renders null.
+ */
+const TENANT_FIXTURE: Tenant = {
+  id: 'tnt_fixture',
+  code: 'FIX-001',
+  name: 'Fixture Farm School',
+  region: 'Region IV-A',
+  type: 'Private',
+  color: '',
+  plan: '',
+  activeBatches: 0,
+  totalScholars: 0,
+};
 
 type Effect = () => void | (() => void);
 type PrivateComponent = (props: Record<string, unknown>) => ReactElement;
@@ -70,13 +86,14 @@ function privateComponent(name: string): PrivateComponent {
   return element!.type as PrivateComponent;
 }
 
+// Mirrors Sidebar's useState call order exactly: orgOpen, tenant, activeOp.
 function arrangeSidebarState({
   orgOpen = false,
-  tenant = TENANTS[1],
+  tenant = null,
   activeOp = null,
 }: {
   orgOpen?: boolean;
-  tenant?: Tenant;
+  tenant?: Tenant | null;
   activeOp?: 'import' | 'settings' | null;
 } = {}) {
   const setOrgOpen = vi.fn();
@@ -180,44 +197,74 @@ describe('Sidebar Escape handling', () => {
 });
 
 describe('SchoolSwitcher', () => {
-  it('renders every school, identifies the active school, and selects another one', () => {
+  // There is no live tenant-listing source yet (TES-34), so the switcher's only
+  // reachable state is locked: no school choices are ever offered, and the
+  // trigger must not pretend to be a menu.
+  it('stays locked and offers no school choices when no tenant list exists', () => {
     const SchoolSwitcher = privateComponent('SchoolSwitcher');
     const onToggle = vi.fn();
-    const onClose = vi.fn();
     const onSelect = vi.fn();
 
-    const tree = SchoolSwitcher({ tenant: TENANTS[1], open: true, onToggle, onClose, onSelect });
+    const tree = SchoolSwitcher({
+      tenant: TENANT_FIXTURE,
+      open: true,
+      onToggle,
+      onClose: vi.fn(),
+      onSelect,
+    });
     const buttons = elementsIn(tree).filter((element) => element.type === 'button');
     const trigger = buttons[0];
-    const schoolButtons = buttons.slice(1);
 
-    expect(trigger.props['aria-expanded']).toBe(true);
-    expect(schoolButtons).toHaveLength(TENANTS.length);
-    expect(schoolButtons.map(textIn)).toEqual(expect.arrayContaining(TENANTS.map((tenant) => expect.stringContaining(tenant.name))));
-    expect(schoolButtons.find((button) => textIn(button).includes(TENANTS[1].name))?.props.className).toContain('active');
+    expect(buttons).toHaveLength(1);
+    expect(trigger.props.className).toContain('locked');
+    expect(trigger.props['aria-haspopup']).toBeUndefined();
+    expect(trigger.props['aria-expanded']).toBeUndefined();
+    expect(elementsIn(tree).filter((element) => element.props.className === 'dd-item')).toHaveLength(0);
 
-    (schoolButtons[0].props.onClick as () => void)();
-    expect(onSelect).toHaveBeenCalledWith(TENANTS[0]);
-    expect(onClose).toHaveBeenCalledOnce();
-    expect(onSelect.mock.invocationCallOrder[0]).toBeLessThan(onClose.mock.invocationCallOrder[0]);
+    (trigger.props.onClick as () => void)();
+    expect(onToggle).not.toHaveBeenCalled();
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it('does not render school choices while closed, but keeps the trigger operable', () => {
+  it('names the resolved school when one is passed in', () => {
     const SchoolSwitcher = privateComponent('SchoolSwitcher');
-    const onToggle = vi.fn();
     const tree = SchoolSwitcher({
-      tenant: TENANTS[1],
+      tenant: TENANT_FIXTURE,
       open: false,
-      onToggle,
+      onToggle: vi.fn(),
       onClose: vi.fn(),
       onSelect: vi.fn(),
     });
-    const buttons = elementsIn(tree).filter((element) => element.type === 'button');
 
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0].props['aria-expanded']).toBe(false);
-    (buttons[0].props.onClick as () => void)();
-    expect(onToggle).toHaveBeenCalledOnce();
+    const text = textIn(tree);
+    expect(text).toContain(TENANT_FIXTURE.name);
+    expect(text).toContain(TENANT_FIXTURE.region);
+  });
+
+  // The Sidebar itself passes null: honest about having no school rather than
+  // naming a plausible-looking one.
+  it('shows an honest placeholder instead of a school name when none is resolved', () => {
+    const SchoolSwitcher = privateComponent('SchoolSwitcher');
+    const tree = SchoolSwitcher({
+      tenant: null,
+      open: false,
+      onToggle: vi.fn(),
+      onClose: vi.fn(),
+      onSelect: vi.fn(),
+    });
+
+    const text = textIn(tree);
+    expect(text).toContain('School not set');
+    expect(text).toContain('Tenant setup pending');
+  });
+
+  it('renders with no resolved school by default from the Sidebar', () => {
+    arrangeSidebarState();
+    const switcher = elementsIn(Sidebar({})).find(
+      (candidate) => typeof candidate.type === 'function' && candidate.type.name === 'SchoolSwitcher',
+    );
+
+    expect(switcher?.props.tenant).toBeNull();
   });
 
   it('closes only for clicks outside its own element and removes its listener on cleanup', () => {
@@ -230,7 +277,7 @@ describe('SchoolSwitcher', () => {
     const { document, listeners } = fakeDocument();
 
     SchoolSwitcher({
-      tenant: TENANTS[1],
+      tenant: TENANT_FIXTURE,
       open: true,
       onToggle: vi.fn(),
       onClose,
@@ -249,31 +296,6 @@ describe('SchoolSwitcher', () => {
     expect(document.removeEventListener).toHaveBeenCalledWith('mousedown', onMouseDown);
   });
 
-  it('locks the selector when only one tenant is available', () => {
-    const SchoolSwitcher = privateComponent('SchoolSwitcher');
-    const otherTenants = TENANTS.splice(1);
-    const onToggle = vi.fn();
-
-    try {
-      const tree = SchoolSwitcher({
-        tenant: TENANTS[0],
-        open: true,
-        onToggle,
-        onClose: vi.fn(),
-        onSelect: vi.fn(),
-      });
-      const trigger = elementsIn(tree).find((element) => element.type === 'button')!;
-
-      expect(trigger.props.className).toContain('locked');
-      expect(trigger.props['aria-haspopup']).toBeUndefined();
-      expect(trigger.props['aria-expanded']).toBeUndefined();
-      expect(elementsIn(tree).filter((element) => element.props.className === 'dd-item')).toHaveLength(0);
-      (trigger.props.onClick as () => void)();
-      expect(onToggle).not.toHaveBeenCalled();
-    } finally {
-      TENANTS.push(...otherTenants);
-    }
-  });
 });
 
 describe('SidebarOverlays', () => {
@@ -283,7 +305,7 @@ describe('SidebarOverlays', () => {
     hooks.useState.mockReturnValue([null, setToast]);
     const onClose = vi.fn();
 
-    const tree = SidebarOverlays({ activeOp: 'import', tenant: TENANTS[1], onClose });
+    const tree = SidebarOverlays({ activeOp: 'import', tenant: TENANT_FIXTURE, onClose });
     const modal = componentElement(tree, ImportCsvModal);
     (modal.props.onImported as (message: string) => void)('124 batches updated');
 
@@ -298,12 +320,12 @@ describe('SidebarOverlays', () => {
     hooks.useState.mockReturnValue([null, setToast]);
     const onClose = vi.fn();
 
-    const tree = SidebarOverlays({ activeOp: 'settings', tenant: TENANTS[2], onClose });
+    const tree = SidebarOverlays({ activeOp: 'settings', tenant: TENANT_FIXTURE, onClose });
     const modal = componentElement(tree, SettingsModal);
 
     expect(modal.props).toMatchObject({
-      workspaceName: TENANTS[2].name,
-      workspaceMeta: `${TENANTS[2].code} · ${TENANTS[2].region}`,
+      workspaceName: TENANT_FIXTURE.name,
+      workspaceMeta: `${TENANT_FIXTURE.code} · ${TENANT_FIXTURE.region}`,
       userName: 'Karina Cruz',
       userLabel: 'coordinator',
       onClose,
@@ -313,13 +335,28 @@ describe('SidebarOverlays', () => {
     expect(setToast).toHaveBeenCalledWith({ title: 'Settings saved' });
   });
 
+  // No tenant resolved (the Sidebar's real state today): Settings must say so
+  // rather than label the workspace with a fabricated school.
+  it('labels Settings honestly when no school is resolved', () => {
+    const SidebarOverlays = privateComponent('SidebarOverlays');
+    hooks.useState.mockReturnValue([null, vi.fn()]);
+
+    const tree = SidebarOverlays({ activeOp: 'settings', tenant: null, onClose: vi.fn() });
+    const modal = componentElement(tree, SettingsModal);
+
+    expect(modal.props).toMatchObject({
+      workspaceName: 'School not set',
+      workspaceMeta: 'Tenant setup pending',
+    });
+  });
+
   it('keeps a completion toast mounted after the operation closes and dismisses it', () => {
     const SidebarOverlays = privateComponent('SidebarOverlays');
     const setToast = vi.fn();
     const toast = { title: 'Import complete', message: '3 batches updated' };
     hooks.useState.mockReturnValue([toast, setToast]);
 
-    const tree = SidebarOverlays({ activeOp: null, tenant: TENANTS[1], onClose: vi.fn() });
+    const tree = SidebarOverlays({ activeOp: null, tenant: TENANT_FIXTURE, onClose: vi.fn() });
     expect(elementsIn(tree).some((element) => element.type === ImportCsvModal || element.type === SettingsModal)).toBe(false);
     const toastElement = componentElement(tree, Toast);
     expect(toastElement.props).toMatchObject(toast);

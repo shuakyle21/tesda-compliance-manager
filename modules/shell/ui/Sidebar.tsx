@@ -17,7 +17,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
-import { TENANTS } from '@/shared/mocks/seed';
 import type { Tenant } from '@/shared/types';
 import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
@@ -43,6 +42,21 @@ const WORKSPACE: NavItem[] = [
   { label: 'Report', icon: 'file-invoice', href: '/report' },
   { label: 'Activity Log', icon: 'timeline', href: '/activity-log', badge: ACTIVITY_UNREAD },
 ];
+
+/**
+ * Schools this user can switch between. There is no live tenant-listing source
+ * yet — the Sidebar is a client island and the layout has no tenant context to
+ * pass down (blocked on TES-34) — so the list is empty and the switcher renders
+ * locked rather than listing a fabricated catalog. Once a real list is plumbed
+ * in as a prop, `canSwitch` and the dropdown below light up unchanged.
+ */
+const AVAILABLE_TENANTS: Tenant[] = [];
+
+// Shown in place of a school name/meta while no tenant is resolved. Deliberately
+// states the absence instead of naming a plausible-looking school.
+const NO_TENANT_NAME = 'School not set';
+const NO_TENANT_META = 'Tenant setup pending';
+const NO_TENANT_MARK = '—';
 
 const ACCOUNT: NavItem[] = [
   { label: 'My Account', icon: 'user', href: '/profile' },
@@ -70,12 +84,12 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
   const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
   const operations = isTrainerRoute ? OPERATIONS.filter((o) => o.op === 'settings') : OPERATIONS;
 
-  // School selector (no tenant backend yet — switch updates local display).
+  // School selector. `tenant` is null until a real tenant list exists (TES-34);
+  // the dropdown layer is kept so the Esc ordering below stays intact and so
+  // wiring a live list in later is a one-line change.
   const [orgOpen, setOrgOpen] = useState(false);
   const closeOrg = useCallback(() => setOrgOpen(false), []);
-  const [tenant, setTenant] = useState<Tenant>(
-    () => TENANTS.find((t) => t.id === 'tnt_j3ed') ?? TENANTS[0],
-  );
+  const [tenant, setTenant] = useState<Tenant | null>(() => AVAILABLE_TENANTS[0] ?? null);
 
   // Operations overlays (Import CSV / Settings); their completion toast lives in <SidebarOverlays>.
   const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
@@ -173,20 +187,23 @@ export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
 }
 
 /**
- * School selector (no tenant backend yet — switching updates local display).
- * Controlled: `open`/`tenant` stay in <Sidebar> because its Esc handler must
- * close this dropdown *before* the drawer, and the Settings modal reads the
- * selected tenant. Click-outside dismissal is owned here.
+ * School selector. Controlled: `open`/`tenant` stay in <Sidebar> because its
+ * Esc handler must close this dropdown *before* the drawer, and the Settings
+ * modal reads the selected tenant. Click-outside dismissal is owned here.
+ *
+ * With no live tenant list (TES-34) `AVAILABLE_TENANTS` is empty, so
+ * `canSwitch` is false: the control renders locked and non-interactive, and a
+ * null `tenant` shows the "School not set" placeholder rather than a name.
  */
 function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
-  tenant: Tenant;
+  tenant: Tenant | null;
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
   onSelect: (t: Tenant) => void;
 }) {
   const orgRef = useRef<HTMLDivElement>(null);
-  const canSwitch = TENANTS.length > 1;
+  const canSwitch = AVAILABLE_TENANTS.length > 1;
 
   // Click-outside closes the school dropdown.
   useEffect(() => {
@@ -206,10 +223,14 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
         aria-haspopup={canSwitch ? 'true' : undefined}
         aria-expanded={canSwitch ? open : undefined}
       >
-        <span className="org-mark">{tenant.code.slice(0, 3)}</span>
+        <span className="org-mark">{tenant ? tenant.code.slice(0, 3) : NO_TENANT_MARK}</span>
         <span className="sb-org-text">
-          <span className="sb-org-name">{tenant.name}</span>
-          <span className="sb-org-meta">{canSwitch ? `${TENANTS.length} schools · registrar` : tenant.region}</span>
+          <span className="sb-org-name">{tenant?.name ?? NO_TENANT_NAME}</span>
+          <span className="sb-org-meta">
+            {canSwitch
+              ? `${AVAILABLE_TENANTS.length} schools · registrar`
+              : (tenant?.region || NO_TENANT_META)}
+          </span>
         </span>
         <Icon name={canSwitch ? 'chevron-down' : 'shield-check'} size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
       </button>
@@ -217,11 +238,11 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
       {open && canSwitch && (
         <div className="dropdown sb-org-dd">
           <div className="dd-section">Registrar · your schools</div>
-          {TENANTS.map((t, i) => (
+          {AVAILABLE_TENANTS.map((t, i) => (
             <button
               type="button"
               key={t.id}
-              className={`dd-item${t.id === tenant.id ? ' active' : ''}`}
+              className={`dd-item${t.id === tenant?.id ? ' active' : ''}`}
               onClick={() => { onSelect(t); onClose(); }}
             >
               <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 22, height: 22, fontSize: 9 }}>
@@ -233,7 +254,7 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
                   {t.region} · {t.type}
                 </span>
               </span>
-              {t.id === tenant.id && <Icon name="check" size={14} style={{ color: 'var(--color-blue-dk)' }} />}
+              {t.id === tenant?.id && <Icon name="check" size={14} style={{ color: 'var(--color-blue-dk)' }} />}
             </button>
           ))}
         </div>
@@ -245,7 +266,7 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
 /** Operations overlays (Import CSV / Settings) and their completion toast. */
 function SidebarOverlays({ activeOp, tenant, onClose }: {
   activeOp: 'import' | 'settings' | null;
-  tenant: Tenant;
+  tenant: Tenant | null;
   onClose: () => void;
 }) {
   const [toast, setToast] = useState<ToastData | null>(null);
@@ -262,8 +283,8 @@ function SidebarOverlays({ activeOp, tenant, onClose }: {
       )}
       {activeOp === 'settings' && (
         <SettingsModal
-          workspaceName={tenant.name}
-          workspaceMeta={`${tenant.code} · ${tenant.region}`}
+          workspaceName={tenant?.name ?? NO_TENANT_NAME}
+          workspaceMeta={tenant ? `${tenant.code} · ${tenant.region}` : NO_TENANT_META}
           userName="Karina Cruz"
           userLabel="coordinator"
           onClose={onClose}

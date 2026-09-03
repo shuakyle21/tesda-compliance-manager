@@ -21,7 +21,6 @@ import { useMemo, useState } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { EGACE_STAGES, EMPLOYMENT_STATUSES } from '@/shared/vocab';
-import { TENANTS } from '@/shared/mocks/seed';
 import type { Batch, Tenant } from '@/shared/types';
 import { egaceVal, computeEgaceTotals, egaceRate } from '@/modules/reports/domain/egace';
 import {
@@ -41,6 +40,12 @@ import { EmploymentReportTable } from '@/modules/reports/ui/EmploymentReportTabl
 
 interface ReportViewProps {
   batches: Batch[];
+  /**
+   * School catalog used to label the School column. No live tenant-listing
+   * source exists yet (blocked on TES-34), so this defaults to empty and every
+   * school label degrades to "—" rather than being fabricated. The multi-school
+   * *count* below is still real — it comes from the batches' own `tenantId`.
+   */
   tenants?: Tenant[];
   /** Show School column + school count. Defaults to true when batches span >1 tenant. */
   multiSchool?: boolean;
@@ -52,7 +57,10 @@ const today = 'June 8, 2026';
 
 /** Derived state for the Report screen: EGACE totals + employment roster/rollup. */
 function useReportViewData(batches: Batch[], tenants: Tenant[], multiSchool: boolean | undefined) {
-  const isMulti = multiSchool ?? new Set(batches.map((b) => b.tenantId)).size > 1;
+  // Distinct tenants the loaded batches actually belong to — real per-batch
+  // data, so the count stays true even without a tenant catalog to name them.
+  const schoolCount = new Set(batches.map((b) => b.tenantId)).size;
+  const isMulti = multiSchool ?? schoolCount > 1;
 
   const tenantOf = (id: string): Tenant =>
     tenants.find((t) => t.id === id) ?? ({ code: '—', name: '—', region: '' } as Tenant);
@@ -75,14 +83,14 @@ function useReportViewData(batches: Batch[], tenants: Tenant[], multiSchool: boo
   const empTotals = computeEmploymentTotals(empScholars, ES);
   const empRate = employmentRate(empTotals);
 
-  return { isMulti, tenantOf, rows, totals, rate, empCohorts, empScholars, empTotals, empRate };
+  return { isMulti, schoolCount, tenantOf, rows, totals, rate, empCohorts, empScholars, empTotals, empRate };
 }
 
-export function ReportView({ batches, tenants = TENANTS, multiSchool }: ReportViewProps) {
+export function ReportView({ batches, tenants = [], multiSchool }: ReportViewProps) {
   const [active, setActive] = useState<'egace' | 'employment'>('egace');
   const [toast, setToast] = useState<ToastData | null>(null);
 
-  const { isMulti, tenantOf, rows, totals, rate, empCohorts, empScholars, empTotals, empRate } = useReportViewData(
+  const { isMulti, schoolCount, tenantOf, rows, totals, rate, empCohorts, empScholars, empTotals, empRate } = useReportViewData(
     batches,
     tenants,
     multiSchool,
@@ -104,7 +112,7 @@ export function ReportView({ batches, tenants = TENANTS, multiSchool }: ReportVi
         active={active}
         onActiveChange={setActive}
         isMulti={isMulti}
-        schoolCount={tenants.length}
+        schoolCount={schoolCount}
         rowCount={rows.length}
         today={today}
         onExport={() => exportXlsx(rows, tenantOf, setToast)}
