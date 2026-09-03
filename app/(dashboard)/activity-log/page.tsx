@@ -17,19 +17,31 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { Icon } from '@/shared/ui/Icon';
 
-export default async function ActivityLogPage() {
-  // Full feed — no `limit`, unlike the dashboard's 6-event recent-activity panel.
-  const activitySnapshot = await getActivitySnapshot();
+const PAGE_SIZE = 50;
+
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function ActivityLogPage({ searchParams }: { searchParams: SearchParams }) {
+  const params = await searchParams;
+  const pageParam = Array.isArray(params.page) ? params.page[0] : params.page;
+  const page = Math.max(0, Number.parseInt(pageParam ?? '0', 10) || 0);
+  const offset = page * PAGE_SIZE;
+
+  const activitySnapshot = await getActivitySnapshot(PAGE_SIZE, offset);
   const events = activitySnapshot.status === 'ok' ? activitySnapshot.events : [];
+  const hasMore = activitySnapshot.status === 'ok' && activitySnapshot.hasMore;
   const syncFailed = activitySnapshot.status === 'sync-failed';
 
   return (
     <div>
       <div className="page-head">
         <h1>Activity Log</h1>
-        {/* The contract has no date window, so the subline counts what was
-            actually loaded rather than claiming a "last 7 days" range. */}
-        <span className="subline">audit · {events.length} {events.length === 1 ? 'event' : 'events'}</span>
+        {/* Bounded page, not the full audit log — the subline describes what's
+            actually loaded (this page), not a claimed total. */}
+        <span className="subline">
+          audit · showing {events.length} {events.length === 1 ? 'event' : 'events'}
+          {page > 0 ? ` (page ${page + 1})` : ''}
+        </span>
         <div style={{ marginLeft: 'auto' }}>
           <button className="btn secondary"><Icon name="download" size={14} />Export</button>
         </div>
@@ -67,6 +79,14 @@ export default async function ActivityLogPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {hasMore && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+          <Link href={`/activity-log?page=${page + 1}`} className="btn secondary">
+            Load older events
+          </Link>
         </div>
       )}
     </div>
