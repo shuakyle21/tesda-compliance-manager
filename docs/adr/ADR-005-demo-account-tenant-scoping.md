@@ -87,8 +87,8 @@ The dev seed creates **five** batches:
 | Tenant | Batch | Course |
 | --- | --- | --- |
 | AKB | `DEV-AKB-001` | Cookery NC II |
-| J3ED | `DEV-J3ED-001` | (CFSP) |
-| J3ED | `DEV-J3ED-002` | (CFSP) |
+| J3ED | `DEV-J3ED-001` | Agri Crops Production NC I |
+| J3ED | `DEV-J3ED-002` | Agri Crops Production NC I |
 | NEN | `DEV-NEN-001` | Rice Machinery Operations NC II |
 | NEN | `DEV-NEN-002` | Rice Machinery Operations NC II |
 
@@ -106,8 +106,9 @@ Two caveats on how to run it:
   `sync-failed`, `app/(dashboard)/dashboard/page.tsx` hands a `viewer` the full
   unscoped mock set while narrowing it for every other role, and an unresolved
   role also defaults to `viewer`. Demo is now a viewer, so it is precisely the
-  role that sees every school's mock data there. Five batches on that path is
-  the fallback, not a regression.
+  role that sees every school's mock data there. Four batches on that path is
+  the `MOCK_BATCHES` fallback, which excludes the completed `DEV-J3ED-002`;
+  `ALL_BATCHES` contains all five seeded batches. It is not a regression.
 
 ## Consequences
 
