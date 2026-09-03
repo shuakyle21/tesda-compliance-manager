@@ -38,7 +38,9 @@ export default async function AnalyticsPage() {
           Sync with the compliance database failed, so no charts can be drawn. Reload to try again.
         </InfoCallout>
       )}
-      <AnalyticsView batches={batches} documentRequirements={documentRequirements} />
+      {!(snapshot.status=== 'sync-failed' && batches.length === 0) && (
+        <AnalyticsView batches={batches} documentRequirements={documentRequirements} />
+      )}
     </div>
   );
 }
