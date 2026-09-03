@@ -81,7 +81,7 @@ export function formatPeso(n: number): string {
 
 /**
  * Formats a scholar's name for the billing statement roster: "DELA CRUZ, Juan P."
- * (uppercase last name, title-case first name, middle initial when present).
+ * (uppercase last name, first name as provided, middle initial when present).
  */
 function scholarName(s: ScholarRow): string {
   const mi = s.middleInit ? ` ${s.middleInit.trim()}` : '';

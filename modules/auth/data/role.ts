@@ -21,7 +21,8 @@ export type RouteSearchParams = Record<string, string | string[] | undefined>;
 /**
  * Extracts the first value from a search param (which may be a single string,
  * an array, or undefined) and normalizes it to lowercase. Returns null when
- * the param is absent or empty.
+ * the param is absent (including an empty array); empty string inputs,
+ * including `['']`, remain an empty string after lowercasing.
  */
 export function firstParam(value: string | string[] | undefined): string | null {
   if (Array.isArray(value)) return value[0]?.toLowerCase() ?? null;

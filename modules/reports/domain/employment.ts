@@ -1,8 +1,8 @@
 /**
  * Post-training employment follow-up (FR-15) — pure domain logic, no I/O.
  *
- * Selects the cohorts due for follow-up and their certified scholars, then
- * rolls up employment outcomes for the Report screen's Employment section.
+ * Selects cohorts with employment follow-up data and their certified scholars,
+ * then rolls up employment outcomes for the Report screen's Employment section.
  */
 
 import type { Batch } from '@/shared/types';
@@ -12,7 +12,9 @@ type EmploymentStatuses = typeof EMPLOYMENT_STATUSES;
 export type EmploymentScholar = { batch: Batch; s: NonNullable<Batch['scholars_list']>[number] };
 
 /**
- * Filters batches to those with an employment follow-up window currently open.
+ * Filters batches to those with an employment follow-up record. In the mock
+ * data, that record exists whenever the batch has at least one certified
+ * scholar; `followUpDue` is metadata and does not restrict this selection.
  */
 export function selectEmploymentCohorts(rows: Batch[]): Batch[] {
   return rows.filter((b) => b.employmentFollowUp);

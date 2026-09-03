@@ -77,7 +77,7 @@ export function tsfAmount(batch: Batch): number {
 }
 
 /**
- * Formats a peso amount with thousands separators (e.g., "₱184,000.00").
+ * Formats a peso amount with thousands separators (e.g., "₱184,000").
  * Used by both the summary tiles and the queue rows.
  */
 export function formatPeso(amount: number): string {
