@@ -1,3 +1,4 @@
+-- Active: 1787931874292@@aws-1-ap-northeast-2.pooler.supabase.com@5432@postgres
 -- Seed dev operational data: batches, learners, documents.
 --
 -- Scope note: tenants (AKB/J3ED/NEN), scholarship programs (TWSP/CFSP), the
