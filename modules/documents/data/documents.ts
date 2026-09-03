@@ -65,6 +65,13 @@ const STAGE_TO_UI: Record<DbLifecycleStage, string> = {
 // ---------------------------------------------------------------------------
 // Mappers — pure, no I/O.
 // ---------------------------------------------------------------------------
+
+/**
+ * Map a database requirement row to a DocumentRequirement.
+ *
+ * @param row - The database requirement row
+ * @returns Mapped document requirement with key, label, stage, and icon
+ */
 export function mapRequirementRow(row: RequirementRow): DocumentRequirement {
   return {
     key: row.document_key,
@@ -75,6 +82,12 @@ export function mapRequirementRow(row: RequirementRow): DocumentRequirement {
   };
 }
 
+/**
+ * Map a database document row to a DocRecord.
+ *
+ * @param row - The database document row
+ * @returns Mapped document record with status, URL, and timestamps
+ */
 export function mapDocumentRow(row: DocumentRow): DocRecord {
   return {
     status: row.status,
@@ -92,7 +105,9 @@ export function mapDocumentRow(row: DocumentRow): DocRecord {
 const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
 
 /**
- * `documents` keyed by `document_key`, the shape `Batch.documents` requires.
+ * Map document rows to a keyed map, backfilling against requirements.
+ *
+ * Creates a map keyed by `document_key`, the shape `Batch.documents` requires.
  * Backfilled against `requirements` so every catalog entry resolves to a real
  * `DocRecord` (status `'missing'`) rather than being absent from the map —
  * deciding "no row means missing" is this contract's job, not each caller's
@@ -101,6 +116,10 @@ const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, so
  * `modules/documents/domain/compliance.ts` — not as verified, not as missing.
  * A submitted row outside the catalog (a stale or ad hoc upload) is still
  * included, keyed by its own `document_key`.
+ *
+ * @param rows - The document rows from the database
+ * @param requirements - The requirement definitions
+ * @returns Keyed map of document records
  */
 function mapDocumentRows(
   rows: DocumentRow[],

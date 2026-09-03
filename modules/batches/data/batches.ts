@@ -59,6 +59,12 @@ type BatchRowWithProgram = BatchRow & {
  */
 const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
 
+/**
+ * Map a database document row to a DocRecord.
+ *
+ * @param row - The database document row
+ * @returns Mapped document record with status, URL, and timestamps
+ */
 function mapDocumentRow(row: DocumentRow): DocRecord {
   return {
     status: row.status,
@@ -70,6 +76,16 @@ function mapDocumentRow(row: DocumentRow): DocRecord {
   };
 }
 
+/**
+ * Map document rows to a keyed map, backfilling missing requirements.
+ *
+ * Creates a map from document rows, backfilled against requirements so every
+ * required key resolves to a real DocRecord (missing rows get MISSING_DOC).
+ *
+ * @param documentRows - The document rows from the database
+ * @param requirementRows - The requirement rows defining the catalog
+ * @returns Keyed map of document records
+ */
 function mapDocumentsMap(
   documentRows: DocumentRow[],
   requirementRows: RequirementRow[],
@@ -101,7 +117,11 @@ const DB_TO_UI_STAGE: Record<DbLifecycleStage, LifecycleStageKey | null> = {
   blocked: null,
 };
 
-/** Canonical UI pipeline order used to derive a lifecycle array from one stage. */
+/**
+ * Canonical UI pipeline order used to derive a lifecycle array from one stage.
+ *
+ * Defines the standard sequence of lifecycle stages displayed in the UI.
+ */
 const UI_PIPELINE: { key: LifecycleStageKey; label: string }[] = [
   { key: 'aou', label: 'AOU' },
   { key: 'ntp', label: 'NTP' },
@@ -112,6 +132,15 @@ const UI_PIPELINE: { key: LifecycleStageKey; label: string }[] = [
   { key: 'bill', label: 'Billing' },
 ];
 
+/**
+ * Normalize a database batch status to the UI status type.
+ *
+ * UI has no 'blocked' state; it surfaces as 'pending' until the UI gains a
+ * blocked tier.
+ *
+ * @param status - The database batch status
+ * @returns Normalized UI batch status
+ */
 function normalizeStatus(status: DbBatchStatus): Batch['status'] {
   // UI has no 'blocked' state; surface it as 'pending' (needs attention) until
   // the UI gains a blocked tier. TODO(contract): align the two status unions.

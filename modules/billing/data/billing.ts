@@ -28,6 +28,8 @@ export interface BillingCard {
 const SUPPORTING_DOC_STAGES = new Set(['aou', 'ntp', 'tip', 'train']);
 
 /**
+ * Derive the supporting-document readiness for a batch.
+ *
  * Supporting-document readiness for a batch: how many of the *critical
  * supporting* documents (see {@link SUPPORTING_DOC_STAGES}) are on file. A
  * document counts as on file when it is `verified` OR `submitted` — ADR-001
@@ -40,6 +42,10 @@ const SUPPORTING_DOC_STAGES = new Set(['aou', 'ntp', 'tip', 'train']);
  * readiness gate must never open on evidence nobody has recorded. So the
  * denominator stays the full supporting set and an untracked batch reads 0 →
  * gate closed.
+ *
+ * @param batch - The batch to check for document readiness
+ * @param requirements - The document requirement catalog (defaults to mock requirements)
+ * @returns Document readiness with verified count and required total
  */
 export function deriveDocReadiness(
   batch: Batch,
@@ -50,13 +56,24 @@ export function deriveDocReadiness(
   return { verified, requiredTotal: supporting.length };
 }
 
-/** Resolve the school context the statement header needs from the tenant record. */
+/**
+ * Resolve the school context (name and region) needed for billing statement headers.
+ *
+ * @param tenantId - The tenant ID to look up
+ * @param tenants - The tenant list to search (defaults to mock tenants)
+ * @returns Statement tenant context with name and region
+ */
 export function resolveTenant(tenantId: string, tenants: Tenant[] = TENANTS): StatementTenant {
   const t = tenants.find((x) => x.id === tenantId);
   return { name: t?.name ?? tenantId, region: t?.region ?? '' };
 }
 
-/** Build one billing card (gate + tracks + tenant context) for a batch. */
+/**
+ * Build one billing card containing gate status, applicable tracks, and tenant context.
+ *
+ * @param batch - The batch to build a billing card for
+ * @returns Complete billing card with readiness gate, tracks, and tenant info
+ */
 export function buildBillingCard(batch: Batch): BillingCard {
   const docs = deriveDocReadiness(batch);
   return {
@@ -72,9 +89,14 @@ export function buildBillingCard(batch: Batch): BillingCard {
 }
 
 /**
- * Build the billing cards for a set of batches, most-ready first (ready batches,
- * then by progress). Only active batches are billable; completed cohorts drop
- * out (their billing is historical).
+ * Build billing cards for a set of batches, sorted by readiness and progress.
+ *
+ * Only active batches are included — completed cohorts drop out since their
+ * billing is historical. Cards are sorted with ready batches first, then by
+ * descending progress percentage.
+ *
+ * @param batches - The batches to build billing cards for
+ * @returns Array of billing cards sorted by readiness and progress
  */
 export function buildBillingCards(batches: Batch[]): BillingCard[] {
   return batches

@@ -38,6 +38,18 @@ const ASSESSMENT_RESULT_TO_UI: Record<DbAssessmentResult, string> = {
 // column; `index` must come from the row's position in the already-ordered
 // fetch result, not be recomputed per-row.
 // ---------------------------------------------------------------------------
+
+/**
+ * Map a database learner row to a ScholarRow.
+ *
+ * `seq` is the roster's 1-based position, matching the mock convention, since
+ * the contract has no sequence column. It must come from the row's position in
+ * the already-ordered fetch result, not be recomputed per-row.
+ *
+ * @param row - The database learner row
+ * @param seq - The 1-based sequence number for this scholar
+ * @returns Mapped scholar row with identity, assessment result, and placeholder fields
+ */
 export function mapLearnerRow(row: LearnerRow, seq: number): ScholarRow {
   return {
     seq,

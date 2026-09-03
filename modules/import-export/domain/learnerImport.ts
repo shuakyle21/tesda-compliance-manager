@@ -65,20 +65,44 @@ export type LearnerCsvParseResult =
   | { status: 'missing-columns'; missing: string[] }
   | { status: 'empty' };
 
+/**
+ * Normalize a CSV header to a canonical form using aliases.
+ *
+ * @param header - The raw header string
+ * @returns Normalized header string
+ */
 function normalizeHeader(header: string): string {
   return HEADER_ALIASES[header] ?? header;
 }
 
-/** Required field: trimmed, empty string when absent. */
+/**
+ * Read a required field from a CSV record.
+ *
+ * @param record - The CSV record
+ * @param key - The field key to read
+ * @returns Trimmed field value, or empty string if absent
+ */
 function readField(record: Record<string, string>, key: string): string {
   return record[key]?.trim() ?? '';
 }
 
-/** Optional field: trimmed, `null` when absent or blank. */
+/**
+ * Read an optional field from a CSV record.
+ *
+ * @param record - The CSV record
+ * @param key - The field key to read
+ * @returns Trimmed field value, or null if absent or blank
+ */
 function readOptionalField(record: Record<string, string>, key: string): string | null {
   return record[key]?.trim() || null;
 }
 
+/**
+ * Read and normalize the assessment result field.
+ *
+ * @param record - The CSV record
+ * @returns Normalized assessment result (competent, not_yet_competent, or pending)
+ */
 function readAssessmentResult(record: Record<string, string>): ImportAssessmentResult {
   const key = record['assessment result']?.trim().toLowerCase() ?? '';
   return ASSESSMENT_RESULT_ALIASES[key] ?? 'pending';
