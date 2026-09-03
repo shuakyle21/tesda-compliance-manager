@@ -60,10 +60,9 @@ type BatchRowWithProgram = BatchRow & {
 const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
 
 /**
- * Map a database document row to a DocRecord.
- *
- * @param row - The database document row
- * @returns Mapped document record with status, URL, and timestamps
+ * Maps a raw document row from the database to the UI domain DocRecord type.
+ * Resolves the most recent timestamp (verification > submission > update) and
+ * derives the source label from storage path or external URL.
  */
 function mapDocumentRow(row: DocumentRow): DocRecord {
   return {
@@ -77,14 +76,10 @@ function mapDocumentRow(row: DocumentRow): DocRecord {
 }
 
 /**
- * Map document rows to a keyed map, backfilling missing requirements.
- *
- * Creates a map from document rows, backfilled against requirements so every
- * required key resolves to a real DocRecord (missing rows get MISSING_DOC).
- *
- * @param documentRows - The document rows from the database
- * @param requirementRows - The requirement rows defining the catalog
- * @returns Keyed map of document records
+ * Builds a complete document map for a batch, backfilling missing requirements
+ * with `MISSING_DOC` so every catalog entry resolves to a real DocRecord. Closes
+ * the `TODO(join)` gap by ensuring "no row means missing" is this contract's
+ * decision, not each caller's.
  */
 function mapDocumentsMap(
   documentRows: DocumentRow[],
@@ -133,13 +128,8 @@ const UI_PIPELINE: { key: LifecycleStageKey; label: string }[] = [
 ];
 
 /**
- * Normalize a database batch status to the UI status type.
- *
- * UI has no 'blocked' state; it surfaces as 'pending' until the UI gains a
- * blocked tier.
- *
- * @param status - The database batch status
- * @returns Normalized UI batch status
+ * Normalizes the database batch status to the UI status type. Maps 'blocked' to
+ * 'pending' since the UI has no blocked state yet.
  */
 function normalizeStatus(status: DbBatchStatus): Batch['status'] {
   // UI has no 'blocked' state; surface it as 'pending' (needs attention) until
@@ -172,7 +162,7 @@ function deriveLifecycle(currentStage: DbLifecycleStage): LifecycleStage[] {
 }
 
 /**
- * Whole days from today to `dateIso` (placeholder for a real billing deadline).
+ * Calculates whole days from today to `dateIso` (placeholder for a real billing deadline).
  * A missing date returns Infinity — the established "no known deadline" sentinel
  * that sorts last and never triggers urgency tiers. An *unparseable* date is
  * treated the same way: without the guard, `new Date('garbage').getTime()` is
@@ -186,7 +176,7 @@ function daysUntil(dateIso: string | null): number {
 }
 
 /**
- * ISO date → the UI's display convention. `Batch` stores dates as pre-formatted
+ * Converts ISO date to the UI's display convention. `Batch` stores dates as pre-formatted
  * display strings (see lib/data/seed.ts: "Jun 18, 2026"; training start drops
  * the year: "Apr 21"). Passing raw ISO through would render "2026-06-18" in the
  * cards and silently defeat deriveDashboardMetrics' `, YYYY`-trimming regex.
@@ -257,24 +247,14 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Fetch — server-only. RLS (Clerk JWT) scopes rows to the caller's tenant, so
-// "assigned batches" filtering happens in the database, not here.
-// ---------------------------------------------------------------------------
-
-/**
- * Outcome of a dashboard batch load. The data layer owns error *shaping* so the
- * dashboard server component can map each state straight to UI (TES-8 AC6, #65):
- *   - `ok`           — live rows; `dataAsOf` is the freshest row's `updated_at`.
- *   - `sync-failed`  — Supabase is configured but the query failed → real
- *                      sync-failed callout.
- *   - `unconfigured` — no Supabase env in this environment → caller falls back
- *                      to the cached/mock snapshot *silently* (no false alarm).
- */
 export type BatchesSnapshot =
   | { status: 'ok'; batches: Batch[]; dataAsOf: string | null }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
+
+export function selectBatchesForDisplay(snapshot: BatchesSnapshot, fallback: Batch[]): Batch[] {
+  return snapshot.status === 'ok' ? snapshot.batches : fallback;
+}
 
 /** Freshest `updated_at` across the loaded rows, or null when there are none. */
 function latestUpdatedAt(batches: Batch[]): string | null {
@@ -304,11 +284,6 @@ export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
   }
 }
 
-/**
- * Throwing convenience wrapper over {@link getBatchesSnapshot} for callers that
- * just want the rows (the original foundational contract). The dashboard uses
- * the snapshot directly so it can distinguish unconfigured from failed.
- */
 export async function getBatches(): Promise<Batch[]> {
   const snap = await getBatchesSnapshot();
   if (snap.status === 'ok') return snap.batches;

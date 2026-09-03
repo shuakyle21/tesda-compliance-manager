@@ -67,10 +67,9 @@ const STAGE_TO_UI: Record<DbLifecycleStage, string> = {
 // ---------------------------------------------------------------------------
 
 /**
- * Map a database requirement row to a DocumentRequirement.
- *
- * @param row - The database requirement row
- * @returns Mapped document requirement with key, label, stage, and icon
+ * Maps a program document requirement row to the UI domain type. Resolves the
+ * lifecycle stage from DB enum to UI stage key and looks up the icon from the
+ * local reference table.
  */
 export function mapRequirementRow(row: RequirementRow): DocumentRequirement {
   return {
@@ -83,10 +82,9 @@ export function mapRequirementRow(row: RequirementRow): DocumentRequirement {
 }
 
 /**
- * Map a database document row to a DocRecord.
- *
- * @param row - The database document row
- * @returns Mapped document record with status, URL, and timestamps
+ * Maps a submitted document row to the UI domain DocRecord type. Derives the
+ * most recent timestamp (verification > submission > update) and the source
+ * label from storage path or external URL.
  */
 export function mapDocumentRow(row: DocumentRow): DocRecord {
   return {
@@ -105,9 +103,7 @@ export function mapDocumentRow(row: DocumentRow): DocRecord {
 const MISSING_DOC: DocRecord = { status: 'missing', url: null, updated: null, source: null };
 
 /**
- * Map document rows to a keyed map, backfilling against requirements.
- *
- * Creates a map keyed by `document_key`, the shape `Batch.documents` requires.
+ * Builds a complete document map keyed by `document_key`, the shape `Batch.documents` requires.
  * Backfilled against `requirements` so every catalog entry resolves to a real
  * `DocRecord` (status `'missing'`) rather than being absent from the map —
  * deciding "no row means missing" is this contract's job, not each caller's

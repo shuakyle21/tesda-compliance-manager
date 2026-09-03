@@ -82,6 +82,11 @@ export function isDocOnFile(batch: Batch, key: string): boolean {
   return record !== null && ON_FILE_STATUSES.has(record.status);
 }
 
+/**
+ * Calculates a percentage (rounded to nearest integer), or null when the
+ * denominator is zero. Used for compliance percentages where "no data" should
+ * render as "—", not "0%".
+ */
 function pct(part: number, whole: number): number | null {
   return whole > 0 ? Math.round((part / whole) * 100) : null;
 }

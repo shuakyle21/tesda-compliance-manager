@@ -77,22 +77,16 @@ export function tsfAmount(batch: Batch): number {
 }
 
 /**
- * Format a peso amount with thousands separators.
- *
+ * Formats a peso amount with thousands separators (e.g., "₱184,000").
  * Used by both the summary tiles and the queue rows.
- *
- * @param amount - The amount in pesos
- * @returns Formatted string like "₱184,000"
  */
 export function formatPeso(amount: number): string {
   return `₱${amount.toLocaleString('en-PH')}`;
 }
 
 /**
- * Format a peso amount in compact notation for summary tiles.
- *
- * @param amount - The amount in pesos
- * @returns Compact string like "₱184K" or "₱1.5M"
+ * Formats a peso amount in compact notation for summary tiles.
+ * Amounts >= 1M show as "₱1.2M", >= 1K show as "₱184K", otherwise full amount.
  */
 export function formatPesoCompact(amount: number): string {
   if (amount >= 1_000_000) return `₱${(amount / 1_000_000).toFixed(1)}M`;
@@ -101,10 +95,8 @@ export function formatPesoCompact(amount: number): string {
 }
 
 /**
- * Generate a human-readable due date label.
- *
- * @param daysToDue - Days until due (negative if past due)
- * @returns Label like "Due in 5d", "Due today", "Due tomorrow", or "3d past due"
+ * Derives a human-readable due label from the days-to-due count.
+ * Negative values show as "Nd past due", zero as "Due today", etc.
  */
 function dueLabelFor(daysToDue: number): string {
   if (daysToDue < 0) return `${Math.abs(daysToDue)}d past due`;
@@ -184,25 +176,17 @@ export function buildPacket(
 }
 
 /**
- * Check if a packet is overdue.
- *
- * A packet is overdue when it has passed its derived due date and is not yet
- * settled (ADR-003 P5).
- *
- * @param packet - The packet to check
- * @returns True if the packet is overdue
+ * Returns true when a live packet has passed its derived due date (ADR-003 P5).
+ * Settled packets are never overdue regardless of their due date.
  */
 export function isOverdue(packet: BillingPacket): boolean {
   return packet.state !== 'settled' && packet.daysToDue < 0;
 }
 
 /**
- * Build packet projections for multiple batches.
- *
- * @param batches - The batches to build packets for
- * @param requirements - The document requirement catalog
- * @param schoolCodes - Map of tenant IDs to school codes
- * @returns Array of billing packet projections
+ * Builds billing packets for a set of batches. Each batch produces one packet,
+ * numbered sequentially. The school code for each tenant is resolved from the
+ * provided `schoolCodes` map, falling back to "—" when not found.
  */
 export function buildPackets(
   batches: Batch[],

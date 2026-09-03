@@ -57,11 +57,9 @@ export function deriveDocReadiness(
 }
 
 /**
- * Resolve the school context (name and region) needed for billing statement headers.
- *
- * @param tenantId - The tenant ID to look up
- * @param tenants - The tenant list to search (defaults to mock tenants)
- * @returns Statement tenant context with name and region
+ * Resolves the minimal school context (name and region) needed for the statement
+ * header from a tenant ID. Falls back to the tenant ID itself for the name and
+ * an empty region when the tenant is not found.
  */
 export function resolveTenant(tenantId: string, tenants: Tenant[] = TENANTS): StatementTenant {
   const t = tenants.find((x) => x.id === tenantId);
@@ -69,10 +67,9 @@ export function resolveTenant(tenantId: string, tenants: Tenant[] = TENANTS): St
 }
 
 /**
- * Build one billing card containing gate status, applicable tracks, and tenant context.
- *
- * @param batch - The batch to build a billing card for
- * @returns Complete billing card with readiness gate, tracks, and tenant info
+ * Builds one billing card for a batch, computing the readiness gate, applicable
+ * billing tracks (program-aware), and tenant context. This is the projection the
+ * Billing screen renders in the card grid.
  */
 export function buildBillingCard(batch: Batch): BillingCard {
   const docs = deriveDocReadiness(batch);
