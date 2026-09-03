@@ -136,24 +136,51 @@ interface DashboardViewState {
   syncFailedMessage: string;
 }
 
+function resolveDataAsOfDate(snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>): Date | null {
+  return snapshot.status === 'ok' && snapshot.dataAsOf ? new Date(snapshot.dataAsOf) : null;
+}
+
+// A real stamp when we have live data; null on the cached/mock path so copy
+// can fall back gracefully instead of printing a fake precise timestamp.
+function dataAsOfLabelFor(dataAsOfDate: Date | null): string | null {
+  return dataAsOfDate ? formatDataStamp(dataAsOfDate) : null;
+}
+
+function isEmptyDashboard(forcedState: string | null, batchCount: number): boolean {
+  return forcedState === 'empty' || batchCount === 0;
+}
+
+function isSyncFailedDashboard(
+  forcedState: string | null,
+  snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>,
+): boolean {
+  return forcedState === 'sync-failed' || snapshot.status === 'sync-failed';
+}
+
+function isStaleDashboard(forcedState: string | null, dataAsOfDate: Date | null): boolean {
+  return forcedState === 'stale' || isDataStale(dataAsOfDate);
+}
+
+function syncFailedMessageFor(dataAsOfLabel: string | null): string {
+  return dataAsOfLabel ? ` from ${dataAsOfLabel}` : '';
+}
+
 function deriveDashboardViewState(
   forcedState: string | null,
   snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>,
   batchCount: number,
 ): DashboardViewState {
-  const dataAsOfDate = snapshot.status === 'ok' && snapshot.dataAsOf ? new Date(snapshot.dataAsOf) : null;
-  // A real stamp when we have live data; null on the cached/mock path so copy
-  // can fall back gracefully instead of printing a fake precise timestamp.
-  const dataAsOfLabel = dataAsOfDate ? formatDataStamp(dataAsOfDate) : null;
+  const dataAsOfDate = resolveDataAsOfDate(snapshot);
+  const dataAsOfLabel = dataAsOfLabelFor(dataAsOfDate);
 
   return {
     // TODO(#32): wire to real role resolver
     isDenied: forcedState === 'denied',
-    isEmpty: forcedState === 'empty' || batchCount === 0,
-    syncFailed: forcedState === 'sync-failed' || snapshot.status === 'sync-failed',
-    isStale: forcedState === 'stale' || isDataStale(dataAsOfDate),
+    isEmpty: isEmptyDashboard(forcedState, batchCount),
+    syncFailed: isSyncFailedDashboard(forcedState, snapshot),
+    isStale: isStaleDashboard(forcedState, dataAsOfDate),
     dataAsOfLabel,
-    syncFailedMessage: dataAsOfLabel ? ` from ${dataAsOfLabel}` : '',
+    syncFailedMessage: syncFailedMessageFor(dataAsOfLabel),
   };
 }
 
@@ -253,75 +280,28 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       <span className="subline">
         {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {pluralize(metrics.activeBatches)}
         {' · '}Data as of {dataAsOfLabel ?? DATA_AS_OF_FALLBACK}
-        {isStale && (
-          <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
-            STALE
-          </span>
-        )}
+        <StaleBadge isStale={isStale} />
       </span>
     </div>
   );
 
   // Permission denied — full-page guard state.
   if (isDenied) {
-    return (
-      <div className="dashboard-view">
-        {header}
-        <EmptyState
-          iconName="shield-off"
-          heading="Access denied"
-          sub="Your role does not have access to this school's dashboard. Contact a coordinator to request access."
-        />
-      </div>
-    );
+    return <DeniedView header={header} />;
   }
 
   // Empty — no assigned batches; surface the next administrative action.
   if (isEmpty) {
-    return (
-      <div className="dashboard-view">
-        {header}
-        <EmptyState
-          iconName="folders"
-          heading="No assigned batches"
-          sub="Once a batch is imported or assigned to you, its readiness, lifecycle, and documents appear here."
-          action={<Link href="/batch-cards" className="btn primary" style={{ marginTop: 12 }}>Import a batch</Link>}
-        />
-      </div>
-    );
+    return <EmptyBatchesView header={header} />;
   }
 
   return (
     <div className="dashboard-view">
       {header}
 
-      {syncFailed && (
-        <InfoCallout variant="warning">
-          Sync with Supabase failed — showing the last cached snapshot{syncFailedMessage}.
-          <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
-        </InfoCallout>
-      )}
+      <SyncFailedCallout syncFailed={syncFailed} message={syncFailedMessage} />
 
-      {criticalMissing > 0 && (
-        <InfoCallout variant="warning">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <span style={{ flex: 1, minWidth: 240 }}>
-              {criticalMissing} critical document missing across {batches.length} {pluralize(batches.length)}.
-              {' '}Document audit is required before billing release.
-            </span>
-            <Link
-              href="/documents"
-              className="btn secondary sm"
-              // `.btn.secondary` is gray by default; tinted amber here since
-              // this button only ever sits inside the amber callout above.
-              style={{ flexShrink: 0, color: 'var(--color-amber-dk)', borderColor: 'var(--color-amber-border)', background: 'var(--color-surface)' }}
-            >
-              Review docs
-              <Icon name="arrow-narrow-right" size={14} />
-            </Link>
-          </div>
-        </InfoCallout>
-      )}
+      <CriticalDocsCallout criticalMissing={criticalMissing} batchCount={batches.length} />
 
       {/* Compact identity row — name + role, matching the design's greeting
           card exactly. `subtitle`/`permissionNote` still exist on ROLE_COPY
@@ -461,6 +441,76 @@ function firstParam(value: string | string[] | undefined): string | null {
 
 function isDashboardRole(role: string | null): role is DashboardRole {
   return role === 'admin' || role === 'coordinator' || role === 'viewer';
+}
+
+function StaleBadge({ isStale }: { isStale: boolean }) {
+  if (!isStale) return null;
+  return (
+    <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
+      STALE
+    </span>
+  );
+}
+
+function DeniedView({ header }: { header: React.ReactNode }) {
+  return (
+    <div className="dashboard-view">
+      {header}
+      <EmptyState
+        iconName="shield-off"
+        heading="Access denied"
+        sub="Your role does not have access to this school's dashboard. Contact a coordinator to request access."
+      />
+    </div>
+  );
+}
+
+function EmptyBatchesView({ header }: { header: React.ReactNode }) {
+  return (
+    <div className="dashboard-view">
+      {header}
+      <EmptyState
+        iconName="folders"
+        heading="No assigned batches"
+        sub="Once a batch is imported or assigned to you, its readiness, lifecycle, and documents appear here."
+        action={<Link href="/batch-cards" className="btn primary" style={{ marginTop: 12 }}>Import a batch</Link>}
+      />
+    </div>
+  );
+}
+
+function SyncFailedCallout({ syncFailed, message }: { syncFailed: boolean; message: string }) {
+  if (!syncFailed) return null;
+  return (
+    <InfoCallout variant="warning">
+      Sync with Supabase failed — showing the last cached snapshot{message}.
+      <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
+    </InfoCallout>
+  );
+}
+
+function CriticalDocsCallout({ criticalMissing, batchCount }: { criticalMissing: number; batchCount: number }) {
+  if (criticalMissing <= 0) return null;
+  return (
+    <InfoCallout variant="warning">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <span style={{ flex: 1, minWidth: 240 }}>
+          {criticalMissing} critical document missing across {batchCount} {pluralize(batchCount)}.
+          {' '}Document audit is required before billing release.
+        </span>
+        <Link
+          href="/documents"
+          className="btn secondary sm"
+          // `.btn.secondary` is gray by default; tinted amber here since
+          // this button only ever sits inside the amber callout above.
+          style={{ flexShrink: 0, color: 'var(--color-amber-dk)', borderColor: 'var(--color-amber-border)', background: 'var(--color-surface)' }}
+        >
+          Review docs
+          <Icon name="arrow-narrow-right" size={14} />
+        </Link>
+      </div>
+    </InfoCallout>
+  );
 }
 
 function DashboardPanel({
