@@ -11,7 +11,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -32,6 +32,25 @@ const UNTRACKED_LABEL = 'Not tracked';
 
 // Single demo identity — an admin (proprietor) who can verify documents.
 const CURRENT_USER = 'Pia Buenaventura';
+
+/** Cell icon per doc status; 'missing' and 'na' both read as file-off. */
+const CELL_STATUS_ICON: Record<string, IconName> = {
+  verified: 'check',
+  submitted: 'clock',
+  pending: 'clock',
+  missing: 'file-off',
+  na: 'file-off',
+};
+
+function cellIcon(doc: DocRecord | null, status: string): IconName {
+  return doc ? CELL_STATUS_ICON[status] : 'info-circle';
+}
+
+function cellTitle(doc: DocRecord | null, status: string, isWriter: boolean): string {
+  if (!doc) return 'This batch does not track this document. Its programme requirement catalog has no entry for it.';
+  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${doc.updated} · ${doc.source}`;
+  return isWriter ? 'Click to attach' : 'Document not yet provided';
+}
 
 export function DocumentsView({ batches }: { batches: Batch[] }) {
   // Verification overrides keyed `${batchId}:${docKey}`.
@@ -193,11 +212,9 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
                     disabled={!doc}
-                    title={!doc
-                      ? 'This batch does not track this document. Its programme requirement catalog has no entry for it.'
-                      : doc.updated ? `${STATUS_LABEL[s]} · updated ${doc.updated} · ${doc.source}` : (isWriter ? 'Click to attach' : 'Document not yet provided')}
+                    title={cellTitle(doc, s, isWriter)}
                   >
-                    <Icon name={!doc ? 'info-circle' : s === 'verified' ? 'check' : s === 'submitted' ? 'clock' : s === 'pending' ? 'clock' : 'file-off'} size={11} />
+                    <Icon name={cellIcon(doc, s)} size={11} />
                     {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
                   {doc?.updated && (
