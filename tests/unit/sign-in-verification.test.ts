@@ -263,6 +263,12 @@ describe('handleSignIn', () => {
     await submit(cardChild(root, 'SignInView'));
 
     expect(signIn.reset).toHaveBeenCalled();
+    expect(signIn.password).toHaveBeenCalled();
+    // Resetting *after* password() would let a stale attempt leak into the
+    // new verification instead of clearing it first.
+    expect(signIn.reset.mock.invocationCallOrder[0]).toBeLessThan(
+      signIn.password.mock.invocationCallOrder[0],
+    );
   });
 
   it('does not reset when there is no attempt in flight', async () => {
