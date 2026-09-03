@@ -51,6 +51,12 @@ export interface BillingGate {
   ready: boolean;
 }
 
+/**
+ * Computes the compound billing gate for a batch: it must be ongoing, reach the
+ * progress threshold, and have a nonzero set of required supporting documents
+ * with every requirement verified. Returns the two component signals alongside
+ * the combined `ready` flag so the UI can display each with its own icon and text.
+ */
 export function billingGate(b: Batch, docs: DocReadiness): BillingGate {
   const thresholdMet = isBillingReady(b);
   const docsVerified = docs.requiredTotal > 0 && docs.verified >= docs.requiredTotal;

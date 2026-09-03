@@ -4,8 +4,11 @@
  * doubled-quote escaping) is small enough not to justify adding one.
  */
 
-/** Parses CSV text into rows of raw string cells. Handles \r\n and \n, quoted
- * fields, embedded commas/newlines inside quotes, and "" as an escaped quote. */
+/**
+ * Parses CSV text into rows of raw string cells. Handles \r\n and \n line
+ * endings, quoted fields, embedded commas/newlines inside quotes, and ""
+ * as an escaped quote character.
+ */
 export function parseCsvRows(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -54,7 +57,11 @@ export function parseCsvRows(text: string): string[][] {
   return rows.filter((r) => !(r.length === 1 && r[0] === ''));
 }
 
-/** Row objects keyed by (trimmed, lowercased) header — case-insensitive lookup. */
+/**
+ * Converts parsed CSV rows into record objects keyed by (trimmed, lowercased)
+ * headers. The first row is treated as the header row. Enables case-insensitive
+ * column lookup.
+ */
 export function rowsToRecords(rows: string[][]): Record<string, string>[] {
   if (rows.length === 0) return [];
   const [headerRow, ...dataRows] = rows;

@@ -56,17 +56,27 @@ export const TRAINING_COST_BY_QUALIFICATION: Record<string, number> = {
 /** Fallback per-scholar Training Cost for an unmapped qualification. */
 export const DEFAULT_TRAINING_COST = 15_000;
 
-/** Nominal training hours for a qualification (mapped, else the default). */
+/**
+ * Returns the nominal training hours for a qualification. Looks up the value in
+ * the reference table and falls back to the default (360) for unmapped qualifications.
+ */
 export function nominalHoursFor(qualification: string): number {
   return NOMINAL_HOURS_BY_QUALIFICATION[qualification] ?? DEFAULT_NOMINAL_HOURS;
 }
 
-/** Billable TSF days = nominal hours ÷ 8 (E2). */
+/**
+ * Calculates the billable TSF days for a qualification: nominal hours ÷ 8 (E2).
+ * One TESDA session equals 8 nominal hours.
+ */
 export function tsfDaysFor(qualification: string): number {
   return Math.round(nominalHoursFor(qualification) / NOMINAL_SESSION_HOURS);
 }
 
-/** Per-scholar Training Cost for a qualification (mapped, else the default). */
+/**
+ * Returns the per-scholar Training Cost for a qualification. Looks up the value
+ * in the reference table and falls back to the default (₱15,000) for unmapped
+ * qualifications.
+ */
 export function trainingCostFor(qualification: string): number {
   return TRAINING_COST_BY_QUALIFICATION[qualification] ?? DEFAULT_TRAINING_COST;
 }
