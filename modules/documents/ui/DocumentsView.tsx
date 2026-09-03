@@ -11,7 +11,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -33,40 +33,23 @@ const UNTRACKED_LABEL = 'Not tracked';
 // Single demo identity — an admin (proprietor) who can verify documents.
 const CURRENT_USER = 'Pia Buenaventura';
 
-type CompletenessTier = 'untracked' | 'on-track' | 'warning' | 'critical';
-
-type CompletenessSummary = {
-  ok: number;
-  total: number;
-  untracked: number;
-  pct: number | null;
-  missing: number;
-  tier: CompletenessTier;
+/** Cell icon per doc status; 'missing' and 'na' both read as file-off. */
+const CELL_STATUS_ICON: Record<string, IconName> = {
+  verified: 'check',
+  submitted: 'clock',
+  pending: 'clock',
+  missing: 'file-off',
+  na: 'file-off',
 };
 
-const TIER_BORDER_COLOR: Record<CompletenessTier, string> = {
-  untracked: 'var(--color-border-strong)',
-  critical: 'var(--color-red)',
-  warning: 'var(--color-amber)',
-  'on-track': 'var(--color-green)',
-};
-
-function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
-  return program === 'TWSP' ? 'twsp' : 'cfsp';
+function cellIcon(doc: DocRecord | null, status: string): IconName {
+  return doc ? CELL_STATUS_ICON[status] : 'info-circle';
 }
 
-/** 'untracked' has no fill variant — an unknown score renders as the empty
- * track (width 0), with the pct/sub labels carrying the meaning in words. */
-function completenessBarClassName(tier: CompletenessTier): string {
-  return tier === 'on-track' || tier === 'untracked' ? '' : tier;
-}
-
-function completenessPctLabel(pct: number | null): string {
-  return pct === null ? '—' : `${pct}%`;
-}
-
-function completenessSubLabel(c: CompletenessSummary): string {
-  return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
+function cellTitle(doc: DocRecord | null, status: string, isWriter: boolean): string {
+  if (!doc) return 'This batch does not track this document. Its programme requirement catalog has no entry for it.';
+  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${doc.updated} · ${doc.source}`;
+  return isWriter ? 'Click to attach' : 'Document not yet provided';
 }
 
 export function DocumentsView({ batches }: { batches: Batch[] }) {
@@ -226,11 +209,9 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
                     disabled={!doc}
-                    title={!doc
-                      ? 'This batch does not track this document. Its programme requirement catalog has no entry for it.'
-                      : doc.updated ? `${STATUS_LABEL[s]} · updated ${doc.updated} · ${doc.source}` : (isWriter ? 'Click to attach' : 'Document not yet provided')}
+                    title={cellTitle(doc, s, isWriter)}
                   >
-                    <Icon name={!doc ? 'info-circle' : s === 'verified' ? 'check' : s === 'submitted' ? 'clock' : s === 'pending' ? 'clock' : 'file-off'} size={11} />
+                    <Icon name={cellIcon(doc, s)} size={11} />
                     {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
                   {doc?.updated && (

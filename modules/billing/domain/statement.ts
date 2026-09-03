@@ -91,7 +91,10 @@ function scholarName(s: ScholarRow): string {
 /**
  * Synthesizes an RQM code (ADR-001 structure `RQM<tranche>-<year>-<program>-<institution>-<seq>`).
  * Deterministic from the batch code so the same batch always shows the same
- * authorization; clearly a prototype value until `rqm_code` is on the contract.
+ * authorization. This is a prototype value until `rqm_code` is on the contract.
+ *
+ * @param batch - The batch to generate an RQM code for
+ * @returns RQM code like "RQM3-2026-CFSP-1263-0001"
  */
 function rqmCode(batch: Batch): string {
   const seq = (batch.id.match(/\d+/)?.[0] ?? '0').padStart(4, '0');
@@ -119,9 +122,17 @@ function programBanner(program: string): string {
 // --- builder ---------------------------------------------------------------
 
 /**
- * Build the statement for a batch + track. Falls back to an empty roster
- * gracefully (the modal shows a zero-row table, never a crash) when a batch has
- * no `scholars_list` yet.
+ * Build a complete billing statement for a batch and track combination.
+ *
+ * Generates all components: header info, column definitions, per-scholar rows,
+ * summary lines, and grand total with amount-in-words. Falls back to an empty
+ * roster gracefully (the modal shows a zero-row table) when a batch has no
+ * `scholars_list` yet.
+ *
+ * @param batch - The batch to bill
+ * @param trackId - The billing track (training_cost, tsf_allowance, or entrepreneurship)
+ * @param tenant - The school context for the statement header
+ * @returns Complete billing statement ready for preview or generation
  */
 export function buildStatement(
   batch: Batch,
