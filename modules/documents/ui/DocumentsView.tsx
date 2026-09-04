@@ -62,13 +62,6 @@ type CompletenessSummary = {
   tier: CompletenessTier;
 };
 
-const TIER_BORDER_COLOR: Record<CompletenessTier, string> = {
-  untracked: 'var(--color-border-strong)',
-  critical: 'var(--color-red)',
-  warning: 'var(--color-amber)',
-  'on-track': 'var(--color-green)',
-};
-
 function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
   return program === 'TWSP' ? 'twsp' : 'cfsp';
 }
@@ -208,7 +201,6 @@ export function DocumentsView({
           return (
             <div key={b.id} style={{
               padding: 12, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-              borderLeft: '3px solid ' + TIER_BORDER_COLOR[c.tier],
               borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
