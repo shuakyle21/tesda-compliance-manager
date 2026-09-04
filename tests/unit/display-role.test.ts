@@ -10,7 +10,23 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { resolveDisplayRole } from '@/modules/auth/data/role';
+import { resolveDisplayRole, toOfficeRole } from '@/modules/auth/data/role';
+
+describe('toOfficeRole', () => {
+  it('passes office roles through unchanged', () => {
+    expect(toOfficeRole('admin')).toBe('admin');
+    expect(toOfficeRole('coordinator')).toBe('coordinator');
+    expect(toOfficeRole('viewer')).toBe('viewer');
+  });
+
+  it('narrows everything else to read-only viewer', () => {
+    // Trainer has no office-screen variant; null means the lookup succeeded
+    // with no role set. Neither may render a write-enabled variant.
+    expect(toOfficeRole('trainer')).toBe('viewer');
+    expect(toOfficeRole(null)).toBe('viewer');
+    expect(toOfficeRole('superuser')).toBe('viewer');
+  });
+});
 
 describe('resolveDisplayRole', () => {
   it('falls back to viewer when neither source names an office role', () => {

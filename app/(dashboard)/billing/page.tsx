@@ -17,7 +17,7 @@ import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
-import { firstParam, isOfficeRole, resolveRouteRole, resolveTrustedRole } from '@/modules/auth/data/role';
+import { firstParam, resolveRouteRole, resolveTrustedRole, toOfficeRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
@@ -70,8 +70,7 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   // tenant/role resolver lands (TES-34): an unresolved or non-office role
   // (including a previewed 'trainer', which BillingQueueView has no variant
   // for) renders read-only rather than write-enabled.
-  const role = await resolveRouteRole(params, dbRole);
-  const billingRole = isOfficeRole(role) ? role : 'viewer';
+  const billingRole = toOfficeRole(await resolveRouteRole(params, dbRole));
 
   const snapshot = await getBatchesSnapshot();
   const forcedState = firstParam(params.state);

@@ -87,7 +87,19 @@ export async function resolveTrustedRole(dbRole?: UserRole | null): Promise<Reso
  */
 export function resolveDisplayRole(queryRole: string | null, trustedRole: ResolvedRole): OfficeRole {
   if (isOfficeRole(queryRole)) return queryRole;
-  return isOfficeRole(trustedRole) ? trustedRole : 'viewer';
+  return toOfficeRole(trustedRole);
+}
+
+/**
+ * The least-privilege narrowing on its own: anything that is not an office
+ * role — trainer, null, an unrecognised string — becomes read-only `viewer`.
+ *
+ * Named once here because every dashboard-tree route needs it at the point
+ * where a resolved role meets an office-only screen, and two hand-written
+ * spellings of one fallback is how the two drift apart.
+ */
+export function toOfficeRole(role: ResolvedRole | string | null): OfficeRole {
+  return isOfficeRole(role) ? role : 'viewer';
 }
 
 /**
