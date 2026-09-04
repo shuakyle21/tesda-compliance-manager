@@ -17,7 +17,7 @@ import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
-import { firstParam, resolveRouteRole } from '@/modules/auth/data/role';
+import { firstParam, isOfficeRole, resolveRouteRole, resolveTrustedRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
@@ -54,17 +54,24 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
   const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
 
-  const role = await resolveRouteRole(params, dbRole);
-
   // Trainer DTOs must omit billing entirely — server-denied, never CSS-hidden
-  // (ADR-001 §9 Scope, and the load-bearing role rule in CLAUDE.md).
-  if (role === 'trainer') {
+  // (ADR-001 §9 Scope, and the load-bearing role rule in CLAUDE.md). Gated on
+  // `resolveTrustedRole` (dbRole/Clerk only): `resolveRouteRole`'s `?role=`
+  // preview override must never decide this, or a real trainer could request
+  // `?role=admin` and skip the redirect entirely.
+  const trustedRole = await resolveTrustedRole(dbRole);
+  if (trustedRole === 'trainer') {
     redirect('/trainer');
   }
 
-  // Least-privilege fallback until the tenant/role resolver lands (TES-34):
-  // an unresolved role renders read-only rather than write-enabled.
-  const billingRole = role ?? 'viewer';
+  // Presentation only, past this point — `?role=` may still change how
+  // BillingQueueView renders (e.g. previewing the coordinator/viewer variant)
+  // but never gates the redirect above. Least-privilege fallback until the
+  // tenant/role resolver lands (TES-34): an unresolved or non-office role
+  // (including a previewed 'trainer', which BillingQueueView has no variant
+  // for) renders read-only rather than write-enabled.
+  const role = await resolveRouteRole(params, dbRole);
+  const billingRole = isOfficeRole(role) ? role : 'viewer';
 
   const snapshot = await getBatchesSnapshot();
   const forcedState = firstParam(params.state);

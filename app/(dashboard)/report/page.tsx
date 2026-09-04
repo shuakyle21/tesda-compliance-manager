@@ -19,16 +19,12 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
-import { resolveRouteRole } from '@/modules/auth/data/role';
+import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { ReportView } from '@/modules/reports/ui/ReportView';
 import type { Batch } from '@/shared/types';
 
-type SearchParams = Promise<Record<string, string | string[] | undefined>>;
-
-export default async function ReportPage({ searchParams }: { searchParams: SearchParams }) {
-  const params = await searchParams;
-
+export default async function ReportPage() {
   // EGACE/employment outcomes are per-scholar financial and employment data —
   // the same trainer-omission boundary billing enforces (CLAUDE.md's
   // load-bearing role rule; ADR-001 §9 Scope) applies here too. This route had
@@ -37,11 +33,15 @@ export default async function ReportPage({ searchParams }: { searchParams: Searc
   // for trainers like every other financial/preparation surface — not merely
   // hidden from the nav (Sidebar.tsx's comment already assumed this redirect
   // existed).
+  //
+  // Gated on `resolveTrustedRole` (dbRole/Clerk only), never `resolveRouteRole`
+  // — the latter's `?role=` preview override would let a real trainer request
+  // `?role=admin` and skip this redirect entirely.
   const clerkUserId = await getAuthUserId();
   const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
   const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
-  const role = await resolveRouteRole(params, dbRole);
-  if (role === 'trainer') {
+  const trustedRole = await resolveTrustedRole(dbRole);
+  if (trustedRole === 'trainer') {
     redirect('/trainer');
   }
 

@@ -46,25 +46,22 @@ function asResolvedRole(role: string | null): ResolvedRole {
 }
 
 /**
- * Resolves the acting role with this precedence:
- *   1. `?role=` preview override — a dev/demo affordance, stays available
- *      even once real identity exists.
- *   2. `dbRole` — the real role from the caller's `profiles` row (via
+ * Resolves the acting role from trusted sources only:
+ *   1. `dbRole` — the real role from the caller's `profiles` row (via
  *      `modules/tenancy/data`'s `getProfileSnapshot`). Passed in rather than
  *      fetched here because a module's `data/` is private to it; the caller
  *      (an `app/` route) fetches both and passes the result down.
- *   3. Clerk `publicMetadata.role` — pre-dates the real resolver, kept as a
+ *   2. Clerk `publicMetadata.role` — pre-dates the real resolver, kept as a
  *      last-resort fallback for a signed-in user with no `profiles` row yet.
- * Returns `null` when none answer — callers must fall back to the
+ * Returns `null` when neither answers — callers must fall back to the
  * least-privileged variant (viewer), not to a write-enabled one.
+ *
+ * This is what redirect/authorization decisions must call — never
+ * `resolveRouteRole`, whose `?role=` override lets any caller claim any role
+ * and would let a real trainer skip the office-only redirect by requesting
+ * `?role=admin`.
  */
-export async function resolveRouteRole(
-  params: RouteSearchParams,
-  dbRole?: UserRole | null,
-): Promise<ResolvedRole> {
-  const fromQuery = asResolvedRole(firstParam(params.role));
-  if (fromQuery) return fromQuery;
-
+export async function resolveTrustedRole(dbRole?: UserRole | null): Promise<ResolvedRole> {
   const fromDb = asResolvedRole(dbRole ?? null);
   if (fromDb) return fromDb;
 
@@ -73,4 +70,25 @@ export async function resolveRouteRole(
     typeof user?.publicMetadata?.role === 'string' ? user.publicMetadata.role.toLowerCase() : null;
 
   return asResolvedRole(metadataRole);
+}
+
+/**
+ * Resolves the acting role for *presentation* purposes, with this precedence:
+ *   1. `?role=` preview override — a dev/demo affordance, stays available
+ *      even once real identity exists. Lets an already-authorized caller
+ *      preview another role's UI; it is not a security signal.
+ *   2/3. Falls through to `resolveTrustedRole` (`dbRole`, then Clerk
+ *      `publicMetadata.role`).
+ *
+ * Do not use this return value to gate a redirect or any write — call
+ * `resolveTrustedRole` for that instead.
+ */
+export async function resolveRouteRole(
+  params: RouteSearchParams,
+  dbRole?: UserRole | null,
+): Promise<ResolvedRole> {
+  const fromQuery = asResolvedRole(firstParam(params.role));
+  if (fromQuery) return fromQuery;
+
+  return resolveTrustedRole(dbRole);
 }
