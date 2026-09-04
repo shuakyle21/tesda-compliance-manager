@@ -22,9 +22,7 @@ import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getActivitySnapshot } from '@/modules/activity/data/activity';
-import { getAuthUserId } from '@/modules/auth/data/auth';
-import { firstParam, isOfficeRole, resolveRouteRole, resolveTrustedRole } from '@/modules/auth/data/role';
-import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
+import { getCurrentUser } from '@/modules/auth/data/auth';
 import type { Batch, DocumentRequirement, UserRole } from '@/shared/types';
 
 type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
@@ -208,34 +206,16 @@ function billingReadyVariant(billingReadyCount: number): 'warning' | 'neutral' {
 
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
+  const role = await resolveDashboardRole(params);
 
-  // Real role/tenant identity (Phase 1 of the live-data cutover): fetched
-  // here, not inside resolveRouteRole, because a module's data/ is private
-  // to it — role.ts (auth) can't import tenancy.ts (tenancy) directly, so
-  // this app/ route fetches both and passes the result down. `null` when
-  // unsigned-in, not-found (no profiles row yet), or Supabase isn't
-  // configured — resolveRouteRole falls through to its other sources.
-  const clerkUserId = await getAuthUserId();
-  const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
-  const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
-
-  // Trainer-facing DTOs must omit billing fields entirely — server-denied,
-  // never CSS-hidden (the load-bearing role rule in CLAUDE.md). Gated on
-  // `resolveTrustedRole` (dbRole/Clerk only): `resolveRouteRole`'s `?role=`
-  // preview override must never decide this, or a real trainer could request
-  // `?role=admin` and skip the redirect entirely.
-  const trustedRole = await resolveTrustedRole(dbRole);
-  if (trustedRole === 'trainer') {
+  if (role === 'trainer') {
     redirect('/trainer');
   }
 
-  // Presentation only, past this point — `?role=` may still change which
-  // dashboard variant renders but never gates the redirect above.
-  // Conservative least-privilege fallback until the tenant-role resolver
-  // lands (TES-34): an unresolved or non-office role renders the read-only
-  // viewer variant rather than a write-enabled one.
-  const role = await resolveRouteRole(params, dbRole);
-  const dashboardRole = isOfficeRole(role) ? role : 'viewer';
+  // Conservative least-privilege fallback until the tenant-role resolver lands
+  // (TES-34): an unresolved role renders the read-only viewer variant rather
+  // than a write-enabled one. Use `?role=` to preview other variants.
+  const dashboardRole = role ?? 'viewer';
   const roleCopy = ROLE_COPY[dashboardRole];
 
   // ---- Live load (TES-8 AC6) ----
@@ -468,6 +448,28 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       </section>
     </div>
   );
+}
+
+async function resolveDashboardRole(params: Awaited<SearchParams>): Promise<DashboardRole | 'trainer' | null> {
+  const queryRole = firstParam(params.role);
+  if (isDashboardRole(queryRole) || queryRole === 'trainer') return queryRole;
+
+  const user = await getCurrentUser().catch(() => null);
+  const metadataRole = typeof user?.publicMetadata?.role === 'string'
+    ? user.publicMetadata.role.toLowerCase()
+    : null;
+
+  if (isDashboardRole(metadataRole) || metadataRole === 'trainer') return metadataRole;
+  return null;
+}
+
+function firstParam(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0]?.toLowerCase() ?? null;
+  return value?.toLowerCase() ?? null;
+}
+
+function isDashboardRole(role: string | null): role is DashboardRole {
+  return role === 'admin' || role === 'coordinator' || role === 'viewer';
 }
 
 function StaleBadge({ isStale }: { isStale: boolean }) {
