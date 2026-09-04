@@ -27,10 +27,15 @@ export async function POST(req: NextRequest) {
 
   try {
     if (event.type === 'user.created' || event.type === 'user.updated') {
-      const { id, email_addresses, first_name, last_name } = event.data;
+      const { id, email_addresses, first_name, last_name, public_metadata } = event.data;
       const email = email_addresses[0]?.email_address ?? null;
       const fullName = [first_name, last_name].filter(Boolean).join(' ') || null;
-      await upsertProfileFromClerkUser({ id, email, fullName });
+      // `public_metadata` carries the role/school grant when the user arrived
+      // through an admin's invitation (Clerk copies invitation metadata onto
+      // the user on sign-up). Backend-API-only, so it cannot be forged by the
+      // person signing up; provisioning applies it on insert only. See
+      // `modules/auth/domain/invitationMetadata.ts`.
+      await upsertProfileFromClerkUser({ id, email, fullName, publicMetadata: public_metadata });
     }
 
     if (event.type === 'user.deleted') {
