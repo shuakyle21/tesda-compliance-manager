@@ -87,7 +87,11 @@ function completenessSubLabel(c: CompletenessSummary): string {
   return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
 }
 
-export function DocumentsView({ batches }: { batches: Batch[] }) {
+export function DocumentsView({ batches, documentRequirements, syncFailed }: {
+  batches: Batch[];
+  documentRequirements: DocumentRequirement[];
+  syncFailed: boolean;
+}) {
   // Verification overrides keyed `${batchId}:${docKey}`.
   const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
