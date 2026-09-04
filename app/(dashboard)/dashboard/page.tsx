@@ -206,16 +206,45 @@ function billingReadyVariant(billingReadyCount: number): 'warning' | 'neutral' {
 
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const role = await resolveDashboardRole(params);
 
-  if (role === 'trainer') {
+  // Redirect gate: Clerk's role only. `?role=` must never decide this — a real
+  // trainer requesting `?role=admin` must still be sent to /trainer.
+  //
+  // `resolveTrustedDashboardRole()` can fail to reach Clerk (network blip,
+  // transient API error) as distinct from succeeding and finding no role set.
+  // Those are not the same thing: collapsing both to `null` would let a real
+  // trainer whose lookup happened to fail fall through to the office
+  // dashboard as 'viewer' instead of being redirected — the lookup failing
+  // means we don't know they're *not* a trainer, so fail closed before any
+  // data loads rather than defaulting to a permissive fallback. This is
+  // separate from `isDenied` below, which is the (not-yet-built) real
+  // tenant/role resolver from TES-34 — this is only about the trusted lookup
+  // itself erroring out.
+  const trustedResult = await resolveTrustedDashboardRole();
+  if (trustedResult.status === 'lookup-failed') {
+    return (
+      <RoleLookupFailedView
+        header={
+          <div className="page-head">
+            <h1>Dashboard</h1>
+          </div>
+        }
+      />
+    );
+  }
+
+  const trustedRole = trustedResult.role;
+  if (trustedRole === 'trainer') {
     redirect('/trainer');
   }
 
-  // Conservative least-privilege fallback until the tenant-role resolver lands
-  // (TES-34): an unresolved role renders the read-only viewer variant rather
-  // than a write-enabled one. Use `?role=` to preview other variants.
-  const dashboardRole = role ?? 'viewer';
+  // Display only, past this point. `?role=` may pick a different dashboard
+  // variant to preview; it never overrides the redirect above. Conservative
+  // least-privilege fallback until the tenant-role resolver lands (TES-34):
+  // an unresolved-but-confirmed role (lookup succeeded, no role set) renders
+  // the read-only viewer variant rather than a write-enabled one.
+  const queryRole = firstParam(params.role);
+  const dashboardRole = isDashboardRole(queryRole) ? queryRole : trustedRole ?? 'viewer';
   const roleCopy = ROLE_COPY[dashboardRole];
 
   // ---- Live load (TES-8 AC6) ----
@@ -450,17 +479,31 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   );
 }
 
-async function resolveDashboardRole(params: Awaited<SearchParams>): Promise<DashboardRole | 'trainer' | null> {
-  const queryRole = firstParam(params.role);
-  if (isDashboardRole(queryRole) || queryRole === 'trainer') return queryRole;
+type TrustedRoleResult =
+  | { status: 'ok'; role: DashboardRole | 'trainer' | null } // role: null = confirmed, no role set
+  | { status: 'lookup-failed' }; // getCurrentUser() itself errored — identity unknown
 
-  const user = await getCurrentUser().catch(() => null);
+// Trusted source only (Clerk `publicMetadata.role`) — never `?role=`, which
+// would let a real trainer skip the redirect above by requesting `?role=admin`.
+// Distinguishes "looked up, no role set" (`role: null`) from "the lookup
+// itself failed" (`status: 'lookup-failed'`) so the caller can fail closed on
+// the latter instead of silently treating both the same way.
+async function resolveTrustedDashboardRole(): Promise<TrustedRoleResult> {
+  let user;
+  try {
+    user = await getCurrentUser();
+  } catch {
+    return { status: 'lookup-failed' };
+  }
+
   const metadataRole = typeof user?.publicMetadata?.role === 'string'
     ? user.publicMetadata.role.toLowerCase()
     : null;
 
-  if (isDashboardRole(metadataRole) || metadataRole === 'trainer') return metadataRole;
-  return null;
+  return {
+    status: 'ok',
+    role: isDashboardRole(metadataRole) || metadataRole === 'trainer' ? metadataRole : null,
+  };
 }
 
 function firstParam(value: string | string[] | undefined): string | null {
@@ -478,6 +521,20 @@ function StaleBadge({ isStale }: { isStale: boolean }) {
     <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
       STALE
     </span>
+  );
+}
+
+function RoleLookupFailedView({ header }: { header: React.ReactNode }) {
+  return (
+    <div className="dashboard-view">
+      {header}
+      <EmptyState
+        iconName="alert-triangle"
+        heading="Couldn't verify your access"
+        sub="We weren't able to confirm your role just now — this is usually temporary. Try again in a moment."
+        action={<Link href="/dashboard" className="btn primary" style={{ marginTop: 12 }}>Retry</Link>}
+      />
+    </div>
   );
 }
 
