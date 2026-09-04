@@ -76,7 +76,7 @@ export function TableView({
               </thead>
               <tbody>
                 {filtered.map((b, i) => (
-                  <TableRow key={b.id} batch={b} criticalRequirements={crit} odd={i % 2 === 0} onClick={() => setOpen(b)} />
+                  <TableRow key={b.id} batch={b} critical={crit} odd={i % 2 === 0} onClick={() => setOpen(b)} />
                 ))}
               </tbody>
             </table>
@@ -119,7 +119,21 @@ function docCellTitle(docs: DocComplianceSummary): string | undefined {
   return `${docs.untracked} required document${docs.untracked === 1 ? '' : 's'} not tracked for this batch`;
 }
 
-function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick: () => void }) {
+// `critical`, not `criticalRequirements`: the latter is the name of the domain
+// *function* imported above, and a prop of that name shadows it inside this
+// component — a later call to `criticalRequirements(...)` here would be a
+// TypeError on an array rather than a compile error.
+function TableRow({
+  batch,
+  critical,
+  odd,
+  onClick,
+}: {
+  batch: Batch;
+  critical: DocumentRequirement[];
+  odd: boolean;
+  onClick: () => void;
+}) {
   const cellStyle: CSSProperties = {
     padding: '0 12px', height: 44,
     fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--color-text-primary)',
@@ -134,7 +148,7 @@ function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick
   // TypeError on any batch missing one (TES-94). Untracked keys count toward
   // neither `ok` nor `missing`; with nothing tracked the cell reads "—", which
   // is also what an unresolved (empty) catalog renders.
-  const docs = summarizeBatchDocCompliance(batch, crit);
+  const docs = summarizeBatchDocCompliance(batch, critical);
   const docColor = docCellColor(docs);
 
   const onEnter = (e: MouseEvent<HTMLTableRowElement>) => {

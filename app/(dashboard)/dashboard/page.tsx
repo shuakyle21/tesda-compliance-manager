@@ -9,23 +9,34 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { Icon, type IconName } from '@/shared/ui/Icon';
-import { MetricCard } from '@/shared/ui/MetricCard';
 import { EgaceOutcomes } from '@/modules/batches/ui/dashboard/EgaceOutcomes';
 import { DocumentStatusDonut } from '@/modules/batches/ui/dashboard/DocumentStatusDonut';
 import { ProgressTrend, type TrendSeries } from '@/modules/batches/ui/dashboard/ProgressTrend';
 import { BatchTimeline } from '@/modules/batches/ui/dashboard/BatchTimeline';
 import { AlertsPanel } from '@/modules/batches/ui/dashboard/AlertsPanel';
+import { DashboardCallouts } from '@/modules/batches/ui/dashboard/DashboardCallouts';
+import { DashboardKpiGrid } from '@/modules/batches/ui/dashboard/DashboardKpiGrid';
+import { ProgramBreakdown } from '@/modules/batches/ui/dashboard/ProgramBreakdown';
+import { DashboardHeader, DashboardHeaderPlain } from '@/modules/batches/ui/dashboard/DashboardHeader';
+import { RecentActivityPanel } from '@/modules/activity/ui/RecentActivityPanel';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getActivitySnapshot } from '@/modules/activity/data/activity';
 import { getCurrentUser } from '@/modules/auth/data/auth';
-import type { Batch, DocumentRequirement, UserRole } from '@/shared/types';
+import {
+  firstParam,
+  isOfficeRole,
+  resolveDisplayRole,
+  type OfficeRole,
+} from '@/modules/auth/data/role';
+import type { ActivityEvent, Batch, DocumentRequirement } from '@/shared/types';
 
-type DashboardRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
+// The three office roles this route renders. Shared with every other
+// dashboard-tree route via `modules/auth/data/role` rather than restated here.
+type DashboardRole = OfficeRole;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 const ROLE_COPY: Record<DashboardRole, {
@@ -73,11 +84,6 @@ const SUMMARY_CARDS: { title: string; icon: IconName; meta?: string }[] = [
 // threshold, not the data itself.
 const DATA_STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24h
 
-// Shown whenever there's no live `updated_at` to read — either the mock/cached
-// fallback (Supabase unconfigured or sync failed) or an `ok` snapshot with no
-// batch rows to stamp. Deliberately doesn't say "cached": it isn't always.
-const DATA_AS_OF_FALLBACK = 'unknown';
-
 // "Jun 19, 2026 · 14:02"-style stamp from a real timestamp.
 function formatDataStamp(date: Date): string {
   const d = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -91,10 +97,6 @@ function formatDataStamp(date: Date): string {
 // (react-hooks/purity forbids impure calls during render).
 function isDataStale(asOf: Date | null): boolean {
   return asOf ? Date.now() - asOf.getTime() > DATA_STALE_AFTER_MS : false;
-}
-
-function pluralize(count: number, singular = 'batch', plural = 'batches'): string {
-  return count === 1 ? singular : plural;
 }
 
 // ---------------------------------------------------------------------------
@@ -161,47 +163,9 @@ function deriveDashboardViewState(
   };
 }
 
-function docComplianceVariant(criticalMissing: number, criticalPending: number): 'critical' | 'warning' | 'neutral' {
-  if (criticalMissing) return 'critical';
-  if (criticalPending) return 'warning';
-  return 'neutral';
-}
-
-// The percentage covers tracked requirements only (ADR-004), so say so
-// rather than implying a cleared checklist.
-function docComplianceSubtext(
-  docsTracked: boolean,
-  criticalMissing: number,
-  docTracked: number,
-  docUntracked: number,
-): string {
-  if (!docsTracked) return 'document sync pending';
-  if (criticalMissing) return `${criticalMissing} critical missing`;
-  if (docUntracked > 0) return `${docTracked} of ${docTracked + docUntracked} tracked`;
-  return 'All critical docs on file';
-}
-
-function billingUrgencyVariant(daysToEarliestBilling: number): 'critical' | 'warning' | 'neutral' {
-  if (daysToEarliestBilling <= 6) return 'critical';
-  if (daysToEarliestBilling <= 21) return 'warning';
-  return 'neutral';
-}
-
-function earliestBillingSubtext(earliestBatchId: string | undefined, daysToEarliestBilling: number): string {
-  if (!earliestBatchId) return 'No batches';
-  // Infinity is the "no known deadline" sentinel from daysUntil(); sound for
-  // sorting/urgency, but never printable copy.
-  return Number.isFinite(daysToEarliestBilling)
-    ? `${earliestBatchId} · ${daysToEarliestBilling} days left`
-    : `${earliestBatchId} · no deadline set`;
-}
-
-function billingReadySubtext(dashboardRole: DashboardRole): string {
-  return dashboardRole === 'viewer' ? 'read-only visibility' : 'billing prep queue';
-}
-
-function billingReadyVariant(billingReadyCount: number): 'warning' | 'neutral' {
-  return billingReadyCount ? 'warning' : 'neutral';
+/** Events on the `ok` path; empty otherwise — never a fabricated feed. */
+function selectRecentActivity(snapshot: Awaited<ReturnType<typeof getActivitySnapshot>>): ActivityEvent[] {
+  return snapshot.status === 'ok' ? snapshot.events : [];
 }
 
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
@@ -222,15 +186,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // itself erroring out.
   const trustedResult = await resolveTrustedDashboardRole();
   if (trustedResult.status === 'lookup-failed') {
-    return (
-      <RoleLookupFailedView
-        header={
-          <div className="page-head">
-            <h1>Dashboard</h1>
-          </div>
-        }
-      />
-    );
+    return <RoleLookupFailedView header={<DashboardHeaderPlain />} />;
   }
 
   const trustedRole = trustedResult.role;
@@ -243,8 +199,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // least-privilege fallback until the tenant-role resolver lands (TES-34):
   // an unresolved-but-confirmed role (lookup succeeded, no role set) renders
   // the read-only viewer variant rather than a write-enabled one.
-  const queryRole = firstParam(params.role);
-  const dashboardRole = isDashboardRole(queryRole) ? queryRole : trustedRole ?? 'viewer';
+  const dashboardRole = resolveDisplayRole(firstParam(params.role), trustedRole);
   const roleCopy = ROLE_COPY[dashboardRole];
 
   // ---- Live load (TES-8 AC6) ----
@@ -260,18 +215,15 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // this page degrades the same way.
   const documentRequirements: DocumentRequirement[] = [];
   const metrics = deriveDashboardMetrics(batches, documentRequirements);
+  // Drives the critical-docs callout below. The ADR-004 "untracked means
+  // unknown, not 0%" reading of `docCompliancePct` lives in DashboardKpiGrid,
+  // alongside the only card that renders it.
   const criticalMissing = metrics.docMissing;
-  const criticalPending = metrics.docPending;
-  // ADR-004: a null percentage means *nothing* is tracked — unknown, not 0%
-  // and not 100%. The rule lives in modules/documents/domain/compliance.ts;
-  // this route only renders the two cases.
-  const docsTracked = metrics.docCompliancePct !== null;
   const billingReady = batches.filter(isBillingReady);
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
   // Recent Activity panel (6 most recent events) — never mock data.
-  const activitySnapshot = await getActivitySnapshot(6);
-  const recentActivity = activitySnapshot.status === 'ok' ? activitySnapshot.events : [];
+  const recentActivity = selectRecentActivity(await getActivitySnapshot(6));
 
   // Progress & Compliance Trend (last 6 weeks): no live weekly-snapshot data
   // source exists yet, so this always renders ProgressTrend's own "No trend
@@ -293,14 +245,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const isShowingCachedFallback = snapshot.status !== 'ok';
 
   const header = (
-    <div className="page-head">
-      <h1>Dashboard</h1>
-      <span className="subline">
-        {roleCopy.roleLabel} workspace · {metrics.activeBatches} active {pluralize(metrics.activeBatches)}
-        {' · '}Data as of {dataAsOfLabel ?? DATA_AS_OF_FALLBACK}
-        <StaleBadge isStale={isStale} />
-      </span>
-    </div>
+    <DashboardHeader
+      roleLabel={roleCopy.roleLabel}
+      activeBatches={metrics.activeBatches}
+      dataAsOfLabel={dataAsOfLabel}
+      isStale={isStale}
+    />
   );
 
   // Permission denied — full-page guard state.
@@ -314,7 +264,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // failed fetch always reads as a failure, never as an empty tenant
   // (RULES.md rule 19: sync-failed must surface the banner). The
   // `?state=sync-failed` preview override with a real non-empty snapshot
-  // still falls through to the inline SyncFailedCallout below, unaffected.
+  // still falls through to DashboardCallouts below, unaffected.
   if (syncFailed && batches.length === 0) {
     return <SyncFailedView header={header} message={syncFailedMessage} />;
   }
@@ -328,34 +278,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
     <div className="dashboard-view">
       {header}
 
-      {syncFailed && (
-        <InfoCallout variant="warning">
-          Sync with Supabase failed — showing{' '}
-          {isShowingCachedFallback ? `the last cached snapshot${syncFailedMessage}` : 'the currently loaded data'}.
-          <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
-        </InfoCallout>
-      )}
-
-      {criticalMissing > 0 && (
-        <InfoCallout variant="warning">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <span style={{ flex: 1, minWidth: 240 }}>
-              {criticalMissing} critical document missing across {batches.length} {pluralize(batches.length)}.
-              {' '}Document audit is required before billing release.
-            </span>
-            <Link
-              href="/documents"
-              className="btn secondary sm"
-              // `.btn.secondary` is gray by default; tinted amber here since
-              // this button only ever sits inside the amber callout above.
-              style={{ flexShrink: 0, color: 'var(--color-amber-dk)', borderColor: 'var(--color-amber-border)', background: 'var(--color-surface)' }}
-            >
-              Review docs
-              <Icon name="arrow-narrow-right" size={14} />
-            </Link>
-          </div>
-        </InfoCallout>
-      )}
+      <DashboardCallouts
+        syncFailed={syncFailed}
+        isShowingCachedFallback={isShowingCachedFallback}
+        syncFailedMessage={syncFailedMessage}
+        criticalMissing={criticalMissing}
+        batchCount={batches.length}
+      />
 
       {/* Compact identity row — name + role, matching the design's greeting
           card exactly. `subtitle`/`permissionNote` still exist on ROLE_COPY
@@ -372,32 +301,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         <span className="sr-only">{roleCopy.subtitle} {roleCopy.permissionNote}</span>
       </section>
 
-      <section className="dash-kpi-grid" aria-label="Dashboard key metrics">
-        <MetricCard label="Active Batches" value={metrics.activeBatches} sub="tenant-scoped" iconName="folders" />
-        <MetricCard label="Total Scholars" value={metrics.totalScholars} sub="current active roster" iconName="users" />
-        <MetricCard label="Avg Progress" value={`${metrics.avgProgress}%`} sub="training completion" iconName="chart-dots" />
-        <MetricCard
-          label="Doc Compliance"
-          value={docsTracked ? `${metrics.docCompliancePct}%` : '—'}
-          sub={docComplianceSubtext(docsTracked, criticalMissing, metrics.docTracked, metrics.docUntracked)}
-          iconName="file-check"
-          variant={docComplianceVariant(criticalMissing, criticalPending)}
-        />
-        <MetricCard
-          label="Earliest Billing"
-          value={metrics.earliestBillingDeadline || '—'}
-          sub={earliestBillingSubtext(earliestBatch?.id, metrics.daysToEarliestBilling)}
-          iconName="receipt"
-          variant={billingUrgencyVariant(metrics.daysToEarliestBilling)}
-        />
-        <MetricCard
-          label="Billing-Ready"
-          value={billingReady.length}
-          sub={billingReadySubtext(dashboardRole)}
-          iconName="send"
-          variant={billingReadyVariant(billingReady.length)}
-        />
-      </section>
+      <DashboardKpiGrid
+        metrics={metrics}
+        role={dashboardRole}
+        billingReadyCount={billingReady.length}
+        earliestBatchId={earliestBatch?.id}
+      />
 
       <section
         className="dash-charts-row"
@@ -416,26 +325,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         <AlertsPanel batches={batches} documentRequirements={documentRequirements} />
 
         <DashboardPanel title={SUMMARY_CARDS[1].title} icon={SUMMARY_CARDS[1].icon}>
-          <div className="dash-program-grid">
-            {['TWSP', 'CFSP'].map((program) => {
-              const programBatches = batches.filter((batch) => batch.program === program);
-              const scholars = programBatches.reduce((sum, batch) => sum + batch.scholars, 0);
-              return (
-                <div key={program} className="surface" style={{ padding: 14 }}>
-                  <div className="t-label">{program}</div>
-                  <div className="t-metric-value" style={{ marginTop: 8 }}>{programBatches.length}</div>
-                  <div className="t-body">{programBatches.length === 1 ? 'batch' : 'batches'} · {scholars} scholars</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="snap-line" style={{ marginTop: 12, gridTemplateColumns: '48px 1fr 42px' }}>
-            <span className="snap-date">BAT-2</span>
-            <span className="snap-bar">
-              <span style={{ width: `${Math.min(100, metrics.avgProgress)}%` }} />
-            </span>
-            <span className="snap-meta">{metrics.avgProgress}%</span>
-          </div>
+          <ProgramBreakdown batches={batches} avgProgress={metrics.avgProgress} />
         </DashboardPanel>
 
         <DashboardPanel title={SUMMARY_CARDS[2].title} icon={SUMMARY_CARDS[2].icon}>
@@ -443,38 +333,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
         </DashboardPanel>
       </section>
 
-      <section className="dash-panel" aria-labelledby="recent-activity-heading">
-        <div className="dash-panel-head">
-          <div id="recent-activity-heading" className="dash-panel-title">
-            <Icon name="timeline" size={13} />
-            Recent Activity
-          </div>
-          <Link href="/activity-log" className="dash-link">View all</Link>
-        </div>
-        <div className="dash-panel-body">
-          {recentActivity.length === 0 ? (
-            <p className="t-body">No recent activity yet.</p>
-          ) : (
-            <div className="activity">
-              {recentActivity.map((event) => (
-                <div key={event.id} className="activity-item">
-                  <span className={`activity-dot ${event.tone}`} />
-                  <div className="activity-body">
-                    <div style={{ fontSize: 13, color: 'var(--color-text-primary)', lineHeight: '19px' }}>
-                      <span className="who">{event.who}</span>
-                      <span style={{ marginLeft: 6, fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
-                        · {event.role}
-                      </span>
-                      <span style={{ color: 'var(--color-text-secondary)' }}> - {event.text}</span>
-                    </div>
-                    <div className="meta">{event.when}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      <RecentActivityPanel events={recentActivity} />
     </div>
   );
 }
@@ -502,26 +361,8 @@ async function resolveTrustedDashboardRole(): Promise<TrustedRoleResult> {
 
   return {
     status: 'ok',
-    role: isDashboardRole(metadataRole) || metadataRole === 'trainer' ? metadataRole : null,
+    role: isOfficeRole(metadataRole) || metadataRole === 'trainer' ? metadataRole : null,
   };
-}
-
-function firstParam(value: string | string[] | undefined): string | null {
-  if (Array.isArray(value)) return value[0]?.toLowerCase() ?? null;
-  return value?.toLowerCase() ?? null;
-}
-
-function isDashboardRole(role: string | null): role is DashboardRole {
-  return role === 'admin' || role === 'coordinator' || role === 'viewer';
-}
-
-function StaleBadge({ isStale }: { isStale: boolean }) {
-  if (!isStale) return null;
-  return (
-    <span style={{ marginLeft: 8, padding: '1px 6px', borderRadius: 999, background: 'color-mix(in srgb, var(--color-amber) 18%, var(--color-surface))', color: 'var(--color-amber-dk)', fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 600, letterSpacing: '0.06em' }}>
-      STALE
-    </span>
-  );
 }
 
 function RoleLookupFailedView({ header }: { header: React.ReactNode }) {
@@ -579,39 +420,6 @@ function SyncFailedView({ header, message }: { header: React.ReactNode; message:
   );
 }
 
-function SyncFailedCallout({ syncFailed, message }: { syncFailed: boolean; message: string }) {
-  if (!syncFailed) return null;
-  return (
-    <InfoCallout variant="warning">
-      Sync with Supabase failed — showing the last cached snapshot{message}.
-      <Link href="/dashboard" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
-    </InfoCallout>
-  );
-}
-
-function CriticalDocsCallout({ criticalMissing, batchCount }: { criticalMissing: number; batchCount: number }) {
-  if (criticalMissing <= 0) return null;
-  return (
-    <InfoCallout variant="warning">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-        <span style={{ flex: 1, minWidth: 240 }}>
-          {criticalMissing} critical document missing across {batchCount} {pluralize(batchCount)}.
-          {' '}Document audit is required before billing release.
-        </span>
-        <Link
-          href="/documents"
-          className="btn secondary sm"
-          // `.btn.secondary` is gray by default; tinted amber here since
-          // this button only ever sits inside the amber callout above.
-          style={{ flexShrink: 0, color: 'var(--color-amber-dk)', borderColor: 'var(--color-amber-border)', background: 'var(--color-surface)' }}
-        >
-          Review docs
-          <Icon name="arrow-narrow-right" size={14} />
-        </Link>
-      </div>
-    </InfoCallout>
-  );
-}
 
 function DashboardPanel({
   title,

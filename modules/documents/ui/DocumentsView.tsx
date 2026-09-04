@@ -62,13 +62,6 @@ type CompletenessSummary = {
   tier: CompletenessTier;
 };
 
-const TIER_BORDER_COLOR: Record<CompletenessTier, string> = {
-  untracked: 'var(--color-border-strong)',
-  critical: 'var(--color-red)',
-  warning: 'var(--color-amber)',
-  'on-track': 'var(--color-green)',
-};
-
 function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
   return program === 'TWSP' ? 'twsp' : 'cfsp';
 }
@@ -87,7 +80,19 @@ function completenessSubLabel(c: CompletenessSummary): string {
   return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
 }
 
-export function DocumentsView({ batches }: { batches: Batch[] }) {
+export function DocumentsView({
+  batches,
+  documentRequirements,
+  syncFailed,
+}: {
+  batches: Batch[];
+  // Injected by the route rather than read from a module-level catalog: the
+  // real requirement catalog is per scholarship program, so only the caller
+  // can resolve it. An empty catalog renders the "requirements unavailable"
+  // state (ADR-004 "unknown"), never a fabricated compliance figure.
+  documentRequirements: DocumentRequirement[];
+  syncFailed: boolean;
+}) {
   // Verification overrides keyed `${batchId}:${docKey}`.
   const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
@@ -196,7 +201,6 @@ export function DocumentsView({ batches }: { batches: Batch[] }) {
           return (
             <div key={b.id} style={{
               padding: 12, background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-              borderLeft: '3px solid ' + TIER_BORDER_COLOR[c.tier],
               borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
