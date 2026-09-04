@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture/design-system.md": {
+      "gitHead": "e95fe4f042e92d7db6e7ff7d4414195a57b132a2",
+      "sourceFingerprint": "sha256:6d7700bfc92b7ee5a24adbf72b329351d778368d792d2ac111c6978fb23ef550",
+      "pageVersion": "sha256:6fd67f78209cfe20f95d2f7d96f6d236a72205557ddb48fe7ab7fd4b742062d2",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "96f9e72e-92ef-4e1c-9614-9013a0302bd3"
+    },
+    "/openwiki/architecture/module-boundaries-and-data-pattern.md": {
+      "pageVersion": "sha256:9fc7555e7500b7f016b8500e3594feccd5f889617161357a5de6710b5bafc4a7",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "96f9e72e-92ef-4e1c-9614-9013a0302bd3",
+      "gitHead": "e95fe4f042e92d7db6e7ff7d4414195a57b132a2",
+      "sourceFingerprint": "sha256:6d7700bfc92b7ee5a24adbf72b329351d778368d792d2ac111c6978fb23ef550"
+    }
+  }
+}
