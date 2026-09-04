@@ -15,9 +15,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const isTrainerRoute = pathname.startsWith('/trainer');
   const isDashboardRoute = pathname === '/dashboard';
 
-  const metrics = isDashboardRoute
-    ? null
-    : deriveDashboardMetrics(selectBatchesForDisplay(await getBatchesSnapshot()), []);
+  const batchesSnapshot = await getBatchesSnapshot();
+  const metrics =
+    isDashboardRoute || batchesSnapshot.status === 'sync-failed'
+      ? null
+      : deriveDashboardMetrics(selectBatchesForDisplay(batchesSnapshot), []);
 
   return (
     <NavDrawerProvider>
