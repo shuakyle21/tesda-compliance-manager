@@ -14,9 +14,9 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/modules/auth/data/auth';
 import { Icon } from '@/shared/ui/Icon';
 import { SignOutButton } from '@/modules/auth/ui/SignOutButton';
-import { TENANTS } from '@/shared/mocks';
+import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import type { IconName } from '@/shared/ui/Icon';
-import type { UserRole } from '@/shared/types';
+import type { Tenant, UserRole } from '@/shared/types';
 
 // ── Role display maps (mirrored from ProfileView.jsx) ───────────────────────
 
@@ -111,13 +111,38 @@ function deriveProfileView(clerkUser: NonNullable<ClerkProfileUser>) {
   };
 }
 
+/**
+ * School access — the schools this user is a member of, read live from their
+ * `profile_tenant_memberships` rows (RLS-scoped). An empty list is honest, not
+ * a fallback: it means the membership rows do not exist yet, so we say so
+ * rather than listing anything.
+ */
 function SchoolAccessCard({
   tenants,
   activeTenantId,
 }: {
-  tenants: typeof TENANTS;
-  activeTenantId: string;
+  tenants: Tenant[];
+  activeTenantId: string | null;
 }) {
+  if (tenants.length === 0) {
+    return (
+      <PCard icon="folders" title="School access">
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '4px 0' }}>
+          <Icon name="folders" size={15} style={{ color: 'var(--color-text-muted)', flexShrink: 0, marginTop: 1 }} />
+          <span>
+            <span style={{ display: 'block', fontSize: 12.5, color: 'var(--color-text-primary)' }}>
+              No school access on record
+            </span>
+            <span style={{ display: 'block', fontSize: 11.5, color: 'var(--color-text-muted)', marginTop: 3, lineHeight: 1.5 }}>
+              Your schools appear here once your organization completes tenant setup and an
+              administrator enrolls you.
+            </span>
+          </span>
+        </div>
+      </PCard>
+    );
+  }
+
   return (
     <PCard icon="folders" title={`School access · ${tenants.length}`}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -213,9 +238,13 @@ export default async function ProfilePage() {
     hasGoogle,
   } = deriveProfileView(clerkUser);
 
-  // Mock tenant data — real tenant resolution lands with TES-34.
-  const tenants = TENANTS;
-  const activeTenant = TENANTS[0];
+  // Live school memberships for this user. Anything other than `ok` (no
+  // profile row yet, query failure, or no Supabase env) leaves the list empty,
+  // which SchoolAccessCard renders as an honest "not on record" state — never
+  // a substituted catalog.
+  const profileSnapshot = await getProfileSnapshot(clerkUser.id);
+  const tenants: Tenant[] = profileSnapshot.status === 'ok' ? profileSnapshot.profile.tenants : [];
+  const activeTenantId = profileSnapshot.status === 'ok' ? profileSnapshot.profile.defaultTenantId : null;
 
   return (
     <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -302,7 +331,7 @@ export default async function ProfilePage() {
         </PCard>
 
         {/* School access */}
-        <SchoolAccessCard tenants={tenants} activeTenantId={activeTenant.id} />
+        <SchoolAccessCard tenants={tenants} activeTenantId={activeTenantId} />
 
         {/* Security & sign-in */}
         <PCard icon="shield-check" title="Security & sign-in" action={<ManagedByClerk />}>

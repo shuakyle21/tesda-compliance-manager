@@ -1,4 +1,3 @@
-import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks';
 import type { Batch, DocumentRequirement, Tenant } from '@/shared/types';
 import { billingGate, type BillingGate, type DocReadiness } from '@/modules/billing/domain/readiness';
 import { isDocOnFile } from '@/modules/documents/domain/compliance';
@@ -44,12 +43,15 @@ const SUPPORTING_DOC_STAGES = new Set(['aou', 'ntp', 'tip', 'train']);
  * gate closed.
  *
  * @param batch - The batch to check for document readiness
- * @param requirements - The document requirement catalog (defaults to mock requirements)
+ * @param requirements - The document requirement catalog. An empty catalog
+ * (not yet loaded) reads as 0 required, which never satisfies the
+ * `requiredTotal > 0` check in {@link billingGate} — an unevaluated
+ * checklist must never look satisfied.
  * @returns Document readiness with verified count and required total
  */
 export function deriveDocReadiness(
   batch: Batch,
-  requirements: DocumentRequirement[] = DOCUMENT_REQUIREMENTS,
+  requirements: DocumentRequirement[],
 ): DocReadiness {
   const supporting = requirements.filter((r) => r.critical && SUPPORTING_DOC_STAGES.has(r.stage));
   const verified = supporting.filter((r) => isDocOnFile(batch, r.key)).length;
@@ -59,9 +61,10 @@ export function deriveDocReadiness(
 /**
  * Resolves the minimal school context (name and region) needed for the statement
  * header from a tenant ID. Falls back to the tenant ID itself for the name and
- * an empty region when the tenant is not found.
+ * an empty region when the tenant is not found — including when no live tenant
+ * list is available at all (no `data/` layer exposes one yet; see TES-34).
  */
-export function resolveTenant(tenantId: string, tenants: Tenant[] = TENANTS): StatementTenant {
+export function resolveTenant(tenantId: string, tenants: Tenant[]): StatementTenant {
   const t = tenants.find((x) => x.id === tenantId);
   return { name: t?.name ?? tenantId, region: t?.region ?? '' };
 }
@@ -70,9 +73,14 @@ export function resolveTenant(tenantId: string, tenants: Tenant[] = TENANTS): St
  * Builds one billing card for a batch, computing the readiness gate, applicable
  * billing tracks (program-aware), and tenant context. This is the projection the
  * Billing screen renders in the card grid.
+ *
+ * @param requirements - The document requirement catalog for the batch's
+ * program. No live per-program source is wired yet (blocked on resolving a
+ * program id from `Batch`, TES-34-adjacent) — callers pass `[]` until it is,
+ * which safely reads as "not ready" rather than fabricating a pass.
  */
-export function buildBillingCard(batch: Batch): BillingCard {
-  const docs = deriveDocReadiness(batch);
+export function buildBillingCard(batch: Batch, requirements: DocumentRequirement[]): BillingCard {
+  const docs = deriveDocReadiness(batch, requirements);
   return {
     batch,
     program: batch.program,
@@ -81,7 +89,7 @@ export function buildBillingCard(batch: Batch): BillingCard {
     progressPct: batch.progressPct,
     gate: billingGate(batch, docs),
     tracks: tracksForProgram(batch.program),
-    tenant: resolveTenant(batch.tenantId),
+    tenant: resolveTenant(batch.tenantId, []),
   };
 }
 
@@ -93,12 +101,13 @@ export function buildBillingCard(batch: Batch): BillingCard {
  * descending progress percentage.
  *
  * @param batches - The batches to build billing cards for
+ * @param requirements - The document requirement catalog; see {@link buildBillingCard}
  * @returns Array of billing cards sorted by readiness and progress
  */
-export function buildBillingCards(batches: Batch[]): BillingCard[] {
+export function buildBillingCards(batches: Batch[], requirements: DocumentRequirement[]): BillingCard[] {
   return batches
     .filter((b) => b.status !== 'completed')
-    .map(buildBillingCard)
+    .map((b) => buildBillingCard(b, requirements))
     .sort((a, b) => {
       if (a.gate.ready !== b.gate.ready) return a.gate.ready ? -1 : 1;
       return b.progressPct - a.progressPct;

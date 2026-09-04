@@ -12,18 +12,17 @@
  * is `modules/billing/data`.
  */
 
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { MOCK_BATCHES } from '@/shared/mocks';
-import { DOCUMENT_REQUIREMENTS, TENANTS } from '@/shared/mocks/seed';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
-import { firstParam, resolveRouteRole } from '@/modules/auth/data/role';
+import { firstParam, isOfficeRole, resolveRouteRole, resolveTrustedRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
-import type { Batch } from '@/shared/types';
+import type { Batch, DocumentRequirement } from '@/shared/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -55,25 +54,33 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
   const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
 
-  const role = await resolveRouteRole(params, dbRole);
-
   // Trainer DTOs must omit billing entirely — server-denied, never CSS-hidden
-  // (ADR-001 §9 Scope, and the load-bearing role rule in CLAUDE.md).
-  if (role === 'trainer') {
+  // (ADR-001 §9 Scope, and the load-bearing role rule in CLAUDE.md). Gated on
+  // `resolveTrustedRole` (dbRole/Clerk only): `resolveRouteRole`'s `?role=`
+  // preview override must never decide this, or a real trainer could request
+  // `?role=admin` and skip the redirect entirely.
+  const trustedRole = await resolveTrustedRole(dbRole);
+  if (trustedRole === 'trainer') {
     redirect('/trainer');
   }
 
-  // Least-privilege fallback until the tenant/role resolver lands (TES-34):
-  // an unresolved role renders read-only rather than write-enabled.
-  const billingRole = role ?? 'viewer';
+  // Presentation only, past this point — `?role=` may still change how
+  // BillingQueueView renders (e.g. previewing the coordinator/viewer variant)
+  // but never gates the redirect above. Least-privilege fallback until the
+  // tenant/role resolver lands (TES-34): an unresolved or non-office role
+  // (including a previewed 'trainer', which BillingQueueView has no variant
+  // for) renders read-only rather than write-enabled.
+  const role = await resolveRouteRole(params, dbRole);
+  const billingRole = isOfficeRole(role) ? role : 'viewer';
 
   const snapshot = await getBatchesSnapshot();
   const forcedState = firstParam(params.state);
 
-  // `unconfigured` falls back to the seed dataset silently; `sync-failed` is a
-  // real failure and must surface the banner (module data-layer contract).
-  // An `ok` snapshot is authoritative even when empty — see ADR-005 §5.
-  const batches: Batch[] = selectBatchesForDisplay(snapshot, MOCK_BATCHES);
+  // `unconfigured`/`sync-failed` render empty rather than substituting mock
+  // data; `sync-failed` additionally surfaces the banner below (module
+  // data-layer contract). An `ok` snapshot is authoritative even when
+  // empty — see ADR-005 §5.
+  const batches: Batch[] = selectBatchesForDisplay(snapshot);
 
   const syncFailed = snapshot.status === 'sync-failed' || forcedState === 'sync-failed';
   const stale = forcedState === 'stale';
@@ -90,15 +97,46 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
     );
   }
 
+  // A real sync failure yields zero batches (no mock fallback), which would
+  // otherwise satisfy the "no batches to bill yet" empty state below and hide
+  // the retry banner behind a misleading message. Check this first so a
+  // failed fetch always reads as a failure (RULES.md rule 19). The
+  // `?state=sync-failed` preview override on a real non-empty snapshot still
+  // falls through to `BillingQueueView`'s inline `syncFailed` banner below,
+  // unaffected.
+  if (syncFailed && batches.length === 0) {
+    return (
+      <div className="page">
+        <div className="page-head">
+          <h1 className="page-title">Billing</h1>
+        </div>
+        <EmptyState
+          iconName="refresh"
+          heading="Couldn't reach Supabase"
+          sub="Billing data isn't available right now. Try again in a moment."
+          action={<Link href="/billing" className="btn primary" style={{ marginTop: 12 }}>Retry</Link>}
+        />
+      </div>
+    );
+  }
+
   const visible = forcedState === 'empty' ? [] : batches;
 
-  const schoolCodes = Object.fromEntries(TENANTS.map((t) => [t.id, t.code]));
-  const packets = buildPackets(visible, DOCUMENT_REQUIREMENTS, schoolCodes);
+  // No live source exists yet for either the per-tenant school-code map or a
+  // per-program document-requirement catalog (the latter needs a program id
+  // that `Batch` doesn't carry — TES-34-adjacent gap). Both degrade safely:
+  // `buildPackets` prints "—" for an unresolved school code, and an empty
+  // requirements catalog reads as "not yet verified", never as "ready" (see
+  // packets.ts's `requirementsUnavailable` guard and readiness.ts's
+  // `requiredTotal > 0` guard) — so this never fabricates a passing gate.
+  const schoolCodes: Record<string, string> = {};
+  const documentRequirements: DocumentRequirement[] = [];
+  const packets = buildPackets(visible, documentRequirements, schoolCodes);
 
   // Statement-preview inputs: one card per active batch (gate + tracks + tenant
   // header context). The queue row is the ADR-003 projection; the card is what
   // `buildStatement` derives the actual document from — same batches, two views.
-  const cards = buildBillingCards(visible);
+  const cards = buildBillingCards(visible, documentRequirements);
 
   const latestUpdate = visible
     .map((b) => b.updatedAt)

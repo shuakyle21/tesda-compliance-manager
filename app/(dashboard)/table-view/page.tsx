@@ -1,11 +1,52 @@
 /**
  * SCREEN ROUTE — Table View
- * Server shell → interactive TableView client island.
+ *
+ * Server shell → interactive TableView client island. `unconfigured`/
+ * `sync-failed` render empty rather than substituting mock data; `sync-failed`
+ * additionally surfaces the banner below (module data-layer contract). An `ok`
+ * snapshot is authoritative even when empty — see ADR-005 §5.
  */
 
-import { MOCK_BATCHES } from '@/shared/mocks';
+import Link from 'next/link';
+import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { TableView } from '@/modules/batches/ui/TableView';
+import { EmptyState } from '@/shared/ui/EmptyState';
+import { InfoCallout } from '@/shared/ui/InfoCallout';
+import type { Batch, DocumentRequirement } from '@/shared/types';
 
-export default function TableViewPage() {
-  return <TableView batches={MOCK_BATCHES} />;
+export default async function TableViewPage() {
+  const snapshot = await getBatchesSnapshot();
+  const batches: Batch[] = selectBatchesForDisplay(snapshot);
+  const syncFailed = snapshot.status === 'sync-failed';
+
+  // No live per-program document-requirement catalog exists yet — the real
+  // `getDocumentRequirementsSnapshot` is scoped per scholarship program and
+  // needs a program id `Batch` doesn't carry (TES-34-adjacent gap). An empty
+  // catalog reads as "unknown"/"—" per ADR-004, never as a fabricated
+  // compliance figure.
+  const documentRequirements: DocumentRequirement[] = [];
+
+  if (batches.length === 0) {
+    return (
+      <div>
+        <div className="page-head">
+          <h1>Table View</h1>
+        </div>
+        {syncFailed ? (
+          <InfoCallout variant="warning">
+            Sync with Supabase failed — batches could not be loaded.
+            <Link href="/table-view" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
+          </InfoCallout>
+        ) : (
+          <EmptyState
+            iconName="folders"
+            heading="No batches yet"
+            sub="Once a batch is imported or assigned to you, its readiness, lifecycle, and documents appear here."
+          />
+        )}
+      </div>
+    );
+  }
+
+  return <TableView batches={batches} documentRequirements={documentRequirements} />;
 }

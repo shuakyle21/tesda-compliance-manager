@@ -46,9 +46,9 @@ reviewing, or merging code.
 14. **`domain/` is pure** — business rules with no I/O. **[review]**
 15. **If a `shared/ui` component starts reading data or encoding business rules, move it into its
     owning module.** **[review]**
-16. **Do not split `shared/types.ts` per-module** without first relocating `shared/mocks/seed.ts`
-    out of `shared/` — it constructs 11 domain types and `shared/` cannot import `modules/`
-    (deliberately deferred in TES-68). **[review]**
+16. ~~Do not split `shared/types.ts` per-module without first relocating `shared/mocks/seed.ts`~~ —
+    resolved: `shared/mocks/` was removed entirely (mock-data retirement); the TES-68 blocker no
+    longer applies, so a per-module type split is unblocked whenever someone wants to do it.
 
 ## 3. Data layer
 
@@ -57,8 +57,10 @@ reviewing, or merging code.
 18. **The enum bridge lives in the mapper, not components.** `DB_TO_UI_STAGE` is a total map — a new
     DB enum variant must fail compilation until its UI treatment is chosen. **[types]**
 19. **Data functions return discriminated snapshots** (`ok` / `sync-failed` / `unconfigured`).
-    `unconfigured` falls back to mocks silently; `sync-failed` **must** surface the sync-failed
-    banner. **[review]**
+    Neither `unconfigured` nor `sync-failed` may substitute mock or fabricated data — both render
+    an honest empty state; `sync-failed` **must** additionally surface the sync-failed banner (a
+    guard-clause ordering that checks "empty" before "sync-failed" will silently swallow the
+    banner whenever a failure yields zero rows — check that ordering explicitly). **[review]**
 20. **After any migration: regenerate `database.types.ts`, then update affected mappers and domain
     types.** New migrations are additive; `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql`
     is canonical. **[review]**

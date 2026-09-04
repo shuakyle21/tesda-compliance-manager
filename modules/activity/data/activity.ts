@@ -89,16 +89,19 @@ export function mapActivityLogRow(row: ActivityLogRowWithProfile): ActivityEvent
 // Fetch — server-only, same snapshot shaping as BatchesSnapshot (TES-8 AC6).
 // ---------------------------------------------------------------------------
 export type ActivitySnapshot =
-  | { status: 'ok'; events: ActivityEvent[] }
+  | { status: 'ok'; events: ActivityEvent[]; hasMore: boolean }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
 /**
  * The tenant's activity feed, most recent first. `limit` defaults to the full
- * feed (activity-log page); the dashboard panel passes a smaller value instead
- * of fetching everything and slicing client-side.
+ * feed (activity-log page, though callers should pass a bounded page size —
+ * see the page's PAGE_SIZE); the dashboard panel passes a smaller value
+ * instead of fetching everything and slicing client-side. `offset` pages
+ * through the feed; combined with `limit`, one extra row is fetched to derive
+ * `hasMore` without a separate count query.
  */
-export async function getActivitySnapshot(limit?: number): Promise<ActivitySnapshot> {
+export async function getActivitySnapshot(limit?: number, offset = 0): Promise<ActivitySnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
   try {
@@ -107,13 +110,15 @@ export async function getActivitySnapshot(limit?: number): Promise<ActivitySnaps
       .from('activity_log')
       .select('*, profiles(full_name, role)')
       .order('created_at', { ascending: false });
-    if (limit !== undefined) query = query.limit(limit);
+    if (limit !== undefined) query = query.range(offset, offset + limit);
 
     const { data, error } = await query;
 
     if (error) return { status: 'sync-failed', error: error.message };
-    const events = (data ?? []).map((row) => mapActivityLogRow(row as ActivityLogRowWithProfile));
-    return { status: 'ok', events };
+    const rows = data ?? [];
+    const hasMore = limit !== undefined && rows.length > limit;
+    const events = rows.slice(0, limit).map((row) => mapActivityLogRow(row as ActivityLogRowWithProfile));
+    return { status: 'ok', events, hasMore };
   } catch (err) {
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
   }

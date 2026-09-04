@@ -19,6 +19,7 @@
  * screen); the billing-deadline `TODO(contract)` remains — see that comment.
  */
 
+import { cache } from 'react';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import type {
   Database,
@@ -268,8 +269,9 @@ export type BatchesSnapshot =
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
-export function selectBatchesForDisplay(snapshot: BatchesSnapshot, fallback: Batch[]): Batch[] {
-  return snapshot.status === 'ok' ? snapshot.batches : fallback;
+/** Never substitutes mock data — an unconfigured or sync-failed snapshot renders empty. */
+export function selectBatchesForDisplay(snapshot: BatchesSnapshot): Batch[] {
+  return snapshot.status === 'ok' ? snapshot.batches : [];
 }
 
 /** Freshest `updated_at` across the loaded rows, or null when there are none. */
@@ -280,7 +282,13 @@ function latestUpdatedAt(batches: Batch[]): string | null {
   );
 }
 
-export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
+/**
+ * `cache()`-wrapped so the layout and its nested page share one Supabase
+ * query per request instead of each `await getBatchesSnapshot()` call firing
+ * its own round-trip — both `app/(dashboard)/layout.tsx` and every route's
+ * `page.tsx` call this independently for the same request.
+ */
+export const getBatchesSnapshot = cache(async (): Promise<BatchesSnapshot> => {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
   try {
@@ -298,7 +306,7 @@ export async function getBatchesSnapshot(): Promise<BatchesSnapshot> {
     // Network / client-construction failures land here, not in `error` above.
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
   }
-}
+});
 
 export async function getBatches(): Promise<Batch[]> {
   const snap = await getBatchesSnapshot();

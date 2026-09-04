@@ -28,20 +28,18 @@
 
 import Link from 'next/link';
 import { Icon, type IconName } from '@/shared/ui/Icon';
-import { DOCUMENT_REQUIREMENTS } from '@/shared/mocks/seed';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
-import type { Batch } from '@/shared/types';
+import type { Batch, DocumentRequirement } from '@/shared/types';
 
 type Tone = 'green' | 'amber' | 'red';
 type AlertRow = { text: string; tone: Tone };
 
-const CRITICAL_DOCS = criticalRequirements(DOCUMENT_REQUIREMENTS);
 const TONE_RANK: Record<Tone, number> = { red: 0, amber: 1, green: 2 };
 const TONE_ICON: Record<Tone, IconName> = { red: 'alert-triangle', amber: 'alert-circle', green: 'shield-check' };
 
-function batchAlerts(b: Batch): AlertRow[] {
+function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): AlertRow[] {
   const rows: AlertRow[] = [];
   // isBillingReady() is the threshold-only prep signal (see readiness.ts) —
   // it does not check documents, so this row must not claim the batch is
@@ -61,7 +59,7 @@ function batchAlerts(b: Batch): AlertRow[] {
   // distinction). summarizeBatchDocCompliance() excludes untracked keys from
   // both `missing` and its denominator, so this can't fire on a batch whose
   // catalog just doesn't overlap the mock's critical-doc keys.
-  const docCompliance = summarizeBatchDocCompliance(b, CRITICAL_DOCS);
+  const docCompliance = summarizeBatchDocCompliance(b, criticalDocs);
   if (docCompliance.tracked > 0 && docCompliance.missing > 0) {
     rows.push({
       tone: 'amber',
@@ -72,8 +70,19 @@ function batchAlerts(b: Batch): AlertRow[] {
   return rows;
 }
 
-export function AlertsPanel({ batches, limit = 5 }: { batches: Batch[]; limit?: number }) {
-  const allAlerts = batches.flatMap(batchAlerts).sort((a, b) => TONE_RANK[a.tone] - TONE_RANK[b.tone]);
+export function AlertsPanel({
+  batches,
+  documentRequirements,
+  limit = 5,
+}: {
+  batches: Batch[];
+  documentRequirements: DocumentRequirement[];
+  limit?: number;
+}) {
+  const criticalDocs = criticalRequirements(documentRequirements);
+  const allAlerts = batches
+    .flatMap((b) => batchAlerts(b, criticalDocs))
+    .sort((a, b) => TONE_RANK[a.tone] - TONE_RANK[b.tone]);
   const alerts = allAlerts.slice(0, limit);
   const criticalCount = allAlerts.filter((a) => a.tone === 'red').length;
 

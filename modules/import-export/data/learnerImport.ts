@@ -4,12 +4,10 @@
  * derive reference, adapted here as fetch (existing learners) → reconcile
  * (domain) → write (insert/update).
  *
- * Deviates from the `unconfigured` convention in that reference file: a read
- * snapshot can fall back to `shared/mocks` silently because showing cached
- * data is harmless, but an import has nothing to "fall back" to — writing to
- * a mock dataset would silently discard the file the user just uploaded. The
- * caller's job on `unconfigured` here is to disable the importer, not to
- * pretend the import ran.
+ * Deviates from the `unconfigured` convention in that reference file only in
+ * degree: a read snapshot renders an empty state, but an import has nothing
+ * to render at all — the caller's job on `unconfigured` here is to disable
+ * the importer, not to pretend the import ran.
  *
  * Reconciliation is keyed on ULI (the permanent learner key per
  * docs/adr) rather than a DB upsert: the only unique constraint on
