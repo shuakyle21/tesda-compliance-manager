@@ -1,4 +1,3 @@
--- Active: 1787931874292@@aws-1-ap-northeast-2.pooler.supabase.com@5432@postgres
 -- DRAFT — NOT APPLIED. Review before running. See "Open decisions" at the end.
 --
 -- Dev tenant assignment: gives real Clerk users a profile row and a tenant
@@ -67,6 +66,30 @@ on conflict (clerk_user_id) do update set
 -- switchable. `is_default` is therefore redundant here -- with a single row the
 -- `find(is_default) ?? [0]` fallback always resolves to it -- and is set true
 -- for forward compatibility only.
+-- ###########################################################################
+-- WARNING -- THIS FILE NO LONGER MATCHES THE DEV DATABASE.
+--
+-- The dev database was converged to decision 2 ONLY (demo = viewer, AKB). The
+-- developer account deliberately KEEPS its AKB + J3ED + NEN grants, because
+-- nothing in the app performs tenant assignment yet -- dropping them means
+-- hand-writing SQL to get back into either school, and J3ED would fall to zero
+-- members. Recorded on PR #174; see "Open deviation" at the end of this file.
+--
+-- The delete below is UNCONDITIONAL for all three managed accounts. Running
+-- this file as written WILL remove those two grants. That is a real change,
+-- not a no-op -- decide before you run it, not after.
+--
+-- To apply decision 2 alone, the whole diff is one statement:
+--
+--   update public.profiles
+--   set role = 'viewer', updated_at = now()
+--   where clerk_user_id = 'user_3IMAGVRr7TnY3avksz6FbpIfPXj'
+--     and role is distinct from 'viewer';
+--
+-- demo's membership already holds exactly AKB, so the delete-then-insert below
+-- churns five rows to arrive where it started.
+-- ###########################################################################
+
 -- Converge to exactly the grants in the CTE below. `on conflict do update` alone cannot
 -- do this: it can add and amend rows but never remove one, so if an earlier
 -- draft of this script was applied (it granted the developer J3ED and NEN),
@@ -137,6 +160,15 @@ commit;
 --       edits the URL; and 8 of 10 dashboard routes still render MOCK_BATCHES
 --       for all three schools regardless of RLS.
 --   4.  The human accounts keep `admin`, defined as the school's proprietor.
+--
+-- OPEN DEVIATION -- decision 1 is NOT applied to the dev database:
+--       klynejoshua13@gmail.com keeps AKB + J3ED + NEN (3 memberships).
+--    can_access_tenant grants on ANY membership and ignores is_default, so that
+--    account still sees all three schools merged into one unscoped list -- the
+--    exact harm decision 1 exists to prevent, left open on one account until an
+--    admin tenant-assignment flow exists. It does NOT affect the isolation
+--    assertion, which runs as demo and is AKB-scoped either way.
+--    Recorded on PR #174.
 --
 -- STILL OPEN -- two orphaned profile rows, deliberately left alone:
 --       user_3FKZdxAzFzE5fIWK9uUKElsZONq  admin,  1 membership (AKB, default)

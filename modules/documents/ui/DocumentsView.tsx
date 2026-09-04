@@ -80,8 +80,16 @@ function completenessSubLabel(c: CompletenessSummary): string {
   return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
 }
 
-export function DocumentsView({ batches, documentRequirements, syncFailed }: {
+export function DocumentsView({
+  batches,
+  documentRequirements,
+  syncFailed,
+}: {
   batches: Batch[];
+  // Injected by the route rather than read from a module-level catalog: the
+  // real requirement catalog is per scholarship program, so only the caller
+  // can resolve it. An empty catalog renders the "requirements unavailable"
+  // state (ADR-004 "unknown"), never a fabricated compliance figure.
   documentRequirements: DocumentRequirement[];
   syncFailed: boolean;
 }) {
