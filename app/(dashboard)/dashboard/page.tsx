@@ -206,16 +206,21 @@ function billingReadyVariant(billingReadyCount: number): 'warning' | 'neutral' {
 
 export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const role = await resolveDashboardRole(params);
 
-  if (role === 'trainer') {
+  // Redirect gate: Clerk's role only. `?role=` must never decide this — a real
+  // trainer requesting `?role=admin` must still be sent to /trainer.
+  const trustedRole = await resolveTrustedDashboardRole();
+  if (trustedRole === 'trainer') {
     redirect('/trainer');
   }
 
-  // Conservative least-privilege fallback until the tenant-role resolver lands
-  // (TES-34): an unresolved role renders the read-only viewer variant rather
-  // than a write-enabled one. Use `?role=` to preview other variants.
-  const dashboardRole = role ?? 'viewer';
+  // Display only, past this point. `?role=` may pick a different dashboard
+  // variant to preview; it never overrides the redirect above. Conservative
+  // least-privilege fallback until the tenant-role resolver lands (TES-34):
+  // an unresolved role renders the read-only viewer variant rather than a
+  // write-enabled one.
+  const queryRole = firstParam(params.role);
+  const dashboardRole = isDashboardRole(queryRole) ? queryRole : trustedRole ?? 'viewer';
   const roleCopy = ROLE_COPY[dashboardRole];
 
   // ---- Live load (TES-8 AC6) ----
@@ -450,10 +455,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   );
 }
 
-async function resolveDashboardRole(params: Awaited<SearchParams>): Promise<DashboardRole | 'trainer' | null> {
-  const queryRole = firstParam(params.role);
-  if (isDashboardRole(queryRole) || queryRole === 'trainer') return queryRole;
-
+// Trusted source only (Clerk `publicMetadata.role`) — never `?role=`, which
+// would let a real trainer skip the redirect above by requesting `?role=admin`.
+async function resolveTrustedDashboardRole(): Promise<DashboardRole | 'trainer' | null> {
   const user = await getCurrentUser().catch(() => null);
   const metadataRole = typeof user?.publicMetadata?.role === 'string'
     ? user.publicMetadata.role.toLowerCase()
