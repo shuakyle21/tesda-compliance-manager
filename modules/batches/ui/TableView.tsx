@@ -119,7 +119,7 @@ function docCellTitle(docs: DocComplianceSummary): string | undefined {
   return `${docs.untracked} required document${docs.untracked === 1 ? '' : 's'} not tracked for this batch`;
 }
 
-function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick: () => void }) {
+function TableRow({ batch, criticalRequirements, odd, onClick }: { batch: Batch; criticalRequirements: DocumentRequirement[]; odd: boolean; onClick: () => void }) {
   const cellStyle: CSSProperties = {
     padding: '0 12px', height: 44,
     fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--color-text-primary)',
@@ -134,7 +134,7 @@ function TableRow({ batch, odd, onClick }: { batch: Batch; odd: boolean; onClick
   // TypeError on any batch missing one (TES-94). Untracked keys count toward
   // neither `ok` nor `missing`; with nothing tracked the cell reads "—", which
   // is also what an unresolved (empty) catalog renders.
-  const docs = summarizeBatchDocCompliance(batch, crit);
+  const docs = summarizeBatchDocCompliance(batch, criticalRequirements);
   const docColor = docCellColor(docs);
 
   const onEnter = (e: MouseEvent<HTMLTableRowElement>) => {
