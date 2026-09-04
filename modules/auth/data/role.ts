@@ -73,6 +73,24 @@ export async function resolveTrustedRole(dbRole?: UserRole | null): Promise<Reso
 }
 
 /**
+ * Picks which office-role variant of a screen to *render*, given a `?role=`
+ * preview override and an already-resolved trusted role.
+ *
+ * Pure and synchronous, unlike `resolveRouteRole`: the caller has already done
+ * the trusted lookup and acted on it (a trainer, for instance, has already
+ * been redirected), so this only chooses a presentation variant. A `?role=`
+ * value reaching here therefore cannot escalate anything.
+ *
+ * Least-privilege fallback: when neither source names an office role — the
+ * lookup succeeded but no role is set — this returns read-only `viewer`, never
+ * a write-enabled variant. Callers must not substitute their own default.
+ */
+export function resolveDisplayRole(queryRole: string | null, trustedRole: ResolvedRole): OfficeRole {
+  if (isOfficeRole(queryRole)) return queryRole;
+  return isOfficeRole(trustedRole) ? trustedRole : 'viewer';
+}
+
+/**
  * Resolves the acting role for *presentation* purposes, with this precedence:
  *   1. `?role=` preview override — a dev/demo affordance, stays available
  *      even once real identity exists. Lets an already-authorized caller
