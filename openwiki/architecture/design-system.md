@@ -2,9 +2,6 @@
 type: "Reference"
 title: "Design System and UI Invariants"
 openwiki_generated: true
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-02T15:29:54.792Z
 ---
 
 # Design System and UI Invariants
