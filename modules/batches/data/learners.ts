@@ -89,8 +89,10 @@ export function mapLearnerRow(row: LearnerRow, seq: number): ScholarRow {
 // ---------------------------------------------------------------------------
 // Fetch — server-only, same snapshot shaping as BatchesSnapshot (TES-8 AC6).
 // ---------------------------------------------------------------------------
+/** `no-tenant-access` is folded in by the caller — see the note on `BatchesSnapshot`. */
 export type LearnersSnapshot =
   | { status: 'ok'; learners: ScholarRow[] }
+  | { status: 'no-tenant-access' }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 

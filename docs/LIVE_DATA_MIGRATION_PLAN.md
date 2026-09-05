@@ -31,6 +31,56 @@
 >
 > For the schema those live tables now follow, see [`DATA_MODEL.md`](DATA_MODEL.md).
 
+> **Status update — 2026-09-05 (later). Phase 2 landed. Phases 1b/1c verified closed.**
+>
+> **Phase 2 — "make empty honest" is done.** `no-tenant-access` is now a real
+> snapshot state on `BatchesSnapshot`, `ActivitySnapshot`, `LearnersSnapshot` and
+> `BatchDocumentsSnapshot`, and all eight dashboard-tree screens plus the shell's
+> metrics strip render `shared/ui/NoTenantAccessState` instead of their ordinary
+> empty state. Step 13's "derive it from a real membership check" is satisfied via
+> `modules/tenancy/domain/access` (`tenantAccessOf`, `withTenantAccess`) and
+> `deriveTenantAccess` in tenancy's `data/`. Unit-tested in
+> `tests/unit/tenant-access.test.ts`.
+>
+> Two design decisions the plan's steps 12–14 did not anticipate:
+> - **The membership check cannot live inside an entity contract.** Another
+>   module's `data/` is private (ESLint-enforced), so `batches.ts` cannot call
+>   tenancy. The verdict is therefore folded in *by the route*, through the pure
+>   `withTenantAccess`, using the same "the route fetches both and passes the
+>   result down" shape `resolveTrustedRole(dbRole)` already established. The
+>   composition helper is `app/(dashboard)/tenant-access.ts`.
+> - **The fold replaces only an `ok` snapshot.** "You belong to no school" is a
+>   tidier story than "the fetch broke", and letting it overwrite `sync-failed`
+>   would reintroduce exactly the class of bug Phase 1b fixed. Likewise a
+>   `unknown` verdict (profile read failed) changes nothing — "we could not
+>   check" must never render as a fact.
+>
+> `DocumentRequirementsSnapshot` deliberately did **not** get the new state: the
+> requirement catalog is per-program reference data, not tenant data, so an empty
+> catalog there means the catalog is unseeded (step 16), never a permissions
+> problem.
+>
+> **Verified closed while sequencing this work, not re-done:**
+> - **Phase 1b** — `/billing` no longer substitutes anything for a live read, and
+>   both swallowed banners now check `syncFailed` before any empty-state return.
+> - **Phase 1c** — `resolveTrustedRole` reads `profiles.role` (then Clerk
+>   metadata) and gates every redirect; `?role=` reaches only `resolveDisplayRole`,
+>   which cannot escalate. **Step 10 (the trainer DTO) is dormant, not breached:**
+>   all four `/trainer/*` routes are static placeholders that import no data layer,
+>   so no trainer response body carries a financial field today. It becomes
+>   required the moment any trainer route calls `selectBatchesForDisplay` —
+>   `mapBatchRow` populates `billingDeadline`, `daysToBilling`, `bsrs`, `ntpLag`
+>   and `remark` unconditionally.
+> - **Phase 6 step 33** (the `proxy.ts` doc drift) was folded into this change:
+>   `proxy.ts` and `CLAUDE.md` now say plainly that the middleware gates nothing
+>   and that `requireAuthenticatedUser()` in `app/(dashboard)/layout.tsx` is the
+>   gate.
+>
+> **Still open and still HITL** (no code can close these): the two dashboard
+> toggles from Phase 1 steps 1–2, and applying
+> `20260904120000_add_user_admin_write_policies.sql` (Phase 4, in flight on
+> `create-user-page`). Phase 6 step 32's advisor fixes also need live SQL.
+
 
 
 **Status:** Draft for review · **Date:** 2026-08-31 · **Audience:** solo junior developer

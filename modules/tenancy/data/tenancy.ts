@@ -14,10 +14,12 @@
  * instead of importing across the boundary.
  */
 
+import { cache } from 'react';
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import type { Database, ProfileRole as DbProfileRole } from '@/lib/supabase/database.types';
 import type { Tenant, UserRole } from '@/shared/types';
 import type { Profile } from '@/modules/tenancy/domain/profile';
+import { tenantAccessOf, type TenantAccess } from '@/modules/tenancy/domain/access';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 type TenantRow = Database['public']['Tables']['tenants']['Row'];
@@ -116,7 +118,7 @@ export type ProfileSnapshot =
  * (webhook racing or failed), `sync-failed` on query error, or `unconfigured`
  * when Supabase is not configured.
  */
-export async function getProfileSnapshot(clerkUserId: string): Promise<ProfileSnapshot> {
+export const getProfileSnapshot = cache(async (clerkUserId: string): Promise<ProfileSnapshot> => {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
   try {
@@ -135,5 +137,30 @@ export async function getProfileSnapshot(clerkUserId: string): Promise<ProfileSn
     // Network / client-construction failures land here, not in `error` above.
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
   }
-}
+});
 
+// ---------------------------------------------------------------------------
+// Derive — pure, no I/O.
+// ---------------------------------------------------------------------------
+
+/**
+ * Reads the tenant-access verdict off a profile snapshot, so every entity
+ * contract can distinguish "this tenant genuinely has no batches" from
+ * "this person is attached to no tenant, so nothing will ever load".
+ *
+ * `not-found` maps to `none`, not to `unknown`: a signed-in Clerk user with no
+ * `profiles` row has no membership either way, and the honest message is the
+ * same one ("no school assigned yet"). A failed or unconfigured read maps to
+ * `unknown`, because "we could not check" must never be rendered as a fact.
+ */
+export function deriveTenantAccess(snapshot: ProfileSnapshot): TenantAccess {
+  switch (snapshot.status) {
+    case 'ok':
+      return tenantAccessOf(snapshot.profile);
+    case 'not-found':
+      return 'none';
+    case 'sync-failed':
+    case 'unconfigured':
+      return 'unknown';
+  }
+}
