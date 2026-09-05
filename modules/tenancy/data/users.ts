@@ -38,6 +38,25 @@ const UI_TO_DB_ROLE: Record<AssignableRole, DbProfileRole> = {
 };
 
 /**
+ * Escapes the characters PostgreSQL `ILIKE` treats as pattern syntax, so an
+ * address is matched literally.
+ *
+ * This is not cosmetic. `_` matches any single character and is common in real
+ * addresses, so an unescaped lookup for `john_doe@example.com` also matches
+ * `johnXdoe@example.com`. `findUserByEmail` takes the first row and
+ * `assignUserAccess` then sets that profile's role and grants it a school —
+ * so a wildcard match assigns access to the wrong person. Backslash first, or
+ * it would escape the escapes added after it.
+ *
+ * PostgREST additionally reads `*` as `%` in a `like`/`ilike` pattern, and it
+ * substitutes before Postgres sees the escape, so `*` cannot be escaped this
+ * way. The exact-match check in `findUserByEmail` covers that residue.
+ */
+export function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+/**
  * A person an admin can act on: already signed up with Clerk, so a `profiles`
  * row exists to assign. `tenantIds` are only the memberships the *caller* can
  * see (RLS scopes the join), which is enough to tell "already in this school"
@@ -128,19 +147,30 @@ export function mapExistingUserRow(row: ProfileLookupRow): ExistingUser {
 export async function findUserByEmail(email: string): Promise<UserLookupSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
+  const normalized = normalizeEmail(email);
+
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from('profiles')
       .select('id, full_name, email, role, is_active, profile_tenant_memberships(tenant_id)')
-      .ilike('email', normalizeEmail(email))
+      .ilike('email', escapeLikePattern(normalized))
       .limit(1);
 
     if (error) return { status: 'sync-failed', error: error.message };
-    const row = data?.[0];
+    const row = data?.[0] as ProfileLookupRow | undefined;
     if (!row) return { status: 'not-registered' };
 
-    return { status: 'found', user: mapExistingUserRow(row as ProfileLookupRow) };
+    // Belt and braces over the escaping above. Any pattern character that slips
+    // through — `*`, which PostgREST rewrites before Postgres can escape it —
+    // would return somebody else's row, and the caller assigns a role and a
+    // school to whatever comes back. Confirming equality here makes the wrong
+    // outcome "no match found" rather than "the wrong person was granted
+    // access": the action then falls through to the invitation path, which
+    // sends to the address the admin actually typed.
+    if (normalizeEmail(row.email ?? '') !== normalized) return { status: 'not-registered' };
+
+    return { status: 'found', user: mapExistingUserRow(row) };
   } catch (err) {
     return { status: 'sync-failed', error: errorMessage(err) };
   }

@@ -21,6 +21,7 @@ import {
   buildInvitationMetadata,
   parseInvitationGrant,
 } from '@/modules/auth/domain/invitationMetadata';
+import { escapeLikePattern } from '@/modules/tenancy/data/users';
 
 const TENANT_A = '11111111-1111-1111-1111-111111111111';
 const TENANT_B = '22222222-2222-2222-2222-222222222222';
@@ -185,5 +186,27 @@ describe('parseInvitationGrant', () => {
         tvicamsTenantId: TENANT_A,
       }),
     ).toEqual({ role: 'viewer', tenantId: TENANT_A });
+  });
+});
+
+/**
+ * The email lookup feeds `assignUserAccess` directly: whatever row it returns
+ * is the profile whose role is changed and whose school is granted. So an
+ * unescaped `ILIKE` pattern is not a search-quality bug, it is a
+ * wrong-person-gets-access bug — `_` alone is enough to cause it, and it is a
+ * legal and common character in real addresses.
+ */
+describe('escapeLikePattern', () => {
+  it('escapes the ILIKE wildcards so an address matches literally', () => {
+    expect(escapeLikePattern('john_doe@example.com')).toBe('john\\_doe@example.com');
+    expect(escapeLikePattern('a%b@example.com')).toBe('a\\%b@example.com');
+  });
+
+  it('escapes the backslash first, so it does not re-escape its own output', () => {
+    expect(escapeLikePattern('a\\_b')).toBe('a\\\\\\_b');
+  });
+
+  it('leaves an ordinary address untouched', () => {
+    expect(escapeLikePattern('demo@tvicams.app')).toBe('demo@tvicams.app');
   });
 });
