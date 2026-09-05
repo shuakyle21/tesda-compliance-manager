@@ -2,7 +2,8 @@
  * Activity log contract (TES-30) — feeds `ActivityEvent[]` (`shared/types.ts`),
  * consumed today by `app/(dashboard)/activity-log/page.tsx` (full feed) and the
  * dashboard's recent-activity panel (`app/(dashboard)/dashboard/page.tsx`, first
- * 6 events), both currently reading the mock `MOCK_ACTIVITY`.
+ * 6 events), both reading live rows through `getActivitySnapshot()`. The
+ * `MOCK_ACTIVITY` dataset they used to read was deleted in the mock-data retirement.
  *
  * Same three layers as `modules/batches/data/batches.ts`:
  *   1. fetch   — typed Supabase query; RLS scopes rows to the caller.
