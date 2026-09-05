@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:6fd67f78209cfe20f95d2f7d96f6d236a72205557ddb48fe7ab7fd4b742062d2",
+  "pageVersion": "sha256:87bd4efad91db3f8cae881e530ec62047f809a9b0c21cadc09fff1c3b8992c62",
   "claims": [
     {
       "id": "claim_82c1b483bc704ba18abe0152b73e0d3c",
@@ -167,12 +167,16 @@
       "statement": "Components default to Server Components with client islands only for interactivity: BatchCard is 'use client' for hover elevation and opening BatchModal, Sidebar is 'use client' for pathname/drawer/tenant state, while the dashboard layout and page are Server Components.",
       "evidence": [
         {
-          "resource": "repo://RULES.md#L77-L77",
+          "resource": "repo://RULES.md#L79-L79",
           "version": "repo-lines-v1:sha256:7dcf05d8ef0945c6baaba6c023242bf6f0a6b56174cbcbbc22e711e7d4643959:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RjZjA1ZDhlZjA5NDVjNmJhYWJhNmMwMjMyNDJiZjZmMGE2YjU2MTc0Y2JjYmJjMjJlNzExZTdkNDY0Mzk1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RjZjA1ZDhlZjA5NDVjNmJhYWJhNmMwMjMyNDJiZjZmMGE2YjU2MTc0Y2JjYmJjMjJlNzExZTdkNDY0Mzk1OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGY1MDY5MTRkYWQ1MTgyMmIzYWE2ODVmMTQzNDM3NGVkNTYxZTNkZjU0Zjk1MWI4Yjg0ZmY3M2E4ZjU2MjE0ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzBmNmZkOWEwNjIwNmI0MzFkOTdjYmZjZjZkNDZhNjc0ZWQ0YmEyZWUzY2UxZTRjODkwMTM4ODYwYjMyNWI3YSJ9"
         },
         {
-          "resource": "repo://app/(dashboard)/layout.tsx#L9-L27",
-          "version": "repo-lines-v1:sha256:6ca20709e2897d8684ab1909cc6c243c6887bd7234bc8b0c86957e449c3e2567:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5MjRkYTk2M2NlNTJkMjVkODNjOGQxMjVkMGViOTVjNjE4ZGMyNjE4YmVhZDk3OTczNDY3MjBkZmI3YzUyNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0OGI2MDNlMWRmOTMxNmNmODZkMWJkYzZmNGQyZWYzNjU3YWJkNGQ2ZDI4Mjc2YjdkZDE3ZTc5MDNhMDg1ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjZmE5ZGIxZTdlYjUwYjA2ODYwODA2MDYwYzcwNzczOTQyNjk0YWVlOTQ2OWViYWUyNDk2OTM4NzU2Nzk0NjQifQ"
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L171-L171",
+          "version": "repo-lines-v1:sha256:662807421571f958d850559d303b61fe963dfbdb35bfb6b038584f01495ed2f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjYyODA3NDIxNTcxZjk1OGQ4NTA1NTlkMzAzYjYxZmU5NjNkZmJkYjM1YmZiNmIwMzg1ODRmMDE0OTVlZDJmOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjYyODA3NDIxNTcxZjk1OGQ4NTA1NTlkMzAzYjYxZmU5NjNkZmJkYjM1YmZiNmIwMzg1ODRmMDE0OTVlZDJmOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjQ1Zjg3NmI0NTc4NGFlZjA4NjE2NmM3OTNhZjFmZmExYTk5ZDMzZjkyNzEwZGI3ZWMxNmQzYTM4MDIzZTBhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODlkYWNhYjU5YWI1ODk0ZDhmOGU1Zjk0OTJhNmZlYmFlYzM5MGU5NTQ4OWY5YWIzZjIyNWRiYzc2OGVlMjgyZiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L11-L38",
+          "version": "repo-lines-v1:sha256:d391a5e34521508f9a56ef5119cb60339d42ad229add31b98228d1bd3e40608f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxODkyZDk5YWY4OWJiNjNkNTAzNGQwOTJhMjhiZjVmMzVlYTMxZDE0ZDVmYTViNGY3NTJkODU2YjI3YmJkNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwZmIwM2ZhNGI5ZTA0MmMzNGI1ODE4MzJjNmRlNjYwYzg3NGMwZmU5Yzk2NTU5NTE0MWI0Mjc4NWM3MjVjZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         },
         {
           "resource": "repo://modules/batches/ui/BatchCard.tsx#L1-L10",
@@ -214,41 +218,45 @@
     },
     {
       "id": "claim_e13d6c11c4b042d2aacd1013b64d2267",
-      "statement": "State derivation works through discriminated snapshots: getBatchesSnapshot() returns BatchesSnapshot of ok / sync-failed / unconfigured; unconfigured (no Supabase env) falls back to shared/mocks silently, while sync-failed (configured but errored) must surface the warning sync-failed banner with Retry over the cached rows. The dashboard additionally supports a ?state= preview override; denied is preview-only until the tenant/role resolver (TES-34), and stale is real data freshness - the freshest row's updated_at older than the 24h DATA_STALE_AFTER_MS threshold.",
+      "statement": "State derivation works through discriminated snapshots: getBatchesSnapshot() (cache-wrapped so the dashboard layout and its nested page share one Supabase query per request) returns BatchesSnapshot of ok / sync-failed / unconfigured, and selectBatchesForDisplay() returns rows only on ok — neither unconfigured (no Supabase env) nor sync-failed (configured but errored) substitutes mock or fabricated data (shared/mocks/ was removed in the mock-data retirement, RULES 2.16), so both render an honest empty state, and sync-failed must additionally surface the sync-failed banner with Retry (RULES 3.19). The dashboard additionally supports a ?state= preview override; denied is preview-only until the tenant/role resolver (TES-34), and stale derives from real data freshness — the freshest row's updated_at older than the 24h DATA_STALE_AFTER_MS threshold.",
       "evidence": [
         {
-          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L240-L303",
-          "version": "repo-lines-v1:sha256:bd2d97128c93d2c37e16be452e363e147b5db8c74c78b8278ea829319fe80804:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MzdhZTZiYzRkNzYyYmQ0NTJmMzRmOGVhNGQ5ZjI0ZDIzZGM5MzAyYTlhMzJmNmUyMTVkOThjZjBmYWE5ZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzAwNDg0N2UwNGQ4ODQxMmY5NGVhYjZiMDU2NDlkNjJiMDQyM2QwNDliYjRiMzI3YTgxNjMxNmQ2NDQzY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxOTU1MzFkMTdkMTE1YzNhYTg3ZmY0NWNiYmQwNjBjNzVlOTQ1ZWM0OGY2OWFhMzY4ZDVlOWRlZmFhOTE0Y2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxY2Y1MzA2YzI2ZDMyYzA2NThiNDFkNDdhMmU1M2YzM2MyM2Y3Yzg2MWUxNGZlYTA2MjJjNjJmZDc5YzQ0NzYifQ"
+          "resource": "repo://RULES.md#L47-L63",
+          "version": "repo-lines-v1:sha256:2eecf4812fddc7c707017f86fd5e743f1d873e1dd167fe68626c9f59beda7ad2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjZjcwM2FmODZmMGJhYTRlNjVhMzVkN2RkNzFmZTRkNWRhNGFhN2NkZWZlMGZiOWZkOTQ2ZGI2YTBkYjUyZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwOTBiMmU4ZWE4OWQ5YjVlOTIzN2Q1NzhiMGRmNzYwYWE5ZTRiMTEyY2E0MTliNDQzYjIxYTg0ODYyMjA4Y2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiY2M0MWU3MzdjMDY3ZTRjNzUzNWU4NGRiZjRmZDg3MDJlYzI1NThkZTBkZjE3MDRmYjViYWZkMjc0MWYzMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwYzliMTRjYzVlODQzOWFkODRjMGEyYjMxYmEzMWU1ODc4YjE0Nzc0YThiYmMyODM2YjE2OTI1MGIzNTM2MjYifQ"
         },
         {
-          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L76-L98",
-          "version": "repo-lines-v1:sha256:e221dd3acdf2b3b12b8d77b6c57dd48fb7c5d932287f23029f0e36498dd7c548:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiM2MyNjE1ZGZiMGEyY2ZiYmViYTU0MDI2Mjk1NWI5YjU5ZjdkZDdjYTA1NzNiMzU1NjBlYjFiMjM4MzNjMDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5ZTNhZjRjMjMyZmRmYzg2YTI0MDczYTZiMjNiMzgzMDhmNDM0NjM0ODllNzM0YjU4MDZiODE3Mzg3NmI5NTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzMzAxYTQzY2NmOGI5ZWIyMWYzNDYzNDg0ZDcxOTViNWIxOWMxNWRhOWE5Mzg1MGZkODRjNTQwZTMxYzA1NmQifQ"
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L205-L245",
+          "version": "repo-lines-v1:sha256:34ae456b8896c1a6c3f27089a2d88d958aef31f84b67a28ca443071de917d150:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkMWJmZDQzODMwZWJkNTY4MTM0NTNjYzg5MmE3MjYxYWMxMTFiMTllOWU1ZDBmZDA5YzIxYzlhMjI0YTY2ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4MDgwMTM4YWZjMTg4MWU1NzZiODYyYzFlYjVjYjE4OTFiNDJjNzUyZDViNGMxYTU2NzMxOTRhOTI4NzhiM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyN2IwMjk1NWViNDZkZmYxNjQ1MTcwYzA1YmFhYWU4YjYxMzU5YzMwYTVhZDRmOTZjZWJjYWExMjUyY2QxNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkMTdhNjFhYzNmNDE3ZjRmZmIzYWE4NTU0YmZjMzM4MDZkM2I5ODRhOWMwYjcyZGU0Nzk2YjI0ZTI1OTNlZGYifQ"
         },
         {
-          "resource": "repo://modules/batches/data/batches.ts#L266-L301",
-          "version": "repo-lines-v1:sha256:afe9adc63501b5cff00a79c212a745f6bae4c910adae587fd9c45e17a7ef69e9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ZWQ0NDdhNWVlNWIxNTM5NTIyNWM3OWJmMjJhYjkxMGE0ZDY2ZmY5Zjc1YzZjNTYyYjUxZWExZjE3YzQ0YmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1ZDAyZDAwOWQzN2ZjZThlNWZiMDhmNjYxMDUzNTJlZjEzNmZmODJlYmFjNTFmOTc5Mjc4NThlZjY4ODI5ZWUifQ"
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L82-L100",
+          "version": "repo-lines-v1:sha256:1df52ac08f09101f31af3ff23796df8e487c5eadb4c9f8a1b2b158aa334aa93c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiM2MyNjE1ZGZiMGEyY2ZiYmViYTU0MDI2Mjk1NWI5YjU5ZjdkZDdjYTA1NzNiMzU1NjBlYjFiMjM4MzNjMDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5ZTNhZjRjMjMyZmRmYzg2YTI0MDczYTZiMjNiMzgzMDhmNDM0NjM0ODllNzM0YjU4MDZiODE3Mzg3NmI5NTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjZDBkZWY0ZWJmMWI5Y2E3NTU1Y2IxNTRhZmQzZDI3YWExNWYzOTgyMjQ0M2I1N2E1ZWZiMGQ5OTM4Y2Q2ZmQifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L267-L309",
+          "version": "repo-lines-v1:sha256:597f0897c7075d5fc49de5e949cd9ebd104a5f0b575425f8e3a07a76ff2e0a1e:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ZWQ0NDdhNWVlNWIxNTM5NTIyNWM3OWJmMjJhYjkxMGE0ZDY2ZmY5Zjc1YzZjNTYyYjUxZWExZjE3YzQ0YmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1ZDAyZDAwOWQzN2ZjZThlNWZiMDhmNjYxMDUzNTJlZjEzNmZmODJlYmFjNTFmOTc5Mjc4NThlZjY4ODI5ZWUifQ"
         }
       ]
     },
     {
       "id": "claim_db7a32f99f4340fca110339d04eb5dd4",
-      "statement": "The 'Data as of' stamp is formatted from the freshest live updated_at as e.g. 'Jun 19, 2026 . 14:02' using hourCycle h23 (midnight prints 00:02, never 24:02), degrades to the literal 'cached snapshot' on the mock path instead of printing a fake precise timestamp, and BillingQueueView receives its dataAsOf as an explicit prop stamped as 'Packet readiness . Data as of {dataAsOf}'.",
+      "statement": "The 'Data as of' stamp is formatted from the freshest live updated_at (resolveDataAsOfDate returns a Date only for an ok snapshot carrying dataAsOf) as e.g. 'Jun 19, 2026 · 14:02' using hourCycle h23 (midnight prints 00:02, never 24:02), and degrades to the literal 'unknown' (DATA_AS_OF_FALLBACK in DashboardHeader) whenever there is no real timestamp to read, rather than printing a fake precise timestamp; BillingQueueView receives its dataAsOf as an explicit prop stamped as 'Packet readiness · Data as of {dataAsOf}' (plus ' · STALE'), and the billing route's formatAsOf degrades to a fixed fallback date when no row carries an updated_at.",
       "evidence": [
         {
-          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L250-L263",
-          "version": "repo-lines-v1:sha256:b6bd05d1799636a969800e10540ec825ef709bd729b989562498e54a4c2e934d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2OTEyNmI5MDEwNzEyMTdjZjQyYjE1M2EwNzQ2NGJmZDUxMzcwM2ExZmZhNGY1YjQ1YTZmOThiMDk2OTEwNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViOTg2ZDRiYzVjNDhhNTM1Mzg5OGNmNGQ4MTQ5NTIwMWRjZTlhNzYyNmI1ZTBjYzMyOTFmOTA3NDgxMmRmNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NDEyMjVjMzhjNjQ5ZjY4MDU5NzljNzY4ODA4YWY5ZTA2N2MxZDAwZTZlMzc0Zjg1ODUwNmYwYmU4MGMzZGIifQ"
+          "resource": "repo://app/(dashboard)/billing/page.tsx#L29-L42",
+          "version": "repo-lines-v1:sha256:a51b2a5943254c82278962ce235ea4d06ec65059db127a0fcb6b4af021acc50d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyMGQ3ZjVmNWYyYjBjZDU0ODNkMmEzY2FlZmQ5ZmY1MzQ0ZWI1N2RlNTFkMDE5YTgxMjlmYWJjMGJjZjBiNTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzODg2MWE2Y2JmMjRiYTA4ZTAzNWZmMWQ4Mzk0MWQ4MWQzMDE0YzllMGJkYWJjZTBlNzY4ZWJlNGJkNGU5OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyYzkzYTNlNzE4YTAyZjBjZjcyZjI2NmE1NzU5MzBhYzUyMjlmODk5NjA1MTc5NzYzOTliNTRlZWE0MGRhZDkifQ"
         },
         {
-          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L85-L92",
-          "version": "repo-lines-v1:sha256:b25380083dd3a0bcda9dcc33f9d7d7cc39e229d12064f9c3e59acac9963f6395:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFkYTMzZjhlYjcwOGI1MmU0ZTQzZTgxMWRhNGY1ZTBiYzg2NGFiZDM2NDY5NTAwYmU0OTE5NGVmMDc2YTQ0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTVmNDFkNDYzYjUxMDZlODJiZGU2YWYyYzhlMDMzM2RkMTU2NDNhNDAyYjM4MjE3NzE0NDhmMjUxNDA5ZjcyMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjI0MzBmNzUyOGViYmY5N2Y5NzZjY2Y5ZmY0MGM5OTdkZTYwZThkNzRmYzY5NDlmNWMyY2U4OWNkYmJmOGEzMSJ9"
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L87-L126",
+          "version": "repo-lines-v1:sha256:fabb54235afe664877fa2887539aff126cdd9deb14ad7cd9fd391600cd76aa79:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxZGEzM2Y4ZWI3MDhiNTJlNGU0M2U4MTFkYTRmNWUwYmM4NjRhYmQzNjQ2OTUwMGJlNDkxOTRlZjA3NmE0NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmNWNjZDgxOTkwNGRiODc4ZTkyNzIxYjM4YzI5MzZjNTA5NDc4MDA0YThkY2ZiZWI0M2JlZTA2YzBlNmU2ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwMGRmM2VhNzM1NDU1MDViMTllZWIxN2UxOWRmODFkZDFjYWNiYmZkMzRjODIzYWExZjk3NzQ5ODAxOTc2Y2MifQ"
         },
         {
-          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L154-L154",
-          "version": "repo-lines-v1:sha256:3a0f18290e1fed1c9707a7d7241e072d9755a05c3fb54765c36ee9972abb7b7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EwZjE4MjkwZTFmZWQxYzk3MDdhN2Q3MjQxZTA3MmQ5NzU1YTA1YzNmYjU0NzY1YzM2ZWU5OTcyYWJiN2I3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EwZjE4MjkwZTFmZWQxYzk3MDdhN2Q3MjQxZTA3MmQ5NzU1YTA1YzNmYjU0NzY1YzM2ZWU5OTcyYWJiN2I3YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWNjMTBiZmM4MWY5NDk4YTk0NDNmNjQ4ZTMyZDE0Mjg4OTY4MjczMWQ4NzFmYjM3ZDc4YjBmOTcxMTk5MzJiNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2M5YWE0NDEzZjRiMjc1NmY0MGNiN2M3MDdjZWZkN2I3MmJkYmNiN2I0NWYyOWZmM2U3MjI2OGU3ZjY5OTAwYSJ9"
+          "resource": "repo://modules/batches/ui/dashboard/DashboardHeader.tsx#L10-L47",
+          "version": "repo-lines-v1:sha256:7651928af6ac8917ab1aece46488f5f0856abe9a8b30d158317236f4ea671458:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY2ZTI4ZGQxM2RhYmRlMGU2MWM4NzNiNmY1Yzk0NWE1M2JkZmYzZmViODdkMzMzNjc2YTg3ZDVhNGU2NThiZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwYWFiOTliODgzN2IwMTA0ZWU5ODliNGNhZmE4ZGJiYzBlNDgzMmNmMzViN2U1MzJhNGQ5ZGYxY2QwODM4YmEifQ"
         },
         {
-          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L53-L54",
-          "version": "repo-lines-v1:sha256:bebab76dad6983087af1a672d468a266b05e2dab06da62fb6c9c9fa65bb16f7e:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWMxZjMwOWNiOWE2MGMyNjc4NTkxNWQwMmZhNDRkN2EzOGJiNmVkYTc5MTA2M2M5MDM1OWMxZDI4ZDE0ZjYxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmVjZGZkYzZjM2QyZWFlOGZkY2VkODUxMDYxYzk0ZDNkZDRmNWE5MGE4YTVlMTA1NTdiNGJkOGEwYzUwNTI1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTAwNDBmZDIwZWQxOGVmNjNlY2E5ZDQ0NWQ0NzhjZTc1MmNiOGZiNDdlZGVlMmMwZTJjMTY5MGE0N2Q3ZWU5ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2FhNDlmZjAzZDc1YTI3ODZhZWVmZGQ1NzFlMjM0NzljNjgzOGJjMTc2MjY0ZGQzYzFiYzliZDAwY2E3YjgyMyJ9"
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L150-L156",
+          "version": "repo-lines-v1:sha256:5b824c455370b1960fadab26836ac42be379bf30fadce031f761269492afaa0d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTcyMTZlOGU5YzBhMWE2OGQwNmMyZmJhYTVmZDIxMzk0ODJiOGVmZDBhMTkzMTViOTE1ZTZjY2U4NDlkODlkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTUyYmFlM2RlZDY2OWI2ODdlOTI1Y2UwZjI4MzU5M2QyNTIwYWE0N2Y5OWZhMWI5ZWE2YTVjMGRhYTA0ZmYzZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTc3MGU4YmYzYTljYjFhNzE5OTc4ZTVlMWQwYzlhNmE3Y2M2YTE4OTEzMmY0OGQzN2MyMGY2MWMwMzNhZWU5MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGYyY2ZiYzNkNTA3MGZmMWYzZTMwNmZkNDRlY2NmOTJiYWFjMDM1NTQzNWFmMTNkMTI2MzVhYTZmYTZiYTdjZSJ9"
         }
       ]
     },
@@ -264,19 +272,19 @@
     },
     {
       "id": "claim_cbbb131eb66046269857c5ff42ce65c5",
-      "statement": "assets/, preview/, screenshots/, ui_kits/, and uploads/ are ported verbatim from the design bundle, excluded from lint and build (eslint globalIgnores), and a PreToolUse hook (.claude/hooks/protect-static-dirs.sh, registered for Edit|Write in .claude/settings.json) blocks agent edits there with the instruction to edit source design files first; public/assets/ is explicitly exempt as the app's real runtime static directory. FIGMA FILES/, diagrams/, and .design-sync/ are review-level design artifacts, and FIGMA FILES/ is not currently materialized in the tree - Figma pages are referenced by node ID in code comments.",
+      "statement": "assets/, preview/, screenshots/, ui_kits/, and uploads/ are ported verbatim from the design bundle, excluded from lint and build (eslint.config.mjs globalIgnores), and a PreToolUse hook enforces the rule at [hook] level; the committed script .claude/hooks/protect-static-dirs.sh exits non-zero on edits under those directories with the instruction to edit the source design files first, and public/assets/ is explicitly exempt as the app's real runtime static directory. Hook registration in .claude/settings.json is per-machine gitignored state — only .claude/hooks/ and .claude/agents/ are committed. FIGMA FILES/, diagrams/, and .design-sync/ are review-level design artifacts, and FIGMA FILES/ and .design-sync/ are not materialized in the committed tree — Figma pages are referenced by node ID in code comments.",
       "evidence": [
         {
-          "resource": "repo://.claude/hooks/protect-static-dirs.sh#L11-L24",
-          "version": "repo-lines-v1:sha256:7f10db6d7ca6d5db423c6290eafa1b6e00a5f659fc9250cc1d476e0e3ce6408c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmZGI4MjFiZGI0MDFkNTQ0NGQ2MGIyYTc1NDkyNTMzNDIwNGZhMDZlODNjMmYyNDE0ZmFkZGQ2YzJlNmE3ODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NjlkMjM3Y2Q0MjBiOWQzOGI5ODFhMGE0ZjY3NzAxOTBhNGE4M2RjYTFmZTU2YzRmNWJhMWUyY2JjMGVmNzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkMzdlYWYwYTc3MTVmNDIzMjJiNTg0OWY3NTM5MWFiMTc1ZTRiYzU4MDg0ZGVjMzBhMzIyOTAwMmQ3MTk2YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4OTFkYmRmYzA0MDJjZDRiYTYwZmFiMWJlMzI0NWRmZWM1NTljNWQ3YWZjN2UyMWI4N2U3OTVhNzNkMDVlNWYifQ"
+          "resource": "repo://.claude/hooks/protect-static-dirs.sh#L1-L26",
+          "version": "repo-lines-v1:sha256:586729bf6bfa8685f58ceef0623e561bed52b72a3479b633fed8c9c14d3e1760:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4NzVmOTI4NTQ2YWVlNzg1NWNiMWRiOWFmYzhhYjNmMWE4YTM0ZDQzZGU1YmJkNjJmNzA3NmQ3YmE5ZjM5MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4ZDNiOWU4ODBhNzc5NzU0OTNkYzdlMzU5MTQ0YzAyOTVhNGY2OTRjZmUwYWY0ZjkyOGMyMjMwN2JjNWMzMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://.claude/settings.json#L45-L55",
-          "version": "repo-lines-v1:sha256:8240988882659f0b0a2aa638b09a50f6606709e6cdaa977018e1af7b37637127:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MThlOTAyMDc0NDJkOGM5N2U0NTdiNTBiMjVjYzVkZDRjODA5MzY0N2UzYzg5ZTRiZTAxODg1ODQxNzYwZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2M2Q1MzVjZTM4MDYzZDZiNGM1MWQ4YzM4NmE3ZjliM2U1ODBhMTRhMTBjMDdiMTk4ZGZhZjE5YzkzYTNiZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI0N2ZlZTRhY2NhMzA5MDIxNzMwMTE1YzhhZmQwZDk4ZDBjNDEyOWQwNjc5Mzk4Zjk3ODVmYTNkN2MyZmM4NjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhNmVlMjNhMDM2MGI1N2Y3NWQ0N2E0OTE3Njk0ZDUxMDNiMWUzNDMxOTUyZGE5N2M1YzM3N2JhY2VkNmJmM2YifQ"
+          "resource": "repo://.gitignore#L46-L71",
+          "version": "repo-lines-v1:sha256:ff43e9c5ca539103af0ebc37e12fc530cf895827d37fa7cdec6ab577333fee0b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViZjQwOWEzZGM3ZTQyZWJiYTczN2Y0MWVlMmE3ZThiMjA2ZGIwZjczYWY2NzdiZTBlMmM2MzcxYzQ3NDI0ZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxN2RmMDcyMTdlNWM3ZmMxOGI2ZThiZGIwM2FmODcyM2RmOWE2MWI1MTg4NzVhZDBhMzI2YjBlMzE0YzZkNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExMTNjYzc4NDUzNzliZGE3NDlkOTVmZjVjNjlkMmM3OTI3N2Y0MjA4OTc4Y2RkNGQwNTlkZjVmMTNmMGQ0NzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxOTg5OTcyNmVhYThhZTE5NWNjZTI4NDg3YWYyM2Q5MThlMjgyMWUzMjY0NmMyNzVjZTk2M2RkNTYxYzU2NGQifQ"
         },
         {
-          "resource": "repo://RULES.md#L86-L89",
-          "version": "repo-lines-v1:sha256:30458f591700a900d720b7dd9773a221872bdc5abfcaf320c9bb9d028f96a704:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODgyMGYwN2MzNzcyNzUxYzcyZTM1NWQxZWQ2NGZjZTJhOGE4NGYxNmRmNTE4OWNjMGZkNGY3ZDU5NjgwMjVjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRhZmQxMjE4YjcwNWUzN2JmNzI2OGRkNjE5OWZiMGI5Njc0NWNhNjdiNDIzNWY0MjU2YjliMjRkZWUwZTdmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTEyN2U4M2Q3MDkxN2UwMmRjOGUzZWJkM2JmOTQ2NzkxNGUwMDMzODM5MWI0MDc0YTNlMDA3ODczZWNjZTYxYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTY4ZmVkYjU5OWM3ZDQwNjk0MjY1YzEyZjc1YTliMmNmNGRlY2JlOWJiNWI0NTZjNGRkYjA4ZWY1ZDkwYzk2ZSJ9"
+          "resource": "repo://RULES.md#L86-L91",
+          "version": "repo-lines-v1:sha256:ef7d07335a99e90e0c3707cd58d887e2b97e1be4a54a6ca64a4d04a6460c7358:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmI0ODBmZThlOWY4ZDFkNGVlMjhkY2JlZjYwNWE2ODlkYmViYjg4N2IwZTlkYzcyMzQ5YWFmOTdhOTI0ZjUzOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRhZmQxMjE4YjcwNWUzN2JmNzI2OGRkNjE5OWZiMGI5Njc0NWNhNjdiNDIzNWY0MjU2YjliMjRkZWUwZTdmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDEwZTY1MDkxOTJiZjk2MWZlYjE1NWViNzcyNmQ3MWNlMTdjNDkwMmQwYjA1ODI2MmYwYmNiMTQyMTlhMjZiMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTY4ZmVkYjU5OWM3ZDQwNjk0MjY1YzEyZjc1YTliMmNmNGRlY2JlOWJiNWI0NTZjNGRkYjA4ZWY1ZDkwYzk2ZSJ9"
         },
         {
           "resource": "repo://eslint.config.mjs#L65-L80",
@@ -286,19 +294,27 @@
     },
     {
       "id": "claim_5043fc0265d64f50bc6a1ec8bdcd4d92",
-      "statement": "The design-sync workflow makes the local Next.js TypeScript components the implementation layer and the handoff source JSX the design reference (.design-sync/config.json); when spec and deviation conflict the deviation wins and colors_and_type.css plus ui_kits/admin/ are the live ground truth, so design changes go to the source design files first.",
+      "statement": "The design-sync workflow makes the local Next.js TypeScript components the implementation layer, ported verbatim from the handoff JSX in ui_kits/admin/ (each ported component carries a 'ported from components/X.jsx' header); when spec and deviation conflict the deviation wins and colors_and_type.css plus ui_kits/admin/ are the live ground truth, so design changes go to the source design files first. The .design-sync/ directory is gitignored local tooling (not committed) that records the design-project mapping on the machine that holds it.",
       "evidence": [
         {
-          "resource": "repo://.design-sync/config.json#L1-L4",
-          "version": "repo-lines-v1:sha256:1bedb5ee4150b74679354764cd43623a75feb9fb4f014d5b49b13513741e2bf9:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWU3MDUwYTgwZmU3ZTk2ZDAwNzI1NjVmMDMyODY4YWFjMTk2YmYyODE0OTk1ZWI3OWRkMjA0ZTcxYWQxMmQwMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTE1YjM1ZWI3MTJhOGEwMDUyZDA2YTgyNTU0MDFkZjBjMDBhNGQ1MDdmMWQzOGFhODcxODdhNGJjMjE2NjRjNSJ9"
+          "resource": "repo://.gitignore#L69-L71",
+          "version": "repo-lines-v1:sha256:55f878ea32fc7bc53eaa4ab6abecaa48e85f135316c52844bb121199d7deccad:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjU2ZjJkODc0YjY0MWM2ZDQ0YmFmMjA5ZWJlYmU5NGI0NjNlZGUxZmJmMzBlMjVlYzdiYTBkODlkMGU4ODQxOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzE3ZGYwNzIxN2U1YzdmYzE4YjZlOGJkYjAzYWY4NzIzZGY5YTYxYjUxODg3NWFkMGEzMjZiMGUzMTRjNmQ3NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWFkYzRhYTg5ZjgyY2I2M2RmZDc2YTExOWRkMDQyYjNmNzkzYTQzYmU5Y2M5OTJmNzQ0Y2JlMjNlMjliMjFhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE5ODk5NzI2ZWFhOGFlMTk1Y2NlMjg0ODdhZjIzZDkxOGUyODIxZTMyNjQ2YzI3NWNlOTYzZGQ1NjFjNTY0ZCJ9"
         },
         {
-          "resource": "repo://docs/DESIGN.md#L1101-L1117",
-          "version": "repo-lines-v1:sha256:fc141c0a2df721a59a3ba431c751bf8a6c6349f5b1ede1adc727cab2058968d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzMWEyZjNmZTYwYmQyMmI1OGQ2NWIyYTFlZTFjZjk2YWRhYWMwYWQxM2JiOWVlMmNlM2JiM2JhODU1MWMxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM1YzJkZTY0YmNiZTg1NjI3YWM1NGZkZDhhMjUwZTY2ZWU5YTgxMjhkYTZjNmU3YzI0NWJlZmFhOGYwZWZhZTEifQ"
+          "resource": "repo://docs/DESIGN.md#L1101-L1116",
+          "version": "repo-lines-v1:sha256:329dede7fc0dc0bf99b7dc1a0838b3d668e0e9a29da6dba4b0b13450b956a4d8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzMWEyZjNmZTYwYmQyMmI1OGQ2NWIyYTFlZTFjZjk2YWRhYWMwYWQxM2JiOWVlMmNlM2JiM2JhODU1MWMxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxZmYyNjM4M2VlMzNlZGU4YjljZTQwZDBmNDgzZWY5MjE4OTA2OTQ0NjRkOWM2MzUyODA3ODFhZTg1YWFhNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
         },
         {
           "resource": "repo://docs/DESIGN.md#L4-L6",
           "version": "repo-lines-v1:sha256:6b8bafecd572785f719c90b1180fd5300ce2865d11bb7a1ab7c9859db1c5ba1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M1OTg2ODNhNDRhOGIwNTJkMDkwYWExNTEzNzAyZTZiMmE2YjhjZDVlYTI2ZDE2ZjMwMGVhYzM5ZWRjNTQyNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjIwMTk1MDJmZDc2OTI4NTYyY2YwODRlZmVkYTZhYzMyYmVhNzlhMzIxODM2YTdmOTBlOTNmY2MzN2RlMDIzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDYxOTFmYTAxNzc4Y2ZmMWNmNTU3ZWQxNGE1MjFlOTRiMjNmZjlmZmMxODI2NTQ1ZDJmY2NmYWY5NzM1ZmE0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        },
+        {
+          "resource": "repo://shared/ui/Icon.tsx#L1-L12",
+          "version": "repo-lines-v1:sha256:013c7bee8c09c35c2df688ad1b2c2e8d6aebe72c60fe0d5d0c8acbb924063f56:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyOGZlNTI2M2U2Y2UzMmFiM2ZhMjljYmMyYjk1ODBiYjY4MDkzNTFjMjNlZWM3NTI1MGVjZWY2Yzg0OTFhNGIifQ"
+        },
+        {
+          "resource": "repo://ui_kits/admin/README.md#L39-L50",
+          "version": "repo-lines-v1:sha256:8b91ace26f025ac61d89cc567263822f2ce6c89cd6dddc3740789fbc77a2f9e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkYTllNzAwZWRmOGZkNDk4MjFlN2Y1MzIwZDdjZTAwY2QxYWJiM2E0YzlkNTI3ZWJkM2E3OTg4ODU1NThmY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1OWRhOTY3YWQ2YjE3ZWIwZmVlOTBlNWEzNzFmZjM0ZWM4MmUwMzJjZjhiZWM4MzgwZGI1ZjQyNTA5NmY5MmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2YjM5NDg3MzIxZDQzOWY2ZGU1ZmRmMDUyM2VkMDgwNTM3ZGU3MDQzMzllMzJkODFmMTIxMzg2MTQyMzU0NDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzMGZjYzUwZTc3OWJiYWI2ZTY5NzZjYjE3YTVkMDc2ZjI1ZDJiOTA0ZGI0MWZmNzE5Zjg4Yzg2OTgwZjkyNjIifQ"
         }
       ]
     },
@@ -315,10 +331,74 @@
           "version": "repo-lines-v1:sha256:bbbb537ddb8d4107946d50d78a0074e58083ea8bcbbe230cf5eef4e02dd31cd4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5MTA5ZmQ5NWQzYzZkMzM0M2Y3YzM4MWRhMzg4YmEwYjViMTdmYjAxMTQ0ZWQ5MGY4NjBiZGVjNTcxYjAxZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmOGQzYmY0ODk0YjcwYTVhZWE2NWZiZjMzYjE2NzgyZTY2Y2ZkZTdkY2ZmODFhMzJmNTMwYjg4M2QwMTlmZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBiMWYzY2VmYzA0NWMyNGIwNjUxNjI1NTNjNTA3NWFmOWQ2Y2EwYjdhMjZkOWM5MTY2YjMxZjNiYmRjZDc5YmYifQ"
         }
       ]
+    },
+    {
+      "id": "claim_dbe41c0215dc43b3925f8a443a99dee6",
+      "statement": "The dashboard maps the snapshot to its six states through named render-derivation helpers — resolveDataAsOfDate(), dataAsOfLabelFor()/formatDataStamp(), isEmptyDashboard(), isSyncFailedDashboard(), isStaleDashboard(), and syncFailedMessageFor() — folded by deriveDashboardViewState(forcedState, snapshot, batchCount) into a DashboardViewState of { isDenied, isEmpty, syncFailed, isStale, dataAsOfLabel, syncFailedMessage }; the guard-clause order in DashboardPage is trusted-lookup failure, trainer redirect, denied, syncFailed && zero rows, empty, then content, so a real sync failure (which yields zero batches with no mock fallback) always reads as a failure with its retry banner, never as an empty tenant — the ordering hazard RULES 3.19 calls out explicitly.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L59-L63",
+          "version": "repo-lines-v1:sha256:f86d9c6163383682e63bbf31a1ca3b9b684ce38d45ec1007d2138454bd8cb182:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5MDM1ZDQ5OGM1MmQzZjAwMWQ2N2U2ZDAyZjExNTkzNWI1YTYwYTEyOTQ3Y2QwNzMyZTgwOTgwYTdmMDI1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTA5MGIyZThlYTg5ZDliNWU5MjM3ZDU3OGIwZGY3NjBhYTllNGIxMTJjYTQxOWI0NDNiMjFhODQ4NjIyMDhjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjAwNjJkOTcwOTI3Y2Y2NzFmOGVmNThkYzhkMzU1YWM2NTQyZWQ0NjIxMWZlYzAyZmFkNDAyYjFmMWVhNTA1ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTBjOWIxNGNjNWU4NDM5YWQ4NGMwYTJiMzFiYTMxZTU4NzhiMTQ3NzRhOGJiYzI4MzZiMTY5MjUwYjM1MzYyNiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L102-L164",
+          "version": "repo-lines-v1:sha256:89b832a00655d81cd37b488c455315eef090caad32b74f304425b1959f68fdb4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YmEyYjU5OTY3MzJlNzEzOTBkM2UwY2M1YjliZmRmZTU4YWUzZDZkMzgzY2VhYTMyNzRiMzc1OTY1NWRlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0YTdiMGJkYTk4NzJiNDhiOWJhNzIyMGY3YzU1ZTljMTZiMTNjZDg4MDgyNGI5M2QxNGE4NjA3ODkxNmZkNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiMzA0NTc0ZjM3MDQ1MWYxOWQwMTA2ZTg2YjE4OGQwZWUwOTU0ZWM1YzVlM2RmNDIyYTU0MWZlNWVmOTBmNjkifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L256-L275",
+          "version": "repo-lines-v1:sha256:cdf9219d9318d393024dd272e971931be9d227499ea6e7e07610aef24e9fb94b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjNzM5YTM5ZmMwNzQ5MzYxYzI0ZmRjMjc3OWE2YzE2OWZlZGU5MDZjZjY0NWZkZWUxZjJmZWJkNzA5Y2Q5ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEyYTYxZDA1OWI0MzQxZDI4ZGI3MTQ4ODQyNTA2Nzk2ODFjMzdmMWZlOWFmMGNhZWVlNjJmNmU0NDUzM2UyZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI2MGVmZjAwZmY5YWY2N2UzODRjMjE4OGYwOTY1Yjc2ZTg5ZTE5NTA1MmIzODQ0NzEzMDBhMzc1MDYwOTcwNjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_55fca1fbc7ac4e7f926d9b81e9835a5e",
+      "statement": "resolveTrustedDashboardRole() reads only the trusted Clerk publicMetadata role (never ?role=) and distinguishes 'lookup succeeded, no role set' (least-privilege viewer display fallback) from 'the lookup itself errored' (getCurrentUser threw); on lookup-failed the dashboard renders RoleLookupFailedView ('Couldn't verify your access' plus Retry) fail-closed before any data loads, instead of letting a real trainer whose lookup failed fall through to the office dashboard, and ?role= may only switch the displayed variant — it can never override the trainer redirect.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L171-L203",
+          "version": "repo-lines-v1:sha256:438042646bb025933a399594d43c283358fcd6ff344268e61db633fa1e1aa96f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2MjgwNzQyMTU3MWY5NThkODUwNTU5ZDMwM2I2MWZlOTYzZGZiZGIzNWJmYjZiMDM4NTg0ZjAxNDk1ZWQyZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2NGQ4ZTg5NzQxNDMzNWIxYTI0NjZiMDQ0NTU5MmIwZjU0OGNiN2IzNTJlNmE3OWJjMTFlNzhjNzc1MjAxYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI0NWY4NzZiNDU3ODRhZWYwODYxNjZjNzkzYWYxZmZhMWE5OWQzM2Y5MjcxMGRiN2VjMTZkM2EzODAyM2UwYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRiM2IxNDNjM2QxYTZhNDNiNjk4YTA3ZWMyN2IwMTUyMmFhNzkyOWFjNzgxNTg3N2Y1NjkwNDRkZTgxZDBlZTQifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L341-L380",
+          "version": "repo-lines-v1:sha256:252f1f511a5234247e0735ea025991166531c61e44a45eee47e975b630c069a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiNWMxMzUyMGU1OGIxNTQ5OWRmMmM1OGY2YTk4MGU5NjBjNDMyZDY1Y2VlNzRlYTUxZDA4YTI1ZDU1NTFmNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkZmZjYmM4N2ZlZDk5M2NiN2Q3ZGJiNzUxZTVlY2E1YzJiOTgwYWE0ZDQ2MWE4ODMzY2E1MDdmODhmY2IzZDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e1c13dd68d0044f18bdaeaa8f999d242",
+      "statement": "The sync-failed banner is SyncFailedCallout in modules/batches/ui/dashboard/DashboardCallouts.tsx: a warning InfoCallout with fixed copy 'Sync with Supabase failed — showing the last cached snapshot{ from <stamp>}' claimed only when isShowingCachedFallback (the rows actually came from a non-ok snapshot), otherwise '…showing the currently loaded data' — so a ?state=sync-failed preview over live rows does not claim cached provenance — ending with a Retry link; DashboardCallouts composes it in fixed order with the critical-docs callout, and the dashboard layout additionally suppresses MetricsRow whenever the snapshot is sync-failed, so the shell never renders derived metrics over a failed fetch.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L240-L254",
+          "version": "repo-lines-v1:sha256:8d2196820d888b5966221c33172df1092ef69a6a0153cfab9c436f818fdff337:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiMmFmNTM5ZDJiY2QyNmQwM2Q5MTQ2MjBlODk4OTI4MjkyYTNmOTI2ZDhjYTJiZGRlYzI0NTkxOWIxM2M5YWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRhZGJhZDUzYjcyZjVlNTExMGRjZTE1MzdiN2NjYTM1M2UwYjA5M2Q5ZTVjYmNkNGM0YjI4MTYzZjZkZjM1NWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NDEyMjVjMzhjNjQ5ZjY4MDU5NzljNzY4ODA4YWY5ZTA2N2MxZDAwZTZlMzc0Zjg1ODUwNmYwYmU4MGMzZGIifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L18-L22",
+          "version": "repo-lines-v1:sha256:97bad8cd1e95fcb2f08d835b0c098e6b7a1b23207fa51d7aba559d41194ab8cb:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY0MWMzMjdhZjI1ZDViMzgyNGIwODk3NDkzOWYyNGFkMzVkZDc4YzUxNmU2ZjVjMDM0ZWM5MzVkYzQzYzhmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY5Mjk2YTg3NDgyY2NhNjhlNzhjYjRhZTZkNzExMzY1MWUzYjUzYWQ5ZTI5MDZmNGIwNmZkYTQ4ZGEyZWFhMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGRiNGJhMDFlNWVjYjk2NGQ5ZWNjYjVmMWZkYWE0MzJlNjY1ZGE2YjFhNWRmMjE5MGY1MzNkNDRhMmU2NDdhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDJjNTY1NTdkMGViYjhmMjc2M2ZkODVmZGI5YzE0ZjE5YzA4OGQyZTcxYmY1ZjRmMmZiOTM3NTg2ZDA4Y2IyMiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/ui/dashboard/DashboardCallouts.tsx#L16-L43",
+          "version": "repo-lines-v1:sha256:d849832be7672469498a614de4500af545a792e89936598679b88c5018ee2069:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2MzNjMjFjZjBiNzk5OTY2N2FkYmI3ZGY5OGZhNjAzNWE4OGJmMWI1ZDJjZGY3NTIwYzgxN2Y4OWQwMDQyYWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4YmI0YmM1M2ZhZTg3OTdhMTRkODY1ZjI0YjdlNWEyOWEwMGE2N2NhMGE3N2EzOTFkMmM5MDJjYzZkMTQzOWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0ZTc0MDA3NWUwMmI5MzE3Y2M0MWRlNTYzNTI1YjdhZDU2ZjA5ODU5NzA2NWJhMzZkN2M2NDdiY2JjYTNiZjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fd2c515e0be14a91939e30c3723f9252",
+      "statement": "The dashboard is the only route with a route-level loading.tsx (TES-8): a Suspense fallback that mirrors the real layout — page head with 'Loading latest snapshot…', six KPI blocks, charts row, and wide panels — marked aria-busy with the label 'Loading dashboard' and shaded from the shared surface/border tokens; elsewhere server fetches render once, so DESIGN.md 12's write-back loading treatments (.btn.loading spinner, aria-busy) apply to client islands and pending actions.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/dashboard/loading.tsx#L1-L47",
+          "version": "repo-lines-v1:sha256:67e3b343a956bb2ce4891c09156aff38e2fe0e17156c8d0c5d79178e54d4e927:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/DESIGN.md#L812-L821",
+          "version": "repo-lines-v1:sha256:447b7b6bc69708167a20af63fc83b46ab514333fc69b69d8fb7999402b1552a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjOGVhOGU0MDE0Mzk3NTA4ODhkMTc2MDc0ZmUyNDI2NTIyNWFjMzdkNjE3OWM0ZTg1MTdmMTQwMDhiYWVkN2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlOGUwZGEyNzkyNzZiZDQ1Y2U3NGNkODgxZDA3NTBiMzg3MjhiOTViODAwN2MwN2YyZGFhOWViMjAyMGYxMmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNTgzNTVlZTAyMWI2NmJkZDExMDVlZmVlNDdlMjFkNmRjNTAzZDc0MjRkNTRlYjdmNzk4ZDQ3OGRhYmJiNmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkNzcwMjI0YWZjYWM0NWNiNTc3NjlmNWQ2MWE4NTIxMTZmYWYzMzQ3Mzk4ODI3ZGNkMDY4ZmNlZWQ4ZTViYWUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-02T15:29:54.792Z"
+    "at": "2026-09-04T23:44:03.987Z"
   }
 }

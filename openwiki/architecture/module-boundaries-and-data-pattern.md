@@ -1,11 +1,71 @@
 ---
 type: Reference
 title: Module Boundaries and the Data Layer Pattern
-description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the ESLint-enforced import direction, the private data/ surface, and the fetch → map → derive contract with discriminated snapshots and total enum-bridge maps.
+description: How TVI-CAMS enforces the four-layer import hierarchy (app -> modules -> shared -> lib/supabase) with ESLint rules, the private per-module data/ surface, and the fetch -> map -> derive contract — discriminated ok/sync-failed/unconfigured snapshots that never substitute mock data after the mock-data retirement, total enum-bridge maps, and the safe extension points.
 tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, type-safety]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-02T15:29:54.792Z
+    at: 2026-09-04T23:44:03.987Z
+sources:
+  - id: openwiki-source-e02f03b4e1a039dfc6c941b8
+    resource: repo://app/(dashboard)/billing/page.tsx
+  - id: openwiki-source-d5b285e555b6625fe0efdaa2
+    resource: repo://app/(dashboard)/dashboard/page.tsx
+  - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
+    resource: repo://app/(dashboard)/layout.tsx
+  - id: openwiki-source-a2371d6362e5db4bc834ad03
+    resource: repo://CLAUDE.md
+  - id: openwiki-source-39c3295efc089133e87a9c80
+    resource: repo://CONTEXT.md
+  - id: openwiki-source-2fda883e9b76745f69f487f7
+    resource: repo://eslint.config.mjs
+  - id: openwiki-source-bac9ca9767a57004b7fbd175
+    resource: repo://lib/supabase/database.types.ts
+  - id: openwiki-source-e6f02f5d20be6272be761347
+    resource: repo://lib/supabase/server.ts
+  - id: openwiki-source-4afc6c67d0142492979e14f5
+    resource: repo://lib/supabase/service.ts
+  - id: openwiki-source-4976e2df62af98c2fbd74920
+    resource: repo://modules/activity/data/activity.ts
+  - id: openwiki-source-203c5b1d1075c30ddbcc761a
+    resource: repo://modules/attendance/README.md
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
+  - id: openwiki-source-ad910b8b276ad30bfcde3f16
+    resource: repo://modules/batches/data/learners.ts
+  - id: openwiki-source-300e35f21bd1332ddfaafdaf
+    resource: repo://modules/batches/data/metrics.ts
+  - id: openwiki-source-6af3f09918cb46eabe775144
+    resource: repo://modules/batches/domain/metrics.ts
+  - id: openwiki-source-b465e228246df6e8641b81df
+    resource: repo://modules/batches/domain/urgency.ts
+  - id: openwiki-source-22f1e37c371371edc123b5ae
+    resource: repo://modules/batches/ui/dashboard/DashboardCallouts.tsx
+  - id: openwiki-source-67dba75e6a6f46ad6f66212e
+    resource: repo://modules/batches/ui/dashboard/DashboardKpiGrid.tsx
+  - id: openwiki-source-9a24e697708df788c06f44e3
+    resource: repo://modules/billing/data/billing.ts
+  - id: openwiki-source-fed00d96acb205744511b2bb
+    resource: repo://modules/documents/data/documents.ts
+  - id: openwiki-source-927476d5ce1369bdfbff408b
+    resource: repo://modules/import-export/data/learnerImport.ts
+  - id: openwiki-source-6d398bd6713150c971d852b0
+    resource: repo://modules/tenancy/data/tenancy.ts
+  - id: openwiki-source-f7ae5e0747518115ed202c7e
+    resource: repo://RULES.md
+  - id: openwiki-source-a4e0261d1d83ecd919690ff7
+    resource: repo://shared/README.md
+  - id: openwiki-source-00554adab84d9a98131a68ed
+    resource: repo://shared/text.ts
+  - id: openwiki-source-d9a6154810528b0710445f92
+    resource: repo://shared/types.ts
+  - id: openwiki-source-eb30361b2d93d2c44af8dc85
+    resource: repo://shared/vocab.ts
+  - id: openwiki-source-2020074c6fdeab02aae020b7
+    resource: repo://tests/unit/batches.test.ts
+  - id: openwiki-source-a018d6d3e536cc944d75e8a4
+    resource: repo://tests/unit/documents.test.ts
+generated: { by: "openwiki/0.5.0", at: "2026-09-04T23:44:03.987Z" }
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -40,7 +100,8 @@ flowchart TD
     subgraph SH["shared/ — leaf level"]
         S1["types.ts — UI domain types"]
         S2["ui/ — props-only primitives"]
-        S3["mocks/ — unconfigured fallback seed"]
+        S3["vocab.ts — fixed TESDA terms"]
+        S4["text.ts — copy shaping"]
     end
     subgraph SUPA["lib/supabase/ — external data boundary"]
         P1["server.ts, client.ts, service.ts"]
@@ -61,7 +122,6 @@ flowchart TD
     TD2 --> S1
     BU1 --> S1
     BU1 --> S2
-    S3 --> S1
     SH -. "never: shared must not import modules or app" .-> TEN
     TEN -. "never: another module's data/ is private" .-> BD1
     BAT -. "never: another module's data/ is private" .-> TD1
@@ -71,7 +131,7 @@ Solid arrows are allowed import directions; dashed arrows are rejected by `impor
 
 ### `app/` — thin routes only
 
-`app/` holds App Router pages, layouts, and route handlers. A page such as `app/(dashboard)/dashboard/page.tsx` shows the shape: it imports `getBatchesSnapshot` and `selectBatchesForDisplay` from `modules/batches/data/batches`, `getCurrentUser` from `modules/auth/data/auth`, pure helpers from `modules/batches/domain/metrics` and `modules/billing/domain/readiness`, and composes `modules/*/ui` screens over `shared/ui` primitives. The route performs fetch + state mapping + composition; the computation itself lives in module `domain/` functions. New code goes inside its owning module — modules without code yet hold a README naming their FR (e.g. `modules/attendance/README.md`, FR-07, planning `data/attendance.ts`, `domain/eligibility.ts`, `ui/`), and new top-level folders are a rule violation (RULES §2.12).
+`app/` holds App Router pages, layouts, and route handlers. The dashboard tree shows the shape: `app/(dashboard)/layout.tsx` and its nested `app/(dashboard)/dashboard/page.tsx` both call `getBatchesSnapshot()` — which is wrapped in react's `cache()`, so the layout (which feeds the `MetricsRow`) and the page share **one Supabase query per request** — and the page additionally imports `selectBatchesForDisplay` from `modules/batches/data/batches`, `getActivitySnapshot` from `modules/activity/data/activity`, `getCurrentUser` from `modules/auth/data/auth`, pure helpers from `modules/batches/domain/metrics` and `modules/billing/domain/readiness`, and composes `modules/*/ui` screens over `shared/ui` primitives. The route performs fetch + state mapping + composition; the computation itself lives in module `domain/` functions. New code goes inside its owning module — modules without code yet hold a README naming their FR (e.g. `modules/attendance/README.md`, FR-07, planning `data/attendance.ts`, `domain/eligibility.ts`, `ui/`), and new top-level folders are a rule violation (RULES §2.12).
 
 ### `modules/<domain>/` — one module per PRD FR
 
@@ -81,17 +141,17 @@ The 14 domains are: auth (FR-01), tenancy (FR-02), batches (FR-03/04/05), docume
 - **`domain/`** — pure business rules, no I/O (e.g. `modules/batches/domain/urgency.ts`, `modules/billing/domain/readiness.ts`), unit-tested with fixed as-of dates. This is public to other modules.
 - **`ui/`** — domain-aware components. Also public to other modules, though in practice other modules reach for `domain/` logic, not each other's screens.
 
-A module's `data/` may import its own `domain/` (e.g. `modules/tenancy/data/tenancy.ts` takes its `Profile` type from `modules/tenancy/domain/profile`), another module's `domain/` (e.g. `modules/batches/data/metrics.ts` imports `docRecordFor` from `modules/documents/domain/compliance`), and anything in `shared/` — including `shared/mocks` (e.g. `modules/billing/data/billing.ts` defaults its tenant lookup to the mock `TENANTS`).
+A module's `data/` may import its own `domain/` (e.g. `modules/tenancy/data/tenancy.ts` takes its `Profile` type from `modules/tenancy/domain/profile`), another module's `domain/` (e.g. `modules/batches/data/metrics.ts` and `modules/billing/data/billing.ts` both import helpers from `modules/documents/domain/compliance`), and anything in `shared/`. `modules/billing/data/billing.ts` is a fully derive-only `data/` file: it has no Supabase import and no I/O at all — `buildBillingCard`/`buildBillingCards` are pure projections over the `Batch[]` and requirement catalog the caller passes in, composed from its module's own `domain/` helpers (readiness, tracks, statement).
 
 ### `shared/` — leaf level
 
-`shared/` is the lowest layer: code here knows no module, page, or data-source context, and it must never import `modules/` or `app/` (lint-enforced). Contents: `shared/types.ts` (UI domain types, deliberately one file — see [The deferred per-module type split](#the-deferred-per-module-type-split-tes-68)), `shared/ui/` (props-only presentational primitives — `Icon`, `StatusBadge`, `EmptyState`, `MetricCard`, …; if one starts reading data or encoding business rules it moves into its owning module, RULES §2.15), and `shared/mocks/` (the seed dataset backing the `unconfigured` fallback — part of the data-layer contract, not throwaway fixtures). `shared/vocab.ts` holds fixed TESDA vocabulary (e.g. `EMPLOYMENT_STATUSES`) that is deliberately *not* re-exported from the mocks facade, to remove the "is this real or mock?" ambiguity (TES-74).
+`shared/` is the lowest layer: code here knows no module, page, or data-source context, and it must never import `modules/` or `app/` (lint-enforced). Contents: `shared/types.ts` (UI domain types, one file today — see [The per-module type split](#the-per-module-type-split-unblocked)), `shared/ui/` (props-only presentational primitives — `Icon`, `StatusBadge`, `EmptyState`, `MetricCard`, …; if one starts reading data or encoding business rules it moves into its owning module, RULES §2.15), `shared/vocab.ts` (fixed TESDA terms *only* — the `EGACE_STAGES` outcome funnel and `EMPLOYMENT_STATUSES`; closed sets defined by the program itself that are never fetched and never vary by tenant, kept out of any module `domain/` because they have consumers in two modules and `shared/` cannot import `modules/`), and `shared/text.ts` (copy shaping — `pluralize`, pure string helpers with no data or domain rules). `shared/mocks/` no longer exists: the mock-data retirement removed it entirely ([below](#the-mock-data-retirement)).
 
 ### `lib/supabase/` — the external data boundary
 
 `lib/supabase/` wraps Supabase behind three factories plus the generated contract:
 
-- `server.ts` — `createSupabaseServerClient()` builds an **anon-key** client and attaches the caller's Clerk session token through the `accessToken` callback (Clerk's native third-party auth; JWT templates were deprecated 1 Apr 2025, and the schema needs no custom claims because RLS reads only `sub`). If no token exists it **throws** (`NO_CLERK_TOKEN_MESSAGE`) rather than silently querying as `anon` — RLS would answer an anon query with zero rows and no error, which for a compliance tool is the dangerous outcome. `isSupabaseConfigured()` (checks `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`) is what data functions probe to decide between live fetch and the `unconfigured` snapshot.
+- `server.ts` — `createSupabaseServerClient()` builds an **anon-key** client and attaches the caller's Clerk session token through the `accessToken` callback (Clerk's native third-party auth; JWT templates were deprecated 1 Apr 2025, and the schema needs no custom claims because RLS reads only `sub`). If no token exists it **throws** (`NO_CLERK_TOKEN_MESSAGE`) rather than silently querying as `anon` — RLS would answer an anon query with zero rows and no error, which for a compliance tool is the dangerous outcome; the caller's try/catch surfaces it as `sync-failed` instead. `isSupabaseConfigured()` (checks `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`) is what data functions probe to decide between a live fetch and the `unconfigured` snapshot.
 - `client.ts` — the browser-side client.
 - `service.ts` — a service-role client that **bypasses RLS entirely**; reserved for trusted server-to-server writes with no Clerk session (the Clerk `user.created` webhook provisioning `profiles` via `modules/auth/data/provisioning.ts`). `SUPABASE_SERVICE_ROLE_KEY` must never be read outside this file.
 - `database.types.ts` — the generated raw-row contract (tables' `Row`/`Insert`/`Update` plus seven Postgres enums: `profile_role`, `lifecycle_stage`, `batch_status`, `document_status`, `document_audience`, `assessment_result`, `activity_action`). Regenerate after every migration.
@@ -115,11 +175,11 @@ The per-module privacy zones are **generated from the `domains` array** at the t
 
 ## A module's `data/` is private
 
-The public surface of a module is `domain/` + `ui/`. Its `data/` holds the live-query coupling to Supabase, and importing it across a module boundary would smuggle that coupling in — so the rule is lint-enforced per domain, with one carve-out: **`app/` Server Components may fetch from any module's `data/`** (and `app/` is exactly where cross-module `data/` imports appear, e.g. the billing page calling both `modules/tenancy/data/tenancy` and `modules/auth/data/auth`).
+The public surface of a module is `domain/` + `ui/`. Its `data/` holds the live-query coupling to Supabase, and importing it across a module boundary would smuggle that coupling in — so the rule is lint-enforced per domain, with one carve-out: **`app/` Server Components may fetch from any module's `data/`** (and `app/` is exactly where cross-module `data/` imports appear — the billing page calls `modules/batches/data/batches`, `modules/auth/data/auth`, and `modules/tenancy/data/tenancy` in one route; the dashboard page calls `modules/batches/data/batches`, `modules/activity/data/activity`, and `modules/auth/data/auth`).
 
 Two real examples of how the boundary is respected instead of crossed:
 
-- **Pass-by-parameter.** `profiles` RLS allows "own or same-tenant" reads, so fetching "my profile" needs the caller's Clerk user id. Resolving that id is `modules/auth/data`'s job, but its `data/` is private — so `getProfileSnapshot(clerkUserId)` in [`modules/tenancy/data/tenancy.ts`](/modules/tenancy/data/tenancy.ts) takes the id as a parameter, and `app/` (which may call both `data/` layers) wires them together.
+- **Pass-by-parameter.** `profiles` RLS allows "own or same-tenant" reads, so fetching "my profile" needs the caller's Clerk user id. Resolving that id is `modules/auth/data`'s job, but its `data/` is private — so `getProfileSnapshot(clerkUserId)` in [`modules/tenancy/data/tenancy.ts`](/modules/tenancy/data/tenancy.ts) takes the id as a parameter, and `app/` (which may call both `data/` layers) wires them together (the billing page's `getAuthUserId()` → `getProfileSnapshot()` sequence).
 - **Import the public surface.** `modules/batches/data/metrics.ts` needs the untracked-document rule, so it imports `modules/documents/domain/compliance` — `domain/` is public, `data/` is not.
 
 ### Hand-duplicated mappers are the price of privacy
@@ -130,17 +190,17 @@ Because `batches.ts` cannot import `documents.ts` (both are `data/` layers of di
 
 `modules/batches/data/batches.ts` is the **reference implementation every entity contract must follow** (RULES §3.17). Its own header names the three intentionally separated layers:
 
-1. **fetch** — `getBatchesSnapshot()`: a typed Supabase query (`batches` with embedded `scholarship_programs(code, program_document_requirements(*))` and `documents(*)` selects, ordered by `end_date`). RLS scopes rows to the caller — **never manually filter by tenant in JS** (RULES §1.2: a JS-side tenant filter is a bug even when it returns the right answer).
+1. **fetch** — `getBatchesSnapshot()`: a typed Supabase query (`batches` with embedded `scholarship_programs(code, program_document_requirements(*))` and `documents(*)` selects, ordered by `end_date`). It is wrapped in react's `cache()` so `app/(dashboard)/layout.tsx` and every nested `page.tsx` that calls it share one Supabase query per request instead of each firing its own round-trip. RLS scopes rows to the caller — **never manually filter by tenant in JS** (RULES §1.2: a JS-side tenant filter is a bug even when it returns the right answer).
 2. **map** — `mapBatchRow(row)`: a pure DB-row → UI-domain (`Batch`) translation, no I/O, **exported for unit tests**. Contract gaps are marked `TODO(contract)` and defaulted so the shape stays valid (`billingDeadline`/`daysToBilling` currently stand in on `end_date` because no `billing_deadline` column exists; `trainingDays`, `notes`, `duration`, … are empty defaults).
 3. **derive** — lifecycle and date helpers computed from the row: `deriveLifecycle(currentStage)` builds the full UI pipeline from the single `current_stage` enum; `daysUntil` returns `Number.POSITIVE_INFINITY` for a missing *or unparseable* date (the "no known deadline" sentinel that sorts last and never trips urgency tiers — without the guard, `NaN` would silently corrupt sorting and urgency math downstream); `toDisplayDate` converts ISO to the UI's "Jun 18, 2026" convention and returns `''` for null/unparseable.
 
-The snapshot also carries `dataAsOf` (the freshest `updated_at` across loaded rows), which is what drives the dashboard's "Data as of" stamp and the 24-hour stale flag. A sibling function, `selectBatchesForDisplay(snapshot, fallback)`, centralizes the decision "live rows when `ok`, mock fallback otherwise." There is also a throwing `getBatches()` for callers that want the raw-or-throw flavor, but the snapshot is the contract.
+The `ok` snapshot carries `dataAsOf` (the freshest `updated_at` across loaded rows), which drives the dashboard's "Data as of" stamp and the 24-hour stale flag. The sibling function `selectBatchesForDisplay(snapshot)` — which takes **only the snapshot** and has no fallback parameter — centralizes "what does this screen render?": live rows when `ok` (an `ok` snapshot is authoritative even when it carries zero rows, per ADR-005 decision 5) and `[]` otherwise. It **never substitutes mock or fabricated data**. There is also a throwing `getBatches()` for callers that want the raw-or-throw flavor, but the snapshot is the contract.
 
 Variants within the convention:
 
-- **Derive-only data files** — `modules/batches/data/metrics.ts` has no I/O at all; it is a pure function over a `Batch[]` the caller already loaded (live or mock), taking `criticalDocumentKeys` as a parameter precisely because the mock and live requirement catalogs use different key sets.
+- **Derive-only data files** — `modules/batches/data/metrics.ts` has no I/O at all; `getDashboardMetrics(batches, criticalDocumentKeys)` is a pure function over a `Batch[]` the caller already loaded, taking the requirement catalog as a parameter precisely because no single flat catalog exists — the live `program_document_requirements` table is scoped per scholarship program, so hardcoding one would make the function correct for only one program at a time.
 - **No derive layer** — `modules/documents/data/documents.ts` and `modules/batches/data/learners.ts` have nothing time-based to compute; fetch + map is the whole contract.
-- **Write paths** — `modules/import-export/data/learnerImport.ts`'s `importLearnersCsv` extends the same shaping for mutations: it validates the CSV *before creating a Supabase client*, then reads the target batch's `tenant_id` back via an RLS-scoped SELECT (so a write can never target a tenant the caller couldn't already read), and reconciles by ULI before insert/update.
+- **Write paths** — `modules/import-export/data/learnerImport.ts`'s `importLearnersCsv` extends the same shaping for mutations: it validates the CSV *before creating a Supabase client*, then reads the target batch's `tenant_id` back via an RLS-scoped SELECT (so a write can never target a tenant the caller couldn't already read), and reconciles by ULI before insert/update. Its `unconfigured` handling deviates only in degree: an import has nothing to render, so the caller's job is to disable the importer rather than pretend it ran.
 
 ## Discriminated snapshots
 
@@ -148,9 +208,11 @@ Data functions return **discriminated snapshot unions** so Server Components map
 
 | Status | Meaning | Required UI treatment |
 |---|---|---|
-| `ok` | Live rows loaded (RLS-scoped) | Render data; show real "Data as of" from `dataAsOf` |
-| `sync-failed` | Supabase configured but the query failed, or the client threw (including a missing Clerk token) | **Must** surface the sync-failed banner; fall back to cached/mock data |
-| `unconfigured` | No Supabase env in this environment | Fall back to `shared/mocks` **silently** — no banner |
+| `ok` | Live rows loaded (RLS-scoped); authoritative even when empty | Render data; show real "Data as of" from `dataAsOf` |
+| `sync-failed` | Supabase configured but the query errored, or the client threw (including a missing Clerk token) | **Must** surface the sync-failed banner; render empty — no mock or fabricated rows |
+| `unconfigured` | No Supabase env in this environment | Honest empty state, no banner — no mock or fabricated rows |
+
+The last column is the post-retirement contract: neither `unconfigured` nor `sync-failed` may substitute mock data — the old `shared/mocks` fallback no longer exists ([The mock-data retirement](#the-mock-data-retirement)).
 
 Modules extend the trio with their own states where a third outcome is genuinely different:
 
@@ -159,20 +221,25 @@ Modules extend the trio with their own states where a third outcome is genuinely
 
 ```mermaid
 flowchart TD
-    F["getBatchesSnapshot()"] --> C{"isSupabaseConfigured()"}
+    F["getBatchesSnapshot() — react cache(), one query per request"] --> C{"isSupabaseConfigured()"}
     C -- "no Supabase env" --> U["unconfigured"]
     C -- "env present" --> Q["typed Supabase select, rows scoped by RLS"]
     Q --> E{"query error or thrown client failure?"}
     E -- "yes" --> SF["sync-failed — error string kept server-side"]
     E -- "no" --> OK["ok — rows mapped via mapBatchRow, dataAsOf = latest updated_at"]
-    U --> FB["route falls back to shared/mocks silently"]
-    SF --> FB
-    SF --> BN["route renders the sync-failed banner"]
+    OK --> SEL["selectBatchesForDisplay: live rows, authoritative even when empty"]
+    SF --> NONE["zero rows — no mock substitution"]
+    U --> NONE
+    NONE --> ORD{"route checks sync-failed before the empty guard"}
+    ORD -- "yes" --> BN["fixed-copy banner or full-page sync-failed view, plus Retry"]
+    ORD -- "no" --> EV["honest empty state"]
 ```
 
 The `getBatchesSnapshot` decision flow; tenancy and import snapshots add their extra states on top of the same trunk.
 
-One subtle invariant lives in the banner itself: the snapshot holds the raw `error` string, but the UI never prints it. `app/(dashboard)/dashboard/page.tsx` renders fixed copy — "Sync with Supabase failed — showing the last cached snapshot" — plus a data-as-of label and a Retry link; the as-of label is ` from <timestamp>` or empty, *not* the error message. RULES §1.6 forbids leaking raw Supabase/SQL errors, table names, or internal IDs to the UI, and the snapshot design is what makes that possible: state discrimination in the union, error detail trapped server-side.
+**Guard-clause ordering (RULES §3.19).** A real sync failure yields zero batches — there are no fallback rows — so a guard-clause ordering that checks "empty" before "sync-failed" will silently swallow the banner whenever a failure yields zero rows, reading a failed fetch as "no batches — import one". The dashboard and billing pages check `syncFailed && batches.length === 0` (the full-page `SyncFailedView` with a Retry action) **before** the `isEmpty` guard, and RULES §3.19 calls out exactly this ordering hazard.
+
+**The fixed-copy banner.** The snapshot holds the raw `error` string, but the UI never prints it. `SyncFailedCallout` in `modules/batches/ui/dashboard/DashboardCallouts.tsx` renders fixed copy — "Sync with Supabase failed — showing the last cached snapshot", or "…showing the currently loaded data" when the `?state=` preview override flags sync-failed while the real snapshot is still `ok` — with the data-as-of label appended as ` from <timestamp>` or nothing, plus a Retry link. RULES §1.6 forbids leaking raw Supabase/SQL errors, table names, or internal IDs to the UI, and the snapshot design is what makes that possible: state discrimination in the union, error detail trapped server-side.
 
 ## Two deliberately separate type families
 
@@ -198,32 +265,38 @@ The DB and the UI use different spellings for the lifecycle pipeline, and the tr
 
 `DB_TO_UI_STAGE` in `modules/batches/data/batches.ts` is a **total (non-`Partial`) map**: every `DbLifecycleStage` must appear, so adding a new DB enum variant is a compile error there until its UI treatment is deliberately chosen. The `null` entries are not omissions — `deriveLifecycle` gives them their own treatment (`completed` → every pipeline stage `done`; `blocked` → nothing marked `active`), and `normalizeStatus` surfaces DB `blocked` as UI `pending` until the UI gains a blocked tier. The same total-map discipline repeats across the data layer: `STAGE_TO_UI` (documents), `ACTION_TO_TONE` (activity, mapping the generic CRUD `activity_action` enum to badge tones), `DB_TO_UI_ROLE` (tenancy, where the DB role set is a strict subset of the UI's — `owner` has no DB equivalent yet), and `ASSESSMENT_RESULT_TO_UI` (learners, where `pending` maps to `''` = not yet assessed). The deliberate exception proves the rule: `DOCUMENT_ICONS` in documents.ts is a `Partial` map because `document_key` is per-program *configured data*, not a closed enum — an unknown key falls back to a generic icon rather than failing compilation. `tests/unit/batches.test.ts` pins the bridge's behavior (stage bridging, `completed`/`blocked` lifecycle treatment, `blocked` → `pending` status).
 
-## Mocks are part of the data contract
+## The mock-data retirement
 
-`shared/mocks/seed.ts` is a faithful port of the design handoff's seed data, including three enrichment passes (`enrichBatches`, `buildRosters`, `enrichTrainerCurriculum`) that run once at module load so every consumer sees the same frozen data. `shared/mocks/index.ts` is a thin facade over it: components import `MOCK_BATCHES` (active operational set — excludes completed cohorts, sorted most-urgent-first by `daysToBilling`), `ALL_BATCHES` (includes completed, for Report), `MOCK_ACTIVITY`, and the re-exported `TENANTS`/`USERS`/`DOCUMENT_REQUIREMENTS`/`ALERTS_LOG`/`SNAPSHOTS`. The facade's comments record what *left* it as domain logic matured: `urgencyTier` → `modules/batches/domain/urgency.ts`, billing readiness → `modules/billing/domain/readiness.ts`, `getMockMetrics` → `modules/batches/domain/metrics.ts` (TES-68/TES-94) — `shared/` may not re-export module code.
+`shared/mocks/` was removed entirely — the seed dataset (`seed.ts`) and its facade (`index.ts`) are gone, and RULES §2.16, which guarded the per-module type split, is struck through as resolved. The retirement changes the meaning of the snapshot states, not just the file tree:
 
-One mismatch is intentionally preserved: the mock's 12-key `DOCUMENT_REQUIREMENTS` and the live `program_document_requirements` table use **different key sets** (`training_sched` vs `training_schedule`, `billing_rpt` vs `billing_report`). `documents.ts` says not to merge the two — that would silently paper over the mismatch instead of surfacing it — which is why `modules/batches/data/metrics.ts` takes the catalog as a parameter rather than hardcoding either.
+- **`unconfigured` no longer means "silent mock fallback".** It means an honest empty state, exactly like `sync-failed` minus the banner (CLAUDE.md error shaping; RULES §3.19). `selectBatchesForDisplay` returns `[]` for both, and the test suite pins that — mock or fabricated rows may never substitute for a non-`ok` snapshot.
+- **Domain logic that lived in the mock facade now lives in module `domain/` layers** — `urgencyTier` → `modules/batches/domain/urgency.ts`, billing readiness → `modules/billing/domain/readiness.ts`, `getMockMetrics` → `modules/batches/domain/metrics.ts` as `deriveDashboardMetrics` (TES-94). That last move was forced by the boundary rule itself: `shared/` cannot import `modules/documents/domain/compliance`, so the compliance-aware metric derivation had to leave `shared/`.
+- **Fixed TESDA terms moved to `shared/vocab.ts`** instead of disappearing with the mocks: closed program-defined sets (`EGACE_STAGES`, `EMPLOYMENT_STATUSES`) that the app needs in every environment are vocabulary, not fixtures.
 
-## The deferred per-module type split (TES-68)
+## The per-module type split (unblocked)
 
-A per-module split of `shared/types.ts` was considered and **deliberately deferred**: `shared/mocks/seed.ts` constructs 11 of these domain types, and since `shared/` can never import `modules/`, moving the types into their modules would break the import boundary until the mock dataset is relocated out of `shared/`. `Batch`'s role as a cross-domain hub type makes the split more painful, not less. RULES §2.16 states it as a guardrail: do not attempt the split without first relocating `shared/mocks/seed.ts`. Revisit only if a concrete need appears.
+A per-module split of `shared/types.ts` was considered and **deliberately deferred** (TES-68) while `shared/mocks/seed.ts` constructed 11 of these domain types: `shared/` can never import `modules/`, so moving the types into their modules would have broken the import boundary until the mock dataset was relocated out of `shared/`. The mock-data retirement removed that blocker — RULES §2.16 is struck through and CLAUDE.md records the split as **unblocked** whenever someone wants to do it. `shared/types.ts` remains a single file today; `Batch`'s role as a cross-domain hub type (it references shapes from six other domains) is the practical cost of a split, so it stays a need-driven change rather than a standing TODO.
 
 ## Testing the pattern
 
-Mappers and module `domain/` layers are unit-tested with **Vitest** (specs in `tests/unit/`, fixed as-of dates per CLAUDE.md; real-Supabase RLS/tenant-isolation integration tests are still outstanding and must run against the real project, no mocks). Two conventions worth copying:
+Mappers and module `domain/` layers are unit-tested with **Vitest** (specs in `tests/unit/`, fixed as-of dates per CLAUDE.md; real-Supabase RLS/tenant-isolation integration tests are still outstanding and must run against the real project, no mocks). Conventions worth copying:
 
 - Fixture rows are typed against the real generated contract — `tests/unit/batches.test.ts` derives the module-private join-row shape with `Parameters<typeof mapBatchRow>[0]` instead of hand-duplicating it, so fixture drift is a compile error too. `tests/unit/documents.test.ts` imports `Database` directly from `lib/supabase/database.types`; the `tests/` directory is outside the lint zones, so test files are allowed to touch raw row types even though app code is not.
-- Domain tests pin behavior at the bridge, e.g. `batches.test.ts` asserting `training` → `active`/`done`/`pending` pipeline statuses, `completed` → all done, `blocked` → none active, and `blocked` status → `pending`.
+- Domain tests pin behavior at the bridge, e.g. `batches.test.ts` asserting `training` → `active`/`done`/`pending` pipeline statuses, `completed` → all done, `blocked` → none active, `blocked` status → `pending`, and the sentinels (null or unparseable `end_date` → `daysToBilling` of `Number.POSITIVE_INFINITY`, never `NaN`).
+- The no-substitution rule is pinned too: `batches.test.ts` asserts `selectBatchesForDisplay` returns `[]` for `unconfigured` and `sync-failed`, and that an `ok` snapshot with zero rows stays empty — authoritative, not a trigger for any fallback (ADR-005 decision 5).
+- `tests/unit/learner-import.test.ts` covers the import pipeline's pure domain layer (CSV parsing, header/row validation, ULI reconciliation) without touching Supabase.
 
 ## Extending the layout safely
 
-- **New entity contract** — mirror `modules/batches/data/batches.ts`: snapshot trio (extend it only with genuinely distinct states, like `not-found` or `validation-failed`), pure exported mapper, total enum-bridge maps, `TODO(contract)` defaults for schema gaps, no tenant filtering in JS.
+- **New entity contract** — mirror `modules/batches/data/batches.ts`: snapshot trio (extend it only with genuinely distinct states, like `not-found` or `validation-failed`), pure exported mapper, total enum-bridge maps, `TODO(contract)` defaults for schema gaps, no tenant filtering in JS, and **no mock or fabricated data on non-`ok` statuses** — a `selectBatchesForDisplay`-style selector returns empty for anything but `ok`.
 - **New module** — create `modules/<name>/{data,domain,ui}` and **add the name to the `domains` array in `eslint.config.mjs`** — that array is what generates the `data/`-privacy zones, so a missing entry silently leaves the module's `data/` importable by other modules. Empty modules get a README naming their FR.
-- **After any migration** — regenerate `lib/supabase/database.types.ts`, then update affected mappers and domain types (RULES §3.20). Migrations are additive; `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is canonical. See [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) for the full workflow.
+- **After any migration** — regenerate `lib/supabase/database.types.ts`, then update affected mappers and domain types (RULES §3.20). Migrations are additive; `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is canonical for schema + RLS. See [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) for the full workflow.
 
 ## Related pages
 
 - [Architecture overview](/openwiki/architecture/overview.md) — the whole app: auth chain, RLS as the security boundary, product context.
+- [Auth and RLS security](/openwiki/architecture/auth-and-rls-security.md) — the token/RLS machinery the data layer's `sync-failed` and `unconfigured` states sit on top of.
 - [Design system and UI invariants](/openwiki/architecture/design-system.md) — the `shared/ui/` primitives and the six required screen states that snapshots map onto.
-- [Batches and lifecycle](/openwiki/domains/batches-and-lifecycle.md) — the domain model the batches module fetches, maps, and derives.
+- [Documents and compliance](/openwiki/domains/documents-and-compliance.md) — the untracked/missing/verified document semantics the mappers and compliance domain encode.
+- [Unit and e2e testing](/openwiki/testing/unit-and-e2e.md) — the Vitest conventions and the outstanding real-Supabase integration tests.
 - [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) — what happens on the other side of `database.types.ts` regeneration.
