@@ -15,16 +15,22 @@
  * `unknown` must never be rendered as `none`.
  */
 
-import { getCurrentUser } from '@/modules/auth/data/auth';
+import { getAuthUserId } from '@/modules/auth/data/auth';
 import { deriveTenantAccess, getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import type { TenantAccess } from '@/modules/tenancy/domain/access';
 
 export async function resolveTenantAccess(): Promise<TenantAccess> {
-  // A failed Clerk lookup is "we could not check", not "no school" — falling
-  // through to `none` would tell a fully-provisioned coordinator that they
-  // have not been assigned a school.
-  const user = await getCurrentUser().catch(() => null);
-  if (!user) return 'unknown';
+  // `getAuthUserId()` reads the id off the session token locally;
+  // `getCurrentUser()` would fetch the whole user object from Clerk's Backend
+  // API, and the id is all this needs. The routes that already hold a profile
+  // snapshot (billing, report) call `deriveTenantAccess` on it directly rather
+  // than coming through here at all.
+  //
+  // A failed lookup is "we could not check", not "no school" — falling through
+  // to `none` would tell a fully-provisioned coordinator they were never
+  // assigned a school.
+  const userId = await getAuthUserId().catch(() => null);
+  if (!userId) return 'unknown';
 
-  return deriveTenantAccess(await getProfileSnapshot(user.id));
+  return deriveTenantAccess(await getProfileSnapshot(userId));
 }
