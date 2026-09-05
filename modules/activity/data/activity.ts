@@ -89,8 +89,14 @@ export function mapActivityLogRow(row: ActivityLogRowWithProfile): ActivityEvent
 // ---------------------------------------------------------------------------
 // Fetch — server-only, same snapshot shaping as BatchesSnapshot (TES-8 AC6).
 // ---------------------------------------------------------------------------
+/**
+ * `no-tenant-access` is folded in by the caller — see the same note on
+ * `BatchesSnapshot`. RLS reports "you belong to no school" as a successful,
+ * empty feed, which would otherwise render as "no activity yet".
+ */
 export type ActivitySnapshot =
   | { status: 'ok'; events: ActivityEvent[]; hasMore: boolean }
+  | { status: 'no-tenant-access' }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 

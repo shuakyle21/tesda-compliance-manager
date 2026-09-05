@@ -16,7 +16,10 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { deriveTenantAccess } from '@/modules/tenancy/data/tenancy';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
@@ -45,7 +48,12 @@ export default async function ReportPage() {
     redirect('/trainer');
   }
 
-  const snapshot = await getBatchesSnapshot();
+  // This route already holds the profile snapshot for the trainer redirect
+  // above, so the membership verdict is derived from it rather than fetched a
+  // second time. `withTenantAccess` rewrites only an `ok` snapshot, so "you
+  // belong to no school" never masks a real fetch failure.
+  const tenantAccess = profileSnapshot ? deriveTenantAccess(profileSnapshot) : 'unknown';
+  const snapshot = withTenantAccess(await getBatchesSnapshot(), tenantAccess);
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
   const syncFailed = snapshot.status === 'sync-failed';
 
@@ -56,11 +64,15 @@ export default async function ReportPage() {
           <h1 className="page-title">Report</h1>
         </div>
         {syncFailed && <SyncFailedCallout />}
-        <EmptyState
-          iconName="certificate"
-          heading="No batches to report"
-          sub="EGACE outcomes and the post-training employment report appear here once a batch is imported or assigned to you."
-        />
+        {snapshot.status === 'no-tenant-access' ? (
+          <NoTenantAccessState subject="EGACE and employment reporting" />
+        ) : (
+          <EmptyState
+            iconName="certificate"
+            heading="No batches to report"
+            sub="EGACE outcomes and the post-training employment report appear here once a batch is imported or assigned to you."
+          />
+        )}
       </div>
     );
   }

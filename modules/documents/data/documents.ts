@@ -125,13 +125,23 @@ function mapDocumentRows(
 // ---------------------------------------------------------------------------
 // Fetch — server-only, same snapshot shaping as BatchesSnapshot (TES-8 AC6).
 // ---------------------------------------------------------------------------
+/**
+ * Deliberately has **no** `no-tenant-access` member. The requirement catalog is
+ * per-scholarship-program reference data, not tenant data — a caller with no
+ * school still reads the same TWSP/CFSP requirements, so an empty catalog here
+ * means the catalog is genuinely unseeded (§Phase 3 step 16), never "you have
+ * no access". Conflating the two would mislabel a seeding gap as a permissions
+ * problem.
+ */
 export type DocumentRequirementsSnapshot =
   | { status: 'ok'; requirements: DocumentRequirement[] }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
+/** Batch-scoped, so tenant-scoped — `no-tenant-access` is folded in by the caller. */
 export type BatchDocumentsSnapshot =
   | { status: 'ok'; documents: Record<string, DocRecord> }
+  | { status: 'no-tenant-access' }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 

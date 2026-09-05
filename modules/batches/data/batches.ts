@@ -262,12 +262,20 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
   };
 }
 
+/**
+ * `no-tenant-access` is never produced by the query below — RLS answers it
+ * with an empty, successful read, which is exactly the ambiguity it resolves.
+ * It is folded in by the caller via
+ * `modules/tenancy/domain/access`'s `withTenantAccess`, because membership is
+ * `modules/tenancy`'s fact and that module's `data/` is private to it.
+ */
 export type BatchesSnapshot =
   | { status: 'ok'; batches: Batch[]; dataAsOf: string | null }
+  | { status: 'no-tenant-access' }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
-/** Never substitutes mock data — an unconfigured or sync-failed snapshot renders empty. */
+/** Never substitutes mock data — any non-`ok` snapshot renders empty. */
 export function selectBatchesForDisplay(snapshot: BatchesSnapshot): Batch[] {
   return snapshot.status === 'ok' ? snapshot.batches : [];
 }
@@ -310,5 +318,6 @@ export async function getBatches(): Promise<Batch[]> {
   const snap = await getBatchesSnapshot();
   if (snap.status === 'ok') return snap.batches;
   if (snap.status === 'unconfigured') throw new Error('getBatches failed: Supabase is not configured');
+  if (snap.status === 'no-tenant-access') throw new Error('getBatches failed: no tenant access');
   throw new Error(`getBatches failed: ${snap.error}`);
 }

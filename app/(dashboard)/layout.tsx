@@ -7,6 +7,8 @@ import { Topbar } from '@/modules/shell/ui/Topbar';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { resolveTenantAccess } from './tenant-access';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireAuthenticatedUser();
@@ -15,9 +17,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const isTrainerRoute = pathname.startsWith('/trainer');
   const isDashboardRoute = pathname === '/dashboard';
 
-  const batchesSnapshot = await getBatchesSnapshot();
+  const batchesSnapshot = withTenantAccess(await getBatchesSnapshot(), await resolveTenantAccess());
+  // A metrics strip reading 0 batches / 0 scholars is a claim about a school.
+  // For someone attached to no school it is a claim about nothing, so it is
+  // suppressed alongside the sync-failed case rather than rendered as zeros.
   const metrics =
-    isDashboardRoute || batchesSnapshot.status === 'sync-failed'
+    isDashboardRoute ||
+    batchesSnapshot.status === 'sync-failed' ||
+    batchesSnapshot.status === 'no-tenant-access'
       ? null
       : deriveDashboardMetrics(selectBatchesForDisplay(batchesSnapshot), []);
 
