@@ -185,10 +185,24 @@ export async function findUserByEmail(email: string): Promise<UserLookupSnapshot
  *
  * Two statements, not one transaction — PostgREST exposes no multi-statement
  * transaction, so ordering carries the safety instead. The role UPDATE runs
- * first because it is the harmless half to stop after: if the membership
- * INSERT then fails, the person holds a changed role but *no new access*.
+ * first because it is the safer half to stop after: if the membership INSERT
+ * then fails, the person holds a changed role but no access to any *school*.
  * Granting access first and failing to set the role would leave someone
  * inside a school at whatever role they happened to have.
+ *
+ * That is not the same as "no new access", which is what this comment used to
+ * claim. Policies 1 and 2 of migration 20260904120000 are keyed on
+ * `current_role() = 'admin'` and match profiles belonging to *no* tenant, so a
+ * half-applied promotion to `admin` can read — and set roles on — the pool of
+ * unassigned profiles, with no membership required. Bounded to people who hold
+ * no access anywhere, and the same exposure any tenantless admin has by
+ * design (the migration flags it), but it is a real widening rather than none.
+ *
+ * Retry is the recovery: re-running the action repeats a no-op UPDATE and
+ * re-attempts the INSERT. Making the pair atomic would take a `SECURITY
+ * INVOKER` Postgres function so the table policies still fire — the first
+ * `.rpc()` in this codebase, so it is a precedent to set deliberately rather
+ * than in passing.
  *
  * An UPDATE blocked by RLS is not an error in PostgREST — the row simply does
  * not match the policy's `using` clause and zero rows come back. That is why
