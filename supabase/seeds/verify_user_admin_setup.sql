@@ -132,6 +132,14 @@ using (
 -- REVERT AS SOON AS VERIFICATION ENDS. The revert is at the bottom of this
 -- file, commented out.
 
+do $$
+begin
+  if coalesce(current_setting('app.environment', true), '') <> 'local' then
+    raise exception 'Part 2 promotes a demo account to admin. Run it only against a local database.';
+  end if;
+end;
+$$;
+
 update public.profiles
 set role = 'admin', updated_at = now()
 where clerk_user_id = 'user_3IMAGVRr7TnY3avksz6FbpIfPXj'
