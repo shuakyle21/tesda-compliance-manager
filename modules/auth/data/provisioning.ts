@@ -3,31 +3,45 @@
  *
  * These run with the service-role Supabase client (no Clerk session exists
  * yet for `user.created`/`user.deleted`), so callers must be limited to the
- * Clerk webhook route handler. New profiles get the least-privileged role
- * and no tenant membership: this repo's sign-up flow already tells users
- * "your registrar will assign your school and role" (see
- * `modules/auth/ui/SignUpModal.tsx`), so provisioning here only creates the
- * row an admin later assigns — it must never grant tenant access itself.
+ * Clerk webhook route handler. A user who signs themselves up gets the
+ * least-privileged role and no tenant membership: this repo's sign-up flow
+ * already tells users "your registrar will assign your school and role" (see
+ * `modules/auth/ui/SignUpModal.tsx`), so provisioning creates only the row an
+ * admin later assigns — self sign-up must never grant tenant access.
+ *
+ * The single exception is a user arriving through an admin's invitation,
+ * which carries the grant the admin already chose. That is still an admin
+ * assignment, just one made before the account existed; the safety argument
+ * for trusting it is in `modules/auth/domain/invitationMetadata.ts`.
  */
 
 import { createSupabaseServiceClient } from '@/lib/supabase/service';
+import { parseInvitationGrant } from '@/modules/auth/domain/invitationMetadata';
 
 type ClerkUserSummary = {
   id: string;
   email: string | null;
   fullName: string | null;
+  /**
+   * The Clerk user's `publicMetadata`. Backend-API-only, so on a user created
+   * from an invitation this is the grant the inviting admin authored. Absent
+   * for a self sign-up.
+   */
+  publicMetadata?: unknown;
 };
 
 /**
  * Creates or updates the `profiles` row for a Clerk user.
  *
- * Insert path (new `clerk_user_id`): role defaults to `viewer`, the least
- * privileged role, and no `profile_tenant_memberships` row is created —
- * the user has no tenant access until an admin assigns one.
+ * Insert path (new `clerk_user_id`): role comes from an invitation grant when
+ * one is present and parses, and otherwise defaults to `viewer`, the least
+ * privileged role. A tenant membership is created only for a grant — a self
+ * sign-up still lands with no tenant access at all.
  *
  * Update path (existing `clerk_user_id`): only syncs `full_name`/`email`.
  * Role and `is_active` are admin-managed in the app and are left untouched
- * here so a Clerk profile edit can never change app-side authorization.
+ * here, so neither a Clerk profile edit nor metadata appearing on an existing
+ * user can change app-side authorization after the fact.
  */
 export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promise<void> {
   const supabase = createSupabaseServiceClient();
@@ -50,15 +64,42 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
     return;
   }
 
-  const { error: insertError } = await supabase.from('profiles').insert({
-    clerk_user_id: user.id,
-    full_name: user.fullName,
-    email: user.email,
-    role: 'viewer',
-    is_active: true,
-  });
+  const grant = parseInvitationGrant(user.publicMetadata);
+
+  const { data: inserted, error: insertError } = await supabase
+    .from('profiles')
+    .insert({
+      clerk_user_id: user.id,
+      full_name: user.fullName,
+      email: user.email,
+      role: grant?.role ?? 'viewer',
+      is_active: true,
+    })
+    .select('id')
+    .single();
 
   if (insertError) throw insertError;
+  if (!grant || !inserted) return;
+
+  const { error: membershipError } = await supabase.from('profile_tenant_memberships').insert({
+    profile_id: inserted.id,
+    tenant_id: grant.tenantId,
+    // Their only school on arrival, so it is also where they land.
+    is_default: true,
+  });
+
+  // A failed membership insert must not fail the whole webhook: the profile
+  // row already exists and Clerk would retry the event, re-running an insert
+  // whose `clerk_user_id` is now taken. The person lands with their role but
+  // no school — visible to an admin as an unassigned user and fixable from
+  // the create-user screen, which is a far better failure than a profile that
+  // never gets created at all. Logged so the gap is not silent.
+  if (membershipError) {
+    console.error(
+      `Clerk invitation grant: profile created for "${user.id}" but tenant membership failed`,
+      membershipError,
+    );
+  }
 }
 
 /**

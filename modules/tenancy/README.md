@@ -8,3 +8,21 @@ Multi-tenant context and role model. Tenant context lives in the URL path segmen
 
 ## Planned
 - Trainer-facing DTO filtering (billing/financial fields omitted server-side) is enforced here + in each module's `data/` layer
+
+## User administration (added with the create-user screen)
+- `domain/userAccess.ts` — pure rules for the create-user form: `ASSIGNABLE_ROLES`
+  (the four DB roles; UI-only `owner` is excluded because `public.profile_role` has no
+  such value), `validateUserAccessDraft`, and the `CreateUserFormState` contract shared
+  by the Server Action and the form.
+- `data/users.ts` — `findUserByEmail`, `assignUserAccess`. The write half of this module:
+  sets a person's role and grants them a tenant, through the Clerk-scoped anon client so
+  RLS decides. Never the service-role client — that bypasses RLS and belongs to the webhook.
+- `ui/CreateUserForm.tsx` — the form. Takes the Server Action as a prop (the action lives in
+  `app/(dashboard)/users/new/actions.ts` because it composes this module's `data/` with
+  `modules/auth`'s, and a module's `data/` is private to it).
+
+Migration `20260904120000_add_user_admin_write_policies.sql` adds the policies this depends
+on: admins may read profiles with no tenant yet (the base "own or same-tenant" policy made
+an unassigned profile invisible to everyone, so nobody could be assigned), set roles on
+profiles they can see, and grant/revoke membership in tenants they belong to themselves.
+**Not yet applied** — see the migration header.
