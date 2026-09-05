@@ -314,12 +314,24 @@ and `activity_log`.
 | `lamr_outcomes` | tenant members | admin, coordinator, assigned trainer |
 | `lamr_activities` | tenant members | admin, coordinator, assigned trainer |
 | `lamr_entries` | tenant members | admin, coordinator, assigned trainer |
-| `activity_log` | tenant members | tenant members (append-only insert) |
+| `activity_log` | tenant members | insert only, `can_access_tenant(tenant_id)` — **any role**, viewer included; no update or delete policy |
 
 Three tables have no write policy at all. That is intentional: `tenants`, `profiles`, and
 `profile_tenant_memberships` are provisioned out-of-band, not through the authenticated
-client. A `viewer` has read access wherever their membership reaches and no write policy
-anywhere.
+client.
+
+A `viewer` has read access wherever their membership reaches. Their only write path is
+`activity_log`: its insert policy checks `app_private.can_access_tenant(tenant_id)` and
+nothing else, so unlike every other write policy in the schema it applies no role predicate.
+Every other table restricts writes to `admin` / `coordinator` / assigned `trainer`, and
+`activity_log` has no update or delete policy, so the append-only behaviour holds — a viewer
+can add an entry but cannot alter or remove one.
+
+> **Note for reviewers.** `CLAUDE.md` states that viewer is read-only and must be
+> server-denied on writes. The `activity_log` insert policy is the one place where the
+> database does not enforce that on its own. Whether appending an audit entry counts as a
+> "write" for the purposes of that invariant is a product decision, not something this
+> document can settle — flagging it rather than assuming either reading is correct.
 
 Every policy resolves through the `app_private` helpers, which read the Clerk `sub` claim off
 the JWT: `current_clerk_user_id()` → `current_profile_id()` → `current_role()` /
