@@ -1,11 +1,9 @@
 /**
  * FOUNDATIONAL EXAMPLE — real batch data via the generated Supabase contract.
  *
- * This is the reference pattern for replacing the `lib/data/mock-batches.ts`
- * MOCK_BATCHES with live data (goal: 2026-06-24). It is NOT yet wired into the
- * dashboard — `app/(dashboard)/dashboard/page.tsx` still imports the mock. Swap
- * `MOCK_BATCHES` → `await getBatches()` once this is reviewed and the gaps below
- * are closed.
+ * This is the reference pattern every entity contract follows. It IS wired into
+ * the dashboard — `app/(dashboard)/dashboard/page.tsx` calls `getBatchesSnapshot()`.
+ * The `MOCK_BATCHES` dataset it replaced was deleted in the mock-data retirement.
  *
  * Three layers, intentionally separated:
  *   1. fetch   — getBatches(): typed Supabase query (RLS scopes to the caller).

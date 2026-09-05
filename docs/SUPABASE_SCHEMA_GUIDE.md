@@ -1,5 +1,16 @@
 # Supabase Schema Guide
 
+> **Superseded for implementation — 2026-09-05.** This guide describes designing the schema
+> and creating the tables *by hand*. That step is done: the schema is now defined by the
+> migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` (plus three
+> additive migrations), which is canonical for both tables and RLS. New migrations are
+> additive — do not create or alter tables through the dashboard.
+>
+> - For the tables, columns, foreign keys, and RLS policies as they exist today, see
+>   [`DATA_MODEL.md`](DATA_MODEL.md).
+> - This document is kept for its **design rationale** — why the tables are shaped this way
+>   and where the TESDA boundary sits — which is still current and is not repeated elsewhere.
+
 This is the first manual backend step for the TESDA Document and Compliance Manager MVP.
 
 Do this before building more UI screens, analytics, MongoDB, OCR, email automation, or GitHub Actions. The goal is to understand and design the database tables first, then manually create them in your hosted Supabase project.

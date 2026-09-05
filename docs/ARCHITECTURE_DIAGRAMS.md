@@ -148,7 +148,6 @@ flowchart TB
     subgraph Shared["shared/ — leaf level"]
         SharedUI["ui/ primitives"]
         SharedTypes["types.ts"]
-        SharedMocks["mocks/seed.ts"]
     end
 
     subgraph LibSupabase["lib/supabase/ — data boundary"]
@@ -186,14 +185,17 @@ flowchart LR
     Derive --> Snapshot{"Snapshot"}
     Snapshot -->|ok| Live["Render live rows.<br/>Empty is a REAL answer."]
     Snapshot -->|sync-failed| Banner["MUST surface the banner.<br/>Never leak the raw error."]
-    Snapshot -->|unconfigured| Mocks["Fall back to mocks,<br/>silently, by design."]
+    Snapshot -->|unconfigured| Empty["Honest empty state.<br/>Never fabricated data."]
 
     style Banner fill:#ffe9df,stroke:#eb6c36
 ```
 
-The states are not interchangeable. The most common defect in this codebase is treating
-`ok` **and empty** as a reason to render mock data — that shows fabricated figures with
-no banner, because `syncFailed` is false.
+The states are not interchangeable. Neither `unconfigured` (no Supabase env) nor
+`sync-failed` (configured but errored) may substitute mock or fabricated data — both render
+an honest empty state, and `sync-failed` must additionally surface the banner. The most
+common defect in this codebase is treating `ok` **and empty** as a reason to render
+something other than an empty state, which would show fabricated figures with no banner
+because `syncFailed` is false.
 
 Two type families stay separate: `lib/supabase/database.types.ts` (generated raw rows,
 regenerate after every migration) and `shared/types.ts` (UI domain types). Only module
@@ -216,8 +218,10 @@ Two rules that actually bite:
 - **Another module's `data/` is private.** Import its `domain/` or `ui/` instead. Only
   `app/` may call any module's `data/`.
 - **`shared/` must never import `modules/` or `app/`.** This is why the per-module type
-  split was deferred: `shared/mocks/seed.ts` constructs 11 domain types, so moving those
-  types into modules would break the boundary until the mock dataset is relocated.
+  split was originally deferred (TES-68): `shared/mocks/seed.ts` constructed 11 domain
+  types, so moving those types into modules would have broken the boundary. That dataset
+  was deleted in the mock-data retirement, so the blocker is gone — the split is unblocked
+  whenever someone wants to do it.
 
 No index barrels — deep imports are the convention.
 
