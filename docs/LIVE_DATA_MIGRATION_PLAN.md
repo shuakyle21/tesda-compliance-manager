@@ -16,6 +16,21 @@
 > Appendix A's seeding phase also landed: 5 batches / 89 learners / 40 documents are in
 > the project (migration `20260831120000_seed_dev_operational_data.sql`).
 
+> **Status update — 2026-09-05. Phase 5 landed, and it diverged from this plan.**
+> This document's A.7 decision was to **keep `shared/mocks`** as the `unconfigured`
+> fallback and as future test fixtures, removing only the fallback *wiring*. That is not
+> what happened. The mock-data retirement **deleted `shared/mocks/` entirely**, including
+> `seed.ts`, and `unconfigured` now renders an honest empty state rather than fixtures —
+> matching `CLAUDE.md`, which forbids either `unconfigured` or `sync-failed` from
+> substituting mock or fabricated data.
+>
+> Read every "`shared/mocks` stays" statement below (A.7, §15, §25, the Phase 5 line, the
+> risk table) as **superseded**. The reasoning is kept as the record of what was planned
+> and why; it no longer describes the code. Table and inventory rows citing
+> `shared/mocks/seed.ts` line numbers refer to a deleted file.
+>
+> For the schema those live tables now follow, see [`DATA_MODEL.md`](DATA_MODEL.md).
+
 
 
 **Status:** Draft for review · **Date:** 2026-08-31 · **Audience:** solo junior developer
