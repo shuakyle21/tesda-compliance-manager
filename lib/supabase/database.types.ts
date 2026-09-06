@@ -1,3 +1,27 @@
+/**
+ * Generated-shape Supabase row types (RULES.md sec.3 rule 20).
+ *
+ * `platform_admins`, `qualifications`, `tenant_qualifications`, the six new
+ * `tenants` columns and the `create_school` /
+ * `current_user_is_platform_admin` functions were written by hand from
+ * `supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql`.
+ *
+ * That migration is now APPLIED (2026-09-06), and these hand-written shapes
+ * were checked field-by-field against `generate_typescript_types` run on the
+ * live project. They match. Two deliberate divergences from the generator:
+ * `create_school`'s nullable text parameters are typed `string | null` here
+ * (the generator emits plain `string`, but every one of them is a nullable
+ * `text` and the data layer passes null), and
+ * `current_user_is_platform_admin`'s `Args` stays `Record<string, never>`
+ * rather than the generator's `never`, matching this file's existing style.
+ *
+ * NOTE FOR A FUTURE CLEANUP: this file is hand-maintained and stubs every
+ * table's `Relationships` as `[]`. That stub is what makes supabase-js unable
+ * to infer embedded joins, which is the root of the four long-standing TS2352
+ * casts in `activity.ts`, `batches.ts`, `tenancy.ts` and `users.ts`. Adopting
+ * the generator's real `Relationships` arrays would very likely retire all
+ * four. Out of scope here; worth doing deliberately.
+ */
 export type Json =
   | string
   | number
@@ -39,6 +63,12 @@ export interface Database {
           name: string;
           region: string | null;
           school_type: string | null;
+          tesda_provider_code: string | null;
+          province: string | null;
+          city_municipality: string | null;
+          street_address: string | null;
+          provider_type: string | null;
+          provider_classification: string | null;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -49,6 +79,12 @@ export interface Database {
           name: string;
           region?: string | null;
           school_type?: string | null;
+          tesda_provider_code?: string | null;
+          province?: string | null;
+          city_municipality?: string | null;
+          street_address?: string | null;
+          provider_type?: string | null;
+          provider_classification?: string | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -96,6 +132,72 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['profile_tenant_memberships']['Insert']>;
+        Relationships: [];
+      };
+      platform_admins: {
+        Row: {
+          profile_id: string;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          profile_id: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['platform_admins']['Insert']>;
+        Relationships: [];
+      };
+      qualifications: {
+        Row: {
+          id: string;
+          code: string;
+          title: string;
+          nc_level: string | null;
+          sector: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          title: string;
+          nc_level?: string | null;
+          sector?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['qualifications']['Insert']>;
+        Relationships: [];
+      };
+      tenant_qualifications: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          qualification_id: string;
+          copr_number: string | null;
+          registration_status: string | null;
+          delivery_mode: string | null;
+          valid_until: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          qualification_id: string;
+          copr_number?: string | null;
+          registration_status?: string | null;
+          delivery_mode?: string | null;
+          valid_until?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['tenant_qualifications']['Insert']>;
         Relationships: [];
       };
       scholarship_programs: {
@@ -483,6 +585,27 @@ export interface Database {
           target_tenant_id: string;
         };
         Returns: undefined;
+      };
+      current_user_is_platform_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      create_school: {
+        Args: {
+          p_code: string;
+          p_name: string;
+          p_region: string | null;
+          p_school_type: string | null;
+          p_tesda_provider_code: string | null;
+          p_province: string | null;
+          p_city_municipality: string | null;
+          p_street_address: string | null;
+          p_provider_type: string | null;
+          p_provider_classification: string | null;
+          p_qualifications: Json;
+        };
+        /** The new tenant's id. */
+        Returns: string;
       };
     };
     Enums: {
