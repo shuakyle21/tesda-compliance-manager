@@ -111,17 +111,18 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
  * Shared by both paths of `upsertProfileFromClerkUser` so that creating the
  * membership and repairing a missing one behave identically.
  *
- * **Never throws.** A membership failure must not fail the whole webhook: the
- * `profiles` row already exists by this point, and a non-2xx makes Clerk retry
- * an insert whose `clerk_user_id` is now taken — trading a missing school for
- * a redelivery that can never succeed. The person instead lands with their
- * role and no school, which an admin sees as an unassigned user and can fix
- * from the create-user screen. Logged, so the gap is never silent, and now
- * self-healing: the next `user.updated` delivery retries this.
+ * The database function locks the profile row, then checks and inserts in the
+ * same transaction. Concurrent deliveries for one profile therefore cannot
+ * both observe an empty membership set and assign different default schools.
+ * A duplicate-key error is still accepted because a writer outside this
+ * helper may have inserted the same membership without taking that lock.
  *
- * The zero-membership gate is what makes the write safe to repeat. It also
- * makes `is_default: true` correct by construction — true is right exactly
- * when there are no others, which is the condition being checked.
+ * Other failures are logged and rethrown so the webhook responds with 500 and
+ * Clerk retries. On retry, the existing-profile path reaches this same helper,
+ * making a partially completed profile creation recoverable.
+ *
+ * The atomic zero-membership gate also makes `is_default: true` correct by
+ * construction — true is right exactly when there are no others.
  * `modules/tenancy/data/users.ts` has to write `false` for precisely the
  * opposite reason: its client is RLS-scoped, so an empty membership list there
  * means "none this admin can see", not "none". Here the service-role client
@@ -130,40 +131,17 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
 async function ensureTenantMembership(profileId: string, tenantId: string): Promise<void> {
   const supabase = createSupabaseServiceClient();
 
-  const { data: existingMemberships, error: readError } = await supabase
-    .from('profile_tenant_memberships')
-    .select('id')
-    .eq('profile_id', profileId)
-    .limit(1);
-
-  if (readError) {
-    console.error(
-      `Clerk invitation grant: could not read memberships for profile "${profileId}"`,
-      readError,
-    );
-    return;
-  }
-
-  // Already has a school. Either this grant landed the first time, or an admin
-  // has since assigned one — and overwriting an admin's assignment from Clerk
-  // metadata is exactly what this must not do.
-  if (existingMemberships && existingMemberships.length > 0) return;
-
-  const { error: insertError } = await supabase.from('profile_tenant_memberships').insert({
-    profile_id: profileId,
-    tenant_id: tenantId,
-    // Their only school, so it is also where they land.
-    is_default: true,
+  const { error: membershipError } = await supabase.rpc('ensure_profile_tenant_membership', {
+    target_profile_id: profileId,
+    target_tenant_id: tenantId,
   });
 
-  // `unique (tenant_id, profile_id)` on the table means a concurrent delivery
-  // that won the race shows up here as a duplicate-key violation. That is the
-  // desired end state, not a failure, so it is not worth logging.
-  if (insertError && insertError.code !== UNIQUE_VIOLATION) {
+  if (membershipError && membershipError.code !== UNIQUE_VIOLATION) {
     console.error(
       `Clerk invitation grant: tenant membership failed for profile "${profileId}"`,
-      insertError,
+      membershipError,
     );
+    throw membershipError;
   }
 }
 

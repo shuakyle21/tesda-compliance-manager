@@ -476,7 +476,15 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      ensure_profile_tenant_membership: {
+        Args: {
+          target_profile_id: string;
+          target_tenant_id: string;
+        };
+        Returns: undefined;
+      };
+    };
     Enums: {
       profile_role: ProfileRole;
       lifecycle_stage: LifecycleStage;
