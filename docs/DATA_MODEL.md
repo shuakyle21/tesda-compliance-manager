@@ -454,5 +454,11 @@ A platform admin reaches `tenants`, `qualifications`, `tenant_qualifications`, u
 `batches`, `learners`, `documents`, `lamr_*` or `activity_log`. Adding one is a boundary change
 that needs its own ADR.
 
+`profile_tenant_memberships` is the sharp edge: `app_private.can_access_tenant()` resolves purely
+from that table, so an unconstrained INSERT there is equivalent to granting every compliance
+table at once. The policy therefore forbids seating **yourself**
+(`profile_id <> app_private.current_profile_id()`) and only admits a tenant that has no members
+yet. Both predicates are load-bearing — see ADR-006 §P3.
+
 `public.create_school(...)` is `security invoker`: it buys one transaction for the school plus
 its programs, not a privilege. RLS still evaluates every statement inside it.

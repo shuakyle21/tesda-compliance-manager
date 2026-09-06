@@ -2497,7 +2497,7 @@ body { min-height: 100vh; margin: 0; }
 select.input { padding-right: 28px; height: 34px; }
 
 /* ---------------------------------------------------------------------------
-   Add-school form (FR-02, ADR-004)
+   Add-school form (FR-02, ADR-006)
 
    Reuses every .user-form-* primitive; only the repeatable program rows need
    anything new. A program is a card rather than a run of loose inputs because

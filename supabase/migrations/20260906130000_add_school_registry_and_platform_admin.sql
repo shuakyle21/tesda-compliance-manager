@@ -91,6 +91,7 @@ as $$
   );
 $$;
 
+revoke execute on function app_private.is_platform_admin() from public, anon;
 grant execute on function app_private.is_platform_admin() to authenticated;
 
 -- The application needs to ask a question it cannot answer with a SELECT,
@@ -286,11 +287,51 @@ with check (app_private.is_platform_admin());
 -- No matching DELETE policy: revoking a membership is the school admin's
 -- operation, and they already have one. The platform admin seats the first
 -- admin and steps back out.
+--
+-- THE TWO GUARDS BELOW ARE THE WHOLE BOUNDARY. `with check` on
+-- `is_platform_admin()` alone constrains the *actor* and says nothing about
+-- the *row*, and this is the one table where that distinction is fatal:
+-- `app_private.can_access_tenant()` resolves purely from
+-- `profile_tenant_memberships`, so an operator who could insert an arbitrary
+-- row could seat *themselves* into any school and, in the same motion, hand
+-- themselves everything `can_access_tenant` gates -- batches, learners,
+-- documents, LAMR. That is the escalation ADR-006 sec.P3 promises cannot
+-- happen, and only these predicates stop it.
+--
+--   1. `profile_id <> current_profile_id()` -- the operator may seat other
+--      people, never themselves. This is what closes the escalation.
+--   2. the tenant has no members yet -- "first members", as the policy name
+--      says. Provisioning a new school is the job; injecting an account into
+--      an established one is not. Racy under concurrent inserts (two calls
+--      can both see an empty tenant), which is tolerable because guard 1
+--      holds regardless and the outcome is at worst two seated members.
+--
+-- Compare `20260904120000` policy 3, which carries
+-- `and app_private.can_access_tenant(tenant_id)` for exactly this reason. A
+-- platform admin cannot use that containment -- they belong to no tenant --
+-- so they need their own, and it must not be weaker.
+--
+-- ORDERING NOTE. Guard 2's subquery reads `profile_tenant_memberships`, so it
+-- is itself filtered by that table's SELECT policies. It is correct only
+-- because "Platform admins can read tenant memberships" (below) shows the
+-- caller every row -- an operator who could not see an existing membership
+-- would read the tenant as empty and seat into it anyway. Deleting or
+-- narrowing that SELECT policy silently weakens this INSERT policy. Neither
+-- SELECT policy recurses: both resolve through `security definer` helpers
+-- that read `platform_admins` / `profiles`, never back into this table.
 create policy "Platform admins can seat a tenant's first members"
 on public.profile_tenant_memberships
 for insert
 to authenticated
-with check (app_private.is_platform_admin());
+with check (
+  app_private.is_platform_admin()
+  and profile_id <> app_private.current_profile_id()
+  and not exists (
+    select 1
+    from public.profile_tenant_memberships existing
+    where existing.tenant_id = profile_tenant_memberships.tenant_id
+  )
+);
 
 -- Reading the membership rows they just wrote, and finding the profile to
 -- seat. `profiles` policy 1 from 20260904120000 already exposes unassigned

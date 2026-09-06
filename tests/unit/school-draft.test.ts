@@ -181,7 +181,48 @@ describe('validateSchoolDraft', () => {
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
+    expect(result.errors.programRows?.[0]).toBe('Choose a qualification from the list.');
+  });
+
+  // Regression: row errors are keyed by the index the FORM rendered, not by a
+  // position in the compacted command list. Blank rows and duplicates never
+  // reach that list, so the two indexes diverge the moment either appears --
+  // and the message then lands on an innocent row while the offender renders
+  // clean.
+  it('keys an unknown-qualification error to the form row, not the compacted row', () => {
+    const blank: SchoolProgramDraft = {
+      qualificationId: '',
+      coprNumber: '',
+      registrationStatus: '',
+      deliveryMode: '',
+    };
+    const result = validateSchoolDraft(
+      draft({ programs: [blank, program({ qualificationId: 'qual_not_real' })] }),
+      ALLOWED,
+    );
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    // Row 1 is the offender. Row 0 is an untouched spare and must stay clean.
+    expect(result.errors.programRows?.[1]).toBe('Choose a qualification from the list.');
+    expect(result.errors.programRows?.[0]).toBeUndefined();
+  });
+
+  it('reports every unknown qualification, not only the first', () => {
+    const result = validateSchoolDraft(
+      draft({
+        programs: [
+          program({ qualificationId: 'qual_not_real' }),
+          program({ qualificationId: 'qual_also_not_real' }),
+        ],
+      }),
+      ALLOWED,
+    );
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
     expect(result.errors.programRows?.[0]).toBeTruthy();
+    expect(result.errors.programRows?.[1]).toBeTruthy();
   });
 
   it('leaves every optional field null rather than empty string', () => {

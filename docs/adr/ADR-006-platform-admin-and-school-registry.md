@@ -105,6 +105,25 @@ members", a newly created school is permanently unstaffable, because the existin
 (migration `20260904120000`, policy 3) requires `can_access_tenant(tenant_id)` — which a platform
 admin, belonging to no tenant by design, can never satisfy.
 
+**That same policy is where P3 is won or lost, and the first draft of this change lost it.**
+Written as `with check (app_private.is_platform_admin())`, it constrains the *actor* and says
+nothing about the *row*. `app_private.can_access_tenant()` resolves purely from
+`profile_tenant_memberships`, so an operator could insert `(any tenant, their own profile_id)`
+and hand themselves everything that function gates — batches, learners, documents, LAMR — in one
+statement. The UI gate does not narrow it; RLS is the boundary. Caught in review before the
+migration was applied.
+
+The policy therefore carries two predicates, and **neither may be removed**:
+
+1. `profile_id <> app_private.current_profile_id()` — the operator seats other people, never
+   themselves. This is the one that closes the escalation.
+2. the target tenant has no members yet — "first members", as the name says. Provisioning a new
+   school is the job; injecting an account into an established one is not. Racy under concurrent
+   inserts, which is tolerable: guard 1 holds regardless, and the worst outcome is two seated
+   members rather than one.
+
+A reader checking P3 should confirm both are still present, not merely that the policy exists.
+
 ### P4/P5 — one national list, per-school certificates
 
 "Organic Agriculture Production NC II" means the same thing at AKB as at J3ED, so storing it

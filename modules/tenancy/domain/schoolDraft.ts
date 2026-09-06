@@ -157,8 +157,20 @@ const SCHOOL_CODE_SHAPE = /^[A-Z0-9]{2,12}$/;
 /** TESDA provider numbers are numeric, e.g. 1263. */
 const PROVIDER_CODE_SHAPE = /^\d{1,10}$/;
 
+/**
+ * Validates every program row, keying each message by its **draft** index.
+ *
+ * The allowed-id check lives in here rather than in the caller on purpose.
+ * `rows` is compacted -- blank rows and duplicates never reach it -- so an
+ * index into `rows` does not address the same row the form rendered. Checking
+ * out here against `rows.findIndex` therefore filed the message against the
+ * wrong input (and reported only the first offender). Inside this loop the
+ * draft index is the one the form uses, so it is the only place the check is
+ * correct.
+ */
 function validatePrograms(
   drafts: readonly SchoolProgramDraft[],
+  allowedQualificationIds: readonly string[],
 ): { rows: SchoolProgramCommand[]; message?: string; rowErrors: Record<number, string> } {
   const rows: SchoolProgramCommand[] = [];
   const rowErrors: Record<number, string> = {};
@@ -188,6 +200,13 @@ function validatePrograms(
       rowErrors[index] = 'This qualification is already listed. Remove the duplicate.';
       return;
     }
+
+    // Turns a foreign-key failure into something the operator can act on.
+    if (!allowedQualificationIds.includes(qualificationId)) {
+      rowErrors[index] = 'Choose a qualification from the list.';
+      return;
+    }
+
     seen.add(qualificationId);
 
     rows.push({
@@ -246,12 +265,7 @@ export function validateSchoolDraft(
     errors.tesdaProviderCode = 'Enter numbers only, for example 1263.';
   }
 
-  const { rows, message, rowErrors } = validatePrograms(draft.programs);
-
-  const unknownRow = rows.findIndex((row) => !allowedQualificationIds.includes(row.qualificationId));
-  if (unknownRow !== -1) {
-    rowErrors[unknownRow] = 'Choose a qualification from the list.';
-  }
+  const { rows, message, rowErrors } = validatePrograms(draft.programs, allowedQualificationIds);
 
   if (message) errors.programs = message;
   if (Object.keys(rowErrors).length > 0) errors.programRows = rowErrors;
