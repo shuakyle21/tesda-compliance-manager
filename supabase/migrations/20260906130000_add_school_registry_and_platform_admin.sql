@@ -68,12 +68,25 @@ create table public.platform_admins (
 
 alter table public.platform_admins enable row level security;
 
--- Intentionally NO policies and NO grants for `authenticated`. The table is
--- unreadable and unwritable through the Clerk-scoped anon client, so platform
--- admin cannot be self-granted through any application path. Membership is
--- conferred only by a statement run against the project directly, which
--- RULES.md rule 36 already gates behind explicit human approval. The
--- `security definer` function below is the only way the app learns the answer.
+-- Intentionally NO POLICIES. RLS is enabled and no policy is ever created, so
+-- every operation is denied for `anon` and `authenticated`: platform admin
+-- cannot be self-granted through any application path. Membership is conferred
+-- only by a statement run against the project directly, which RULES.md rule 36
+-- already gates behind explicit human approval. The `security definer` function
+-- below is the only way the app learns the answer.
+--
+-- NOT by withholding grants. Supabase ships `alter default privileges in schema
+-- public grant all on tables to anon, authenticated, service_role`, so this
+-- table receives SELECT/INSERT/UPDATE/DELETE for both roles the moment it is
+-- created, whatever this file does or does not say. Verified against the live
+-- project after applying: `authenticated` holds all seven privileges here, and
+-- `insert into public.platform_admins values (<a real profile id>)` as
+-- `authenticated` still fails with "new row violates row-level security policy".
+-- The deny comes entirely from RLS-with-no-policies.
+--
+-- CONSEQUENCE: the Supabase linter reports `rls_enabled_no_policy` (INFO) for
+-- this table. That finding is the design, not a defect. Do not "fix" it by
+-- adding a policy -- any policy here is a way in.
 
 create or replace function app_private.is_platform_admin()
 returns boolean

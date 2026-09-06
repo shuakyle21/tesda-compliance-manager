@@ -51,8 +51,11 @@ school *registry* only — no policy gives it batches, learners, documents or LA
 before widening it.
 
 Migration `20260906130000_add_school_registry_and_platform_admin.sql` adds the tables and policies
-this depends on. **Not yet applied** — and neither are the three migrations before it. Enrolling
-the first platform admin is a separate statement run against the project directly:
+this depends on. **Applied 2026-09-06** (out of order — the three migrations before it are still
+pending; it depends on none of them). Note `/users/new` still cannot assign anyone until
+`20260904120000` lands, so seating a new school's first admin does not work yet.
+
+Enrolling a platform admin is a separate statement run against the project directly:
 
 ```sql
 insert into public.platform_admins (profile_id)

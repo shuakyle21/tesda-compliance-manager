@@ -1,14 +1,26 @@
 /**
  * Generated-shape Supabase row types (RULES.md sec.3 rule 20).
  *
- * PENDING REGENERATION. `platform_admins`, `qualifications`,
- * `tenant_qualifications`, the six new `tenants` columns, and the
- * `create_school` / `current_user_is_platform_admin` functions were written by
- * hand from
- * `supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql`
- * because that migration is not applied yet (RULES.md rule 36 -- one hosted
- * project, no staging). Regenerate against the live project as soon as it is
- * applied, and treat any diff as a bug in this file, not in the migration.
+ * `platform_admins`, `qualifications`, `tenant_qualifications`, the six new
+ * `tenants` columns and the `create_school` /
+ * `current_user_is_platform_admin` functions were written by hand from
+ * `supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql`.
+ *
+ * That migration is now APPLIED (2026-09-06), and these hand-written shapes
+ * were checked field-by-field against `generate_typescript_types` run on the
+ * live project. They match. Two deliberate divergences from the generator:
+ * `create_school`'s nullable text parameters are typed `string | null` here
+ * (the generator emits plain `string`, but every one of them is a nullable
+ * `text` and the data layer passes null), and
+ * `current_user_is_platform_admin`'s `Args` stays `Record<string, never>`
+ * rather than the generator's `never`, matching this file's existing style.
+ *
+ * NOTE FOR A FUTURE CLEANUP: this file is hand-maintained and stubs every
+ * table's `Relationships` as `[]`. That stub is what makes supabase-js unable
+ * to infer embedded joins, which is the root of the four long-standing TS2352
+ * casts in `activity.ts`, `batches.ts`, `tenancy.ts` and `users.ts`. Adopting
+ * the generator's real `Relationships` arrays would very likely retire all
+ * four. Out of scope here; worth doing deliberately.
  */
 export type Json =
   | string

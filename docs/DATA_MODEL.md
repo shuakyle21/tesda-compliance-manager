@@ -12,21 +12,25 @@ as of these seven versions. **Applied** means present in the live Supabase proje
 | `20260831120000` | `seed_dev_operational_data` (data only, no DDL) | **pending** |
 | `20260904120000` | [`add_user_admin_write_policies`](../supabase/migrations/20260904120000_add_user_admin_write_policies.sql) (RLS policies only, no DDL) | **pending** |
 | `20260906120000` | [`ensure_invitation_membership_atomic`](../supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql) (one function, no DDL) | **pending** |
-| `20260906130000` | [`add_school_registry_and_platform_admin`](../supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql) — 3 tables, 6 `tenants` columns, 2 functions, RLS ([ADR-006](adr/ADR-006-platform-admin-and-school-registry.md)) | **pending** |
+| `20260906130000` | [`add_school_registry_and_platform_admin`](../supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql) — 3 tables, 6 `tenants` columns, 2 functions, RLS ([ADR-006](adr/ADR-006-platform-admin-and-school-registry.md)) | applied |
 
-The status column was last checked against the live project on **2026-09-06**.
+The status column was last checked against the live project on **2026-09-06**, when
+`20260906130000` was applied and `database.types.ts` verified field-by-field against the
+regenerated types.
 
-**`20260906130000` is the first pending migration that carries DDL**, so the counts below no
-longer describe both states. The applied schema has **15 tables and 33 foreign keys**; after
-`20260906130000` lands it has **18 tables and 36 foreign keys** (`platform_admins`,
-`qualifications`, `tenant_qualifications`, plus six new nullable `tenants` columns). Diagrams
-below still draw the applied schema; the new tables are described in their own section rather
-than redrawn into the clusters.
+**Applied out of order.** `20260906130000` was applied while `20260831120000`, `20260904120000`
+and `20260906120000` were still pending, because it depends on none of them — only on the base
+schema. Supabase records migrations by version, so applying the earlier three later is fine; just
+do not assume "highest applied version" means everything below it has run.
 
-The other pending migrations change behaviour rather than shape: until `20260904120000` runs, no
-client can write `profiles` or `profile_tenant_memberships`, which is what the
-user-administration screens need (`modules/tenancy/data/users.ts`); until `20260906130000` runs,
-`/schools/new` cannot resolve a platform admin and renders its denied state for everyone.
+The live schema is therefore **18 tables and 36 foreign keys**. The four cluster diagrams below
+still draw the 15 pre-existing tables; the three new ones have their own section at the end
+rather than being redrawn into the clusters.
+
+The three still-pending migrations change behaviour rather than shape. Most consequentially:
+until `20260904120000` runs, no client can write `profiles` or `profile_tenant_memberships`, so
+`/users/new` cannot assign anyone — **including the school admin that `/schools/new` expects you
+to seat next**. The two screens are a pair; the second is not usable until that migration lands.
 
 If you add a migration, update this file in the same PR — nothing enforces that automatically,
 so the version table above is how a reader tells whether this is current. Applying a migration
@@ -380,11 +384,11 @@ happens in `DB_TO_UI_STAGE` in `modules/batches/data/batches.ts` and nowhere els
 
 ---
 
-## School registry (pending — migration `20260906130000`)
+## School registry (applied 2026-09-06 — migration `20260906130000`)
 
 Added by [ADR-006](adr/ADR-006-platform-admin-and-school-registry.md). Three tables and six
-`tenants` columns. Drawn separately from the clusters above because the migration is not applied
-yet — fold this section into the diagrams once it is.
+`tenants` columns. Drawn separately from the four clusters above; folding it in is a tidy-up
+nobody has done yet.
 
 ```mermaid
 erDiagram
@@ -444,8 +448,12 @@ The certificate says COPR; the T2MIS import/export columns say CTPR. Same number
 
 ### Access
 
-`platform_admins` has RLS enabled and **no policies or grants for `authenticated`**, so it is
-unreadable and unwritable through the anon client; the role cannot be self-granted from the app.
+`platform_admins` has RLS enabled and **no policies at all**, so every operation is denied and
+the role cannot be self-granted from the app. Note it *does* carry the usual grants —
+Supabase's default privileges grant every new `public` table to `anon` and `authenticated`
+regardless — so the deny comes entirely from RLS-with-no-policies, verified by probe after
+applying. The Supabase linter's `rls_enabled_no_policy` (INFO) on this table is the design;
+adding a policy to silence it would open the door.
 `app_private.is_platform_admin()` (`security definer`) is what policies consult, and
 `public.current_user_is_platform_admin()` exposes only the caller's own boolean to the app.
 
