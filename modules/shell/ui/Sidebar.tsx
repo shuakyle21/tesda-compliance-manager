@@ -67,6 +67,20 @@ const OPERATIONS: NavItem[] = [
   { label: 'Settings', icon: 'settings', op: 'settings' },
 ];
 
+/**
+ * Admin-only operations. Kept out of `OPERATIONS` because the roles differ:
+ * that list is office-vs-trainer, this one needs the real role.
+ *
+ * Unlike Billing — whose nav row is shown to everyone because the route
+ * redirects trainers server-side — this row is hidden from non-admins, since
+ * for them it leads only to a dead end ("Only admins can add users"). Hiding
+ * is usability, not security: the gate is `resolveTrustedRole` in the route
+ * and the Server Action, and RLS beneath both.
+ */
+const ADMIN_OPERATIONS: NavItem[] = [
+  { label: 'Add user', icon: 'users', href: '/users/new' },
+];
+
 interface SidebarProps {
   /**
    * The only role signal a Server Component layout can derive today (no real
@@ -77,12 +91,24 @@ interface SidebarProps {
    * already enforces for the metrics row.
    */
   isTrainerRoute?: boolean;
+  /**
+   * Whether the signed-in person is an admin, resolved server-side by the
+   * layout from their `profiles` row. Defaults to false so anything that has
+   * not resolved a role shows the smaller menu rather than the larger one.
+   */
+  isAdmin?: boolean;
 }
 
-export function Sidebar({ isTrainerRoute = false }: SidebarProps) {
+export function Sidebar({ isTrainerRoute = false, isAdmin = false }: SidebarProps) {
   const pathname = usePathname();
   const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
-  const operations = isTrainerRoute ? OPERATIONS.filter((o) => o.op === 'settings') : OPERATIONS;
+  const baseOperations = isTrainerRoute
+    ? OPERATIONS.filter((o) => o.op === 'settings')
+    : OPERATIONS;
+  // A trainer is never an admin here, but the guard is explicit rather than
+  // implied so the two conditions cannot drift apart later.
+  const operations =
+    isAdmin && !isTrainerRoute ? [...baseOperations, ...ADMIN_OPERATIONS] : baseOperations;
 
   // School selector. `tenant` is null until a real tenant list exists (TES-34);
   // the dropdown layer is kept so the Esc ordering below stays intact and so

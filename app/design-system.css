@@ -2361,3 +2361,137 @@ body { min-height: 100vh; margin: 0; }
 .auth-clerk-card { box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
 .auth-clerk-title { letter-spacing: -0.01em; }
 
+
+/* ----- Add user form (FR-01/FR-02) --------------------------- */
+/* A single-column form capped at reading width. Every colour below is a
+   semantic token, and every state that uses one also carries an icon and a
+   sentence (see CreateUserForm) so status is never signalled by colour alone
+   -- a coordinator misreading a role grant is an access-control failure, not
+   a cosmetic one. */
+
+/* Success tone for .banner, alongside the existing .critical and .info.
+   The base .banner is amber (a caution), so a confirmed grant needed its own
+   variant rather than borrowing one that reads as a warning. */
+.banner.success {
+  background: var(--color-green-lt);
+  border-color: var(--color-green-border);
+  color: var(--color-green-dk);
+}
+
+.user-form-intro {
+  margin: 0 0 20px;
+  max-width: 60ch;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Capped rather than full-bleed: form fields wider than roughly 60ch make
+     the label-to-input association harder to hold at a glance. */
+  max-width: 560px;
+}
+
+.user-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* fieldset carries browser defaults that a div does not. */
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.user-form-label {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding: 0;
+}
+
+.user-form-optional {
+  margin-left: 6px;
+  font-weight: 400;
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+}
+
+.user-form-hint,
+.user-form-note {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.user-form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--color-red-dk);
+}
+.user-form-error svg { flex-shrink: 0; margin-top: 1px; }
+
+/* Roles are radios rather than a select because each choice carries a
+   sentence explaining what it grants, and a select cannot show those at the
+   point of choosing. */
+.user-form-roles { gap: 8px; }
+
+.user-form-role {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--dur-base) var(--ease-standard),
+              background var(--dur-base) var(--ease-standard);
+}
+.user-form-role:hover { border-color: var(--color-border-strong); }
+/* The checked row is tinted AND the label is the only text set in the accent
+   colour -- but the radio dot itself is what actually reports selection to
+   assistive tech and to anyone not distinguishing the tints. */
+.user-form-role:has(input:checked) {
+  border-color: var(--color-blue);
+  background: var(--color-blue-lt);
+}
+.user-form-role input { margin-top: 2px; flex-shrink: 0; accent-color: var(--color-blue); }
+.user-form-role > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.user-form-role-name {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+.user-form-role-desc {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.user-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.user-form-note { max-width: 52ch; }
+
+/* select needs the arrow room .input does not reserve. */
+select.input { padding-right: 28px; height: 34px; }
