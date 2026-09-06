@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { requireAuthenticatedUser } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { deriveTenantAccess, getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
+import { isPlatformAdmin as resolveIsPlatformAdmin } from '@/modules/tenancy/data/platform';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
@@ -27,6 +28,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const dbRole = profileSnapshot.status === 'ok' ? profileSnapshot.profile.role : null;
   const isAdmin = (await resolveTrustedRole(dbRole)) === 'admin';
 
+  // Platform operator (ADR-006), for the "Add school" row. A separate axis
+  // from `isAdmin`: it is not read from `profiles.role` at all, but from the
+  // `platform_admins` table via a `security definer` RPC, because that table
+  // is deliberately unreadable through the anon client. The boolean-only
+  // helper is right here -- a failed check should hide the row rather than
+  // render a link into a denial. The route itself tells `sync-failed` apart
+  // from `denied`, because there the two need different screens.
+  const isPlatformAdmin = await resolveIsPlatformAdmin();
+
   // Derived from the snapshot already read above, not via `resolveTenantAccess`:
   // that helper exists to look up the profile for callers who do not hold one,
   // and its "no signed-in user → unknown" branch is unreachable here because
@@ -49,7 +59,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <NavDrawerProvider>
       <div className="app-layout">
-        <Sidebar isTrainerRoute={isTrainerRoute} isAdmin={isAdmin} />
+        <Sidebar isTrainerRoute={isTrainerRoute} isAdmin={isAdmin} isPlatformAdmin={isPlatformAdmin} />
         <div className="main-area">
           <MobileHeader />
           <main className="main-content">

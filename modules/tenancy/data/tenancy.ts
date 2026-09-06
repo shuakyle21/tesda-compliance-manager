@@ -46,6 +46,10 @@ const DB_TO_UI_ROLE: Record<DbProfileRole, UserRole> = {
  * Maps a raw tenant row to the UI domain Tenant type. Some fields (color, plan,
  * activeBatches, totalScholars) are UI-only decorations that the seed mock
  * invents but the DB does not yet carry; they are defaulted here.
+ *
+ * The TESDA registry fields below them DO have columns as of migration
+ * 20260906130000 (ADR-006). Null becomes '' rather than staying null so the
+ * shape matches `region`/`type` and no consumer needs a null check.
  */
 function mapTenantRow(row: TenantRow): Tenant {
   return {
@@ -54,6 +58,12 @@ function mapTenantRow(row: TenantRow): Tenant {
     name: row.name,
     region: row.region ?? '',
     type: row.school_type ?? '',
+    tesdaProviderCode: row.tesda_provider_code ?? '',
+    province: row.province ?? '',
+    cityMunicipality: row.city_municipality ?? '',
+    streetAddress: row.street_address ?? '',
+    providerType: row.provider_type ?? '',
+    providerClassification: row.provider_classification ?? '',
     // TODO(contract): no DB columns for these — UI-only decoration/rollups
     // the seed mock invents. Defaulted so the shape stays valid.
     color: '',

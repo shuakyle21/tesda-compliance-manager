@@ -2495,3 +2495,65 @@ body { min-height: 100vh; margin: 0; }
 
 /* select needs the arrow room .input does not reserve. */
 select.input { padding-right: 28px; height: 34px; }
+
+/* ---------------------------------------------------------------------------
+   Add-school form (FR-02, ADR-004)
+
+   Reuses every .user-form-* primitive; only the repeatable program rows need
+   anything new. A program is a card rather than a run of loose inputs because
+   the operator is transcribing one line of a Certificate of Program
+   Registration at a time, and the grouping is what keeps a COPR number with
+   the qualification it belongs to.
+   --------------------------------------------------------------------------- */
+.school-form-programs { gap: 12px; }
+
+.school-form-program {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  min-width: 0;
+}
+
+.school-form-program-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.school-form-program-index {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Both buttons stay text + icon, never an icon alone: the design system
+   requires the meaning to survive without colour, and a bare glyph does not
+   say which of "add" or "remove" it performs. */
+.school-form-add,
+.school-form-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+}
+
+.school-form-remove {
+  padding: 4px 8px;
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+}
+.school-form-remove:hover { color: var(--color-red-dk); border-color: var(--color-red-border); }
+
+/* The program fields sit closer together than top-level ones -- they are one
+   record, read as a block. */
+.school-form-program .user-form-label { margin-top: 6px; }
+.school-form-program .user-form-label:first-of-type { margin-top: 0; }

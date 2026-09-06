@@ -45,6 +45,7 @@ const ICONS = {
   'shield-off': '<path d="M3 3l18 18"/><path d="M20.043 16.045a12 12 0 0 0 .457 -3.045m0 -4a12 12 0 0 0 -8.5 -3a12 12 0 0 0 -3 .397m-3.13 1.567a12 12 0 0 0 -2.37 1.036m0 4a12 12 0 0 0 8.5 15a12 12 0 0 0 5.130 -2.870"/>',
   presentation: '<path d="M3 4l18 0"/><path d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"/><path d="M12 16v4"/><path d="M9 20h6"/>',
   briefcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/>',
+  building: '<path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/><path d="M9 8h1"/><path d="M9 12h1"/><path d="M9 16h1"/><path d="M14 8h1"/><path d="M14 12h1"/><path d="M14 16h1"/>',
   timeline: '<path d="M4 16l6 -7l5 5l5 -6"/><circle cx="4" cy="16" r="1"/><circle cx="10" cy="9" r="1"/><circle cx="15" cy="14" r="1"/><circle cx="20" cy="8" r="1"/>',
   plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
   x: '<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',

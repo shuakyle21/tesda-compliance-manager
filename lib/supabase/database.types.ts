@@ -1,3 +1,15 @@
+/**
+ * Generated-shape Supabase row types (RULES.md sec.3 rule 20).
+ *
+ * PENDING REGENERATION. `platform_admins`, `qualifications`,
+ * `tenant_qualifications`, the six new `tenants` columns, and the
+ * `create_school` / `current_user_is_platform_admin` functions were written by
+ * hand from
+ * `supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql`
+ * because that migration is not applied yet (RULES.md rule 36 -- one hosted
+ * project, no staging). Regenerate against the live project as soon as it is
+ * applied, and treat any diff as a bug in this file, not in the migration.
+ */
 export type Json =
   | string
   | number
@@ -39,6 +51,12 @@ export interface Database {
           name: string;
           region: string | null;
           school_type: string | null;
+          tesda_provider_code: string | null;
+          province: string | null;
+          city_municipality: string | null;
+          street_address: string | null;
+          provider_type: string | null;
+          provider_classification: string | null;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -49,6 +67,12 @@ export interface Database {
           name: string;
           region?: string | null;
           school_type?: string | null;
+          tesda_provider_code?: string | null;
+          province?: string | null;
+          city_municipality?: string | null;
+          street_address?: string | null;
+          provider_type?: string | null;
+          provider_classification?: string | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -96,6 +120,72 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['profile_tenant_memberships']['Insert']>;
+        Relationships: [];
+      };
+      platform_admins: {
+        Row: {
+          profile_id: string;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          profile_id: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['platform_admins']['Insert']>;
+        Relationships: [];
+      };
+      qualifications: {
+        Row: {
+          id: string;
+          code: string;
+          title: string;
+          nc_level: string | null;
+          sector: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          title: string;
+          nc_level?: string | null;
+          sector?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['qualifications']['Insert']>;
+        Relationships: [];
+      };
+      tenant_qualifications: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          qualification_id: string;
+          copr_number: string | null;
+          registration_status: string | null;
+          delivery_mode: string | null;
+          valid_until: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          qualification_id: string;
+          copr_number?: string | null;
+          registration_status?: string | null;
+          delivery_mode?: string | null;
+          valid_until?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['tenant_qualifications']['Insert']>;
         Relationships: [];
       };
       scholarship_programs: {
@@ -483,6 +573,27 @@ export interface Database {
           target_tenant_id: string;
         };
         Returns: undefined;
+      };
+      current_user_is_platform_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      create_school: {
+        Args: {
+          p_code: string;
+          p_name: string;
+          p_region: string | null;
+          p_school_type: string | null;
+          p_tesda_provider_code: string | null;
+          p_province: string | null;
+          p_city_municipality: string | null;
+          p_street_address: string | null;
+          p_provider_type: string | null;
+          p_provider_classification: string | null;
+          p_qualifications: Json;
+        };
+        /** The new tenant's id. */
+        Returns: string;
       };
     };
     Enums: {

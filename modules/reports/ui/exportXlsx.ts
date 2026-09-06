@@ -147,12 +147,25 @@ export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onRe
   rows.forEach((b) => {
     const t = tenantOf(b.tenantId);
     const reg = (t.region || '').split('·');
+    // `region` is free text shaped like "Region IV-A, Laguna", so it was split
+    // to fill two columns. The dedicated columns (migration 20260906130000)
+    // are authoritative where recorded; the split stays as the fallback for
+    // the three schools seeded before those columns existed.
     const region = (reg[0] || '').trim();
-    const province = (reg[1] || '').trim();
+    const province = t.province || (reg[1] || '').trim();
+    const address = t.streetAddress || t.region || '';
     (b.scholars_list || []).forEach((s) => {
       data.push([
-        region, province, '', '', t.name,
-        t.region || '', 'Private', 'TVIs', 'Agriculture, Forestry and Fishery',
+        region, province, '', t.cityMunicipality, t.name,
+        address, t.providerType, t.providerClassification,
+        // Industry sector, registration status and CTPR are facts about the
+        // *qualification at this school* (`qualifications.sector`,
+        // `tenant_qualifications.registration_status` / `.copr_number`), not
+        // about the school. `Batch.qualification` is still free text with no
+        // link to that row (deliberately -- ADR-006 leaves
+        // `batches.qualification_title` alone), so there is nothing to read
+        // them from yet. Left as they were rather than guessed at.
+        'Agriculture, Forestry and Fishery',
         'WTR', b.qualification, '', '',
         b.id, 'Institution-Based Training (IBT)',
         s.lastName, s.firstName, s.middleInit, s.extName,
@@ -161,7 +174,7 @@ export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onRe
         s.clientClass, s.trainingStatus, s.scholarshipType, '',
         s.dateStarted, s.dateFinished, s.dateAssessed, s.assessmentResult,
         s.empStatusBefore, s.dateEmployed, s.occupation, s.employer,
-        s.employer && s.employer !== 'Self-employed' ? t.region || '' : '', s.empClassification, s.salary,
+        s.employer && s.employer !== 'Self-employed' ? address : '', s.empClassification, s.salary,
       ]);
     });
   });
