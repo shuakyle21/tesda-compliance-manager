@@ -11,7 +11,10 @@
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { AnalyticsView } from '@/modules/analytics/ui/AnalyticsView';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { Icon } from '@/shared/ui/Icon';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { resolveTenantAccess } from '../tenant-access';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export default async function AnalyticsPage() {
@@ -19,7 +22,9 @@ export default async function AnalyticsPage() {
   // data; `sync-failed` additionally surfaces the banner below (module
   // data-layer contract). An `ok` snapshot is authoritative even when empty —
   // see ADR-005 §5.
-  const snapshot = await getBatchesSnapshot();
+  // `withTenantAccess` rewrites only an `ok` snapshot, so "you belong to no
+  // school" never masks a real fetch failure — see the fold's own note.
+  const snapshot = withTenantAccess(await getBatchesSnapshot(), await resolveTenantAccess());
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
 
   // No live per-program document-requirement catalog exists yet: the real
@@ -38,9 +43,14 @@ export default async function AnalyticsPage() {
           Sync with the compliance database failed, so no charts can be drawn. Reload to try again.
         </InfoCallout>
       )}
-      {!(snapshot.status=== 'sync-failed' && batches.length === 0) && (
-        <AnalyticsView batches={batches} documentRequirements={documentRequirements} />
-      )}
+      {/* Charting an empty series for someone who belongs to no school would
+          render four "cannot be scored" panels as if they described their
+          school. Say why instead. */}
+      {snapshot.status === 'no-tenant-access' && <NoTenantAccessState subject="analytics" />}
+      {snapshot.status !== 'no-tenant-access' &&
+        !(snapshot.status === 'sync-failed' && batches.length === 0) && (
+          <AnalyticsView batches={batches} documentRequirements={documentRequirements} />
+        )}
     </div>
   );
 }

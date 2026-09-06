@@ -29,9 +29,9 @@ Effort tags: **S** ≈ ≤0.5 day · **M** ≈ 1–2 days · **L** ≈ 3–5 day
 ### Reality check vs. the audit
 
 The audit named `/dashboard` the #1 P0 gap. Since then the route file exists as a
-**mock-backed, role-aware** page with full state coverage. So Phase 1 is about
-**wiring real data + completing role resolution + the remaining role variants**,
-not creating the route. Phase 0 must land first because the data contracts the
+**role-aware, Supabase-wired** page with full state coverage. So the remainder of
+Phase 1 is **completing role resolution + the remaining role variants** — the route
+and its data wiring are done (see §1.1). Phase 0 must land first because the data contracts the
 dashboard needs are still stubbed.
 
 ---
@@ -151,10 +151,15 @@ proceed.
 
 ## Phase 1 — P0 Route: `/dashboard` (audit #1 gap)
 
-**Goal:** turn the mock-backed dashboard into a real, role-correct, Supabase-wired
-landing page across all four role variants.
+**Goal:** a real, role-correct, Supabase-wired landing page across all four role
+variants. The Supabase wiring (§1.1) is done; role correctness and the remaining
+variants are the open half.
 
-### 1.1 Wire dashboard to live Supabase data
+### 1.1 Wire dashboard to live Supabase data — ✅ done (mock-data retirement)
+
+> The dashboard now calls `getBatchesSnapshot` / `getActivitySnapshot` and the
+> `MOCK_BATCHES` / `MOCK_ACTIVITY` datasets were deleted along with `shared/mocks/`.
+> The build steps below are kept as the record of what was planned.
 
 - **Build:** Replace `MOCK_BATCHES` / `deriveDashboardMetrics`-over-mocks / `MOCK_ACTIVITY` in the
   dashboard with `getBatches()` / `getMetrics()` / `getActivity()` from

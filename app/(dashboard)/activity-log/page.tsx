@@ -14,8 +14,11 @@
 import Link from 'next/link';
 import { getActivitySnapshot } from '@/modules/activity/data/activity';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { Icon } from '@/shared/ui/Icon';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { resolveTenantAccess } from '../tenant-access';
 
 const PAGE_SIZE = 50;
 
@@ -27,10 +30,16 @@ export default async function ActivityLogPage({ searchParams }: { searchParams: 
   const page = Math.max(0, Number.parseInt(pageParam ?? '0', 10) || 0);
   const offset = page * PAGE_SIZE;
 
-  const activitySnapshot = await getActivitySnapshot(PAGE_SIZE, offset);
+  // `withTenantAccess` rewrites only an `ok` snapshot, so "you belong to no
+  // school" never masks a real fetch failure — see the fold's own note.
+  const activitySnapshot = withTenantAccess(
+    await getActivitySnapshot(PAGE_SIZE, offset),
+    await resolveTenantAccess(),
+  );
   const events = activitySnapshot.status === 'ok' ? activitySnapshot.events : [];
   const hasMore = activitySnapshot.status === 'ok' && activitySnapshot.hasMore;
   const syncFailed = activitySnapshot.status === 'sync-failed';
+  const noTenantAccess = activitySnapshot.status === 'no-tenant-access';
 
   return (
     <div>
@@ -54,7 +63,9 @@ export default async function ActivityLogPage({ searchParams }: { searchParams: 
         </InfoCallout>
       )}
 
-      {events.length === 0 ? (
+      {events.length === 0 && noTenantAccess ? (
+        <NoTenantAccessState subject="the activity log" />
+      ) : events.length === 0 ? (
         <EmptyState
           iconName="timeline"
           heading="No activity yet"

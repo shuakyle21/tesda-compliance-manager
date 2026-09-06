@@ -383,7 +383,7 @@ Public routes are `/sign-in` and `/sign-up`.
 | `/` → `/dashboard` | `app/page.tsx` | Public redirect | — | Implemented (redirect). |
 | `/sign-in` | `app/sign-in/[[...sign-in]]/page.tsx` | Public | — | Implemented. |
 | `/sign-up` | `app/sign-up/[[...sign-up]]/page.tsx` | Public | — | Redirects to `/sign-in?sign_up=1`; sign-up is the `SignUpModal` (TES-72). |
-| `/dashboard` | `app/(dashboard)/dashboard/page.tsx` | Clerk | Admin, Coordinator, Viewer (Trainer redirected to `/trainer`) | **Built on mock data.** Role-aware variants + loading/empty/denied/sync-failed/stale states exist; **not** wired to Supabase; role resolver incomplete (TES-34/TES-63). |
+| `/dashboard` | `app/(dashboard)/dashboard/page.tsx` | Clerk | Admin, Coordinator, Viewer (Trainer redirected to `/trainer`) | **Wired to Supabase** via `getBatchesSnapshot` / `getActivitySnapshot`. Role-aware variants + loading/empty/denied/sync-failed/stale states exist. Authorization resolves through `resolveTrustedRole` (profiles row → Clerk metadata, fails closed); the `?role=` preview override still selects which variant *renders*, so the resolver is not finished (TES-34/TES-63). |
 | `/batch-cards` | `app/(dashboard)/batch-cards/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`modules/batches/ui/CardsView`). |
 | `/table-view` | `app/(dashboard)/table-view/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`TableView`). |
 | `/documents` | `app/(dashboard)/documents/page.tsx` | Clerk | Admin, Coordinator, Viewer | Placeholder/partial (`DocumentsView`). |
@@ -403,10 +403,10 @@ T2MIS/BSRS import) are **route states**, not standalone routes, for MVP. Deep
 links use query params (e.g. `/batch-cards?batchId=:id`).
 
 **Status reconciliation with the audit:** the audit listed `/dashboard` as a
-missing P0 route. It now exists as a mock-backed, role-aware page. The *remaining*
-P0 work is wiring real Supabase data, completing the role resolver, and the
-non-Coordinator role variants — not creating the file. The Implementation Plan
-Phase 1 reflects this.
+missing P0 route. It now exists as a role-aware page reading live Supabase data.
+The *remaining* P0 work is completing the role resolver (retiring the `?role=`
+preview override) and the non-Coordinator role variants — not creating the file
+and no longer the data wiring. The Implementation Plan Phase 1 reflects this.
 
 ---
 
@@ -613,8 +613,8 @@ data exists; define evidence-file retention/recovery before importing real data.
 
 These mirror the PRD risk register, framed as engineering work:
 
-1. **Dashboard on mock data** — real Supabase wiring + role resolver outstanding
-   (Phase 1). High.
+1. **Role resolver unfinished** — the dashboard now reads live Supabase data, but the
+   `?role=` preview override still selects the rendered variant (Phase 1). Medium.
 2. **No API/test harness** — contracts and tests must precede broad UI work
    (Phase 0). High.
 3. **Schema gaps** — `attendance_records` (and RQM modeling) block trainer

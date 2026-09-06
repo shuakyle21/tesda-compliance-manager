@@ -1200,8 +1200,8 @@ Frontend must receive user-friendly DTOs, not raw database payloads. API example
 - Dashboard shell layout exists but renders placeholders instead of imported shell components.
 - `/` redirects to `/dashboard`, but `/dashboard` page is missing.
 - Batch Cards, Table View, Documents, Analytics, Activity Log, Trainer routes exist as placeholders/TODOs.
-- `modules/batches/data/batches.ts` now provides a real Supabase-backed data-access contract (TES-30: `getBatches`/`getBatchesSnapshot`/`mapBatchRow`, fetch→map→derive) — the reference pattern for other entities. It is **not yet wired into the dashboard** (still `MOCK_BATCHES`) and carries `TODO(contract)`/`TODO(join)` gaps (billing-deadline field, documents join).
-- `shared/types.ts` and the remaining mock data still contain TODOs and will not support full real rendering until completed.
+- `modules/batches/data/batches.ts` provides the real Supabase-backed data-access contract (TES-30: `getBatches`/`getBatchesSnapshot`/`mapBatchRow`, fetch→map→derive) — the reference pattern for other entities. It **is now wired into the dashboard**; the `MOCK_BATCHES` dataset was deleted in the mock-data retirement. It still carries `TODO(contract)`/`TODO(join)` gaps (billing-deadline field, documents join).
+- `shared/types.ts` still contains TODOs. With `shared/mocks/seed.ts` deleted, the per-module type split deferred in TES-68 is unblocked.
 - Several components are partial placeholders, including `Icon`, `StatusBadge`, `MetricsRow`, `Topbar`.
 - A batches data-fetching layer now exists (`modules/batches/data/batches.ts`); no production API **route handlers** (`app/api/*`) exist yet — fetching is via Server Components calling the `modules/*/data` contract.
 
@@ -1612,7 +1612,7 @@ Security:
 | Risk | Severity | Description | Recommendation |
 | --- | --- | --- | --- |
 | Missing `/dashboard` route | High | Root redirects to `/dashboard`, but implementation file is absent. | Add role-aware dashboard route or change redirect to implemented default. |
-| Placeholder implementation | High | Many pages/components/data files are TODO placeholders. Batches now has a real data-access contract (`modules/batches/data/batches.ts`, TES-30); other entities still stubbed. | Extend the batches fetch→map→derive pattern to remaining entities, complete shell components and core screens, and wire the dashboard off mocks before claiming MVP. |
+| Placeholder implementation | Medium | Some pages/components/data files are TODO placeholders. Batches, activity, and documents have real data-access contracts and the dashboard reads live data; other entities still stubbed. | Extend the batches fetch→map→derive pattern to the remaining entities and complete the core screens before claiming MVP. |
 | Conflicting backend direction | High | Supabase-only MVP and a future backend API are mixed in docs. | Keep MVP Supabase-based; document Express.js as future only until implemented. |
 | Incomplete API layer | High | No production API routes found. | Implement stable API/DTO boundary via Next route handlers or a future Express.js API. |
 | Schema gaps for trainer attendance | High | Trainer attendance/progress required but no dedicated table exists. | Add attendance/trainer update tables or explicitly model in documents/LAMR with tradeoffs. |
@@ -1627,7 +1627,7 @@ Security:
 ### Actionable Recommendations
 
 1. Fix the route baseline: add `/dashboard` or change root redirect; then implement role-aware shell navigation.
-2. `modules/batches/data/batches.ts` is now the reference Supabase-backed data function (TES-30). Extend the same fetch→map→derive pattern to the other entities, close its `TODO(contract)`/`TODO(join)` gaps, and wire the dashboard off `MOCK_BATCHES`.
+2. `modules/batches/data/batches.ts` is the reference Supabase-backed data function (TES-30), and the dashboard now reads through it. Extend the same fetch→map→derive pattern to the remaining entities and close its `TODO(contract)`/`TODO(join)` gaps.
 3. Implement core DTO/API layer before building more UI states.
 4. Add attendance/progress schema and tests, or explicitly scope Trainer MVP to document/LAMR evidence only.
 5. Decide whether Reports and RQM are MVP requirements; update route map/schema accordingly.

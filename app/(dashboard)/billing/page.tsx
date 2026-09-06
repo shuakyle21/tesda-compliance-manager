@@ -18,7 +18,9 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { firstParam, resolveRouteRole, resolveTrustedRole, toOfficeRole } from '@/modules/auth/data/role';
-import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
+import { getProfileSnapshot, deriveTenantAccess } from '@/modules/tenancy/data/tenancy';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
@@ -72,7 +74,12 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
   // for) renders read-only rather than write-enabled.
   const billingRole = toOfficeRole(await resolveRouteRole(params, dbRole));
 
-  const snapshot = await getBatchesSnapshot();
+  // This route already holds the profile snapshot for the trainer redirect
+  // above, so the membership verdict is derived from it rather than fetched a
+  // second time. `withTenantAccess` rewrites only an `ok` snapshot, so "you
+  // belong to no school" never masks a real fetch failure.
+  const tenantAccess = profileSnapshot ? deriveTenantAccess(profileSnapshot) : 'unknown';
+  const snapshot = withTenantAccess(await getBatchesSnapshot(), tenantAccess);
   const forcedState = firstParam(params.state);
 
   // `unconfigured`/`sync-failed` render empty rather than substituting mock
@@ -149,11 +156,15 @@ export default async function BillingPage({ searchParams }: { searchParams: Sear
         <div className="page-head">
           <h1 className="page-title">Billing</h1>
         </div>
-        <EmptyState
-          iconName="file-off"
-          heading="No batches to bill yet"
-          sub="Packets appear here once a batch reaches training. Import a batch to get started."
-        />
+        {snapshot.status === 'no-tenant-access' ? (
+          <NoTenantAccessState subject="the billing queue" />
+        ) : (
+          <EmptyState
+            iconName="file-off"
+            heading="No batches to bill yet"
+            sub="Packets appear here once a batch reaches training. Import a batch to get started."
+          />
+        )}
       </div>
     );
   }

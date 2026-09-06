@@ -21,11 +21,14 @@ import { ProgramBreakdown } from '@/modules/batches/ui/dashboard/ProgramBreakdow
 import { DashboardHeader, DashboardHeaderPlain } from '@/modules/batches/ui/dashboard/DashboardHeader';
 import { RecentActivityPanel } from '@/modules/activity/ui/RecentActivityPanel';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getActivitySnapshot } from '@/modules/activity/data/activity';
 import { getCurrentUser } from '@/modules/auth/data/auth';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { resolveTenantAccess } from '../tenant-access';
 import {
   firstParam,
   isOfficeRole,
@@ -108,6 +111,7 @@ function isDataStale(asOf: Date | null): boolean {
 
 interface DashboardViewState {
   isDenied: boolean;
+  hasNoTenantAccess: boolean;
   isEmpty: boolean;
   syncFailed: boolean;
   isStale: boolean;
@@ -127,6 +131,18 @@ function dataAsOfLabelFor(dataAsOfDate: Date | null): string | null {
 
 function isEmptyDashboard(forcedState: string | null, batchCount: number): boolean {
   return forcedState === 'empty' || batchCount === 0;
+}
+
+/**
+ * "You belong to no school yet" — distinct from "your school has no batches".
+ * The snapshot only ever carries this because `withTenantAccess` folded the
+ * membership verdict in; the query itself cannot tell the two apart.
+ */
+function hasNoTenantAccessDashboard(
+  forcedState: string | null,
+  snapshot: Awaited<ReturnType<typeof getBatchesSnapshot>>,
+): boolean {
+  return forcedState === 'no-tenant-access' || snapshot.status === 'no-tenant-access';
 }
 
 function isSyncFailedDashboard(
@@ -155,6 +171,7 @@ function deriveDashboardViewState(
   return {
     // TODO(#32): wire to real role resolver
     isDenied: forcedState === 'denied',
+    hasNoTenantAccess: hasNoTenantAccessDashboard(forcedState, snapshot),
     isEmpty: isEmptyDashboard(forcedState, batchCount),
     syncFailed: isSyncFailedDashboard(forcedState, snapshot),
     isStale: isStaleDashboard(forcedState, dataAsOfDate),
@@ -206,7 +223,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   // Attempt the real Supabase fetch. `ok` → live rows (already RLS-scoped, so
   // no manual tenant filter). `sync-failed`/`unconfigured` render empty —
   // never mock data (RULES.md rule 19).
-  const snapshot = await getBatchesSnapshot();
+  //
+  // Membership is `modules/tenancy`'s fact and its `data/` is private to that
+  // module, so the route composes the two reads and folds the verdict in —
+  // the same shape `resolveTrustedRole(dbRole)` already uses for the role.
+  // `withTenantAccess` only ever rewrites an `ok` snapshot, so a real fetch
+  // failure still reads as a failure.
+  const tenantAccess = await resolveTenantAccess();
+  const snapshot = withTenantAccess(await getBatchesSnapshot(), tenantAccess);
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
   // No live per-program document-requirement catalog exists yet
   // (TES-34-adjacent gap) — an empty catalog reads as "unknown"/"pending"
@@ -223,7 +247,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const earliestBatch = batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0];
 
   // Recent Activity panel (6 most recent events) — never mock data.
-  const recentActivity = selectRecentActivity(await getActivitySnapshot(6));
+  const recentActivity = selectRecentActivity(
+    withTenantAccess(await getActivitySnapshot(6), tenantAccess),
+  );
 
   // Progress & Compliance Trend (last 6 weeks): no live weekly-snapshot data
   // source exists yet, so this always renders ProgressTrend's own "No trend
@@ -237,8 +263,15 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   //   - denied:      still preview-only — derives from the tenant/role resolver,
   //                  which does not exist yet (blocked by TES-34 / #32).
   const forcedState = firstParam(params.state);
-  const { isDenied, isEmpty, syncFailed, isStale, dataAsOfLabel, syncFailedMessage } =
-    deriveDashboardViewState(forcedState, snapshot, batches.length);
+  const {
+    isDenied,
+    hasNoTenantAccess,
+    isEmpty,
+    syncFailed,
+    isStale,
+    dataAsOfLabel,
+    syncFailedMessage,
+  } = deriveDashboardViewState(forcedState, snapshot, batches.length);
   // `syncFailed` can be true via the `?state=` preview override while the
   // real snapshot is still `ok` (live rows) — only claim "cached" when the
   // rows actually came from the mock/cached fallback, not the live table.
@@ -269,7 +302,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
     return <SyncFailedView header={header} message={syncFailedMessage} />;
   }
 
-  // Empty — no assigned batches; surface the next administrative action.
+  // No school assigned yet. This must be checked *before* the empty guard: the
+  // two look identical from the query's side (both yield zero batches), but
+  // only one of them is a fact about the data. Telling someone with no
+  // membership to "import a batch" names an action they cannot perform and
+  // hides the one that would actually help them.
+  if (hasNoTenantAccess) {
+    return <NoTenantAccessView header={header} />;
+  }
+
+  // Empty — the tenant is assigned but holds no batches; surface the next
+  // administrative action.
   if (isEmpty) {
     return <EmptyBatchesView header={header} />;
   }
@@ -388,6 +431,15 @@ function DeniedView({ header }: { header: React.ReactNode }) {
         heading="Access denied"
         sub="Your role does not have access to this school's dashboard. Contact a coordinator to request access."
       />
+    </div>
+  );
+}
+
+function NoTenantAccessView({ header }: { header: React.ReactNode }) {
+  return (
+    <div className="dashboard-view">
+      {header}
+      <NoTenantAccessState subject="your dashboard" />
     </div>
   );
 }

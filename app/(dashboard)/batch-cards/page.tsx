@@ -12,13 +12,19 @@ import Link from 'next/link';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { CardsView } from '@/modules/batches/ui/CardsView';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { resolveTenantAccess } from '../tenant-access';
 import type { Batch } from '@/shared/types';
 
 export default async function BatchCardsPage() {
-  const snapshot = await getBatchesSnapshot();
+  // `withTenantAccess` rewrites only an `ok` snapshot, so "you belong to no
+  // school" never masks a real fetch failure — see the fold's own note.
+  const snapshot = withTenantAccess(await getBatchesSnapshot(), await resolveTenantAccess());
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
   const syncFailed = snapshot.status === 'sync-failed';
+  const noTenantAccess = snapshot.status === 'no-tenant-access';
 
   if (batches.length === 0) {
     return (
@@ -31,6 +37,8 @@ export default async function BatchCardsPage() {
             Sync with Supabase failed — batches could not be loaded.
             <Link href="/batch-cards" className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
           </InfoCallout>
+        ) : noTenantAccess ? (
+          <NoTenantAccessState subject="batches" />
         ) : (
           <EmptyState
             iconName="folders"

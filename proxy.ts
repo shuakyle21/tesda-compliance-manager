@@ -1,11 +1,19 @@
 /**
- * Clerk middleware proxy — the authentication boundary for the entire app.
+ * Clerk middleware proxy — session context and request-path stamping.
  *
- * Protects every route except `/sign-in` and `/sign-up` (the matcher excludes
- * those paths). Clerk's middleware injects the session context, which
- * `lib/supabase/server.ts` reads via `auth()` to attach the JWT to every
- * Supabase query — so RLS can make every authorization decision. See CLAUDE.md
- * "Auth chain" for the full flow.
+ * **This file does not gate access.** It calls no `protect()` and declares no
+ * public-route matcher: every request passes through. The comment here used to
+ * claim it "protects every route", which is the kind of false assumption the
+ * next unguarded route group gets built on.
+ *
+ * What it actually does: injects Clerk's session context, which
+ * `lib/supabase/server.ts` reads via `auth()` to attach the session token to
+ * every Supabase query — so RLS can make every authorization decision.
+ *
+ * The gate lives in `app/(dashboard)/layout.tsx`'s `requireAuthenticatedUser()`.
+ * Coverage is complete today only because every data route happens to sit under
+ * `(dashboard)`. A new route group outside it is unguarded until it adds its
+ * own check. See CLAUDE.md "Auth chain".
  *
  * The `x-pathname` header injection is a Next.js App Router convention: route
  * segments can read `headers().get('x-pathname')` to learn the full request
