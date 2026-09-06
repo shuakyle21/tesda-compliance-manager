@@ -65,6 +65,23 @@ export interface Tenant {
   plan: string;
   activeBatches: number;
   totalScholars: number;
+  /**
+   * TESDA registry facts, recorded by the add-school screen (ADR-006).
+   *
+   * Empty string, not undefined, so every consumer can render one without a
+   * null check -- the same convention `region` and `type` already follow. The
+   * T2MIS export reads these instead of the literals it used to hardcode; an
+   * empty value there means "not recorded", which is the honest output.
+   *
+   * `tesdaProviderCode` is the school's provider number, e.g. 1263. It also
+   * appears inside COPR numbers and batch RQM codes.
+   */
+  tesdaProviderCode: string;
+  province: string;
+  cityMunicipality: string;
+  streetAddress: string;
+  providerType: string;
+  providerClassification: string;
 }
 
 export type UserRole = 'owner' | 'admin' | 'coordinator' | 'trainer' | 'viewer';

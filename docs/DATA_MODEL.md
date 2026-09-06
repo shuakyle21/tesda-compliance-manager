@@ -1,7 +1,7 @@
 # Data model
 
 Entity-relationship reference for the `public` schema, generated from the migration history
-as of these five versions. **Applied** means present in the live Supabase project;
+as of these seven versions. **Applied** means present in the live Supabase project;
 **pending** means committed here but not yet run against it, so the database does not have it:
 
 | Version | Migration | Status |
@@ -11,13 +11,26 @@ as of these five versions. **Applied** means present in the live Supabase projec
 | `20260717054607` | `migrate_akb_tenant_and_drop_rogue_table` | applied |
 | `20260831120000` | `seed_dev_operational_data` (data only, no DDL) | **pending** |
 | `20260904120000` | [`add_user_admin_write_policies`](../supabase/migrations/20260904120000_add_user_admin_write_policies.sql) (RLS policies only, no DDL) | **pending** |
+| `20260906120000` | [`ensure_invitation_membership_atomic`](../supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql) (one function, no DDL) | **pending** |
+| `20260906130000` | [`add_school_registry_and_platform_admin`](../supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql) — 3 tables, 6 `tenants` columns, 2 functions, RLS ([ADR-006](adr/ADR-006-platform-admin-and-school-registry.md)) | applied |
 
-The status column was last checked against the live project on **2026-09-06**. Neither pending
-migration carries DDL — one is seed data, the other adds RLS policies — so every diagram, table
-count, and foreign key below describes the applied schema *and* the schema after both land. What
-the pending pair does change is behaviour: until `20260904120000` runs, no client can write
-`profiles` or `profile_tenant_memberships`, which is what the user-administration screens need
-(`modules/tenancy/data/users.ts`).
+The status column was last checked against the live project on **2026-09-06**, when
+`20260906130000` was applied and `database.types.ts` verified field-by-field against the
+regenerated types.
+
+**Applied out of order.** `20260906130000` was applied while `20260831120000`, `20260904120000`
+and `20260906120000` were still pending, because it depends on none of them — only on the base
+schema. Supabase records migrations by version, so applying the earlier three later is fine; just
+do not assume "highest applied version" means everything below it has run.
+
+The live schema is therefore **18 tables and 36 foreign keys**. The four cluster diagrams below
+still draw the 15 pre-existing tables; the three new ones have their own section at the end
+rather than being redrawn into the clusters.
+
+The three still-pending migrations change behaviour rather than shape. Most consequentially:
+until `20260904120000` runs, no client can write `profiles` or `profile_tenant_memberships`, so
+`/users/new` cannot assign anyone — **including the school admin that `/schools/new` expects you
+to seat next**. The two screens are a pair; the second is not usable until that migration lands.
 
 If you add a migration, update this file in the same PR — nothing enforces that automatically,
 so the version table above is how a reader tells whether this is current. Applying a migration
@@ -368,3 +381,92 @@ These are the *database* spellings. The UI uses different names for three lifecy
 (`training→train`, `assessment→assess`, `billing→bill`), DB `blocked` surfaces as UI
 `pending`, and the UI adds an `entre` stage that has no database column. That translation
 happens in `DB_TO_UI_STAGE` in `modules/batches/data/batches.ts` and nowhere else.
+
+---
+
+## School registry (applied 2026-09-06 — migration `20260906130000`)
+
+Added by [ADR-006](adr/ADR-006-platform-admin-and-school-registry.md). Three tables and six
+`tenants` columns. Drawn separately from the four clusters above; folding it in is a tidy-up
+nobody has done yet.
+
+```mermaid
+erDiagram
+    tenants ||--o{ tenant_qualifications : "is registered for"
+    qualifications ||--o{ tenant_qualifications : "is registered at"
+    profiles ||--o| platform_admins : "may be"
+
+    tenants {
+        uuid id PK
+        text code UK
+        text name
+        text tesda_provider_code "e.g. 1263 — also inside COPR and RQM codes"
+        text province
+        text city_municipality
+        text street_address
+        text provider_type "e.g. Private"
+        text provider_classification "e.g. TVIs"
+    }
+    qualifications {
+        uuid id PK
+        text code UK "e.g. AFFOAP212"
+        text title "Organic Agriculture Production NC II"
+        text nc_level
+        text sector
+        boolean is_active
+    }
+    tenant_qualifications {
+        uuid id PK
+        uuid tenant_id FK
+        uuid qualification_id FK
+        text copr_number "e.g. 20221263AFFOAP212009-R — nullable"
+        text registration_status
+        text delivery_mode
+        date valid_until
+        boolean is_active
+    }
+    platform_admins {
+        uuid profile_id PK "also FK to profiles"
+        text note
+    }
+```
+
+### Why the split
+
+`qualifications` is **national reference data**, not tenant data: "Organic Agriculture
+Production NC II" means the same thing at every school, and storing it per-tenant would produce
+one spelling per school. What differs per school is the *registration* — the COPR number, its
+status, delivery mode and expiry — so that lives on the link row.
+
+Do not confuse `qualifications` with `scholarship_programs`. The latter holds TWSP and CFSP, the
+**funding** programs ADR-001 builds billing on. They are unrelated axes: a batch has one
+scholarship program and one qualification.
+
+`copr_number` is nullable by design — a school is routinely entered before its certificate is
+issued — which is why the unique constraint is `(tenant_id, qualification_id)` and not the COPR.
+The certificate says COPR; the T2MIS import/export columns say CTPR. Same number.
+
+### Access
+
+`platform_admins` has RLS enabled and **no policies at all**, so every operation is denied and
+the role cannot be self-granted from the app. Note it *does* carry the usual grants —
+Supabase's default privileges grant every new `public` table to `anon` and `authenticated`
+regardless — so the deny comes entirely from RLS-with-no-policies, verified by probe after
+applying. The Supabase linter's `rls_enabled_no_policy` (INFO) on this table is the design;
+adding a policy to silence it would open the door.
+`app_private.is_platform_admin()` (`security definer`) is what policies consult, and
+`public.current_user_is_platform_admin()` exposes only the caller's own boolean to the app.
+
+A platform admin reaches `tenants`, `qualifications`, `tenant_qualifications`, unassigned
+`profiles`, and `profile_tenant_memberships` — **and nothing else**. No policy grants them
+`batches`, `learners`, `documents`, `lamr_*` or `activity_log`. Adding one is a boundary change
+that needs its own ADR.
+
+`profile_tenant_memberships` is the sharp edge: `app_private.can_access_tenant()` resolves purely
+from that table, so an unconstrained INSERT there is equivalent to granting every compliance
+table at once. The policy therefore forbids seating **yourself**
+(`profile_id <> app_private.current_profile_id()`) and only admits a tenant that has no members
+yet. Both predicates are load-bearing — see ADR-006 §P3.
+
+`public.create_school(...)` is `security invoker`: it buys one transaction for the school plus
+its programs, not a privilege. RLS still evaluates every statement inside it.

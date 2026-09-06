@@ -95,6 +95,14 @@ reviewing, or merging code.
 30. **`docs/adr/ADR-001-billing-and-domain-model.md` supersedes** any conflicting
     "billing = preparation signal only" wording in the PRD/TRD.
     **`docs/adr/ADR-003-billing-packet-queue.md` amends ADR-001 §4.**
+    **`docs/adr/ADR-006-platform-admin-and-school-registry.md` supersedes** FR-02's
+    "Super Admin is not implemented and must not be assumed in production behavior."
+    A platform admin exists and provisions schools; its reach is the school registry
+    only (`tenants`, `qualifications`, `tenant_qualifications`, unassigned `profiles`,
+    seating a tenant's first member). **Granting `app_private.is_platform_admin()`
+    access to any compliance table — `batches`, `learners`, `documents`, `lamr_*`,
+    `activity_log` — or letting it seat itself into a tenant, is a boundary change
+    that needs its own ADR.**
     **Consult the ADRs before changing schema or billing math.** **[review]**
 31. Otherwise: `docs/MASTER_PRD_SRS.md` (product) → `docs/TRD.md` (engineering) →
     `docs/IMPLEMENTATION_PLAN.md` (phasing).
