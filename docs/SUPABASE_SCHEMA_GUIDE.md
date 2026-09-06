@@ -2,9 +2,11 @@
 
 > **Superseded for implementation — 2026-09-05.** This guide describes designing the schema
 > and creating the tables *by hand*. That step is done: the schema is now defined by the
-> migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` (plus three
-> additive migrations), which is canonical for both tables and RLS. New migrations are
-> additive — do not create or alter tables through the dashboard.
+> migration `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` (plus four
+> additive migrations, two of which are still **pending** — committed to the repo but not yet
+> run against the live project; [`DATA_MODEL.md`](DATA_MODEL.md) tracks which is which), and it
+> is canonical for both tables and RLS. New migrations are additive — do not create or alter
+> tables through the dashboard.
 >
 > - For the tables, columns, foreign keys, and RLS policies as they exist today, see
 >   [`DATA_MODEL.md`](DATA_MODEL.md).
