@@ -1,3 +1,4 @@
+-- Active: 1787931874292@@aws-1-ap-northeast-2.pooler.supabase.com@5432@postgres
 -- Verification setup for the create-user screen (PR #213 / commit b3361a6).
 --
 -- PURPOSE
@@ -29,7 +30,7 @@ begin;
 
 -- Part 2 below refuses to run unless this is set. Uncomment it ONLY when you
 -- are certain $DATABASE_URL points at a local database:
--- set local app.environment = 'local';
+set local app.environment = 'local';
 
 -- ===========================================================================
 -- PART 1 -- the migration's four policies, made idempotent.
@@ -162,12 +163,12 @@ commit;
 -- Check what you just did
 -- ---------------------------------------------------------------------------
 -- Expect: demo@tvicams.app, role = admin, exactly one tenant (AKB).
---
---   select p.email, p.role, t.code
---   from public.profiles p
---   left join public.profile_tenant_memberships m on m.profile_id = p.id
---   left join public.tenants t on t.id = m.tenant_id
---   where p.clerk_user_id = 'user_3IMAGVRr7TnY3avksz6FbpIfPXj';
+
+    select p.email, p.role, t.code
+    from public.profiles p
+    left join public.profile_tenant_memberships m on m.profile_id = p.id
+    left join public.tenants t on t.id = m.tenant_id
+    where p.clerk_user_id = 'user_3IMAGVRr7TnY3avksz6FbpIfPXj';
 --
 -- Expect four rows -- the policies from Part 1:
 --
