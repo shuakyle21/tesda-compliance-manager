@@ -181,6 +181,29 @@ export async function findUserByEmail(email: string): Promise<UserLookupSnapshot
 // ---------------------------------------------------------------------------
 
 /**
+ * Puts a role back after a grant failed part-way through.
+ *
+ * Best effort by nature: there is no transaction to roll back, so this is a
+ * second write that can itself fail. When it does, the state is what it would
+ * have been without the attempt, and the log is the only trace — hence no
+ * thrown error and no return value for the caller to branch on.
+ */
+async function restorePriorRole(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  profileId: string,
+  role: DbProfileRole,
+): Promise<void> {
+  const { error } = await supabase.from('profiles').update({ role }).eq('id', profileId);
+
+  if (error) {
+    console.error(
+      'assignUserAccess: membership failed and the role could not be restored',
+      error,
+    );
+  }
+}
+
+/**
  * Sets a person's role and grants them a school.
  *
  * Two statements, not one transaction — PostgREST exposes no multi-statement
@@ -190,19 +213,18 @@ export async function findUserByEmail(email: string): Promise<UserLookupSnapshot
  * Granting access first and failing to set the role would leave someone
  * inside a school at whatever role they happened to have.
  *
- * That is not the same as "no new access", which is what this comment used to
- * claim. Policies 1 and 2 of migration 20260904120000 are keyed on
- * `current_role() = 'admin'` and match profiles belonging to *no* tenant, so a
- * half-applied promotion to `admin` can read — and set roles on — the pool of
- * unassigned profiles, with no membership required. Bounded to people who hold
- * no access anywhere, and the same exposure any tenantless admin has by
- * design (the migration flags it), but it is a real widening rather than none.
+ * Stopping there would still not be free, which is why the INSERT failure path
+ * restores the prior role rather than leaving it. Policies 1 and 2 of
+ * migration 20260904120000 are keyed on `current_role() = 'admin'` and match
+ * profiles belonging to *no* tenant, so a half-applied promotion to `admin`
+ * can read — and set roles on — the pool of unassigned profiles, with no
+ * membership required. The compensating UPDATE closes that window.
  *
- * Retry is the recovery: re-running the action repeats a no-op UPDATE and
- * re-attempts the INSERT. Making the pair atomic would take a `SECURITY
- * INVOKER` Postgres function so the table policies still fire — the first
- * `.rpc()` in this codebase, so it is a precedent to set deliberately rather
- * than in passing.
+ * It is a compensation, not a transaction: if the restore itself fails the
+ * state is what it would have been anyway, and it is logged. Real atomicity
+ * would take a `SECURITY INVOKER` Postgres function so the table policies
+ * still fire — the first `.rpc()` in this codebase, so it is a precedent to
+ * set deliberately rather than in passing.
  *
  * An UPDATE blocked by RLS is not an error in PostgREST — the row simply does
  * not match the policy's `using` clause and zero rows come back. That is why
@@ -269,6 +291,21 @@ export async function assignUserAccess(
     });
 
     if (membershipError) {
+      // The role UPDATE already committed and PostgREST gives us no
+      // transaction to roll it back with, so undo it explicitly: a grant that
+      // failed should leave no trace of itself. This matters beyond tidiness —
+      // a half-applied promotion to `admin` can read and set roles on every
+      // unassigned profile (policies 1 and 2 of 20260904120000), so leaving
+      // the role behind widens access the admin never finished granting.
+      //
+      // Reachable only when the target has no memberships, so policy 2 still
+      // matches the row and this restore lands. Had they belonged to another
+      // school, the original UPDATE would already have been denied.
+      //
+      // Best effort, not a transaction: if the restore fails we are exactly
+      // where we would have been without it, and the log says so.
+      await restorePriorRole(supabase, user.profileId, user.role);
+
       if (membershipError.code === RLS_VIOLATION) return { status: 'denied' };
       return { status: 'sync-failed', error: membershipError.message };
     }

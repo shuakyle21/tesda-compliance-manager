@@ -81,6 +81,21 @@ const ADMIN_OPERATIONS: NavItem[] = [
   { label: 'Add user', icon: 'users', href: '/users/new' },
 ];
 
+/**
+ * Platform-operator operations (ADR-006). A third list rather than an entry in
+ * `ADMIN_OPERATIONS` because platform admin is a different axis from the
+ * tenant-scoped `profile_role`: holding 'admin' at a school grants nothing
+ * here, and being the operator does not make you an admin anywhere.
+ *
+ * Hidden from everyone else for the same reason "Add user" is: for them the
+ * row leads only to a dead end ("Only the platform operator can add schools").
+ * Hiding is usability, not security -- the gate is the route and the Server
+ * Action, and RLS beneath both.
+ */
+const PLATFORM_OPERATIONS: NavItem[] = [
+  { label: 'Add school', icon: 'building', href: '/schools/new' },
+];
+
 interface SidebarProps {
   /**
    * The only role signal a Server Component layout can derive today (no real
@@ -97,9 +112,19 @@ interface SidebarProps {
    * not resolved a role shows the smaller menu rather than the larger one.
    */
   isAdmin?: boolean;
+  /**
+   * Whether the signed-in person is the platform operator, resolved
+   * server-side by the layout. Defaults to false so anything that has not
+   * resolved it shows the smaller menu rather than the larger one.
+   */
+  isPlatformAdmin?: boolean;
 }
 
-export function Sidebar({ isTrainerRoute = false, isAdmin = false }: SidebarProps) {
+export function Sidebar({
+  isTrainerRoute = false,
+  isAdmin = false,
+  isPlatformAdmin = false,
+}: SidebarProps) {
   const pathname = usePathname();
   const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
   const baseOperations = isTrainerRoute
@@ -107,8 +132,11 @@ export function Sidebar({ isTrainerRoute = false, isAdmin = false }: SidebarProp
     : OPERATIONS;
   // A trainer is never an admin here, but the guard is explicit rather than
   // implied so the two conditions cannot drift apart later.
-  const operations =
-    isAdmin && !isTrainerRoute ? [...baseOperations, ...ADMIN_OPERATIONS] : baseOperations;
+  // A trainer route never gains either extra list; the two role checks are
+  // independent because the two roles are.
+  const adminOperations = isAdmin && !isTrainerRoute ? ADMIN_OPERATIONS : [];
+  const platformOperations = isPlatformAdmin && !isTrainerRoute ? PLATFORM_OPERATIONS : [];
+  const operations = [...baseOperations, ...adminOperations, ...platformOperations];
 
   // School selector. `tenant` is null until a real tenant list exists (TES-34);
   // the dropdown layer is kept so the Esc ordering below stays intact and so

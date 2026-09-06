@@ -26,3 +26,38 @@ on: admins may read profiles with no tenant yet (the base "own or same-tenant" p
 an unassigned profile invisible to everyone, so nobody could be assigned), set roles on
 profiles they can see, and grant/revoke membership in tenants they belong to themselves.
 **Not yet applied** — see the migration header.
+
+## School registry and platform admin (ADR-006)
+
+The screen `/users/new` presupposed. That one grants a person access to a school; nothing created
+the school, so onboarding a TVI meant editing the canonical migration. `/schools/new` closes that.
+
+- `domain/schoolDraft.ts` — pure rules for the add-school form: the TESDA vocabularies it suggests
+  (`PROVIDER_TYPE_SUGGESTIONS`, `DELIVERY_MODE_SUGGESTIONS`, …), `validateSchoolDraft`, and the
+  `CreateSchoolFormState` contract shared by the Server Action and the form. Mirrors
+  `domain/userAccess.ts` field for field. Unit-tested in `tests/unit/school-draft.test.ts`.
+- `data/platform.ts` — `getPlatformAdminSnapshot()` / `isPlatformAdmin()`. Answers "is the caller
+  the platform operator" through the `current_user_is_platform_admin()` RPC, because
+  `public.platform_admins` is deliberately unreadable through the anon client.
+- `data/schools.ts` — `listQualifications`, `createSchool`. The write goes through the
+  `create_school` RPC (one transaction, still `security invoker`, so RLS decides). Anon client
+  only, never the service-role client.
+- `ui/CreateSchoolForm.tsx` — the form, with repeatable program rows. The action lives in
+  `app/(dashboard)/schools/new/actions.ts`.
+
+**Platform admin is a different axis from `profile_role`.** Holding `admin` at a school grants
+nothing on `/schools/new`, and being the operator makes you an admin nowhere. The role reaches the
+school *registry* only — no policy gives it batches, learners, documents or LAMR. See ADR-006 §P3
+before widening it.
+
+Migration `20260906130000_add_school_registry_and_platform_admin.sql` adds the tables and policies
+this depends on. **Applied 2026-09-06** (out of order — the three migrations before it are still
+pending; it depends on none of them). Note `/users/new` still cannot assign anyone until
+`20260904120000` lands, so seating a new school's first admin does not work yet.
+
+Enrolling a platform admin is a separate statement run against the project directly:
+
+```sql
+insert into public.platform_admins (profile_id)
+select id from public.profiles where email = '<operator email>';
+```

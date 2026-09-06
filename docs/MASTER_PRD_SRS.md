@@ -275,7 +275,7 @@ Business rules:
 - Coordinator may operate across one or more assigned schools.
 - Trainer can access assigned batches/classes only.
 - Viewer is read-only for assigned schools.
-- Super Admin is not implemented and must not be assumed in production behavior.
+- Super Admin ("platform admin") provisions schools only. **Amended by [ADR-006](adr/ADR-006-platform-admin-and-school-registry.md)**, which supersedes the previous "not implemented and must not be assumed" wording. The role is scoped to the school registry — `tenants`, `qualifications`, `tenant_qualifications`, and seating a school's first member. It has no read access to batches, learners, documents, LAMR or billing, so it does not cross the compliance boundary this section exists to protect.
 
 User stories:
 
