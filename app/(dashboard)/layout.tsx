@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { requireAuthenticatedUser } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
-import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
+import { deriveTenantAccess, getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
@@ -10,7 +10,6 @@ import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { withTenantAccess } from '@/modules/tenancy/domain/access';
-import { resolveTenantAccess } from './tenant-access';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const clerkUserId = await requireAuthenticatedUser();
@@ -28,7 +27,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const dbRole = profileSnapshot.status === 'ok' ? profileSnapshot.profile.role : null;
   const isAdmin = (await resolveTrustedRole(dbRole)) === 'admin';
 
-  const batchesSnapshot = withTenantAccess(await getBatchesSnapshot(), await resolveTenantAccess());
+  // Derived from the snapshot already read above, not via `resolveTenantAccess`:
+  // that helper exists to look up the profile for callers who do not hold one,
+  // and its "no signed-in user → unknown" branch is unreachable here because
+  // `requireAuthenticatedUser` has already redirected. Sibling routes that lack
+  // a snapshot still call it. Please do not restore the indirection.
+  const batchesSnapshot = withTenantAccess(
+    await getBatchesSnapshot(),
+    deriveTenantAccess(profileSnapshot),
+  );
   // A metrics strip reading 0 batches / 0 scholars is a claim about a school.
   // For someone attached to no school it is a claim about nothing, so it is
   // suppressed alongside the sync-failed case rather than rendered as zeros.

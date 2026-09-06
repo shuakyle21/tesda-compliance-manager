@@ -18,6 +18,9 @@
 import { createSupabaseServiceClient } from '@/lib/supabase/service';
 import { parseInvitationGrant } from '@/modules/auth/domain/invitationMetadata';
 
+/** Postgres `unique_violation`. A concurrent delivery beat us to the insert. */
+const UNIQUE_VIOLATION = '23505';
+
 type ClerkUserSummary = {
   id: string;
   email: string | null;
@@ -38,10 +41,19 @@ type ClerkUserSummary = {
  * privileged role. A tenant membership is created only for a grant — a self
  * sign-up still lands with no tenant access at all.
  *
- * Update path (existing `clerk_user_id`): only syncs `full_name`/`email`.
- * Role and `is_active` are admin-managed in the app and are left untouched
- * here, so neither a Clerk profile edit nor metadata appearing on an existing
- * user can change app-side authorization after the fact.
+ * Update path (existing `clerk_user_id`): syncs `full_name`/`email`, then
+ * repairs a missing invitation membership (see `ensureTenantMembership`).
+ * Role and `is_active` stay admin-managed in the app and are never touched
+ * here, so no Clerk profile edit can change what a person *is* allowed to do.
+ *
+ * The membership repair narrows that invariant rather than holding it whole,
+ * so state it exactly: a membership is written only when the profile holds
+ * *none*, so a grant can never add a second school or move someone an admin
+ * has already placed. What it does allow is an admin authoring a grant onto an
+ * existing tenantless user through Clerk's Backend API and having it applied.
+ * That is the same actor and the same intent the invitation path already
+ * trusts — an admin's assignment, made outside the app — and `publicMetadata`
+ * is Backend-API-only, so the person signing up cannot forge it.
  */
 export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promise<void> {
   const supabase = createSupabaseServiceClient();
@@ -54,6 +66,10 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
 
   if (selectError) throw selectError;
 
+  // Parsed before the branch because both paths need it: the insert path to
+  // apply the grant, the update path to repair one that failed to apply.
+  const grant = parseInvitationGrant(user.publicMetadata);
+
   if (existing) {
     const { error: updateError } = await supabase
       .from('profiles')
@@ -61,10 +77,15 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
       .eq('clerk_user_id', user.id);
 
     if (updateError) throw updateError;
+
+    // The repair channel. A membership insert that failed on `user.created`
+    // used to be permanent: it logged, the route still answered 200, so Clerk
+    // never retried — and every later delivery returned right here without
+    // looking at the grant. `user.updated` routes to this same function, so
+    // the next delivery now closes the gap instead of stepping over it.
+    if (grant) await ensureTenantMembership(existing.id, grant.tenantId);
     return;
   }
-
-  const grant = parseInvitationGrant(user.publicMetadata);
 
   const { data: inserted, error: insertError } = await supabase
     .from('profiles')
@@ -81,31 +102,46 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
   if (insertError) throw insertError;
   if (!grant || !inserted) return;
 
-  const { error: membershipError } = await supabase.from('profile_tenant_memberships').insert({
-    profile_id: inserted.id,
-    tenant_id: grant.tenantId,
-    // Their only school on arrival, so it is also where they land.
-    is_default: true,
+  await ensureTenantMembership(inserted.id, grant.tenantId);
+}
+
+/**
+ * Grants a profile its invitation school, if it has no school yet.
+ *
+ * Shared by both paths of `upsertProfileFromClerkUser` so that creating the
+ * membership and repairing a missing one behave identically.
+ *
+ * The database function locks the profile row, then checks and inserts in the
+ * same transaction. Concurrent deliveries for one profile therefore cannot
+ * both observe an empty membership set and assign different default schools.
+ * A duplicate-key error is still accepted because a writer outside this
+ * helper may have inserted the same membership without taking that lock.
+ *
+ * Other failures are logged and rethrown so the webhook responds with 500 and
+ * Clerk retries. On retry, the existing-profile path reaches this same helper,
+ * making a partially completed profile creation recoverable.
+ *
+ * The atomic zero-membership gate also makes `is_default: true` correct by
+ * construction — true is right exactly when there are no others.
+ * `modules/tenancy/data/users.ts` has to write `false` for precisely the
+ * opposite reason: its client is RLS-scoped, so an empty membership list there
+ * means "none this admin can see", not "none". Here the service-role client
+ * bypasses RLS, so the count is the whole truth and can be acted on.
+ */
+async function ensureTenantMembership(profileId: string, tenantId: string): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+
+  const { error: membershipError } = await supabase.rpc('ensure_profile_tenant_membership', {
+    target_profile_id: profileId,
+    target_tenant_id: tenantId,
   });
 
-  // A failed membership insert must not fail the whole webhook: the profile
-  // row already exists and Clerk would retry the event, re-running an insert
-  // whose `clerk_user_id` is now taken. The person lands with their role but
-  // no school — visible to an admin as an unassigned user and fixable from
-  // the create-user screen, which is a far better failure than a profile that
-  // never gets created at all. Logged so the gap is not silent.
-  //
-  // Nothing repairs this automatically, and that is deliberate. A later
-  // `user.updated` takes the early-return branch above, which syncs only name
-  // and email — so the obvious "reconcile the grant on update" fix would let
-  // metadata appearing on an *existing* user grant them a school, the exact
-  // escalation the update path exists to prevent. The repair is an admin
-  // reassigning from the create-user screen, not the webhook.
-  if (membershipError) {
+  if (membershipError && membershipError.code !== UNIQUE_VIOLATION) {
     console.error(
-      `Clerk invitation grant: profile created for "${user.id}" but tenant membership failed`,
+      `Clerk invitation grant: tenant membership failed for profile "${profileId}"`,
       membershipError,
     );
+    throw membershipError;
   }
 }
 

@@ -1,25 +1,27 @@
 # Data model
 
 Entity-relationship reference for the `public` schema, generated from the migration history
-as of these versions. **Committed is not the same as applied** — the diagrams below describe
-the applied schema only, and a migration can sit in `supabase/migrations/` unapplied for a
-long time:
+as of these five versions. **Applied** means present in the live Supabase project;
+**pending** means committed here but not yet run against it, so the database does not have it:
 
-| Version | Migration | State |
+| Version | Migration | Status |
 |---|---|---|
 | `20260528160300` | `create_tenant_scoped_schema` — canonical schema, 14 tables, RLS | applied |
 | `20260705070510` | `add_trainer_credentials` | applied |
 | `20260717054607` | `migrate_akb_tenant_and_drop_rogue_table` | applied |
-| `20260831120000` | `seed_dev_operational_data` (data only, no DDL) | **not applied** |
-| `20260904120000` | `add_user_admin_write_policies` — admin read/write RLS policies | **not applied** |
+| `20260831120000` | `seed_dev_operational_data` (data only, no DDL) | **pending** |
+| `20260904120000` | [`add_user_admin_write_policies`](../supabase/migrations/20260904120000_add_user_admin_write_policies.sql) (RLS policies only, no DDL) | **pending** |
+
+The status column was last checked against the live project on **2026-09-06**. Neither pending
+migration carries DDL — one is seed data, the other adds RLS policies — so every diagram, table
+count, and foreign key below describes the applied schema *and* the schema after both land. What
+the pending pair does change is behaviour: until `20260904120000` runs, no client can write
+`profiles` or `profile_tenant_memberships`, which is what the user-administration screens need
+(`modules/tenancy/data/users.ts`).
 
 If you add a migration, update this file in the same PR — nothing enforces that automatically,
-so the version table above is how a reader tells whether this is current. The `State` column
-is likewise manual: confirm it against the project's own migration list rather than assuming a
-committed file has run. The two pending rows above were verified unapplied on 2026-09-06.
-
-Because `20260904120000` has not run, the admin write policies it defines are absent from the
-live database, and the user-administration write path built on them is denied there.
+so the version table above is how a reader tells whether this is current. Applying a migration
+is a separate, deliberate step; move its row to `applied` only after it has actually run.
 
 **15 tables, 33 foreign keys.** `tenants` and `profiles` are the two hubs, with 9 inbound
 references each. Diagrams are split into four clusters because a single graph of 15 tables is
