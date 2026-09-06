@@ -12,6 +12,10 @@
 -- Run with:  psql "$DATABASE_URL" -f supabase/seeds/verify_user_admin_setup.sql
 -- or paste into the Supabase SQL editor.
 --
+-- Part 2 will refuse to run until the `set local app.environment` line just
+-- below `begin;` is uncommented. Because both parts share one transaction,
+-- leaving it commented aborts the file entirely -- Part 1 applies nothing.
+--
 -- WHY THIS IS A SEED AND NOT A MIGRATION
 -- --------------------------------------
 -- Part 1 duplicates `supabase/migrations/20260904120000_add_user_admin_write_policies.sql`
@@ -22,6 +26,10 @@
 -- supabase/migrations/ (same reasoning as dev_profile_memberships.sql).
 
 begin;
+
+-- Part 2 below refuses to run unless this is set. Uncomment it ONLY when you
+-- are certain $DATABASE_URL points at a local database:
+-- set local app.environment = 'local';
 
 -- ===========================================================================
 -- PART 1 -- the migration's four policies, made idempotent.
@@ -130,6 +138,18 @@ using (
 --
 -- REVERT AS SOON AS VERIFICATION ENDS. The revert is at the bottom of this
 -- file, commented out.
+
+-- Part 2 is deny-by-default: it aborts unless the opt-in below `begin;` has
+-- been uncommented. A careless paste against a real database must not promote
+-- an account. The raise aborts the whole transaction, so Part 1's policies are
+-- rolled back too -- this file is deliberately all-or-nothing.
+do $$
+begin
+  if coalesce(current_setting('app.environment', true), '') <> 'local' then
+    raise exception 'Part 2 promotes a demo account to admin. Run it only against a local database. Uncomment the `set local app.environment` line below `begin;` to proceed.';
+  end if;
+end;
+$$;
 
 update public.profiles
 set role = 'admin', updated_at = now()
