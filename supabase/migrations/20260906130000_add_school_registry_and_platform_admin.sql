@@ -1,3 +1,5 @@
+-- Active: 1787931874292@@aws-1-ap-northeast-2.pooler.supabase.com@5432@postgres
+-- Active: 1788015995997@@136.85.45.192@5432
 -- School registry and platform admin (FR-02, ADR-006).
 --
 -- WHY THIS EXISTS
