@@ -1,17 +1,25 @@
 # Data model
 
 Entity-relationship reference for the `public` schema, generated from the migration history
-as of these four versions:
+as of these versions. **Committed is not the same as applied** — the diagrams below describe
+the applied schema only, and a migration can sit in `supabase/migrations/` unapplied for a
+long time:
 
-| Version | Migration |
-|---|---|
-| `20260528160300` | `create_tenant_scoped_schema` — canonical schema, 14 tables, RLS |
-| `20260705070510` | `add_trainer_credentials` |
-| `20260717054607` | `migrate_akb_tenant_and_drop_rogue_table` |
-| `20260831120000` | `seed_dev_operational_data` (data only, no DDL) |
+| Version | Migration | State |
+|---|---|---|
+| `20260528160300` | `create_tenant_scoped_schema` — canonical schema, 14 tables, RLS | applied |
+| `20260705070510` | `add_trainer_credentials` | applied |
+| `20260717054607` | `migrate_akb_tenant_and_drop_rogue_table` | applied |
+| `20260831120000` | `seed_dev_operational_data` (data only, no DDL) | **not applied** |
+| `20260904120000` | `add_user_admin_write_policies` — admin read/write RLS policies | **not applied** |
 
 If you add a migration, update this file in the same PR — nothing enforces that automatically,
-so the version table above is how a reader tells whether this is current.
+so the version table above is how a reader tells whether this is current. The `State` column
+is likewise manual: confirm it against the project's own migration list rather than assuming a
+committed file has run. The two pending rows above were verified unapplied on 2026-09-06.
+
+Because `20260904120000` has not run, the admin write policies it defines are absent from the
+live database, and the user-administration write path built on them is denied there.
 
 **15 tables, 33 foreign keys.** `tenants` and `profiles` are the two hubs, with 9 inbound
 references each. Diagrams are split into four clusters because a single graph of 15 tables is

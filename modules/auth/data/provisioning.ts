@@ -94,6 +94,13 @@ export async function upsertProfileFromClerkUser(user: ClerkUserSummary): Promis
   // no school — visible to an admin as an unassigned user and fixable from
   // the create-user screen, which is a far better failure than a profile that
   // never gets created at all. Logged so the gap is not silent.
+  //
+  // Nothing repairs this automatically, and that is deliberate. A later
+  // `user.updated` takes the early-return branch above, which syncs only name
+  // and email — so the obvious "reconcile the grant on update" fix would let
+  // metadata appearing on an *existing* user grant them a school, the exact
+  // escalation the update path exists to prevent. The repair is an admin
+  // reassigning from the create-user screen, not the webhook.
   if (membershipError) {
     console.error(
       `Clerk invitation grant: profile created for "${user.id}" but tenant membership failed`,
