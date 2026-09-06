@@ -12,6 +12,20 @@
 -- Run with:  psql "$DATABASE_URL" -f supabase/seeds/verify_user_admin_setup.sql
 -- or paste into the Supabase SQL editor.
 --
+-- `DATABASE_URL` is not defined by this project -- it is not in `.env.local`
+-- and nothing exports it. Set it yourself from the Supabase dashboard
+-- (Database Settings -> Connection string). Use the *session pooler* string,
+-- not the direct one: `db.<ref>.supabase.co` publishes an AAAA record only,
+-- so it is unreachable from any network without IPv6, which is the usual
+-- cause of `could not translate host name`. The pooler resolves over IPv4:
+--
+--   postgresql://postgres.<project-ref>:<password>@aws-1-<region>.pooler.supabase.com:5432/postgres
+--
+-- Port 5432 (session mode), not 6543 -- this file runs one transaction and
+-- uses `set local`, which transaction-mode pooling does not hold across
+-- statements. Note the user is `postgres.<project-ref>`, not bare `postgres`;
+-- the bare form returns "Tenant or user not found".
+--
 -- Part 2 will refuse to run until the `set local app.environment` line just
 -- below `begin;` is uncommented. Because both parts share one transaction,
 -- leaving it commented aborts the file entirely -- Part 1 applies nothing.
