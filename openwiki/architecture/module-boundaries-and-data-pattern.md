@@ -3,9 +3,6 @@ type: Reference
 title: Module Boundaries and the Data Layer Pattern
 description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the ESLint-enforced import direction, the private data/ surface, and the fetch → map → derive contract with discriminated snapshots and total enum-bridge maps.
 tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, type-safety]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-02T15:29:54.792Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
