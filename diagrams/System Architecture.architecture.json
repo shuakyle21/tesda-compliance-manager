@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TVI-CAMS · System Architecture",
+    "subtitle": "Multi-tenant TESDA compliance manager — Next.js 16 on Vercel · Clerk identity · Postgres RLS boundary",
+    "locale": "en",
+    "output": "System Architecture.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/shuakyle21/tesda-compliance-manager",
+      "revision": "6d2b78e7883047d83730c17557eefd327418a358"
+    },
+    "views": [
+      {
+        "id": "request-path",
+        "label": "Request path",
+        "focus": ["staff", "nextjs", "modules", "supabase-api", "postgres"],
+        "note": "Follow a page load from the browser to the RLS-enforced database."
+      },
+      {
+        "id": "auth-chain",
+        "label": "Auth chain",
+        "focus": ["staff", "clerk", "nextjs"],
+        "note": "proxy.ts middleware stamps the session; the (dashboard) layout is the actual gate."
+      },
+      {
+        "id": "evidence-billing",
+        "label": "Evidence & billing",
+        "focus": ["modules", "billing", "supabase-api", "storage"],
+        "note": "LAMR and evidence files live in Storage; billing generates versioned .docx snapshots."
+      },
+      {
+        "id": "external-boundary",
+        "label": "External boundary",
+        "focus": ["tesda", "postgres", "clerk"],
+        "note": "TESDA SIS/T2MIS/BSRS stay authoritative — Supabase stores references, never official standing."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "staff",
+      "type": "external",
+      "label": "School staff",
+      "sublabel": "3 TVI schools · 4 roles",
+      "pos": [40, 290],
+      "size": [140, 64]
+    },
+    {
+      "id": "clerk",
+      "type": "security",
+      "label": "Clerk",
+      "sublabel": "Identity & organizations",
+      "tag": "JWT session",
+      "pos": [40, 100],
+      "size": [140, 64],
+      "sources": [
+        { "path": "proxy.ts", "label": "Clerk middleware" }
+      ]
+    },
+    {
+      "id": "nextjs",
+      "type": "frontend",
+      "label": "Next.js 16",
+      "sublabel": "proxy.ts · dashboard gate",
+      "tag": "App Router",
+      "brand": "next-js",
+      "pos": [240, 290],
+      "size": [160, 64],
+      "sources": [
+        { "path": "proxy.ts", "label": "session context" },
+        { "path": "app/(dashboard)/layout.tsx", "label": "auth gate" }
+      ]
+    },
+    {
+      "id": "modules",
+      "type": "backend",
+      "label": "Domain modules",
+      "sublabel": "batches · documents · lamr",
+      "tag": "data / domain / ui",
+      "pos": [470, 290],
+      "size": [160, 64],
+      "sources": [
+        { "path": "modules/documents/domain/compliance.ts", "label": "compliance rules" }
+      ]
+    },
+    {
+      "id": "billing",
+      "type": "backend",
+      "label": "Billing engine",
+      "sublabel": ".docx · TSF · Cost · Entre",
+      "tag": "ADR-001",
+      "pos": [470, 440],
+      "size": [160, 64],
+      "sources": [
+        { "path": "modules/billing/domain/readiness.ts", "label": "readiness gate" },
+        { "path": "modules/billing/domain/tracks.ts", "label": "billing tracks" }
+      ]
+    },
+    {
+      "id": "supabase-api",
+      "type": "cloud",
+      "label": "Supabase API",
+      "sublabel": "anon key · Clerk token",
+      "tag": "data boundary",
+      "brand": "supabase",
+      "pos": [700, 290],
+      "size": [160, 64],
+      "sources": [
+        { "path": "lib/supabase/server.ts", "label": "server client" },
+        { "path": "lib/supabase/client.ts", "label": "browser client" }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "Postgres",
+      "sublabel": "RLS · app_private.*",
+      "tag": "tenant isolation",
+      "brand": "postgresql",
+      "pos": [930, 290],
+      "size": [140, 64],
+      "sources": [
+        { "path": "supabase/migrations/20260528160300_create_tenant_scoped_schema.sql", "label": "schema + RLS" }
+      ]
+    },
+    {
+      "id": "storage",
+      "type": "cloud",
+      "label": "Supabase Storage",
+      "sublabel": "evidence & source files",
+      "pos": [700, 440],
+      "size": [160, 64]
+    },
+    {
+      "id": "tesda",
+      "type": "external",
+      "label": "TESDA systems",
+      "sublabel": "SIS · T2MIS · BSRS",
+      "tag": "authoritative",
+      "pos": [930, 100],
+      "size": [140, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Vercel · Next.js 16",
+      "wraps": ["nextjs", "modules", "billing"]
+    },
+    {
+      "kind": "region",
+      "label": "Supabase project",
+      "wraps": ["supabase-api", "postgres", "storage"]
+    }
+  ],
+  "connections": [
+    { "id": "staff-to-nextjs", "from": "staff", "to": "nextjs", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "nextjs-verify-clerk", "from": "nextjs", "to": "clerk", "label": "verify session", "variant": "security", "fromSide": "top", "toSide": "bottom" },
+    { "id": "clerk-signin-staff", "from": "clerk", "to": "staff", "label": "sign in", "variant": "dashed", "labelDy": 100 },
+    { "id": "nextjs-route-modules", "from": "nextjs", "to": "modules", "label": "route render" },
+    { "id": "modules-queries-api", "from": "modules", "to": "supabase-api", "label": "queries" },
+    { "id": "api-sql-postgres", "from": "supabase-api", "to": "postgres", "label": "SQL + RLS" },
+    { "id": "api-storage-files", "from": "supabase-api", "to": "storage", "label": "evidence files", "variant": "dashed", "labelDy": 24 },
+    { "id": "modules-billing-docgen", "from": "modules", "to": "billing", "label": "doc generation", "labelDy": 24 },
+    { "id": "tesda-refs-postgres", "from": "tesda", "to": "postgres", "label": "references only", "variant": "dashed", "labelDy": 24 }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "App — Vercel",
+      "items": [
+        "Next.js 16 App Router · React 19 · Tailwind v4",
+        "No separate backend — one DDD module per PRD FR"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Data — Supabase",
+      "items": [
+        "Anon-key client with Clerk access-token callback",
+        "Postgres RLS (app_private.*) is the security boundary"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Security & scope",
+      "items": [
+        "RLS enforces school-level tenant isolation",
+        "TESDA SIS/T2MIS/BSRS stay authoritative — references only"
+      ]
+    }
+  ]
+}
