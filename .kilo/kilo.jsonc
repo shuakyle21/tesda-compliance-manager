@@ -1,0 +1,18 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "model": "custom-model",
+  "provider": {
+    "openai-compatible": {
+      "models": {
+        "custom-model": {
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 128000,
+            "output": 16384,
+          },
+        },
+      },
+    },
+  },
+}
