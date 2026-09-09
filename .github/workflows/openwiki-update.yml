@@ -33,7 +33,7 @@ jobs:
 
       - name: Run OpenWiki
         id: openwiki
-        continue-on-error: true
+        continue-on-error: false
         run: openwiki code --update --print
         env:
           # This project talks to an OpenAI-compatible router, not api.openai.com
@@ -61,8 +61,9 @@ jobs:
 
       - name: Create OpenWiki update pull request
         if: ${{ !cancelled() }}
-        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        uses: peter-evans/create-pull-request@v7 # v7
         with:
+          token: ${{secrets.OPENWIKI_PR_TOKEN}}
           add-paths: |
             openwiki
             AGENTS.md
