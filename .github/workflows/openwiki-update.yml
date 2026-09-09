@@ -63,7 +63,6 @@ jobs:
         if: ${{ !cancelled() }}
         uses: peter-evans/create-pull-request@v7 # v7
         with:
-          token: ${{secrets.OPENWIKI_PR_TOKEN}}
           add-paths: |
             openwiki
             AGENTS.md
