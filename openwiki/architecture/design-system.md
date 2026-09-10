@@ -1,32 +1,105 @@
 ---
 type: "Reference"
 title: "Design System and UI Invariants"
+description: "Non-negotiable UI rules of the Training Compliance System: the CSS token layer, semantic color and urgency tiers, no-emoji Tabler iconography, text+icon status rule, the mandatory screen states and their snapshot-driven derivation, component layering, copy rules, and the do-not-edit design handoff directories."
+tags: ["design-system", "ui-invariants", "css-tokens", "accessibility", "screen-states", "nextjs-app-router"]
 openwiki_generated: true
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-09T23:50:06.293Z
+sources:
+  - id: openwiki-source-10906e03e3f3530d2d51e5ab
+    resource: repo://.claude/hooks/protect-static-dirs.sh
+  - id: openwiki-source-ea70eb6c045047448e446296
+    resource: repo://.gitignore
+  - id: openwiki-source-b24355b9c448ffaeee5032f0
+    resource: repo://app/(dashboard)/dashboard/loading.tsx
+  - id: openwiki-source-d5b285e555b6625fe0efdaa2
+    resource: repo://app/(dashboard)/dashboard/page.tsx
+  - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
+    resource: repo://app/(dashboard)/layout.tsx
+  - id: openwiki-source-34483bdeb5950b355468581b
+    resource: repo://app/(dashboard)/tenant-access.ts
+  - id: openwiki-source-f7a1db4a7009ee4e5d95ebd5
+    resource: repo://app/design-system.css
+  - id: openwiki-source-9f4bb955ff4b1a8ac130e5cd
+    resource: repo://app/globals.css
+  - id: openwiki-source-850cd942fe1e04537aa0d1df
+    resource: repo://app/layout.tsx
+  - id: openwiki-source-a2371d6362e5db4bc834ad03
+    resource: repo://CLAUDE.md
+  - id: openwiki-source-f07520170d3d4915ae762528
+    resource: repo://docs/DESIGN.md
+  - id: openwiki-source-894b3bca075aa3e21b9af3bb
+    resource: repo://docs/design/colors_and_type.css
+  - id: openwiki-source-2fda883e9b76745f69f487f7
+    resource: repo://eslint.config.mjs
+  - id: openwiki-source-3da0446fc6c5da744a43e0a3
+    resource: repo://modules/auth/data/role.ts
+  - id: openwiki-source-128693abfd554d0f93b3a906
+    resource: repo://modules/auth/ui/SignUpModal.tsx
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
+  - id: openwiki-source-b465e228246df6e8641b81df
+    resource: repo://modules/batches/domain/urgency.ts
+  - id: openwiki-source-11143d90a0b8c4cf26c3fe0d
+    resource: repo://modules/batches/ui/BatchCard.tsx
+  - id: openwiki-source-512d2efffc85412d8c1e789f
+    resource: repo://modules/batches/ui/CardsView.tsx
+  - id: openwiki-source-462215e279ec0e2bc1ca4933
+    resource: repo://modules/batches/ui/dashboard/DashboardHeader.tsx
+  - id: openwiki-source-7cb36b33e9628c982ac3ac0f
+    resource: repo://modules/batches/ui/TableView.tsx
+  - id: openwiki-source-998cecf14b03cb1c124f5871
+    resource: repo://modules/billing/ui/BillingQueueView.tsx
+  - id: openwiki-source-1d56d4ea0a3a5a0ef9c322a5
+    resource: repo://modules/shell/ui/MetricsRow.tsx
+  - id: openwiki-source-7cb0b5f9c6ed9ed4128872a0
+    resource: repo://modules/shell/ui/Sidebar.tsx
+  - id: openwiki-source-3f1f3f4919f6d868d27df2e3
+    resource: repo://modules/tenancy/data/platform.ts
+  - id: openwiki-source-4a6c5a1d0a57f700524b0a69
+    resource: repo://modules/tenancy/domain/access.ts
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
+  - id: openwiki-source-f7ae5e0747518115ed202c7e
+    resource: repo://RULES.md
+  - id: openwiki-source-fc59a8a20ab21faa88616189
+    resource: repo://shared/ui/Icon.tsx
+  - id: openwiki-source-b31191d4a42825d361850b4d
+    resource: repo://shared/ui/InfoCallout.tsx
+  - id: openwiki-source-58a9a7102ac88705ca20196e
+    resource: repo://shared/ui/MetricCard.tsx
+  - id: openwiki-source-4971bd8e4d814db883c769ff
+    resource: repo://shared/ui/NoTenantAccessState.tsx
+  - id: openwiki-source-7dd3708406ba767fe786d831
+    resource: repo://uploads/training-compliance-design-system.md
+generated: { by: "openwiki/0.5.0", at: "2026-09-09T23:50:06.293Z" }
 ---
 
 # Design System and UI Invariants
 
-The design system in this repository exists because the product is a compliance tool: "a coordinator misreading a status by color alone is a real operational failure, not a cosmetic one" ([CLAUDE.md](/CLAUDE.md)). The non-negotiable UI rules are checklisted in [`RULES.md`](/RULES.md) §4–§6, the full visual reference is [`docs/DESIGN.md`](/docs/DESIGN.md), and the upstream v1.0 spec sheet lives at [`uploads/training-compliance-design-system.md`](/uploads/training-compliance-design-system.md). `.design-sync/config.json` records the relationship between the two worlds: "Local Next.js TypeScript components are the implementation layer; source JSX is the design reference."
+The design system in this repository exists because the product is a compliance tool: "a coordinator misreading a status by color alone is a real operational failure, not a cosmetic one" ([CLAUDE.md](/CLAUDE.md)). The non-negotiable UI rules are checklisted in [`RULES.md`](/RULES.md) §3–§6, the full visual reference is [`docs/DESIGN.md`](/docs/DESIGN.md), and the upstream v1.0 spec sheet lives at [`uploads/training-compliance-design-system.md`](/uploads/training-compliance-design-system.md). DESIGN.md states the precedence: key deviations from the spec are marked `⚠ DEVIATION` and **win** over the spec, with `colors_and_type.css` and `ui_kits/admin/` as the live ground truth.
 
 ## Sources of truth
 
 | Source | Role |
 |---|---|
-| [`RULES.md`](/RULES.md) §4–§6 | The invariants, in checklist form with an enforcement level per rule (`[hook]`, `[lint]`, `[review]`) |
-| [`docs/DESIGN.md`](/docs/DESIGN.md) | Complete design reference: principles, tokens, components, states, motion, accessibility. Implementation decisions that diverge from the upstream spec are marked `⚠ DEVIATION` and **win** over the spec; `colors_and_type.css` and `ui_kits/admin/` are the live ground truth |
+| [`RULES.md`](/RULES.md) §3–§6 | The invariants, in checklist form with an enforcement level per rule (`[hook]`, `[lint]`, `[review]`, …) |
+| [`docs/DESIGN.md`](/docs/DESIGN.md) | Complete design reference: principles, tokens, components, states, motion, accessibility. Implementation decisions that diverge from the upstream spec are marked `⚠ DEVIATION` and **win** over the spec |
 | [`docs/design/colors_and_type.css`](/docs/design/colors_and_type.css) | Token definitions — "source of truth for color" per the DESIGN.md file index |
 | [`uploads/training-compliance-design-system.md`](/uploads/training-compliance-design-system.md) | Original v1.0 spec — re-read before making a visual decision not covered by DESIGN.md |
 | [`ui_kits/admin/`](/ui_kits/admin/), [`assets/`](/assets/), [`preview/`](/preview/), [`screenshots/`](/screenshots/), [`uploads/`](/uploads/) | Design handoff bundle, ported verbatim — **do not edit** (see [Static directories](#do-not-edit-static-directories-and-design-sync)) |
 
-Related pages: [Module boundaries and data patterns](/openwiki/architecture/module-boundaries-and-data-pattern.md), [Architecture overview](/openwiki/architecture/overview.md), [Batches and lifecycle](/openwiki/domains/batches-and-lifecycle.md).
+Related pages: [Module boundaries and data patterns](/openwiki/architecture/module-boundaries-and-data-pattern.md), [Architecture overview](/openwiki/architecture/overview.md), [Batches and lifecycle](/openwiki/domains/batches-and-lifecycle.md), [Quickstart](/openwiki/quickstart.md).
 
 ## Token layer
 
-**Where tokens live at runtime.** `app/globals.css` is the single style entry point: it imports Tailwind v4 (`@import "tailwindcss"`), imports the layout-only `app/design-system.css`, and then defines the entire `:root` token block **copied verbatim** from `docs/design/colors_and_type.css` (the file's own header instructs: "Do NOT delete or merge — copy the entire :root block verbatim"). `app/design-system.css` is deliberately layout-only — shell, sidebar, topbar, `.page-head`, `.metrics`, buttons, focus ring, data rows, keyframes, and screen-specific sections — and every rule in it references token variables rather than raw colors.
+**Where tokens live at runtime.** `app/globals.css` is the single style entry point: it imports Tailwind v4 (`@import "tailwindcss"`), imports the layout-only `app/design-system.css`, and then defines the entire `:root` token block **copied verbatim** from `docs/design/colors_and_type.css` (the block's own header warns: "Do NOT delete or merge — copy the entire :root block verbatim"). It also bridges Tremor's legacy v3-style chart config through `@config "../tremor.config.mjs"` plus `@source inline(...)` utilities, scoped to `modules/analytics/**` so no other screen touches the Tremor palette. `app/design-system.css` is deliberately layout-only — shell, sidebar, topbar, `.page-head`, `.metrics`, buttons, focus ring, data rows, keyframes, and screen-specific sections — and every rule in it references token variables rather than raw colors.
 
 **Fonts.** `app/layout.tsx` self-hosts IBM Plex Sans (weights 300–600) and IBM Plex Mono (300–500) through `next/font`, exposing `--font-ibm-plex-sans` / `--font-ibm-plex-mono` on `<html>`. `:root` prepends these variables into `--font-sans` / `--font-mono`, so the optimized, layout-shift-free fonts win with the web/system names as fallbacks. The type families are spec-locked: IBM Plex Sans for UI/body, IBM Plex Mono for IDs, dates, codes, and numeric data — and Inter/Geist/Roboto/Arial are explicitly banned as primary typefaces. Semantic type roles (`.t-page-title`, `.t-label`, `.t-cell`, `.t-metric-value`, …) are defined once in `globals.css` and reused across screens.
 
-**Semantic color system.** Six hues, each with staged tokens (`base` / `-lt` / `-dk` / `-border` / `-hover`), and *every color carries one meaning*, applied 100% consistently:
+**Semantic color system.** Six hues, each with staged tokens (`base` / `-lt` / `-dk` / `-border` / `-hover`; purple defines the base three), and *every color carries one meaning*, applied 100% consistently:
 
 - **Blue** — informational / TWSP / active navigation
 - **Teal** — CFSP program
@@ -35,7 +108,7 @@ Related pages: [Module boundaries and data patterns](/openwiki/architecture/modu
 - **Red** — critical / <7 days / errors
 - **Purple** — NC level indicators
 
-Urgency is the most important color rule in the system: the tier (≤6 days critical/red, 7–21 warning/amber, >21 on-track/green) is **computed once at data fetch and stored on the batch** — never recomputed in render functions. In code this is the `daysToBilling` field mapped in `modules/batches/data/batches.ts` (`daysUntil()`, which returns `Infinity` as the "no known deadline" sentinel so missing dates never trigger urgency tiers).
+Urgency is the most important color rule in the system. The deadline math happens once, at data fetch: the mapper stores `daysToBilling` on the batch, where `daysUntil()` returns `Infinity` as the "no known deadline" sentinel so missing or unparseable dates never trigger urgency tiers (and sort last). The tier itself is the pure domain function `urgencyTier()` in `modules/batches/domain/urgency.ts` applied to that stored value — ≤6 days critical/red, 7–21 warning/amber, >21 on-track/green; `UrgencyIndicator` adds an `overdue` tier for negative day counts.
 
 **Documented deviations from the upstream spec** (DESIGN.md `⚠ DEVIATION` markers, which win):
 
@@ -62,7 +135,7 @@ RULES §4.23 mandates that status is conveyed by **text + icon, never color alon
 - Row selection in the billing queue tints the row but is announced structurally: "Selection is also announced structurally (aria-selected), never by tint alone" (comment in `design-system.css`).
 - DESIGN.md §14 prescribes the ARIA patterns (batch card `aria-label` with name/status/deadline, `role="progressbar"` with value attributes, `role="list"`/`aria-current` on the pipeline, `role="img"` on charts) and the verified contrast pairs for badge tokens.
 
-A related anti-misleading invariant lives in `modules/shell/ui/MetricsRow.tsx`: the `hasBatches` guard is load-bearing (TES-74) — with zero batches, an empty state must **not** be styled as a critical red billing deadline, and "All verified" copy must not appear when there is nothing to verify (a compliance tool must distinguish *empty* from *cleared*, per ADR-004's unknown-vs-0% rule).
+A related anti-misleading invariant lives in `modules/shell/ui/MetricsRow.tsx`: the `hasBatches` guard is load-bearing (TES-74) — with zero batches, the Earliest Billing card must **not** be styled as a critical red deadline, and the Doc Compliance subline says "No batches" (the code comment: "'All verified' must not appear when there is nothing to verify"). A compliance tool must distinguish *empty* from *cleared*, per ADR-004's unknown-vs-0% rule. The `(dashboard)` layout goes one step further and omits the `MetricsRow` entirely on `sync-failed` or `no-tenant-access` — a zero-metrics strip would be a claim about a school that isn't established.
 
 ## Component layering
 
@@ -72,32 +145,33 @@ The layering convention (RULES §2/§4, CLAUDE.md) is:
 
 - `app/(dashboard)/<route>/page.tsx` is a thin Server Component: it fetches via a module's `data/` layer, applies pure `domain/` rules, and composes module UI. No business logic in `app/`.
 - `modules/<domain>/ui/*` holds the screens and views (`CardsView`, `TableView`, `BatchModal`, `BillingQueueView`, the dashboard widgets in `modules/batches/ui/dashboard/*`, and the app shell in `modules/shell/ui/*`).
-- `shared/ui/*` holds props-only primitives that know **nothing** about data or rules: `Icon`, `StatusBadge`, `InfoCallout`, `MetricCard`, `ProgressBar`, `EmptyState`, `TrainerAvatar`, `UrgencyIndicator`/`BillingReadyBadge`, `TrainingDayPills`, `Toast`, `Switch`, `Charts`, `FilePreviewModal`. They receive pre-computed values (a `Batch` object, a number of days, a percent) and render tokens.
+- `shared/ui/*` holds props-only primitives that know **nothing** about data or rules: `Icon`, `StatusBadge`, `InfoCallout`, `MetricCard`, `ProgressBar`, `EmptyState`, `NoTenantAccessState`, `TrainerAvatar`, `UrgencyIndicator`/`BillingReadyBadge`, `TrainingDayPills`, `Toast`, `Switch`, `Charts`, `FilePreviewModal`. They receive pre-computed values (a `Batch` object, a number of days, a percent) and render tokens.
 - **If a `shared/ui` component starts reading data or encoding business rules, move it into its owning module** (RULES §2.15). This is why `LifecyclePipeline` lives in `modules/batches/ui/` (it encodes the batch lifecycle domain), while the shell's `Sidebar`/`Topbar`/`MetricsRow` live in `modules/shell/ui/` (they encode navigation and role-surface rules).
 - Import direction is `app → modules → shared → lib/supabase`, lint-enforced by `import/no-restricted-paths` in `eslint.config.mjs`: another module's `data/` is private (only `app/` may fetch it), `shared/` can never import `modules/` or `app/`, and raw DB types from `lib/supabase/database.types.ts` are reachable only from module `data/` layers. No module `ui` file imports any `data/` layer today.
-- **Server Components by default; client islands only for interactivity** (RULES §4.26). `BatchCard` is `'use client'` for hover elevation and opening `BatchModal`; `Sidebar` is `'use client'` for pathname, drawer, and tenant-switch state; the dashboard layout and page stay server.
+- **Server Components by default; client islands only for interactivity** (RULES §4.26). `BatchCard` is `'use client'` for hover elevation and opening `BatchModal`; `Sidebar` is `'use client'` for pathname, drawer, and tenant-switch state; the dashboard layout and page stay server. The layout is also where role surfaces are resolved server-side: `isAdmin` from the trusted profile role (never the `?role=` preview) drives the admin-only "Add user" nav row, and the ADR-006 platform-admin axis is resolved separately through the boolean-only `isPlatformAdmin()` helper (a `security definer` RPC over the deliberately unreadable `platform_admins` table) so any failure hides the "Add school" row rather than rendering a link into a denial.
 - **Reuse existing primitives** — `BatchCard`, `BatchModal`, `StatusBadge`, `LifecyclePipeline`, `EmptyState`, `InfoCallout`, … — rather than creating parallels (RULES §4.25). `CardsView` and `TableView` both compose the same `BatchCard`/`BatchModal`/`StatusBadge`/`EmptyState` set, differing only in arrangement.
 
 ```mermaid
 flowchart TD
-    layout["app dashboard layout.tsx - Server Component shell with auth gate, Sidebar, Topbar, MetricsRow"]
-    route["app route page.tsx - thin Server Component"]
-    data["modules <domain> data layer - Supabase fetch and mapper, importable only from app"]
-    domain["modules <domain> domain layer - pure rules such as urgencyTier and isBillingReady"]
-    screen["modules <domain> ui screens - CardsView, TableView, BillingQueueView, dashboard widgets"]
-    prim["shared ui primitives - Icon, StatusBadge, InfoCallout, MetricCard, EmptyState, ProgressBar"]
-    mocks["shared mocks - silent fallback dataset when Supabase is unconfigured"]
+    layout["app dashboard layout.tsx - Server Component shell: auth gate, trusted admin role, ADR-006 platform-admin flag, MetricsRow suppression"]
+    route["app route page.tsx - thin Server Component: fetch, fold tenant verdict, compose"]
+    data["module data layer - Supabase fetch and mapper, importable only from app/"]
+    access["modules/tenancy/domain/access - withTenantAccess folds the membership verdict into the snapshot"]
+    domain["module domain layer - pure rules such as urgencyTier, isBillingReady, deriveDashboardMetrics"]
+    screen["module ui screens - CardsView, TableView, BillingQueueView, dashboard widgets"]
+    prim["shared/ui primitives - Icon, StatusBadge, InfoCallout, MetricCard, EmptyState, NoTenantAccessState, ProgressBar"]
 
     layout --> route
     route -->|"fetch via module data"| data
+    route -->|"fold verdict"| access
     route -->|"compose"| screen
-    route -->|"unconfigured fallback"| mocks
     data -->|"map and derive via"| domain
+    access -->|"no-tenant-access guard state"| prim
     screen -->|"render"| prim
     screen -->|"rules from"| domain
 ```
 
-*Component layering: fetch is confined to `app/`, screens compose props-only `shared/ui` primitives, and pure domain rules are shared between mappers and screens.*
+*Component layering: fetch is confined to `app/`, the tenancy membership verdict is folded into the snapshot at the route, screens compose props-only `shared/ui` primitives, and pure domain rules are shared between mappers and screens.*
 
 ## The six mandatory screen states
 
@@ -105,37 +179,37 @@ Every data screen must implement all six states (RULES §4.24):
 
 | State | Mandated treatment |
 |---|---|
-| **loading** | Skeleton shimmer for initial load/refresh; write-back buttons show the `.btn.loading` spinner in the leading slot (width-stable) with `aria-busy`. DESIGN.md §12. No route-level `loading.tsx` files exist yet — server fetches render once, so the spec'd treatments apply to client islands and pending actions |
+| **loading** | Skeleton shimmer for initial load/refresh; the dashboard ships a route-level `app/(dashboard)/dashboard/loading.tsx` Suspense boundary whose token-based shimmer blocks mirror the real layout (`aria-busy="true"`). Write-back buttons show the `.btn.loading` spinner in the leading slot (width-stable) with `aria-busy`. DESIGN.md §12 |
 | **empty** | `EmptyState` with icon + heading + the next administrative action (e.g. "No assigned batches" → *Import a batch* link) |
 | **no-results** | `EmptyState` "No batches match" when search/program filters remove all rows (see `CardsView` and `TableView`) |
-| **error / sync-failed** | A warning `InfoCallout` banner over the last cached snapshot with a *Retry* link — `sync-failed` **must** surface this banner (RULES §3.19). Raw Supabase/SQL errors, table names, and internal IDs are never leaked to the UI (RULES §1.6) |
+| **error / sync-failed** | **Must** surface: a full-page `SyncFailedView` ("Couldn't reach Supabase" + *Retry*) when the failure yields zero rows — checked *before* the empty guard, or the banner is swallowed behind "import a batch" (RULES §3.19) — and a warning `SyncFailedCallout` banner over the rows on display when non-empty data coexists with the failure (e.g. the `?state=sync-failed` preview). Raw Supabase/SQL errors, table names, and internal IDs are never leaked to the UI (RULES §1.6) |
 | **permission-denied** | Full-page guard: `EmptyState` "Access denied — your role does not have access to this school's dashboard" |
-| **stale-data** | A `STALE` pill beside the `Data as of` stamp when the data is older than the 24 h threshold |
+| **stale-data** | A `STALE` text badge beside the `Data as of` stamp when the data is older than the 24 h threshold |
+| **no-tenant-access** (beyond the six RULES lists) | `NoTenantAccessState` "No school assigned yet" — the dashboard's fourth terminal state, checked before the empty guard because RLS makes a non-member's read look identical to an empty tenant's |
 
-**Mechanism.** Data functions return **discriminated snapshots** so Server Components map states straight to UI: `getBatchesSnapshot()` in `modules/batches/data/batches.ts` yields `BatchesSnapshot` = `ok` (rows + `dataAsOf`) / `sync-failed` (configured but errored) / `unconfigured` (no Supabase env). `unconfigured` falls back to `shared/mocks` **silently**; `sync-failed` falls back to mocks **with the mandatory banner**. The dashboard (the canonical implementation) additionally accepts a `?state=` query param as a manual preview override for each state; `denied` is preview-only until the real tenant/role resolver lands (TES-34), and `stale` derives from real freshness: the freshest batch row's `updated_at` versus the 24 h `DATA_STALE_AFTER_MS` threshold.
+**Mechanism.** Data functions return **discriminated snapshots** so Server Components map states straight to UI. `getBatchesSnapshot()` in `modules/batches/data/batches.ts` (React `cache`-wrapped, so the layout and its nested page share one query per request) yields `BatchesSnapshot` = `ok` (rows + `dataAsOf` from the freshest `updated_at`) / `sync-failed` (configured but errored) / `unconfigured` (no Supabase env). `no-tenant-access` is never produced by the query — RLS answers it with a successful, empty read — so routes fold the tenancy verdict (`granted` / `none` / `unknown`) in via `withTenantAccess` (from `modules/tenancy/domain/access`, composed at the route because tenancy's `data/` is private to its module). The fold replaces **only** an `ok` snapshot: a real fetch failure is never masked by the tidier explanation, and an unverified verdict changes nothing.
+
+`selectBatchesForDisplay` **never substitutes mock data** — any non-`ok` snapshot renders `[]`. `shared/mocks/` was removed entirely in the mock-data retirement, and RULES §3.19 bans the pattern: neither `unconfigured` nor `sync-failed` may render mock or fabricated data — both render an honest empty or failure state.
+
+The dashboard (the canonical implementation) guards in a fixed order: role-lookup-failed (fail-closed "Couldn't verify your access" + *Retry*, instead of defaulting to a permissive role) → trusted trainer redirect to `/trainer` → `denied` → `sync-failed` with zero batches → `no-tenant-access` → `empty` → main content. `?state=` remains a manual preview override for each state: `denied` is preview-only until the real tenant/role resolver lands (TES-34 / issue #32), `stale` is real data freshness — the freshest row's `updated_at` older than the 24 h `DATA_STALE_AFTER_MS` threshold — or forced, and a `?state=sync-failed` preview over a live non-empty snapshot falls through to the banner. `?role=` may pick which office-role variant (coordinator/admin/viewer, with a least-privilege viewer fallback) is displayed, but never gates the trainer redirect.
 
 ```mermaid
 flowchart TD
-    fetch["Server Component route calls getBatchesSnapshot"] --> status{"snapshot.status"}
-    status -->|"ok"| live["live RLS-scoped rows, dataAsOf from latest updated_at"]
-    status -->|"unconfigured"| mocks["shared/mocks fallback, silent"]
-    status -->|"sync-failed"| cached["shared/mocks fallback rows"]
-    live --> denied{"permission denied?"}
-    mocks --> denied
-    cached --> denied
-    denied -->|"yes"| deniedUI["Access denied EmptyState"]
-    denied -->|"no"| empty{"zero batches?"}
-    empty -->|"yes"| emptyUI["No assigned batches EmptyState with import action"]
-    empty -->|"no"| filtered{"search or program filter removes all rows?"}
-    filtered -->|"yes"| noResultsUI["No batches match EmptyState"]
-    filtered -->|"no"| content["main content with Data as of stamp in the page header"]
-    content -.->|"when snapshot was sync-failed"| banner["warning InfoCallout with Retry over cached rows"]
-    content -.->|"when stamp is older than 24 hours"| stalepill["STALE pill beside the stamp"]
+    lookup["trusted role lookup - Clerk metadata and profile row"] -->|"lookup-failed"| blocked["full-page guard - Couldnt verify your access, with Retry"]
+    lookup -->|"trainer role"| trainer["redirect to /trainer before any data loads"]
+    lookup -->|"office role or none"| snap["getBatchesSnapshot - ok, sync-failed, or unconfigured"]
+    snap --> fold["withTenantAccess - none rewrites only an ok snapshot to no-tenant-access"]
+    fold -->|"?state=denied preview"| denied["full-page guard - Access denied"]
+    fold -->|"sync-failed and zero batches"| syncfail["full-page guard - Couldnt reach Supabase, with Retry"]
+    fold -->|"no-tenant-access"| notenant["NoTenantAccessState - No school assigned yet"]
+    fold -->|"ok or unconfigured, zero batches"| empty["EmptyState - No assigned batches, Import a batch action"]
+    fold -->|"batches present"| content["dashboard content with Data as of stamp and STALE text badge"]
+    content -.->|"?state=sync-failed preview over live rows"| banner["warning callout - Sync with Supabase failed, with Retry"]
 ```
 
-*State derivation on a data screen: the snapshot status chooses the data source, terminal guards (denied → empty → no-results) short-circuit, and stale/sync-failed render as overlays on the main content.*
+*State derivation on the dashboard: the snapshot status and the folded tenant verdict choose the data source, terminal guards run in a fixed order (lookup-failed → trainer → denied → sync-failed → no-tenant-access → empty), and stale/sync-failed render as overlays on the main content.*
 
-**"Data as of" timestamp.** Screens that show relative dates must show an **exact** "Data as of" timestamp (RULES §4.24). The dashboard formats the freshest `updated_at` across live rows as e.g. `Jun 19, 2026 · 14:02` (hour cycle `h23` so midnight prints `00:02`, never `24:02`) and degrades to the literal `cached snapshot` on the mock path rather than printing a fake precise timestamp. `BillingQueueView` receives its `dataAsOf` as an explicit prop and stamps `Packet readiness · Data as of {dataAsOf}`.
+**"Data as of" timestamp.** Screens that show relative dates must show an **exact** "Data as of" timestamp (RULES §4.24). The dashboard formats the freshest `updated_at` across live rows as e.g. `Jun 19, 2026 · 14:02` (hour cycle `h23` so midnight prints `00:02`, never `24:02`). A stamp is only produced from an `ok` snapshot — when there is no live `updated_at` to read, `DashboardHeader` degrades to the literal word `unknown` rather than printing a fake precise timestamp, and staleness renders as a text `STALE` badge beside the stamp, never by color alone. `BillingQueueView` receives its `dataAsOf` as an explicit prop and stamps `Packet readiness · Data as of {dataAsOf}` (plus ` · STALE` when stale).
 
 ## Copy rules and product framing
 
@@ -144,10 +218,11 @@ flowchart TD
 
 ## Do-not-edit static directories and design sync
 
-- **`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim** from the design bundle and excluded from lint and build (`eslint.config.mjs` `globalIgnores`). A PreToolUse hook, `.claude/hooks/protect-static-dirs.sh` (registered for `Edit|Write` in `.claude/settings.json`), **blocks agent edits there** and exits with the instruction to edit the source design files instead. `public/assets/` is explicitly exempt — it is the app's real runtime static directory (served at the site root) that merely shares the name.
-- **`FIGMA FILES/`, `diagrams/`, `.design-sync/` are design artifacts, not app code** (RULES §6.29, review-level). `FIGMA FILES/` is not currently materialized in the tree — Figma pages are referenced by node ID in code comments instead (e.g. `8:4330` for the primary navigation aside, `840:5128` for the billing packet queue). `diagrams/` holds the architecture/ER Mermaid sources and rendered PNGs; `.design-sync/` records the design-project mapping.
-- **Design changes go to the source design files first.** The handoff bundle *is* the source: `ui_kits/admin/index.html` is the working no-build prototype of all dashboard views, `ui_kits/admin/*.jsx` are the prototype components the local ones were ported from, `preview/` holds standalone HTML sheets for type/color/spacing/components, and `assets/icons/` is the curated offline SVG subset of the Tabler icons. When spec and deviation conflict, the deviation wins and `colors_and_type.css` + `ui_kits/admin/` are the live ground truth.
-- A PostToolUse hook (`lint-edited-file.sh`) lints every file an agent edits, so design-system violations surface immediately at edit time.
+- **`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim** from the design bundle and excluded from lint (`eslint.config.mjs` `globalIgnores`, which also ignores the vendored `.claude/**`/`.agents/**` tooling). The PreToolUse hook script **`.claude/hooks/protect-static-dirs.sh` blocks agent edits there** — `Edit`/`Write` under any of the five directories exits 2 with the instruction to edit the source design file instead (or confirm with the user first). `public/assets/` is explicitly exempt — it is the app's real runtime static directory (served at the site root) that merely shares the name.
+- **Where the hook is registered:** the registration file `.claude/settings.json` is gitignored by design (`.gitignore` ignores `.claude/*` and re-includes only `skills/`, `hooks/`, and `agents/`), so it is a per-machine local configuration and is **not present in this checkout**. The version-controlled artifacts are the hook scripts themselves, the `[hook]`/`[deny]` declarations in RULES.md (which name `.claude/settings.json` as the registration point, including the Supabase `permissions.deny` entries in §10), and the CLAUDE.md documentation. Enforcement therefore exists on machines that keep the local settings file; the repo's durable record of the invariant is the script plus the `[hook]` rule.
+- **`FIGMA FILES/`, `diagrams/`, `.design-sync/` are design artifacts, not app code** (RULES §6.29, review-level). `FIGMA FILES/` and `.design-sync/` are not currently materialized in the tree — Figma pages are referenced by node ID in code comments instead (e.g. `8:4330` for the primary navigation aside in `Sidebar`, `840:5128` for the billing packet queue in the billing route, `522:2367`/`382:3`/`394:723` for the three dashboard role variants). `diagrams/` holds the architecture/ER Mermaid sources plus rendered PNG/HTML.
+- **Design changes go to the source design files first.** The handoff bundle *is* the source: `ui_kits/admin/index.html` is the working no-build prototype of the dashboard views, `ui_kits/admin/*.jsx` are the prototype components the local ones were ported from, `preview/` holds standalone HTML sheets for type/color/spacing/components, and `assets/icons/` is the curated offline SVG subset of the Tabler icons. When spec and deviation conflict, the deviation wins and `colors_and_type.css` + `ui_kits/admin/` are the live ground truth.
+- A PostToolUse hook (`lint-edited-file.sh`) lints only the file an agent just edited (TS/JS) via `eslint_d` with a plain `eslint` fallback, so design-system and boundary violations surface immediately at edit time without tripping on pre-existing repo debt.
 
 ## Invariant checklist
 

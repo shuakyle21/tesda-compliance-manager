@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:bba661c382344e0954ba4a7233dbeae25b1449dcdcfa4ab80780afc1a99d3d7e",
+  "pageVersion": "sha256:368d2ddc74db3420e9050bb43997ee272557d428e124a7a9b60e26da2ff044c8",
   "claims": [
     {
       "id": "claim_b261aa00374b4985868752f47201bd09",
@@ -799,10 +799,44 @@
           "version": "repo-lines-v1:sha256:9f53de2e2015de8200c3bddd8c99ba02134f07a6a365cdf91d943eb5394cf5e8:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWRlZGQ4N2Q2NWUwNTNmZDA2ZjU1N2ZlZTdiZGYzNTFlYWM2ZDI5ZWE2MmRhNTc1MTIzNjJmNmI3NzRlNjkzMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjU4OTVlODU4MTNlMzkzN2UwNzJlZTM0MmVjNzI1MjQzN2M0ZjI0OTYyMDMyZDQ4ZTliNzY1OGI5ZDY4NWJjMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTZmNjMyODVkNWI0NWVhNzJlOTRhNjg1NTlmMmZhZTIzMjI4N2IxMjg0MTBjMWM4NWJlOTNkZWZlZWI3ODc4MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDhlYjY3Y2FiYjk5YzNkMjcwNDEzYTAzNzU4Y2VmYTRkZTczNDBjNDg1NGY0NmFkYjc1MGJlZTcyNzkxOGQ3YSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_2e7f0bd922ca4cc393d5c05f9977ff42",
+      "statement": "The supabase/migrations/ ledger is the seven additive migrations on top of the canonical 20260528160300_create_tenant_scoped_schema.sql (schema + RLS, which also idempotently seeds tenants, TWSP/CFSP programs, and the 8-key requirement catalog): 20260705070510 adds the trainer_credentials table with RLS; 20260717054607 is a guarded corrective that copies the lone AKB record out of the hand-made, non-conforming public.tenant (singular) table into the canonical tenants table and drops the rogue table, short-circuiting on databases rebuilt from the history where the table never existed; 20260831120000 seeds DEV-prefixed fixture batches/learners/documents ported from the then-present shared/mocks/seed.ts with NULL official_system_reference and adds the unique documents (batch_id, document_key) index; 20260904120000 adds the user-admin write policies; 20260906120000 adds the ensure_profile_tenant_membership function that applies an invitation's membership atomically; 20260906130000 adds the ADR-006 school registry and platform-admin RLS + RPCs.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L62-L66",
+          "version": "repo-lines-v1:sha256:b3c81a1554b8fadecab1236821775fe33b913f5c0f337fb2660a26bfef4480ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTI3YjNkZmEyOWZiZWFhYzkwYjA3YzA4MDE5M2ZhMTgyMDg0OGMyYTI3MTU2ZTk2OTc1NjljNThkYzNlOGE3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzY2QyODFmNDhmMmVhYzc2NzJmZDcxMDcxNTJhMjE2NmM4MTJkOTMzMjFmZDQ5NjE2ZjY5ZWZkMTFkNTBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWVkYTEzZGYyNTIwYzFjMmQxOGU4NGYyN2ViNjUyYzliYmU0NzRhMDZiNzMzOTg2YjYzZDNlNTU1Yjg0Y2Y0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMxMjNhMjViYzk1YWM3OTZhZjg5ZTlmNDBkYTU1MDllZDhkYzY5ZGJlN2Y3NWJkYTg2YTRhYTJmNWVjMzY3MCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260705070510_add_trainer_credentials.sql#L1-L16",
+          "version": "repo-lines-v1:sha256:15230a65102e40c6e629fdbeed6651389bde9648f3a9ac0c1d1abf10dcf9539e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmZTRlYzk0MDNlZGEwYzAwOGRmNjI5ZjQxNTg4YzZmMWFiNDlmNTg1YzJiMzA4ZDBiMGM3NmUwODU5MGYyYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxODY1Zjg5MzI1MDAzMGYzOGFjOGM4YjgxMjE2ZjBkZDIwMmE3YjVmODA1ZDY3NGJmN2ZlM2I0NWQyNzAwNTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhOTIzYTEyNTNhYzMwMWM1NGYyNDlhMTcyNWNmMDE3NTU4MjY5YWI1NzAzMTRlYjE4MDg1MGI4MzM1NWFlMzYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql#L1-L41",
+          "version": "repo-lines-v1:sha256:759315b5e0258b09b70dbf91d679b49d47917a767b32833201f5ab9d6f1e2e11:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NjE5YWRhODY3NWFkZGVjMGQ4MGJmYWMyOWY4MDY3ZDYwM2Y0YjhmZTE1MTYxNTdjMTQxNjVkODg0MzJmMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260831120000_seed_dev_operational_data.sql#L1-L34",
+          "version": "repo-lines-v1:sha256:49e8bd39de8470cb50c8fc301057c5635eec82c89efeef3a2fd97f6bca045d77:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViYTU2M2ZkMjdmMDMxNzcyYmU3MmFmZWQyYmExNDNkYzk3ZjRiNjFlNmMzOWE1Zjc5N2Q4OWM4MmVjNjg0YTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiZGZkYmE1ODM3NWU4ZDA1MTFiNmI4NzA1OWJmNGI0NWVlNzkzYTQ3MGUxNmU4MmM4MWZiNTZhMDE1OTk1ODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyOWMxNTRjN2FjMjE4ZDMxMmJlMzc0NjUyNWU3MTU5YzYyNGZiMDUxNzcwZTAzZjcyOGE3Yjg4MGY2NzQ3ZjgifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql#L1-L25",
+          "version": "repo-lines-v1:sha256:690acdb96ccd636d43a74d3e427fd7d3b6d93c8710b71e410888853758f82b67:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyOWFmYzNlNjY3MmNlYTQzMjM5M2YzMTI3ZThjNzliNDMzYWI5MWZhMmNkZmYwODdiYjVkYjg1OGJkYTU3YzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0MmFhYWVhZGE3MWVhZDRiMGZjZjlkZDhkYTAxMzk1ZjAxYjcyYzkxMDdkNzc3ZTk3ZGY4NDc3NTNlNTAyNzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3ODg3Y2ZkNDZhNTg4ODVkZGI3OGEwOTI1ZjMwMzhiNmI4MTMxZWRlMjdjOWEwMzZiMDBkZGUwMmU0ZjZlY2IifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql#L1-L29",
+          "version": "repo-lines-v1:sha256:3fb76e087a10f6cb0feeeab7bf664e003bfea038831bce651515c9e6ed10fd4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3MjZhOGU0ZDFjY2M5NGZkMWNjMTQyZDcxNTUzNTNlMzJmZTAzNmYwYTQ4MGEyNzQyNTc2NzRjYmJmMGZhMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZWE1ZWNlZWEwMWNmZWI4OThjMDUyNzkwZmE3ODVjOTYwMjkwNThhZjNkZjVmMTQwYzNmNGE0ZjRjYzI2ZjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlNGZkMmQ2NjkxZDEwNTlhZDc0NTBjMTAzMDIzMmE3OWUxMTdlZDM1YjliYmU5Y2YwNWQ0NGMyOTkyMmFhYmMifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql",
+          "version": "repo-file-v1:sha256:8fa82ec9c13277d89304780190fab60cafa8688cff3cbaf78ec71881e678728e"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-07T23:59:58.343Z"
+    "at": "2026-09-09T23:50:06.293Z"
   }
 }
