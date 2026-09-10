@@ -61,10 +61,17 @@
 -- likeliest failure point is the `storage.objects` policy in section 9, which
 -- requires ownership of that table.
 --
--- Note also (2026-09-10) that the repo and the database have drifted: three
--- checked-in migrations are unapplied, and the school registry is applied under
--- version 20260906114735 while its file is named 20260906130000. Reconcile that
--- before assuming a clean `db push`.
+-- Note also (2026-09-10) that the repo and the database have drifted -- see
+-- issue #230. Three checked-in migrations are missing from the migration table,
+-- and the school registry is recorded under version 20260906114735 while its
+-- file is named 20260906130000. Verification showed the database is *ahead* of
+-- its own records rather than behind them: those objects exist, applied by hand.
+-- The one real gap is `public.ensure_profile_tenant_membership`, which does not
+-- exist even though `modules/auth/data/provisioning.ts` calls it.
+--
+-- Reconcile #230 before assuming a clean `db push`. Nothing in this file depends
+-- on that reconciliation -- every table and function it references was verified
+-- present -- but the push mechanics need sorting out first.
 
 -- ---------------------------------------------------------------------------
 -- 1. Enum
@@ -637,12 +644,14 @@ using (
 -- it. Which code is correct against TESDA's registry has NOT been verified --
 -- if it is AFFACP213, both this seed and the registry seed need correcting.
 --
--- THIS SEED MAY INSERT NOTHING, AND THAT IS SAFE
 -- It is a `select` from `scholarship_programs`, so if TWSP/CFSP are not present
--- it inserts zero rows rather than failing. As of writing, introspection reports
--- `scholarship_programs` empty and `20260831120000_seed_dev_operational_data`
--- unapplied -- so on the current database this seed is likely inert until the
--- program rows exist. Re-run it (it is idempotent) after seeding programs.
+-- it inserts zero rows rather than failing.
+--
+-- Verified 2026-09-10: `scholarship_programs` holds 2 rows (TWSP + CFSP) and
+-- `qualifications` holds 6 including AFFACP211, so this seed inserts both rows
+-- on the current database. (An earlier draft of this comment said the table was
+-- empty -- that came from a `list_tables` reltuples estimate, which is a planner
+-- statistic and not a count. A real `count(*)` corrected it.)
 --
 -- CFSP-only components (New Normal, Insurance, Entrepreneurship) are left null
 -- on the TWSP row rather than zeroed: null reads as "does not apply to this
