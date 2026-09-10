@@ -48,7 +48,7 @@ const DB_TO_UI_ROLE: Record<DbProfileRole, UserRole> = {
  * invents but the DB does not yet carry; they are defaulted here.
  *
  * The TESDA registry fields below them DO have columns as of migration
- * 20260906130000 (ADR-006). Null becomes '' rather than staying null so the
+ * 20260906114735 (ADR-006). Null becomes '' rather than staying null so the
  * shape matches `region`/`type` and no consumer needs a null check.
  */
 function mapTenantRow(row: TenantRow): Tenant {

@@ -50,7 +50,7 @@ nothing on `/schools/new`, and being the operator makes you an admin nowhere. Th
 school *registry* only — no policy gives it batches, learners, documents or LAMR. See ADR-006 §P3
 before widening it.
 
-Migration `20260906130000_add_school_registry_and_platform_admin.sql` adds the tables and policies
+Migration `20260906114735_add_school_registry_and_platform_admin.sql` adds the tables and policies
 this depends on. **Applied 2026-09-06** (out of order — the three migrations before it are still
 pending; it depends on none of them). Note `/users/new` still cannot assign anyone until
 `20260904120000` lands, so seating a new school's first admin does not work yet.

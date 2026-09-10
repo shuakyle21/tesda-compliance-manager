@@ -8,7 +8,7 @@
  *
  * Every statement goes through `createSupabaseServerClient()` — the anon-key
  * client carrying the caller's Clerk token — so Postgres RLS decides what is
- * allowed (policies in migration 20260906130000). The service-role client is
+ * allowed (policies in migration 20260906114735). The service-role client is
  * deliberately not used: it bypasses RLS and belongs only to the Clerk
  * webhook, which has no session to scope by.
  *

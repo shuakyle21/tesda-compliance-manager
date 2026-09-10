@@ -14,7 +14,7 @@
  * question leaks nothing.
  *
  * This is a usability and defence-in-depth signal, not the security boundary.
- * The boundary is RLS (migration 20260906130000): a non-platform-admin who
+ * The boundary is RLS (migration 20260906114735): a non-platform-admin who
  * reached the write path anyway would have their INSERT rejected by policy.
  */
 
