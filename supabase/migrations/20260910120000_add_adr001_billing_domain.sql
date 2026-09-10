@@ -45,6 +45,26 @@
 -- Unapplied and unexecuted as of writing. There is one hosted project and no
 -- staging (RULES.md rule 36), so this file has never been parsed by Postgres.
 -- Read it before it runs.
+--
+-- THIS FILE IS SINGLE-SHOT, NOT RE-RUNNABLE.
+-- `add column` and `create index` are guarded with `if not exists`, but
+-- `create type`, `create table`, `create trigger` and `create policy` are not --
+-- Postgres offers no `if not exists` for policies, so guarding only some of it
+-- would give a false impression that a re-run is safe. It is not: a second run
+-- fails at `create type public.billing_type`.
+--
+-- This is fine when the migration runs inside a transaction, which is how the
+-- Supabase CLI and the MCP `apply_migration` tool both apply it -- a failure
+-- rolls the whole file back and the re-run starts clean. If you run it any
+-- other way (piping to psql without an explicit BEGIN, say), a partial failure
+-- leaves objects behind that you must drop by hand before retrying. The
+-- likeliest failure point is the `storage.objects` policy in section 9, which
+-- requires ownership of that table.
+--
+-- Note also (2026-09-10) that the repo and the database have drifted: three
+-- checked-in migrations are unapplied, and the school registry is applied under
+-- version 20260906114735 while its file is named 20260906130000. Reconcile that
+-- before assuming a clean `db push`.
 
 -- ---------------------------------------------------------------------------
 -- 1. Enum
@@ -212,7 +232,10 @@ create table public.billing_records (
   generated_by uuid references public.profiles(id) on delete set null,
   generated_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
+  -- No `updated_at` column and no set_updated_at trigger, unlike every sibling
+  -- table here. This table has no UPDATE policy, so a row is never updated and
+  -- the column could only ever mirror created_at. Its absence is part of the
+  -- append-only signal rather than an oversight.
   unique (tenant_id, batch_id, billing_type, tranche, version)
 );
 
@@ -341,9 +364,8 @@ create trigger batch_trainer_assignments_set_updated_at
 before update on public.batch_trainer_assignments
 for each row execute function public.set_updated_at();
 
-create trigger billing_records_set_updated_at
-before update on public.billing_records
-for each row execute function public.set_updated_at();
+-- No billing_records trigger -- see the table definition: append-only, so a
+-- `before update` trigger could never fire.
 
 create trigger tenant_settings_set_updated_at
 before update on public.tenant_settings
@@ -493,15 +515,23 @@ with check (app_private.can_manage_tenant(tenant_id));
 -- makes the log append-only (ADR-001 NoLedger / Y-hybrid). Adding either would
 -- silently turn a generation log into a mutable ledger.
 --
--- Read uses can_access_tenant rather than can_read_batch: RULES.md rule 5 keeps
--- financial fields away from trainers server-side, and can_read_batch would let
--- a trainer read the billing amounts for their own batch.
-
-create policy "Admins and coordinators can read billing records"
+-- Read deliberately does NOT use can_read_batch: RULES.md rule 5 keeps financial
+-- fields away from trainers server-side, and can_read_batch admits the assigned
+-- trainer, who would then read the billing amounts for their own batch.
+--
+-- It is an explicit role allowlist rather than can_manage_tenant, because
+-- can_manage_tenant is admin/coordinator only and would lock out `viewer` --
+-- which rule 4 makes read-only, not blind, and rule 5 excludes trainers alone
+-- from financial fields. Spelling the roles out also means a fifth role added
+-- later needs a decision here instead of silently inheriting one.
+create policy "Non-trainer tenant users can read billing records"
 on public.billing_records
 for select
 to authenticated
-using (app_private.can_manage_tenant(tenant_id));
+using (
+  app_private.can_access_tenant(tenant_id)
+  and app_private.current_role() in ('admin', 'coordinator', 'viewer')
+);
 
 create policy "Admins and coordinators can append billing records"
 on public.billing_records
