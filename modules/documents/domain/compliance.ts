@@ -138,3 +138,140 @@ export function criticalRequirements(
 ): DocumentRequirement[] {
   return requirements.filter((r) => r.critical);
 }
+
+// ---------------------------------------------------------------------------
+// Blocking strip (TES-40 / FR-06 AC-2) — "which documents are holding this
+// batch up, by name?"
+//
+// This is a **gate**, not a measurement, so it follows ADR-004 D4 rather than
+// D2: an untracked requirement counts as blocking. Measurement declines to
+// judge a requirement nobody recorded; a gate must fail closed on it. That is
+// why this reads through `isDocOnFile` (which already treats untracked as
+// not-on-file) rather than counting statuses the way `summarizeDocCompliance`
+// does — the two give deliberately different answers about the same batch,
+// and that divergence is the ADR, not a bug.
+//
+// It lives in this file rather than a new one because ADR-004 D6 puts the
+// untracked rule in exactly one module, and a blocker list is that rule
+// applied.
+// ---------------------------------------------------------------------------
+
+/**
+ * Why one requirement is blocking.
+ *
+ * Deliberately not a subset of `DocStatus`: `untracked` is a state no row can
+ * carry (ADR-004 D5), and the two on-file statuses never block, so this is a
+ * smaller, gate-shaped vocabulary of its own.
+ */
+export type DocBlockerReason = 'untracked' | 'missing' | 'pending';
+
+export interface DocBlocker {
+  /**
+   * The requirement key. Internal — fine as a React key or a test handle, but
+   * **never rendered**: FR-06 AC-1 forbids showing a raw `document_key` to a
+   * user. Render {@link DocBlocker.label} instead.
+   */
+  key: string;
+  /** The configured display name (`document_name`), e.g. "Notice to Proceed". */
+  label: string;
+  /** Lifecycle stage the requirement belongs to, for grouping in the strip. */
+  stage: string;
+  /** Compliance-bearing requirements sort first and drive `criticalCount`. */
+  critical: boolean;
+  reason: DocBlockerReason;
+}
+
+export interface BatchBlockerSummary {
+  /** Critical first, then original catalog order within each group. */
+  blockers: DocBlocker[];
+  /** Total blocking requirements — the batch card's blocker count. */
+  count: number;
+  /** Size of the critical subset, for "N critical" emphasis in the strip. */
+  criticalCount: number;
+}
+
+/**
+ * Which blocking reason applies to one requirement, or `null` when it is on
+ * file and therefore not blocking.
+ */
+function blockerReasonFor(batch: Batch, key: string): DocBlockerReason | null {
+  const record = docRecordFor(batch, key);
+  if (record === null) return 'untracked';
+  if (isDocOnFile(batch, key)) return null;
+  // Narrowed by elimination: `missing` and `pending` are the only members of
+  // `DocStatus` left once the two on-file statuses are excluded.
+  return record.status === 'pending' ? 'pending' : 'missing';
+}
+
+/**
+ * The named list of documents blocking one batch, plus counts.
+ *
+ * Answers FR-06 AC-2 ("missing documents are named explicitly; batch card
+ * shows blocker count") for whatever catalog the caller passes. Pass
+ * {@link criticalRequirements} to restrict the strip to compliance-bearing
+ * documents; pass the full catalog for the complete picture.
+ *
+ * An empty `requirements` yields an empty summary, not a blocked batch — the
+ * caller asked about nothing, which is not evidence of a problem. (Contrast
+ * ADR-004 D3: *measuring* nothing yields `null`/unknown, because a percentage
+ * of nothing is unanswerable, whereas a list of nothing is simply empty.)
+ */
+export function blockingDocuments(
+  batch: Batch,
+  requirements: readonly DocumentRequirement[],
+): BatchBlockerSummary {
+  const blockers: DocBlocker[] = [];
+
+  for (const req of requirements) {
+    const reason = blockerReasonFor(batch, req.key);
+    if (reason === null) continue;
+    blockers.push({
+      key: req.key,
+      label: req.label,
+      stage: req.stage,
+      critical: req.critical,
+      reason,
+    });
+  }
+
+  // Stable partition rather than a comparator: expressing "critical first,
+  // catalog order within" as two filters states the intent without depending
+  // on sort stability.
+  const ordered = [...blockers.filter((b) => b.critical), ...blockers.filter((b) => !b.critical)];
+
+  return {
+    blockers: ordered,
+    count: ordered.length,
+    criticalCount: ordered.filter((b) => b.critical).length,
+  };
+}
+
+/**
+ * Just the blocker count — the batch card's badge.
+ *
+ * A separate entry point so a card rendering only a number does not build and
+ * discard the whole list.
+ */
+export function blockerCount(
+  batch: Batch,
+  requirements: readonly DocumentRequirement[],
+): number {
+  let count = 0;
+  for (const req of requirements) {
+    if (blockerReasonFor(batch, req.key) !== null) count += 1;
+  }
+  return count;
+}
+
+/**
+ * Human-readable names of the blocking documents, in strip order.
+ *
+ * The function a screen should call to *render* names, so no caller is tempted
+ * to reach for `.key`. Returns display names only (FR-06 AC-1).
+ */
+export function blockingDocumentNames(
+  batch: Batch,
+  requirements: readonly DocumentRequirement[],
+): string[] {
+  return blockingDocuments(batch, requirements).blockers.map((b) => b.label);
+}
