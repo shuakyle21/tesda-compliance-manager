@@ -5,7 +5,7 @@ description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,u
 tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, snapshots, no-tenant-access, type-safety]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-07T23:59:58.343Z
+    at: 2026-09-09T23:50:06.293Z
 sources:
   - id: openwiki-source-4ddc2be5b2adc07e50368090
     resource: repo://app/(dashboard)/batch-cards/page.tsx
@@ -83,11 +83,23 @@ sources:
     resource: repo://shared/types.ts
   - id: openwiki-source-eb30361b2d93d2c44af8dc85
     resource: repo://shared/vocab.ts
+  - id: openwiki-source-bee9a19811f0683a75a227f5
+    resource: repo://supabase/migrations/20260705070510_add_trainer_credentials.sql
+  - id: openwiki-source-76fe323aec348484b7584741
+    resource: repo://supabase/migrations/20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql
+  - id: openwiki-source-e41155c2222416a1b1c3d84b
+    resource: repo://supabase/migrations/20260831120000_seed_dev_operational_data.sql
+  - id: openwiki-source-6d151b9adff3e78556c9a327
+    resource: repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql
+  - id: openwiki-source-13117a840913dd27670d0422
+    resource: repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql
+  - id: openwiki-source-67635060d6a4945c43bef066
+    resource: repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql
   - id: openwiki-source-2020074c6fdeab02aae020b7
     resource: repo://tests/unit/batches.test.ts
   - id: openwiki-source-a018d6d3e536cc944d75e8a4
     resource: repo://tests/unit/documents.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-09-07T23:59:58.343Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-09T23:50:06.293Z" }
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -318,7 +330,7 @@ The order the dashboard, billing, and batch-cards routes implement. `app/(dashbo
 
 Raw error strings never reach the UI (RULES §1.6 — no raw Supabase/SQL errors, table names, or internal IDs). The snapshot keeps `error: string` server-side and every screen renders fixed copy:
 
-- A real failure with no rows renders `SyncFailedView`: heading "Couldn't reach Supabase", body "Batch data isn't available right now**from <stamp>**. Try again in a moment." plus a Retry link. The appended fragment is `syncFailedMessageFor(dataAsOfLabel)` — ` from <timestamp>` or the empty string — never the error message.
+- A real failure with no rows renders `SyncFailedView`: heading "Couldn't reach Supabase", body "Batch data isn't available right now" plus an optional " from <stamp>" fragment, then "Try again in a moment." and a Retry link. That fragment is `syncFailedMessageFor(dataAsOfLabel)` — ` from <timestamp>` or the empty string — never the error message.
 - The inline `SyncFailedCallout` in `modules/batches/ui/dashboard/DashboardCallouts.tsx` reads "Sync with Supabase failed — showing the last cached snapshot …" only when `isShowingCachedFallback` (`snapshot.status !== 'ok'`), otherwise "showing the currently loaded data". With mocks retired there is no cached fallback, so the "last cached snapshot" wording is a remnant of the mock era and is unreachable for a real failure (a real `sync-failed` always yields zero rows and is caught by the full-page guard above) — it now appears only under a `?state=sync-failed` preview override, which prints "the currently loaded data".
 - Screens that must degrade on a missing catalog do so without inventing a passing number: an empty `DocumentRequirement[]` makes `deriveDashboardMetrics` return `docCompliancePct: null` ("unknown", rendered "—"), and `billingGate` refuses to open because `requiredTotal > 0` fails. **This is the reason the requirement catalog is a parameter everywhere**, from `getDashboardMetrics`'s `criticalDocumentKeys` down to `buildBillingCards(batches, requirements)`: the live catalog is `program_document_requirements`, scoped per scholarship program, and `Batch` does not currently carry a resolvable program id (the TES-34-adjacent gap), so no data function may hardcode one catalog — doing so would be correct for exactly one program.
 
@@ -369,20 +381,23 @@ Two derive-layer sentinels guard the same kind of silent corruption: `daysUntil`
 - **New screen** — order the guards denied → sync-failed-with-zero-rows → no-tenant-access → empty → no-results, and reuse `shared/ui/EmptyState` / `NoTenantAccessState` / `InfoCallout` rather than writing new ones (RULES §4.24, §4.25).
 - **New module** — create `modules/<name>/{data,domain,ui}` and **add the name to the `domains` array in `eslint.config.mjs`** — that array is what generates the `data/`-privacy zones, so a missing entry silently leaves the module's `data/` importable by other modules. Empty modules get a README naming their FR.
 - **Cross-module need** — pass the value as a parameter, import the other module's `domain/`, or (only in `app/`) call both `data/` layers. Never add a `shared/` re-export of module code, and never reach for `lib/supabase/database.types.ts` outside a `data/` layer.
-<!-- openwiki: broken internal link [/openwiki/workflows/schema-and-migration-change.md] file "/openwiki/workflows/schema-and-migration-change.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-- **After any migration** — regenerate `lib/supabase/database.types.ts`, then update affected mappers and domain types (RULES §3.20). Migrations are additive; `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` is canonical, with later ones adding trainer credentials, user-admin write policies (`20260904120000`), atomic invitation membership (`20260906120000`), and the school registry + platform admin (`20260906130000`). See [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md).
+- **After any migration** — regenerate `lib/supabase/database.types.ts`, then update affected mappers and domain types (RULES §3.20). Migrations are additive on the canonical `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` (schema + RLS, which also seeds the tenants, TWSP/CFSP programs, and the 8-key requirement catalog idempotently). The full ledger in `supabase/migrations/` today:
+  1. `20260705070510_add_trainer_credentials.sql` — the `trainer_credentials` table + RLS.
+  2. `20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql` — a guarded corrective: it copies the lone AKB record out of the hand-made, non-conforming `public.tenant` (singular) table into the canonical `tenants`, then drops the rogue table; the guard short-circuits on databases rebuilt from this history, where the table never existed.
+  3. `20260831120000_seed_dev_operational_data.sql` — dev fixture batches/learners/documents ported from the then-present `shared/mocks/seed.ts`, with `DEV-`-prefixed batch codes and NULL `official_system_reference` so the seed can never look like authoritative TESDA data; it also adds the unique `documents (batch_id, document_key)` index that makes re-runs idempotent.
+  4. `20260904120000_add_user_admin_write_policies.sql` — the user-admin write policies on `profiles` / `profile_tenant_memberships` behind `modules/tenancy/data/users.ts`.
+  5. `20260906120000_ensure_invitation_membership_atomic.sql` — the `ensure_profile_tenant_membership` function that applies an invitation's membership atomically (only while the profile holds none).
+  6. `20260906130000_add_school_registry_and_platform_admin.sql` — the school registry (tenants' TESDA columns, `qualifications`, `tenant_qualifications`, `platform_admins`) and platform-admin RLS + RPCs (ADR-006).
+
+See [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) for the change procedure around this ledger.
 
 ## Related pages
 
 - [Design system and UI invariants](/openwiki/architecture/design-system.md) — the `shared/ui/` primitives and the six required screen states that snapshots map onto.
 - [Security and the auth chain](/openwiki/architecture/security-and-auth-chain.md) — why RLS, not this layering, is the boundary that matters.
-<!-- openwiki: broken internal link [/openwiki/domains/batches-and-lifecycle.md] file "/openwiki/domains/batches-and-lifecycle.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Batches and lifecycle](/openwiki/domains/batches-and-lifecycle.md) — the domain model the batches module fetches, maps, and derives.
 <!-- openwiki: broken internal link [/openwiki/workflows/add-a-data-driven-screen.md] file "/openwiki/workflows/add-a-data-driven-screen.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Add a data-driven screen](/openwiki/workflows/add-a-data-driven-screen.md) — the same contract as a step-by-step change.
-<!-- openwiki: broken internal link [/openwiki/workflows/schema-and-migration-change.md] file "/openwiki/workflows/schema-and-migration-change.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) — what happens on the other side of `database.types.ts`.
-<!-- openwiki: broken internal link [/openwiki/testing/testing-and-verification.md] file "/openwiki/testing/testing-and-verification.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Testing and verification](/openwiki/testing/testing-and-verification.md) — the unit-suite conventions referenced above.
-<!-- openwiki: broken internal link [/openwiki/operations/configuration-and-runtime.md] file "/openwiki/operations/configuration-and-runtime.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Configuration and runtime](/openwiki/operations/configuration-and-runtime.md) — the Supabase env vars that decide `ok` versus `unconfigured`.
