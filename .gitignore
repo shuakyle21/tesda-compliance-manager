@@ -77,6 +77,8 @@ next-env.d.ts
 .fallow/
 .nogic/
 
-# OpenWiki transient run state (checkpoints an in-progress generation; not meant to be committed)
+# OpenWiki transient run state (checkpoints an in-progress generation; not meant to be committed).
+# Only this file is ignored. The wiki itself under openwiki/ IS committed -- the nightly
+# OpenWiki workflow stages it with `add-paths: openwiki`, and `git add` skips ignored paths,
+# so a blanket `openwiki/` entry silently drops newly generated pages from the update PR.
 openwiki/.run.json
-openwiki/

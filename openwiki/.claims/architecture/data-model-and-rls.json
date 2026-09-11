@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:e0c24ebaf5f928049746fd3c1f918036c0de31d0653398fbab691a0e780e9d3d",
+  "claims": [
+    {
+      "id": "claim_2451e47bfaa74c17ab764a2de4103019",
+      "statement": "TVI-CAMS has no separate backend: a single Next.js app talks directly to one hosted Supabase project (Postgres + Storage) with Clerk as identity, and Supabase holds only internal working copies — TESDA SIS, T2MIS, and BSRS remain the authoritative systems, so nothing in the schema may be presented as official TESDA approval.",
+      "evidence": [
+        {
+          "resource": "repo://CLAUDE.md#L39-L41",
+          "version": "repo-lines-v1:sha256:4767f06a406a40743bb26a4e373aa10626910b739c7ec104c49af33d2bd07c05:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmZmZTk4OGIyNWQ2M2M5OGNlMmFkMmI1YWExMmM5MmY5MzJhYTU4NjQ3OWZmNjAzNzVlOTM3ZTY3NjhmNGI3ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjk1NDgzYWQxZjZiMDI3MmQyYTZhZWUzNDNiYjhlZDBjZGQ1MDEwMmQ5N2Y1OTM0YTlmYTdlMDNkNGM1NWU4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTdhNzU3OTk3M2ZiMDZkZGEzZjcwYzIyMzhjNDIxYTFlMDBkZjE2MjEwZGUzMjY3ZGJhYTgyZDRhZTZmNjJkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWRhZTMzOTc3MGUyNjJlMjFlMmRjNjY4OWZhODliNWZjMzMyOTM0YTFmOGExZWQ3ZTlmNjZjZjJlMDY2ZjNjOCJ9"
+        },
+        {
+          "resource": "repo://RULES.md#L123-L137",
+          "version": "repo-lines-v1:sha256:8c060b6a3df1a97f187e1ea14d7e66989c9cd936b58fc2ba6f91888632a75a0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5ZjRkMTQzNGM1MTU0OGYzZDMwNWE2ZWU5NjQ1M2MxODlmYTNlMjMwYTU4YThhNjgyYjBkMzVmYTU4YWNlNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1YzM4OGQxNTljZmFmYzFlNDE3OTcwMjBlMzY3NzIzNTNiZWQ0MmUwZjhkNGQwMGE1Y2EwNGNkMGEwNmU0MTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxYzcwODczM2NmNDM0MGZiYmZhMTI2YzRhNjJjYThlYzIxNmEwNWI5NTAzMjEzZTZjY2M5N2RiZTNiNGQ0NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/SUPABASE_SCHEMA_GUIDE.md#L20-L26",
+          "version": "repo-lines-v1:sha256:ea208d4fc7f170d823f26d505920335fd38f2fcfd34d16ce7116e62a8a27d0a6:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjgwNzg0MjAzYWI1Y2EzOTMwNTBkYTA2OWFmM2U4OWNiNDc1YTJmODgwZWU3Yjk4MTE2YWY0ZDk1ODU2YzY2ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGJhYmIwNTk4NDBlOGYwMDNkODNkNDJjOGUyNmU0MDliMmI4NzYyNjRjYzE0MjkyZmI3ZTgxMmE5YTc5ODM3NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGNhZjBlYWZlNjYxNGMxY2Y5ZTNhMTMzNjJiMDAwM2U1ZDIzYTljNjA0OTM3ZDVmNDZhODZiYmIyOGVhMzQwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODEwNThjMTk3M2FlYjIxNDkyNDU3MGZkNjA5YzY4MzMxNTE3N2YyMzYxNmE4OTRmYjM4MjFhY2IzNGQxOWYyNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_95d3a31ecdb341579edc27afc3fc3662",
+      "statement": "The canonical migration 20260528160300_create_tenant_scoped_schema.sql creates the app_private schema, all seven enums, all 14 original public tables, indexes, set_updated_at triggers, every app_private.* RLS helper, RLS enablement on all of them, all public-table policies, idempotent reference-data seeds, and the private compliance-evidence storage bucket with its policies; it is the canonical source for schema and RLS, and new migrations are additive.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L64-L66",
+          "version": "repo-lines-v1:sha256:e0c9b14cc5e8439ad84c0a2b31ba31e5878b14774a8bbc2836b169250b353626:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGQ3MWFiMmY0NzIwMDIwNmY5ZGQ5M2JiZDM4ODhmY2UzMDM1ZThlOTQxYWU5ZGI5ZmY3NzRhZmJlNDYyYjA0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzY2QyODFmNDhmMmVhYzc2NzJmZDcxMDcxNTJhMjE2NmM4MTJkOTMzMjFmZDQ5NjE2ZjY5ZWZkMTFkNTBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJkZGZhYWIxMTk1NzMwZmVlMjE5MTBlZjQ3NzUzZjdkNmI0ZjBkOTUxZWUxN2FjMDMxN2U0NjE3YWJkMTE3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMxMjNhMjViYzk1YWM3OTZhZjg5ZTlmNDBkYTU1MDllZDhkYzY5ZGJlN2Y3NWJkYTg2YTRhYTJmNWVjMzY3MCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L1-L872",
+          "version": "repo-lines-v1:sha256:ac47eea2061988a695bdf7e4e09fbce960c19f14158cf711679f8520294fa12d:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhZjkyOGZmNzY3NWI3ZjVkMzJkNDZlNGJiNGFjNjFhMDg3Y2I4MjdlN2ExOTVmYzBiMzZmZDE4NWE4M2IxMzE5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0OTk2N2VjMWVkMzgzNmY4ZWIxN2FmZjE3MmI1YmZlZjdkZTYwNDg1YTQzOWM2Y2ExMWM1OTFlMTc1NTczOWFlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_531258b3aff14d2083e285a203bbf283",
+      "statement": "The schema defines exactly seven Postgres enums — profile_role (admin, coordinator, trainer, viewer), lifecycle_stage (aou, ntp, tip, training, assessment, billing, completed, blocked), batch_status (pending, ongoing, completed, blocked), document_status (missing, pending, submitted, verified), document_audience (admin, coordinator, trainer, viewer, all), assessment_result (competent, not_yet_competent, pending), activity_action (created, updated, uploaded, verified, submitted, deleted, system_note) — each mirrored 1:1 by a TypeScript alias in database.types.ts.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L33-L54",
+          "version": "repo-lines-v1:sha256:444ec392a4f2fd509b77fbf70375029f7d4758b0b12fa064c4f0d206b932fa4f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjZmRmZjM3NWVhNDY0ZDQ3MWJmOWEyZmI1ZmY2NDM0ZTMwYzVhZmRmODFmYzMyYzQ0YzM4MzhmYTFmMTc5ZTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjZmU5Zjc5YjczNWFjODEyNDRiMjBmYjU2Mzk5ZThhMzkyZTIyYjllMjk5MDZkYzA5NmMxNjlhZGU2OTRiN2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzODRkYjQyYzQyMTMxNjMyMTEzMDFmZDJkZDY3NzJmMTgxM2M4ODQ1NTVjYmZjOTZlYTNlOTdmYjc1NGQyMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2ODczOTA0NTc3NWI2OTIxMGI4OTJhYzgzZmI0NmYxZTMxMGNjYjhiOTFiNTA1YTMzZTQ5ZjNlMTY3YzM2ODgifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L5-L59",
+          "version": "repo-lines-v1:sha256:a5607fcb2c4cbd62f7cd26d59990d9ec0524261f6e586a87ab21f746b8f1eb00:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MmUzNTJmNmJmMTVjNDQ1ZGQ2ZTc3OTExMDNhZjMwNzcyNTkxNGQwZWY1OTkzZWMwMzZkODg3Y2U1NGI3YTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2NDc0YzFiNDMxNjRhYzhlOWFhNzVjZmQ4ZjgzNTA5OTMxZTk0OThkN2RhZWNiMWM5MjIxY2E1NTA1YWY0ZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzYzY4MjY3NGEyMzI2N2M1MTQyNjg4OWQ1YjdhYTU3MGMwMWI1Y2NkY2Y3YjBhZmEzYzdmZWQ4ZmEwMDFhYjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1811d9db78bb4f65908bcb0529746af6",
+      "statement": "Every tenant-owned table carries a tenant_id, and tenant scoping is enforced structurally: composite natural keys are tenant-scoped (batches unique on (tenant_id, batch_code), learners on (tenant_id, batch_id, learner_no), and the three LAMR detail tables include tenant_id in their uniqueness constraints); most FKs use ON DELETE CASCADE, authorship profile references (created_by, updated_by, submitted_by, verified_by, marked_by) use ON DELETE SET NULL so deleting a profile never destroys compliance history, and batches.program_id references scholarship_programs with no delete behavior.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L83-L251",
+          "version": "repo-lines-v1:sha256:ce9d842784b9a289dabec23a51a85dbc1f0d945bb9232aef6b077b1724655aab:eyJzZWxlY3RlZExpbmVDb3VudCI6MTY5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhNDZiYjNiOWU0MmRkZTE1MWYxODU2MDdhM2NlNDE0MDI4MGE3NWI5ODJjZmIwZTVhNzhlZDkwMzkyZjMwMDk1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0OTk2N2VjMWVkMzgzNmY4ZWIxN2FmZjE3MmI1YmZlZjdkZTYwNDg1YTQzOWM2Y2ExMWM1OTFlMTc1NTczOWFlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5MTY1ZGViMTI3NmE1MzM0Y2QzNzNhZDNkYjFiZjVhZmJkOWZhOGY4NTU5ZTM5MWYyMzA2MGNiZDNkMzYwMjlkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyN2Q2YTdiMzg2Y2M0NGM3OGZmYTM3MjI1M2ZjZWQ2YTJiNGJkZjNmYWIwNjE2MDc5ZWZhODliNGZlOWI0MGNiIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_637cf862627843a8a9069bd7e05dde0c",
+      "statement": "The RLS identity chain is driven by the standard JWT sub claim — no custom claims and no Supabase JWT template are needed (Clerk deprecated JWT templates 1 Apr 2025): app_private.current_clerk_user_id() coalesces auth.jwt() 'sub', then a 'clerk_user_id' claim, then app_metadata.clerk_user_id; current_profile_id() maps that to the profiles row with is_active = true (limit 1); current_role() returns the profile's role. All app_private helpers are stable, security definer, with search_path ''. ADR-006's is_platform_admin() follows the same pattern on a separate axis, reading platform_admins joined to the active current profile.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/server.ts#L24-L39",
+          "version": "repo-lines-v1:sha256:59bd483089bbe12983144ecfe819a77dd3c7a297a0fcfbcdc092e5d62fdfd732:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1ZGFkZDY3MTIwMGYyNGJlNDEzOTkwZmY1YjA1N2Q4YzdhNjFhMWNjYjdlYjEwMzg4YTk2NjA5MzYxOGViNzEifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L339-L378",
+          "version": "repo-lines-v1:sha256:71cc2de9268eeb84b3203bc67d61663f48168af7f5efffda6e0546d44792cb4b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNTM2ZGVjMjY5YTY1MjYzNjkyYzkzY2MwN2Q3NGJmNjdiMzRhNmEyNjRhZjcyYzY3OWYwNDQwZTkwMzc5ODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMWNjMTg1MDRiYzczOGViZmViMjcwMTM2MzU3MDc5MjE4ZjBlNjZiOTczZmMwOWFhNTcyY2U3NjRkZWM3OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwNDgwYTIyYmY4ODE0NDM4MTYxMGE2MWJjN2UzMTY1MzE3ZTgyNjZmZDA3ZGU3MzZjZmEyODdkY2IzZDdiOGEifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L93-L110",
+          "version": "repo-lines-v1:sha256:b08a616a2e0f00e20e85e20d22e446c372a721198baca77e34afab28581abbd7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZDJiMjkwNzlmZDYzOWQxOWIxYjc5M2QyYzQ3ZGFlMjE4MjY1OTA5MTY3YzQxMTFhMDM0ZDkxM2U2OGQ3YTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkZmIyZGQzNGE5ODU5MGYyOTQ3NzA0N2RmMTUxOGUwNmRkMTA0ZWZjNTA2MWQxZTI2ZThmOWIxMTVhMmY5ODciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzNDRmZTc4MTAyNjdiODQwMDhhNTI4Yzc2MWUzNzM5OTRjZWNmOWZhNmIzOTFhNzAzYTc3MDYzODk4MjA2NzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiODgyMWQ2ODNjM2E3N2U5ODFlMDA4MDI0NjVjYmE2OGUxZjY5MDEzMWQyYzNjODdlMzEyY2RlY2Q3MDYxMTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2209ef210dc44731adaed969ccbee245",
+      "statement": "The tenant/role predicates compose as: can_access_tenant is true iff an active profile has any profile_tenant_memberships row for the target tenant (is_default is never consulted); can_manage_tenant is current_role in (admin, coordinator) AND can_access_tenant; can_read_batch is tenant access AND (role in admin/coordinator/viewer, OR the caller is the batch's trainer_profile_id); can_trainer_write_batch is role = trainer AND assigned trainer of the batch AND tenant access.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L42-L44",
+          "version": "repo-lines-v1:sha256:9b09e5ccc850053b3b0044bfd4331b4506bcef507fcb43583c5eab8221158f9c:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmY2YzEzODFiMjdhYTY4MTdkODg2NjhiY2I3NGZkYTgxYTY4NGJjNThkYmQ2MjJiMWRmNDk5YTcxZGZmYjk5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTRhZTQ5Nzc1OTU2MTgyOGU3NTlmMDVmNjlmYjhmODcwZWYyOWQ4OGZhNGEyZjYxYzU3NDZlNDgwNDUxNzgxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDVkZjZmMTdkN2ZhNjI2NTZjZmQ0MmYzMGY3ZDUzYWVlMGQzNTAzZDA0Y2NjMmU2ZWMyMGY0MzU4Y2RmYmEzZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWU3ODE3YWQ5Yjc0Mjk1YWJkNzBlY2VmM2E2ZTRlZTc2MzdjZDYwYWNjMGRkODMyYjJhNWMzNTgyOTAyOGM4YSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L380-L445",
+          "version": "repo-lines-v1:sha256:a49694714302f33fc8a8090584f24b2b2bb23fccc6bef404ff66b3b8ee95b461:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5ZDYyNGQ1NGMzM2MxMWM2NmIyYzBlYmQ2NjJmMWEwNWZjMjQzNjliZTk2NTk0MWM2M2MwNjEyYzU0OGE1OTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxZWE2OThmMjYzNzdmMmM2MDk0NTMzMWU2OWM3YThmYzQ4NzQwN2M2ZTEzYzMzNmRiZmE5NmJmYzgyYzUwOWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0ZWI5OGFkZmJhMDMzOGIxZTU5YTM4YTM5NjZlMTZjZWY1MTQ4NzM3MDVmNjE3MDJlY2MwNDQ1NDM3M2JlZWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a78af4b6686e469eb960baa0b309e041",
+      "statement": "In the applied base schema, admin and coordinator are indistinguishable — every check pairs them — so the role records who a person is (school proprietor vs day-to-day staff, per CONTEXT.md and ADR-005) rather than what they may do, and both will silently gain any future admin-only capability; the first deliberate split is the pending admin write policies (20260904120000), which scope user administration to current_role() = 'admin' alone instead of can_manage_tenant as a recorded scope decision. Trainers are batch-scoped (write surface limited to their assigned batches), and viewers are read-only in the app (RULES §1.4 server-denies their writes) with the single applied write policy reaching them being the activity_log append (can_access_tenant, no role predicate) — the one place where the database does not itself enforce the read-only rule.",
+      "evidence": [
+        {
+          "resource": "repo://CONTEXT.md#L70-L72",
+          "version": "repo-lines-v1:sha256:30aa74e86246c72cdf0763478920fb5c254fd1b0e5fc622ba9d5db14299ccf96:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQ3NDk5ZTNiMGRiYTA4ZjAwNDI4OWJjMjFkN2NiM2ZhYjViZWU3OTY3ZmYxZmRmNDQ0YmZhYmEyNzBmYzVkMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTg2Y2RiZjU0MTU1MDA0NmQzYzZiMDI5MDg0NTJkZWIyMGJkMmVhY2UwNGI2MGIwNjMyMWQ4Y2YzMmZjMjExZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTYxNmQ5OTZhOTRlZmNmZjM2YTg5ZDMxNzgyMDk0YmMwZTk3MDU0YjViZWIzMWFkOGJjZWVjMWUxZjVkYTkwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2Q5ZjZiZmI1NDQzOWRkNWY0OGY0ZDUyMDIxMjg4NzBlYjFkZjU4MGY5ZmZiMTZhNjExYjU0NDY0MDY5OTQ1OSJ9"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L64-L68",
+          "version": "repo-lines-v1:sha256:dea8b593fe90da02b8788601b72d233f406b29f16477b507a0dcf02a631ea161:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDNjZmY2OTgzZmQyNjE5NjExOTc0NDUzNDZkNTBlMjE1NjI2ZmQ1MjU0YTJkMTYzYzFiYzQyNDZhYzQyNzIxYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzgzYWM2MTQ5YTMwOWUwYzUzMmUwNjIwZjcwNzlhNzMzZGNiNzIwNjVhYzJjYTk1MThiMDkxM2U5ZGI5YzRhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjA5YTUxYWI1ZmRjMzVhOGJmYTFlMGQzY2VjYTMwZjI1Yjc3YmI3YjA0YTVmNWZlMzVkYzE3ODBjYjNjOTc5ZSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L754-L764",
+          "version": "repo-lines-v1:sha256:8376b4979160fc59c3a8cfdc335888abdecadf3f70a876315338f1b544de031f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjNGRhZmVmMTE1OTUzNzdkM2I5Y2M5YTRlMDk2MWQ5MTQ2NjY4Y2Q2OWNjNmFkZjBmNDQwZTgzZDdmMTI2NTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0NDg5ODEyZDk2Yzc5YTMyMGQ3OTExMGM3ZDA0MDk1NzY4YTFmODc3NjRlOGIyY2JmMmM0ZjZmZmVlNDY3NmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0N2EyNmU3NTJjMmYxZjE5MjdjYzJlZDkxNzczYzY5MzIxYmMyZDk2NTgyMGFjMmU5NzgxYTZhOTA5Y2Y5MTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkMWE3ZThjNGMyOTkxYmZiN2RhNWUxYjhkZWY0OTgyZjVlNDFkOGJlOTQ5ZTdjZDcyZmM1NWY0MWQ4ZTg4MWQifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql#L26-L30",
+          "version": "repo-lines-v1:sha256:1bdb66aa915a8425f38940d19cf188de5081230303b98bbd96adb1640914166d:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDFmZTg0Nzg0YmVhNDQ0MzA2MDQyZDAyOTc2ODYwNDcxYjYyMDExZmM3MjdjNDRkMjgxY2FjOTk2NzA1MTRiYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmViZTlhYjcwOTYwODExYTczMjRjNTEzZDQ1YzdhOTdmYTg4OTJjNmViMjM4ZjMwYjNkNjAyMmZhNzY4Y2YzOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2ZkM2M1MTViNDE3Y2M4ZWY1OGRiYWI5ZjMwOWMyM2JhMGNmY2YxZmJlNTYzZTI3YWZkM2IxODNhNDFkMzE4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjBkMzk0NTFhODY2MDZjNjBlMzA3OWYyMDRjZDU5YTEyNzY0OTRkNjgzMGFiZDkxM2EyOWVhMDg4ZDg2YTU5ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bd9fc3e9bdbc4c6692c41081a432d685",
+      "statement": "batches policies: SELECT via can_read_batch(id); INSERT with check can_manage_tenant(tenant_id); UPDATE using+with check can_manage_tenant; DELETE using can_manage_tenant. learners policies: SELECT via can_read_batch(batch_id); a for-all policy gated on can_manage_tenant(tenant_id) covers insert/update/delete.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L539-L575",
+          "version": "repo-lines-v1:sha256:cac21e8e5e98c3ba5327fec0719f649720556fb540a251b671b6f55990eddb71:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4Y2MyNTMwOGM3OTExMWQ1NzZjMGE0OWZjOTA4MDJiZWY1MTdiNDM5NDlkYmFhNzM5NjJiNjE1NjE2ZjZmNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NmY5YmU1NjUwODJiODg0ZWFiMWQ0ZTg2ZTI0MDk1NWE0NjRmNzczYzllMGUwMGNjNGEwZmQ2MThlZjgyMWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3MGY3NGE4NzQ4ZDY2YWM5MjRhN2MzMWYxYWRmYmJiZDcxM2U5MzkwMGZlMWFkYmFkNjAwOTFmODE0MDQzNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5YTJhNjQ3YjE5ZWI0N2IxZTI3Y2M5ZTE4YmIyNTk5NzIwMmI4NTgzZjJiMzA2ZTc4Y2U5ZTViNjI5MDhkYzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce11efcf1cf94bf09bb98c59f54c4320",
+      "statement": "documents policies implement the audience gate: SELECT is allowed to admin/coordinator via can_manage_tenant, to any viewer with can_access_tenant, and to trainers via can_trainer_write_batch only when audience in ('trainer','all'); INSERT is allowed to admin/coordinator and to trainers who can write the batch with trainer/all audience; UPDATE by a trainer is restricted to their own submission (submitted_by = current_profile_id()) in a writable batch with trainer/all audience; admin/coordinator manage via the for-all can_manage_tenant policy.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L577-L619",
+          "version": "repo-lines-v1:sha256:7d9ca659a6298b984bf4815eef985f3a406d4dee6ed223d70eb0dbcc085bc13c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzNWU3NDQ5MjE0OWRhY2I3MzQzZmIyNjEyNDg1ODJjNTNjZjQxZjczNGE5NThhYjQwZDhmMzgxNjUyZWI2NzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkOTE5YWZlMmYxODY0MzViZGFmMTE4MDEwNGMwZDhlYTg0MzA0YTJhNzA4YzE3YjMxNGE5YjA4ZmEzZmUzYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmNWYxZGY5ZGY3YzI2ZDQzNGU4N2MwOGRlNjAzMjRhN2YzYjA1ZDUwNDc3ZDc4NWYzZmY4Y2U3NjJiYTA1ODEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_56bb284d8e2449f1894a668e71938331",
+      "statement": "Identity and reference-table policies (base schema): tenants SELECT via can_access_tenant(id); profiles SELECT is own row or, for admin/coordinator, rows of profiles sharing any tenant (membership join), with no insert/update/delete policy for authenticated; profile_tenant_memberships SELECT via can_access_tenant(tenant_id); scholarship_programs and program_billing_rules SELECT only active rows for any authenticated user while program_document_requirements SELECT is unconditional; all three reference tables allow for-all writes only to admin/coordinator (plain role check, no tenant argument); activity_log SELECT and INSERT are open to any tenant member (can_access_tenant) with no update/delete policy.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L469-L537",
+          "version": "repo-lines-v1:sha256:6dfc8f96ffcab8c0a1945b14ccc9cca9522b4c95ccd411bedfaf5a09bc9ac09b:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjNjMxMGJjYWZhOTVmZjI3MDZkMGQ5N2VkNTVjOTZlOTQ2MzQ1Mjg5MGU2YjRlNTUwNTBmNDU0Yjk2ZTlhOGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1YWIzYTMzN2U1Y2U5OTlhMDllYTQ1MmU0NzdiYWRhZjE5YTNjMjdiYjA0NTIxMGM0ZjkxMTdlYTNiNWNjZWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxNDFmZGQ4MDNhMTVjMzUyOTg1NThkMWRkZGQ0NzNiYTU1NjhiOWUwNTY2ZDIwNTY4MjJkYzIyYzE5NGRhYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWIxODhiMDA0MDFhMGVkOTA0YTRhNzU3NjFlYzAxNjhmYTI0MzY5ZTEzNmUzYTg0MTA1NDQyZDgxNGI2NmYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L754-L764",
+          "version": "repo-lines-v1:sha256:8376b4979160fc59c3a8cfdc335888abdecadf3f70a876315338f1b544de031f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjNGRhZmVmMTE1OTUzNzdkM2I5Y2M5YTRlMDk2MWQ5MTQ2NjY4Y2Q2OWNjNmFkZjBmNDQwZTgzZDdmMTI2NTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0NDg5ODEyZDk2Yzc5YTMyMGQ3OTExMGM3ZDA0MDk1NzY4YTFmODc3NjRlOGIyY2JmMmM0ZjZmZmVlNDY3NmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0N2EyNmU3NTJjMmYxZjE5MjdjYzJlZDkxNzczYzY5MzIxYmMyZDk2NTgyMGFjMmU5NzgxYTZhOTA5Y2Y5MTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkMWE3ZThjNGMyOTkxYmZiN2RhNWUxYjhkZWY0OTgyZjVlNDFkOGJlOTQ5ZTdjZDcyZmM1NWY0MWQ4ZTg4MWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ceb078622894b00b5f0bd18f9fad734",
+      "statement": "All four LAMR tables resolve access through the parent lamr_reports row: SELECT via exists(lamr_reports r where r.id = row.lamr_report_id and can_read_batch(r.batch_id)); insert/update/delete via a for-all policy granting can_manage_tenant(r.tenant_id) or can_trainer_write_batch(r.batch_id), with the with-check additionally enforcing r.tenant_id equals the row's tenant_id.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L621-L752",
+          "version": "repo-lines-v1:sha256:4028caadafa45c9fac7e0bab16f6ca7ce12b899e4cda823dd55780f967051447:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiM2ExNWU4MTk1YjM5ZTAyY2U2NDVmYzMwN2ZhMjIxYWQzZjU5NjVkNzVjOTdjOWNiZDY2Zjc0OWE2ZTc2NTJkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0OTk2N2VjMWVkMzgzNmY4ZWIxN2FmZjE3MmI1YmZlZjdkZTYwNDg1YTQzOWM2Y2ExMWM1OTFlMTc1NTczOWFlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzYTk3MjgwZjVjZDViYzQ4ZjFhYzMyNjBkNTI4ZjViMTU5ZjlhMjRjYzcwMjY0OTExMTU0N2IwOTZmNWI4NTI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0ZTc1MjE2MWJmZDMyYTZmYzcwZmNmYWNiNWI1OWY1ZjMyZGM3YTU4Y2MzOGUzZWM3ZWU3NWUyOTE4N2FhODRlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_4ddfc8331f3945a3abe5ca30ac5ee497",
+      "statement": "Migration 2 (20260705070510) adds trainer_credentials — one row per profile (unique profile_id, ON DELETE CASCADE) holding credential_number, certified_nc_levels text[], specialization, accreditation_expiry — with the set_updated_at trigger, RLS enabled, a SELECT policy for own row or admin/coordinator of a same-tenant profile, and a for-all write policy restricted to the trainer role on their own profile row.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260705070510_add_trainer_credentials.sql#L1-L48",
+          "version": "repo-lines-v1:sha256:09b71110a2b7fb7ab047e96beb64b7889e881e65fc930e04cb4461af3f495fc9:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmZTRlYzk0MDNlZGEwYzAwOGRmNjI5ZjQxNTg4YzZmMWFiNDlmNTg1YzJiMzA4ZDBiMGM3NmUwODU5MGYyYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1d414d6fab7c45a6a0ae456ae43dde02",
+      "statement": "Evidence storage is the private compliance-evidence bucket (50 MiB limit) created idempotently by the canonical migration; storage.objects has SELECT, INSERT, and UPDATE policies allowing operations only when bucket_id = 'compliance-evidence' and can_access_tenant((storage.foldername(name))[1]::uuid) — i.e. the first path segment of the object name must be the caller's tenant UUID — and there is no DELETE policy for authenticated; no ADR-006 policy touches storage, so a platform admin cannot read a single evidence file.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L837-L872",
+          "version": "repo-lines-v1:sha256:7166c4804b3f9314f649f3d6cb150d26ecd5e2d191fe740b5ace31008016e39f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0NTE5ZTkzYzNjMjhiNTMwNzBjZGJhYzZiY2Y0YzI0YjMxMmY3MDM4MDQ0ZmE3ZjM1MGM0YzE0MjMwMjcwYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0ZDE2MDVlOGI3ZTk2NTUwYjJjZDA0OWIzMmIxODE1MDRkYWVhZmRkN2JlNGRmNTdjNWZhNmZkYWRkYTdhOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8d154999b54a490b9a2d81407fb1bd98",
+      "statement": "A single shared trigger function public.set_updated_at() (before update, sets updated_at = now()) is attached to 15 tables — the 12 updatable tables of the canonical migration, trainer_credentials (migration 2), and qualifications and tenant_qualifications (migration 7) — while profile_tenant_memberships, activity_log, and platform_admins have no updated_at column; execute on set_updated_at is revoked from anon and authenticated, and authenticated instead holds blanket select/insert/update/delete on all public tables, making the policies the only gate.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L281-L337",
+          "version": "repo-lines-v1:sha256:4c5d31ccf360cde4dc740f243e7234cc32e9472a057d78a548b96587dcef745a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYjUzNjA0NjRjMmIxYzAwYWM3NDU0NzlkMTViZmU1NTJmZjVkNDY2OWQ1NjViYzNkNDMwNmYzMzIyYjEzNmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkZTVhMGFlYjIyOTg3YzVjZWE5NWZmZGI1ODliYjkwNmUzMzdiYTQ4ODI1ZjM3ODkzZmRiMTMwMmNiYTFhZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiMTkwMGRlOTQxMjkwNjc2ZjVlNmJhMjE5ZTRkMDc4ZmM4ZjA2NjBlOWYxMDRmY2RlMmJlODRjNGRlY2RlNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlMjU4M2ZjMDYyMzM5ZWEyOGU1NjA5NDg0NzMxZmU5ZWQ0ZmViYmQ4NGUwZjY2NTQzMmNkZmVjNzZhMjllZDUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L447-L467",
+          "version": "repo-lines-v1:sha256:929f507628b788ad3dd6548d49605876d545d73d4c083eaa3f8b247129e340a8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1MDhmNjBlMmUxOTI5M2ZmMjc1YTllMDAzZGI4NjFiYjYwNDU5OWFkMDYyNTZjZGU5NjNiNGI1MDYzN2RlZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ZTJmNzQ5MTJjZDgxODUyZDJmZGNjMjM3OTc5MTVhNmQ2YzMxYjk5N2M5YzE0ODk0NWMxZWU3YWJlN2M2ODAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5YzU2Mjc0ZGRkZjc3ZGNlNzlmMjA0NWZhYTQ5ODUxZjBlMDNiMjNhNDRjYzNhOTU3Mjk0YzMxZGI1YTYyOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0MzMxODZhOThiMDU4ZTg4YmY4YmIwNzZhZWIzZWU5MWViYjE0NWFjOTFkOGU5NjUzYzRkY2Q5M2Q4YmE4ZGMifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260705070510_add_trainer_credentials.sql#L12-L16",
+          "version": "repo-lines-v1:sha256:024bc42a8b50a06ce4e8ae205463783f03dd140419b63dcc0a1c080b958b3aaa:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWRjMGM1MzRmNTdiNDg4ZGQ2NGYxZjgxMDJmYzAwNzZmYjkyMjNmOTI3ZGU0MjgxYTU1MWFiMzMxMWE0MjA5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzE4NjVmODkzMjUwMDMwZjM4YWM4YzhiODEyMTZmMGRkMjAyYTdiNWY4MDVkNjc0YmY3ZmUzYjQ1ZDI3MDA1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTE2NWRlYjEyNzZhNTMzNGNkMzczYWQzZGIxYmY1YWZiZDlmYThmODU1OWUzOTFmMjMwNjBjYmQzZDM2MDI5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGE5MjNhMTI1M2FjMzAxYzU0ZjI0OWExNzI1Y2YwMTc1NTgyNjlhYjU3MDMxNGViMTgwODUwYjgzMzU1YWUzNiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L183-L185",
+          "version": "repo-lines-v1:sha256:1997cd62747b18e88971d2821e7af945a7659768920c4e0f462825336e86223a:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWQwNjAwODY3ZGIyNmM4ODY2N2EzOTAzYjkyNzgzZGM5MTExZDhhNjhhYzgyNjFjNGMzODM2Y2ZhYjcwNjgyNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGRlNWEwYWViMjI5ODdjNWNlYTk1ZmZkYjU4OWJiOTA2ZTMzN2JhNDg4MjVmMzc4OTNmZGIxMzAyY2JhMWFmMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjRhODYxYjdmNTExNjI1YTk2M2Y4Mjg4OTc3NDA4MTA5ZmZiNjIwOGUwNzEwMmJkMTA4NTcwMjI4MWUxMGNiMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzE2NGFlYzc0MzQ4YTZhZmUxMWNiMmI2YTYzOTliOGU4NDZiNzhkNzFkMzI5YWZlNzI1MGVmY2NiNjlmMzJjZSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L240-L242",
+          "version": "repo-lines-v1:sha256:dcca8728370df4a32691cdaa0c45d9dd9eb6827dfd3befb08ba1e3c5e2b782e9:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQ4M2Q2Y2Q2MWRlNDFmMGY5YjcyMThkNzJhNzU1YTFmNDJkOTUwMzdkODY4YTllNzg2NmU4OGY3M2M5NTZkNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGRlNWEwYWViMjI5ODdjNWNlYTk1ZmZkYjU4OWJiOTA2ZTMzN2JhNDg4MjVmMzc4OTNmZGIxMzAyY2JhMWFmMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTY5ZjJmMjRjYzVhNDUxODZiM2RlMTEwNmExZTM1YTA0NzY2MmNkMDY5OTAwZTQ3ZWI2MWQxNWU5MTlmMDc0NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGQwNmFiNDk3NDYwN2MwNDI4YzI3MjAzMjNlOWNiODgzOWViOTlhODUyMzFmMWI1YzczZWM3ODkyYzk1MjQ4MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f815f8bf28f1478d965e0e00b8d46117",
+      "statement": "Migration 3 (20260717054607) is a corrective migration for a hand-created rogue public.tenant table (camelCase columns, int PK, no FKs): it copies the one real record (AKB Technical Vocational Inc.) into the canonical public.tenants by code and drops the rogue table, guarded by to_regclass('public.tenant') is null inside a do $$ block so a database rebuilt from migration history short-circuits instead of failing with 42P01; it was applied to the hosted project on 2026-07-17 and carries that version so it is never re-applied.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql#L1-L41",
+          "version": "repo-lines-v1:sha256:759315b5e0258b09b70dbf91d679b49d47917a767b32833201f5ab9d6f1e2e11:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NjE5YWRhODY3NWFkZGVjMGQ4MGJmYWMyOWY4MDY3ZDYwM2Y0YjhmZTE1MTYxNTdjMTQxNjVkODg0MzJmMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_00c07388faf4471f985e610933e0811c",
+      "statement": "Migration 4 (20260831120000) seeds dev operational data: five DEV-prefixed batches (four ongoing, one completed) resolved by tenant/program code and upserted on (tenant_id, batch_code), placeholder learners sized to each batch's learner_count with uli = NULL, and eight document rows per batch joined from the program catalog (the completed DEV-J3ED-002 batch is all verified); it adds the unique index documents_batch_id_document_key_key to close the silent-duplication hazard (failing loudly on pre-existing duplicates, and producing no database.types.ts change because it is an index, not a constraint), while deliberately leaving trainer_profile_id, created_by, updated_by, official_system_reference, and storage_path/external_url NULL so no Clerk identities or official TESDA references are fabricated.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260831120000_seed_dev_operational_data.sql#L1-L192",
+          "version": "repo-lines-v1:sha256:90ba1e3a5dec4cb8e91661af5727894db17fb2383221c11972ee4778022b3baf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTkyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1YmE1NjNmZDI3ZjAzMTc3MmJlNzJhZmVkMmJhMTQzZGM5N2Y0YjYxZTZjMzlhNWY3OTdkODljODJlYzY4NGE3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkMTJiZjkyNTNlZTRlMDgxZjYyNWIzMTE1ZGZhNDdlMTQ0ZThiZTc0YjNhOThiOThjNDdkZDFiYmJjZmE4OTQ1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_cfd8a55f20c94319b946a1ed1e18b45c",
+      "statement": "The canonical migration idempotently seeds reference data: tenants AKB/J3ED/NEN, scholarship programs TWSP/CFSP, the 8-key program document catalog (aou, ntp, tip_report, training_schedule, attendance, lamr, assessment, billing_report — with per-key stage and audience, where attendance and lamr are trainer-audience and billing_report is admin-audience), and the 80% 'Billing Preparation' rule per program, explicitly an internal preparation signal rather than TESDA billing approval; supabase/seed.sql is deliberately trivial because this migration carries the real seeds, so a fresh db reset reproduces them.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L766-L841",
+          "version": "repo-lines-v1:sha256:95076a86753622516dbe26214ae8097091c01c9ebbe25e6a11f8b8a426a71bf4:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmZWNiZGY1ZjEwZmZlOGMzNzQ2NDM1YWY2ODI1N2I1NzY1MTI3MGZhN2RlNTNhMzBhMDhhY2YwYzIxMDQyYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjMTU3ZTBkNTI4NzYxNmFlMjY3NTMxMjU1MWQ4NDUyOTFiOThmN2E5ZDNhODVkYzliMjUwMDcyM2VjNDRkNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZWU0NTg2ZmI3OGEzY2I3OGNmYmE3NWIzOTkxNzRkYjExZDE2ZDVmOTgzNmNjZmVhNjdjMGFiYzFkZmM3Y2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTI4NjEzZDdkNDc0MjU3YjliNWRmOGVkNTgxZTVmODkzYzA0MTY5OTIyYjQ1ZmU5MjAwYzY0OGNlMzljNWMifQ"
+        },
+        {
+          "resource": "repo://supabase/seed.sql#L1-L2",
+          "version": "repo-lines-v1:sha256:d72dd4e59b496c6cb397784cbd37dd7e78e2f902e2f597dc4f911e58e85ca903:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWQxODliMzZhMDUwNjBjYjI2MWUxYzEzYTU4YzUxZWJjNGQ0MjViNjU2Y2M2OWRiYTcyMGQ3Y2RiNjQzZWNkYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWQzYThmYzY4NDhjNGVlOWY1YTAwNTMzOTFlMjNkNzgwNTc3ZWMxZGVmZTJmMzJhMzMyOThlYmRjNDY3MWVlZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bddd3dbb62bc432ea97c4c68bba63fa9",
+      "statement": "supabase/seeds/dev_profile_memberships.sql is a seed, not a migration, per ADR-005: it hardcodes Clerk user IDs, and Clerk development and production instances issue different IDs for the same person, so a migration carrying them would run in production and insert rows keyed to users that cannot exist there — dead identities in the table RLS trusts most; it is environment-specific fixture data run manually via psql.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L26-L31",
+          "version": "repo-lines-v1:sha256:b4b43b087f0212ca74a9aa2865a897999d212ed8cca5b0b7b2fb9e4ecaeb855d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjRjZGRmOTA3MDE3YWU1MjEyMWQ3YTEzZDA0YTU4ZjkzYzFlMDVjZjQ1OGNjMmZmMzdjYWQ4ZjA1MWJiOTMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJmNWVlMDBmZDE2Y2QzMGIxMGNmNzVmYjk2MzE2Y2UzYTk1NTNlMzEwNGJhZjFlZTYwYTFlNTljMDdlNDQ3MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE1OGE5MjMxZmVhOGIwMjk5ODYwNDgxNGU5YjkxZWFjYjIwNTJiN2JjOTk3ODgzMjdkZjcyMDBiZTBmYmNjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGM2MWNiMmNkNmMwZDIzNWMwZTQwODhjNjM2YzVmMTVlZjg0ZjkzMjhlMDhmODk3YTE2OWNjNzViMjIyNjNiNyJ9"
+        },
+        {
+          "resource": "repo://supabase/seeds/dev_profile_memberships.sql#L1-L22",
+          "version": "repo-lines-v1:sha256:7cdff689198245e33b056fa8962a4bfb9bea31ec6885c9b11abaddd5a3731edc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1NzliMzc2NmNlYjY4MTRhM2QxNTM4Mzg5MDgxYzcxYmQ3MTlkNjc2NzMxN2YwMjI4MDdiZWE4NTA2NGI2NjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2YzdmZTczNjJmNTI4NTA0YjNlNzdjMjZiNDUzN2YwZDNlMDUxYjcxNTA4NWM1MzVmNDQzNjlmY2ZiNTMwOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhMTI1YWI3NGY3NjBmYmQ3N2ZjNWRmNGY3YzhlMTRlMmQ2ZDE3NWM4NzA5ZTQxODBmNGVkYjVhMTdhOTQ0ZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_602bdc7e1d72461e973300cdc98ff96f",
+      "statement": "The dev membership seed grants one membership per profile (ADR-005 decision 1): demo@tvicams.app is a viewer scoped to AKB only, and the two human accounts are admins for AKB and NEN; it converges by deleting then reinserting the memberships of its three managed clerk_user_ids because ON CONFLICT DO UPDATE can never remove a stale row and can_access_tenant grants on any membership; is_default is set true for forward compatibility only since it is redundant under single membership; and the isolation assertion it exists to prove is that the demo account sees exactly one batch (DEV-AKB-001) on /dashboard while a scoping regression shows five, verified in the app on the ok snapshot path, not in SQL.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L35-L53",
+          "version": "repo-lines-v1:sha256:d2d099f980277116c347844841db90aef7ce8e4bd34328990eb631879b9c5fbf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZGQzZmRmNWFmZmQ1NmViZGY5YTE1ZTZlYmFkOWUxNGVmZGMwZWVjOWE4NmI0NTViYTVhZTJmNjFjYTkyYTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YjRkZjU1YmZlZWI3YTJjNjY5Nzk5OGQyZGY5MDVhYTY5ZjI4NGJiYjJkYjAxNjZjNzFiNDRhNjBlNDZlNzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNjFjYjJjZDZjMGQyMzVjMGU0MDg4YzYzNmM1ZjE1ZWY4NGY5MzI4ZTA4Zjg5N2ExNjljYzc1YjIyMjYzYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyNTQ4ZTQ3NDRiMDM0ZjkzMzJkNGM5MjRhYmE3ZjU5ZGZlNTMyNGU0YTNiMGNmMzZmMDllNGNmNzg2MTk1NzgifQ"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L93-L111",
+          "version": "repo-lines-v1:sha256:4a29a85078f397a36d0efbc7ef42475fd828e6e4447885c0ea2905886a46bdf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkNTdkNjE4YTBmOTc5NmJhYmEzZmU5M2JhYTZlZGEwNDllMmJhNDI3NDZlMmE2NjBmMGE4MjMwZTgxMmFiNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYTg2YzBjNGI1YzkyNjQyNDhjZWFlMDJkNGRjZDI3Y2FkOWQ4Mjk5YjI3Zjc3NTE0NmM2MjgzZjRhYTBiNDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5ZGQzOWRiYzk4Y2JiNzY1ZGQ5YmI1OThjNzcyNDQzOGNmMjEwZDUxNmVjY2M4OWY3YTUzODgxNmE1MGMxMGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmNzMyODlkZTFiYjVlM2E4NDM0Y2ZmMzYxNjczOGY4NWU3ZDQzMmM5MTM2Y2E4MDk0MGI0NTk4MGE4YWViOGUifQ"
+        },
+        {
+          "resource": "repo://supabase/seeds/dev_profile_memberships.sql#L43-L134",
+          "version": "repo-lines-v1:sha256:08370598b397d2adb273ed509c3b7acd47a062785ab609fb13933a0517e9f221:eyJzZWxlY3RlZExpbmVDb3VudCI6OTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZjhlNTRlMGI4NDhiYzQ4NGRlNTM3NzU0ZjMzNGQxNmRiMWZiOTc3YmY3NDRjZjk3M2YwYTQ2N2Q1MWYwNmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNTlkNjFiN2ZkNjM2NzY2Zjc4YWQzNmRkNDFkYWFjNTNlMmI1NGY0YWY4MjE0MTMwOWUyYWU1MGFmMWVhY2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2Nzg1ZjU5MjU4OGFlY2NmMjA4MmVjZGE1Y2IyOGZhMGEyYmU2MTI4M2U2OWU2NmZkYWE5OGFmZjVjZDc0ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlNWFmNTIxOGQ0MmJhN2MwMjFlOTU4Y2JjMDYzM2FkNGUyNzY5ZDIxMTE1YmRlNTMxM2ZlYjUwMDM2NWY5MWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_513c43aef8b142a09dce861e5adbd603",
+      "statement": "Two type families stay deliberately separate: lib/supabase/database.types.ts holds the raw row types (the Database interface with all 18 tables each carrying Row/Insert/Update/Relationships, the seven enum aliases, and three function signatures — ensure_profile_tenant_membership, current_user_is_platform_admin, create_school) while shared/types.ts holds hand-written UI domain types (Tenant now carrying the six ADR-006 registry fields); only module data/ layers (plus lib/supabase itself) may import database.types.ts, enforced by an import/no-restricted-paths zone covering app/**, shared/**, modules/*/ui/**, and modules/*/domain/**, with the error 'Raw DB row types are data-layer only. Import domain types (shared/types or a module's domain/) instead.'",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L40-L41",
+          "version": "repo-lines-v1:sha256:ddf440d67fda3eced490b96f0a377c12e23a876a872391b013eafee8669f6a86:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTRlMjFjNTVjMWFiM2JhMTc1ZTk5ODNjYzlhYmNlMjRhYjA1ODQwNmE5ODBiYTU1MzBjODk5YTY0ZTBjMzkzMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ3ZjdkMTU0ZGM2YTEwZjY5MDA2NjA4Y2NmZDRmYWM5OTcyYjY0YTY4OTdhZmNiYzBjZjY0YjAxZWI1YzM3ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDNiNjhjYWVhMjBhM2Q3NzBiZTdhNTA1NjhkNzMyMmI0ZmQ3OTdmOTM5ZGE5ZjMxMTgzNmY4MDQ3NzJkZGU2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDcwNWFlMDRmY2M5NzJjMWY1Y2FiYzNmMGMyMWIzM2FiZjcyNGViYmVkNzQzZmRjYzMzODZmOWY2YTc2MmU5NSJ9"
+        },
+        {
+          "resource": "repo://eslint.config.mjs#L26-L46",
+          "version": "repo-lines-v1:sha256:caebafe35fb189941075616bfda66079585fe2a01990ed0b5bd8122616de3c4b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MGMyNTEzZDE3NjJjMmUxZjExNTVmZGNmYmY4NGM1ZTUxYzRhOGI0NzU5ZTU3ZDdmNTE2ODcxZWVlNDcxNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlMjVlNWUzODA2N2Q4OTJiMjVhYjlmNWVkOTNlM2ViZDIwYzBkMWY4NTFlZGQ0ZjEzZTM0YTgwMjJkMjcxYzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlmMTVkYzA3NTEyMTZmMDYxOWVlNWJjYWI2ZDM0YTdlZWY4MmYzZjQxOTBjZjcwNWY2MjBkMjQyNzU2NTU2ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0ZTM4YWU5MWVjNzNjZjQxMjBkZDg2YmQ1YjY0YWEwNTY5MzUyYTM4ODk4MWU4ZjVjOTRiZWU4Y2NmNjdjODgifQ"
+        },
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L56-L619",
+          "version": "repo-lines-v1:sha256:a38a22cb609d8526729100b65f45de66abf562a77c02bd2c96625a2d8ccacf7d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTY0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyZTdkNjUzNmY0YTVhNWI4Zjc4ZjE5MTczOWY2MTEyNWQwZThhZjdiNWMzOGM3YmJiMDdiMDgzYzA2ZjY1NzZkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhZDllMTI1NDY0MjU1NzZkM2RlYWU4YzliOWRiZjEyOGQ1ZDZkZGFmNWQ3ZmU4NTc5MzQ5MjdkZWZmYTNiOWRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyZjgwYTFhZjBkNDZjYWEyMDY1MDgwOGQ5MGM3MmVhY2JmNjUwNTgwMWU4YzJmNjllMTliYzg5MjUxZTNlMWU4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MiwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkYjQ0NjJkMDcyMmZkZmMwNmJhN2JmZTVjMjEwOWU4YTNkZWQ2NDdlNzBjY2E2ODE1NTcwYTllODMxNWQwZDNiIn0"
+        },
+        {
+          "resource": "repo://shared/types.ts#L58-L87",
+          "version": "repo-lines-v1:sha256:f514b4e7a3d6344520318c9631a462d3b15b217365166459dffe0354bcd02ffc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ODdjNGNkMWY3NTQzZjczZWJkMmRkMDQ2NmM3MGJmODZjYWZjMTk0NmFjYmU4NDA5YjM2MzI5NmQ1ZGJiNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0MTIwMjBlZTQ5YWY4MDU0ZDFmODFmODE4M2NmNjE3ZDRiNDRiMzk2ZDRhYTk3NzZhNDM3MDQxOGM3M2IwOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlMjI3NTBkMTZkYTY4ZTU5M2RlZTg5NTJjMTZiNzIyYThlOTdhYTcxNDlmNjVjMDM2ZmM1MTkxY2IxYjE2YjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExMDg5NWZjNWM0ZGRjMzg1ZmViYTk2ZWY0ZTIzMmM1ZWVlZjYzMTRmMTJmNmFmNTVkNjRlMDhmNWEzOTFmNjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b9b06fef180b465b81bcf8029be4d01c",
+      "statement": "The regeneration contract (RULES §3.20) requires that after any migration you regenerate database.types.ts and then update affected mappers and domain types; the enum bridge in the mappers (DB_TO_UI_STAGE in modules/batches/data/batches.ts: DB training→UI train, assessment→assess, billing→bill, UI-only entre stage, DB blocked surfacing as UI pending) is a total map, so a new DB enum variant fails compilation until its UI treatment is chosen.",
+      "evidence": [
+        {
+          "resource": "repo://CLAUDE.md#L61-L63",
+          "version": "repo-lines-v1:sha256:e851fa99218c13613411aefdacc03434e072b1096a203452d52db7eebb21a506:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTlmY2IyZDYzY2FhYjQzZTJhZGU4YmM5NjBhMGUyYTA4MDZjNWRiMjAzMTI0YzBhZTM4N2EzMGVlZWI2Y2I3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGE2MGI0YTM1M2RlNTkyOWI1ZWFiMjI3Yzc0MDQzMjE5ZDEyM2I1ODk0NzBmN2I3MTEyNzhiZDdkNWUyOTQyMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Y4YmRkZGM3MzkwYzQ1NzFkMjYxNGIyOWEzZDc3ZGZlYjQ3Yjg5MDk5YWJmNGEyM2RkYzQ1YmRkMTc1NDZhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmMxOGFjYTA2NTE5MzMxMmY3ZjQ5MTkxNDM3YTk4NGI1YmMzYjNjMzk4ZmRhZDQ0MTU2YTM4N2EwMGIzMTE1ZiJ9"
+        },
+        {
+          "resource": "repo://RULES.md#L53-L66",
+          "version": "repo-lines-v1:sha256:f7f18b4651d8c94a4d88b728ff6b7f030287b04d2c83561058ad0b6684fb9d50:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmZTE3M2I4MWVmNDgxOGE3OWM4ODAzOGJkYTc2MmE4ODcwOGVhZmQzZTY4MmI1NDlhOTc3YTE1MDUxZTk5YWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1M2NkMjgxZjQ4ZjJlYWM3NjcyZmQ3MTA3MTUyYTIxNjZjODEyZDkzMzIxZmQ0OTYxNmY2OWVmZDExZDUwZGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5OWQxYjZjMGNmZjg3NTdhOWMxOWE3M2E4MmFkMDBkMWQyMzdjMGUzMmQ2OWU5YjE2YWRhYzMyMmU2M2E5OGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczMTIzYTI1YmM5NWFjNzk2YWY4OWU5ZjQwZGE1NTA5ZWQ4ZGM2OWRiZTdmNzViZGE4NmE0YWEyZjVlYzM2NzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5fbbe7f67dc340d9bfc87244d3851a71",
+      "statement": "RULES §10 forbids executing statements against the live Supabase project without explicit user permission or an agreed plan, and .claude/settings.json permissions.deny enforces this: mcp__supabase__execute_sql (denied as a tool, including read-only selects), apply_migration, deploy_edge_function, all branch operations, the CLI routes supabase db push / db reset / migration up (plain and npx), and psql; because there is one hosted project and no staging, schema questions must be answered from the checked-in migrations and lib/supabase/database.types.ts first, with only read-only introspection tools (list_tables, list_migrations, get_advisors, search_docs) remaining available — and list_tables row counts are reltuples planner estimates, not counts.",
+      "evidence": [
+        {
+          "resource": "repo://.claude/settings.json#L6-L31",
+          "version": "repo-lines-v1:sha256:45839e2bfd923d1c7e2c62a4086eddf360437ea638696850f5b7ef6a0345911b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NmQ5NGM2NGI5NGI1M2E4NDFmYmIwOWE2YWY2N2U5ZWUyMWMwOTcwMmFhMTE2Y2Q5OWIyZDY4ZDA3YWI1MjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkZDI0NDU4MmI2ZmIwM2QyM2I4NDE1YWJlY2QzNDZiMGM5ZjQ2NmI2Zjc1MmIwNjgxODljZTdlOWEyZGMzNTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllYjA0Y2ZjMDNmMmYzNDFmNjZhN2UxMjNkZjgxZmZhOTJjZDFiMGQ1ZDE1ZmJiNWU3OGU3MTkyYzI5YjkyMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5OGJhOWI5MDc0MWY3YjczNmJmNTBjNTY3N2JhZDM2NWE5NTAzMTdiYmUzOGZkNTBjYzNjNWFlN2U2MjVjMzAifQ"
+        },
+        {
+          "resource": "repo://RULES.md#L123-L137",
+          "version": "repo-lines-v1:sha256:8c060b6a3df1a97f187e1ea14d7e66989c9cd936b58fc2ba6f91888632a75a0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5ZjRkMTQzNGM1MTU0OGYzZDMwNWE2ZWU5NjQ1M2MxODlmYTNlMjMwYTU4YThhNjgyYjBkMzVmYTU4YWNlNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1YzM4OGQxNTljZmFmYzFlNDE3OTcwMjBlMzY3NzIzNTNiZWQ0MmUwZjhkNGQwMGE1Y2EwNGNkMGEwNmU0MTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxYzcwODczM2NmNDM0MGZiYmZhMTI2YzRhNjJjYThlYzIxNmEwNWI5NTAzMjEzZTZjY2M5N2RiZTNiNGQ0NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8935c623c3174f2a94dbeb3792321805",
+      "statement": "The Supabase clients implement the anon-key pattern: createSupabaseServerClient and useSupabaseClient build anon-key clients whose accessToken callback returns the Clerk session token (Clerk native third-party auth; the callback is re-invoked on expiry and its presence means supabase.auth.* must never be called on those clients), a missing token throws NO_CLERK_TOKEN_MESSAGE rather than returning null because an anon client would get silent zero-row RLS results indistinguishable from 'no data', and createSupabaseServiceClient (service-role, bypasses RLS entirely) is reserved for trusted server-side writes with no Clerk session.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/client.ts#L20-L49",
+          "version": "repo-lines-v1:sha256:81ebaebba20ae4073a23126ec9ebfa151c1b4e32615b4a6fc4b008152671f836:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4YjFjMWFmZmFlZTI2MDFlYTVlMTUwYjY3ZWY4YTY5ZDY4NTIwZGNkNWQyNzViOTdkMzViNGY0NzFlYWI4M2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2YTk4ZDM0M2ExNTIzNTU4NDE5NWY0NjI0YTI4OGJmYmY0ZmYxNmY4MjA1YTYwMWFmM2IxNmVhODA0OTA5NzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://lib/supabase/server.ts#L40-L68",
+          "version": "repo-lines-v1:sha256:d630d2ce441574f80988e7ea615459700dd0c0c3510043928e1fc63d64bc1eee:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkZjAzNThkY2Q5ZjgyMjNkNWVjMWYxNGUzY2MxMDIzODNmODI0OTMzNWNjMmYzZDhjYjU3NWEyZWFiZGY5NWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRhNjA4NDBmZDRmOTMwYjk3ZDI1ZjE4YmE1NmVlYmEyZjNlZDVkZDQwZjM4NDliNmEyZDU0MGZmMmQ0MzI3YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://lib/supabase/service.ts#L5-L33",
+          "version": "repo-lines-v1:sha256:f989248f82e571668654a14da5a6e313d3c53144a503ba54ee0861ea0e38a744:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkMWNlNzgyNTM2ODg5ZWZhNDU5NjIxYzQ2MzEyMjZjNTU3ZDIyOGY0NTJiZWUzMzVjZWQ1ZDk4NWYyOTJlOGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0ZDM3NjZiNjAyMjEzMzZiY2RiN2E2NmQ0N2FkNjU1MjcyZWQzOGI0OTMyYmJjNzhhZGEzZjVkZjgzODljZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b86e128bf1f8430ba07fe4dd40c6f337",
+      "statement": "profiles rows are provisioned by the server-only Clerk webhook path: upsertProfileFromClerkUser inserts new users with the role from a parseable invitation grant (else 'viewer') and only the membership for that grant — least privilege, self sign-up never gets tenant access — and on update syncs only full_name/email, repairing a missing invitation membership through the ensure_profile_tenant_membership RPC so a failed user.created insert is recoverable on the next delivery, while role and is_active stay admin-managed; deactivateProfileFromClerkUser sets is_active = false instead of deleting, preserving the audit trail while current_profile_id()'s is_active filter cuts access immediately. The admin assignment flow these depend on has shipped as the /users/new screen, but its write policies (migration 20260904120000) are still pending against the live project, so on live a freshly provisioned user still resolves to zero rows until the migration runs (ADR-005 frames the dev seed as the stopgap).",
+      "evidence": [
+        {
+          "resource": "repo://app/api/webhooks/clerk/route.ts#L28-L49",
+          "version": "repo-lines-v1:sha256:aaa31396ac188663e69a88b0a07cab8ef8a43e39ad9e6b9cd0270f0b28da2220:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4Mzg4YThjZmZiMDMyODJkZWQ2ZWJlNzA4NDJlYTdkMjFjMWY0OTlhZjhhZTNmNTFmNGE1Y2VkYmU1ZjRjYzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1OTU2NWE2Nzk3ZDVmMGEwMjE1ODIxOWRiZjEyY2Y4NmQzZTI3OTJhMWY3MDBjNWQzZjM0Y2E0ZGM4YTYwZGEifQ"
+        },
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L30-L33",
+          "version": "repo-lines-v1:sha256:17e852cfaeddce41fa496c30a18ee15ac297ce0d6a3b854be5bb42809cfa57f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWNjNmE0MThlZmQ5ODIyNmE3OTk0Y2Y1YzU5YzAzMjlmNmY2NzI1NDhiYjM3ZDViZjJhODUwMWEyNDYyZWE2ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRhOTM0YjllOThiOWM5ZjVhYWY4YjcyNmJlNGI3MWQ2YmFjOWU5NDVhOTYwNWNkMTQwODcyZGEyOWE1MDVmZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzEyODJmMjQ2NjcyMzhhNTkxN2FkMDYwMWRjYzJlOTg4NDgyMTNkMGQzZjczZTBmMTQ1NjYxZGFkNzc0Zjc4NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODYzZDg4NWRlYmI0NDZhNDMwZmE5NWNhODZmOTc3YmVmYWIwZDIwNjBkMWUzYjk3MzRlZWQwMzYyNWM2ZmNjNyJ9"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L13-L24",
+          "version": "repo-lines-v1:sha256:c3fae07f31a5cd9c9dc5c9f6763767d472d78629b5a27f6ed709382e43f46c77:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwYTRlODYxMTkxYzY1NTQ0ZGMwOTY4NTQxMDIyOGI4OGU2OGFmMzEzZjk5NjhmYWZjMmU3YzRlMmUwYzAzM2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ZjIzMDE5ZGIyNWI3NjJjMDk0MDFhM2U2NTFkZWVmMDY1ZDZhNGE4ZjVhZTYwY2UxNWY5Y2RkOTcxZmRlNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlNmExYTRiZjA4YzM2NjU4ODViNzU3ZWM1NGZiMGEwMDIxZmEwOWNlYTVhMGFmOTJmMzQxZTE1YTQxZGMyZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiNmIwYmEwZjA1Mzc1Y2IwZmUxYTUxNjEwNDE4ZDBhZThhNTM2YWI2M2VjN2VlMWQ2YjJiY2JmNzEyNWIyNjcifQ"
+        },
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L58-L146",
+          "version": "repo-lines-v1:sha256:90a3531f1bdeb151468710483e865428bf51a58e52cd950a4a31dc6e57c1c1c5:eyJzZWxlY3RlZExpbmVDb3VudCI6ODksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3M2FiZDQ1NTgyM2ZkNjk4YjljNjk5ZTc0NDM0ZGEwYjM0ZWI0NWExYTM1YWJiOTFjMmYyYWQ5ODQxNzBlYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiNmI5ZTYwMTcxN2YxZjdlNGFiOTIxZDc3MmVmYTdlMzIzZjQ2MTg0NWQzY2JmYjgyNjk3MTUzNDNjNmE3ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MjcwNjhjMDNmNmZhM2M2OTA0OTZiY2E1OTk4ZDcxYTMxNmNmZTM2ZjJlNGYyNDY5MDBmNmQ3ZWIxODJlNTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4be466dadcb043cb9a2ea21c4be4af7e",
+      "statement": "RLS failure semantics are uniform and silent at the database: no table has a policy for anon, and because every predicate bottoms out in current_profile_id(), a missing or inactive profile row, a profile with no membership, or a membership in another tenant all yield zero rows with no error — the app must distinguish 'not signed in' (the client throws) from 'signed in but empty' (RLS zero rows), and neither unconfigured nor sync-failed states may substitute fabricated data.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L59-L63",
+          "version": "repo-lines-v1:sha256:f86d9c6163383682e63bbf31a1ca3b9b684ce38d45ec1007d2138454bd8cb182:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5MDM1ZDQ5OGM1MmQzZjAwMWQ2N2U2ZDAyZjExNTkzNWI1YTYwYTEyOTQ3Y2QwNzMyZTgwOTgwYTdmMDI1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTA5MGIyZThlYTg5ZDliNWU5MjM3ZDU3OGIwZGY3NjBhYTllNGIxMTJjYTQxOWI0NDNiMjFhODQ4NjIyMDhjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjAwNjJkOTcwOTI3Y2Y2NzFmOGVmNThkYzhkMzU1YWM2NTQyZWQ0NjIxMWZlYzAyZmFkNDAyYjFmMWVhNTA1ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTBjOWIxNGNjNWU4NDM5YWQ4NGMwYTJiMzFiYTMxZTU4NzhiMTQ3NzRhOGJiYzI4MzZiMTY5MjUwYjM1MzYyNiJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/server.ts#L50-L57",
+          "version": "repo-lines-v1:sha256:02fc34e7b56e5a50a6fa467dd597d243f83ad11ae0c0cc910508eec7d03c4bce:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTkzZjk2ZjMzMGE3YjQzOGZhMjM4ZDA4NjU5ODU4NTQ1NThkZDRjYzc1MzVlMDdjNWZkYWQzYTgzNWM5N2NkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTg2Y2EyNGU1ZTE4YWVjYmY1Zjg5ZDU2OGY5OGYyM2MyNmMwMTliNTE3YTcwZjE5ODUxMjEyZGYzOTJhYjNkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjBhYzc1MDlhMDk3ZDRmNDM0YjNkOTE3YWY0NDYxMGMwMzM3NTVlZTk0MTE1NTljZTEwMWRmODdkZGE3OWI3MiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L353-L445",
+          "version": "repo-lines-v1:sha256:fe00226c7ae36285d1943ebb5a2452c2d56ca32d4dfe5d0ce7191d8c12e66c2a:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMTE0MzExODcyZjQwNDg0YzgzODc1M2M1ZWRjYTE3YzU0NDU4MDg4NmIyZTY4OTMzNmI5NmMyNGQ5YTNiMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5YzU2Mjc0ZGRkZjc3ZGNlNzlmMjA0NWZhYTQ5ODUxZjBlMDNiMjNhNDRjYzNhOTU3Mjk0YzMxZGI1YTYyOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0ZWI5OGFkZmJhMDMzOGIxZTU5YTM4YTM5NjZlMTZjZWY1MTQ4NzM3MDVmNjE3MDJlY2MwNDQ1NDM3M2JlZWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_efaf1f87530f4506b53a4b3c0c610914",
+      "statement": "supabase/config.toml configures the local Supabase CLI stack for the project (project_id 'tesda-compliance-manager-design-system-v', Postgres major version 17, migrations enabled, db.seed sql_paths pointing at the trivial ./seed.sql, storage enabled with a 50 MiB limit matching the compliance-evidence bucket, and the API exposing public and graphql_public schemas with max_rows 1000).",
+      "evidence": [
+        {
+          "resource": "repo://supabase/config.toml#L116-L119",
+          "version": "repo-lines-v1:sha256:ead8007fdb6865744649ec9492fe718aca7fd9f00d58eca6420073b8510400df:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTY1MTQyZDlmZWE0NjU4MTUwMDUxYWI4N2FmMGJmM2Q3OTQ5MWQzMWZmZmRjYTFiYzY5NmZiYmIwN2ZkNDYzMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdiNWNlODhiYjMyNmZkZWI1NWU5YjI5NjFhMTFlNjU3NmVjNTE2YmIyMGY2MDZmZTI0NzJiYmQxOGEzYzdjMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTM0NDk3MWRiYzJkYjExYjQ1NTgxZjM1MWY1ZWFlNWFhMmViYWYwMmUwYjgyZWIxYjNhYjM2Y2E2ZGJmYmIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTY4Yjg5NWM1YWQzYjgyZTRjNDkzNjM1OWNlZmRhYzBmOTU2YTFmYWVhYzk5NjI1Mzk3ODkxMTg3ZjNmNzA2YSJ9"
+        },
+        {
+          "resource": "repo://supabase/config.toml#L5-L76",
+          "version": "repo-lines-v1:sha256:3089178929eb0370282d9cbb8f149d6aa0642e99005acaba341e5d98fbb945b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkOWRhOTVlMDY4YjZmOTYzMDcyNjc5NDkyMGJlYzU1MTA4OWY3ODIyMWVhYTAzZDU2ODFmNmFiNzFiNWM2ZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzNTY1YTk2OGNiYmZhN2ViNzU0MTIxNzY2YWFiNGQ2ZTIyNTE5MTQ5MWFlMGUyYmM2MTFiMWIzMDgyYWZiNTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2OTkwYWE4NjA0MWYzNDZjNWFlNTIyZGRjNzk1ZmI4OGNkOTBlMWVkZTQzZTAzZDIwOGM0OTE3ZDBmYTI5ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3NzM3NzcyNGFhYmU1ZTI3NmIyMTEwNDBjZDUyOTc2ZWM4NjYzYTc5MDEwM2UwYzQ2MWI0MDAyZTcxZDMwMzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0c5a0ce200f44be0b7522b623ec51d46",
+      "statement": "The user-creation screen (PR #213, commit b3361a6) and its migration 20260904120000_add_user_admin_write_policies.sql are both checked in — supabase/migrations/ now holds seven files and docs/DATA_MODEL.md tracks the migration as the #5 row, pending against the live project. The migration is policy-only (four admin write policies, no tables, columns, or enums), so it does not fire the database.types.ts regeneration contract; until it runs, no client can write profiles or profile_tenant_memberships, so /users/new cannot assign anyone. Its verification seed supabase/seeds/verify_user_admin_setup.sql is checked in for exactly that reason.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L7-L15",
+          "version": "repo-lines-v1:sha256:47764e4b70e894a5ed7c1a75d5510de49d0015849b8cc112fd226966e3dbce51:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWRkMWZhMGVmMmM4ODZjNzk1ZDQxZTZjM2ZjNGQ4NzYyNjVhN2QyNDMzNTFlNGViYTVmYzVjZmJjOThkYzI5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDQ0YWE5MzA4NmQ1OGU3MGI3ODMzMmMwOTJhMjlhYjk3ZjNiZmMwYmNlYTc5ZGVmNzk4MmU0MjZlYWE1M2I5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmJhOTAwZTUzYWM5NWNhZTE4NDg4NWRjMjA2NTA1NTNhNzIyMzNlNDQ2NDQ4NTcyN2UyNGIwZTEwYTE1NjMwYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2E5ODc4NGJiZGZmYWVkY2M1NzUyOTUzZTYyM2M4YThmOTg1OGZmOTVkMGM1Y2JhMTZhNWExY2NjOGMwOTQ3ZiJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/README.md#L12-L28",
+          "version": "repo-lines-v1:sha256:742dd3e2875e4c70c90b594784c8b42245bce82ef85e251132c0523fb6ff6080:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAwZTVmMWM5MGViODQyNzRmNTM5MDFiNDU2NzA1MzY5YmI1MDI1YTRkMDRkZTQwZjFmOGQ5YWFlYzkxOTlmNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1Y2Q3MGJkYzg1MjE1ZDU0NTIyMDQyOGM5ODdlZWU5OTk0MTk3OWUwN2RkMzdhYjEwNWI3ODE1Y2Q0MDE1Y2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4OTJmY2IyMWNlZmE4YzkyZTk5OGQ2MzFlZDA0ODIyN2E5OTg0ZWFjYTM0NTJhMjc1ZmFkNzdkYzhlOWM3ODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhOWRiNDZjZjlmYzAwZmYxY2ZiZmI4YjM2NWU1YmZjNTBkNGQyZjAyZGVjOTZkZTEyMjhmNDAyNzJkZmNjOTUifQ"
+        },
+        {
+          "resource": "repo://supabase/seeds/verify_user_admin_setup.sql#L10-L41",
+          "version": "repo-lines-v1:sha256:0b168f9ec4c4d77edc78a2717c729abf5e6741b52d6f371e1251c0f0090aecec:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3OTk3YzdkZjAwODU5YjdiOWZiMjIyNDg3YTBjZGM3YmU3YmQ0Mzk4ZWI1MDBhN2VkZmZiODVmMDZmODc2NmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyM2JkMjhjNWE1NmM5NmExZDE4MDQwZjUwMjMxODZjMzUyNTczYWZhYWE3YTQ0NDZlODM1ZGFlYTI1NDQxNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5NzQ3NTFjMTEzZjJiYzNlMjQyZGY3MTljNTc3MTdmZTQyOWUzMzY4MzdmYjMyY2FhZWY1YzRjMjU0NTVkM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhMTI1YWI3NGY3NjBmYmQ3N2ZjNWRmNGY3YzhlMTRlMmQ2ZDE3NWM4NzA5ZTQxODBmNGVkYjVhMTdhOTQ0ZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_337238af884e4ade9628ce5f900350f2",
+      "statement": "supabase/seeds/verify_user_admin_setup.sql is a pasteable, two-part setup in one all-or-nothing transaction that makes the user-creation screen observable at runtime: part 1 recreates the migration's four admin-only policies with drop policy if exists guards (re-runnable, the guards doubling as the uninstall, semantics kept identical to the migration) granting admin read on unassigned profiles, role/is_active updates on visible profiles, and membership insert/delete restricted to tenants the admin belongs to; part 2 temporarily promotes demo@tvicams.app (hardcoded Clerk ID — the reason it is a seed, not a migration) to admin on one column of one row, leaves its single AKB membership alone, degrades the tenant-isolation canary until the commented-out revert runs, and is guarded by a do $$ block that raises unless set local app.environment = 'local' (an abort rolls part 1 back too) — though the checked-in file ships that opt-in line uncommented, so the guard is disarmed in the repo copy and the file promotes demo as written. Demo is promoted rather than either real admin account only because its credentials are the ones in .env.local.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/seeds/verify_user_admin_setup.sql#L157-L174",
+          "version": "repo-lines-v1:sha256:5e88b962d4d5ccea845b6731b387ec36619dcdbb0fb6e16c0fd4ecb578e6b9c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3MjhkOTA4Mzk5MTgzODZmY2VmMDdlMTM4ZjRmOWYxODcxZjVmZjc3MGE5NTQzM2RkYzE0OTk2MDNkNzJmYTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNzRkYjcxYzMyZDRkMDFmOTUzNTVhNGE0MTljZDNjYmZhMjczNjNjYTE3NjNhODJhNzUzOTEyNTcyYzliNmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxOWE0ZDU3ZDNiZTFiYjc1MWY2OTIxMGY4MTU1NzRkNDUxNjRlMGIxY2UzMjlhYzY4MGMzNTU2YTRhZTRiY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2MDhkZjg3N2Q1ZTk2MWM1NzRjNzdlNTk5MzQzMWY3MWU3NWEzZWRiNmVlN2ExMjQ3MjNlYTUwM2NiMjBmYzUifQ"
+        },
+        {
+          "resource": "repo://supabase/seeds/verify_user_admin_setup.sql#L196-L205",
+          "version": "repo-lines-v1:sha256:2e5b9d46a364339fa13ac022f3ba23878c73cf507b369bb89edc942561d557be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlZTQ1MDlmYzMzNzFiNjRhZmIxYjA1MTZiN2U2NjNiZTU4ODhmM2Q1NzJiNjQ5M2RkN2Y1NDBiNDg5YjFmYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZWJiMjJkNGNmNDM1OGIyZDRhMTY1ZWU5ZGUwYjVjMTBlYzFhYmI2M2YxZjJjNmVjNjRlYjBkMjI3YjFjZTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4N2I1NGE3NzA3YWRiNGE2MzU1MGYxOTNlNTk4YmIxMGZhYzA3YjVlNTEzMzlkZDc1ZjNhYjVmZDk5NmQ0MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/seeds/verify_user_admin_setup.sql#L34-L47",
+          "version": "repo-lines-v1:sha256:e2381c19903becc52a0bd1ea276f45102bb229c6f803f57b24a38768834e5bf0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0NmZkZWIyZmZmMmUyZmZjOTM2NzI5YjE2ODE1ZjgwM2RkM2UxOTE1ZThmY2QzYmIyOGMxMDk3NDY5YzA3YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4MWQyMGVlNGI3MjQxNDM0NGViZDU5YzVmZjJlZTY0NjQ3NjllNGM0M2VhNDdhNzc3OTY4NWQwN2Y4OTRhOGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkNWVkYTY5MGNiNTg0ZDE4NDE3YzBlZTExYTIzOGQ3ZWZhMWFiMzUzNTViMGFjZTI3ODFiYjBkMDZkYjM3NTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlNWVhOTVhOTI2MDJjOTUzNDhhMjY3NDQ0OWNiZDc0MmY0OTBhZTI1N2Q0OGM2NGEwNDVmYjE4MjE5ZTlkZGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_41e6048d030741d0a7cbe211b612d850",
+      "statement": "The mock-data retirement changed the isolation assertion's caveat: shared/mocks/ was removed entirely and the dashboard renders an honest empty state on unconfigured/sync-failed snapshots (RULES §3.19; selectBatchesForDisplay returns [] for any non-ok snapshot) instead of the legacy viewer-scoped MOCK_BATCHES fallback, so the demo account's exactly-one-batch assertion is only live on the ok path, any non-empty count comes from the live RLS-scoped query, and the DRAFT dev seed's caveat about the mock fallback predates the retirement.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L49-L51",
+          "version": "repo-lines-v1:sha256:9e96e61b10f7fbc70808967c7b4ca42317288811ec65ae58e200da47981caf32:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmEwYzFjMTExNTExZDliZjY4MzEwOTM5OGM5MjkyMmRlMzUxYTE1YzQxZTQxMWNmNjM4NTVlODEwNDQ0YTU3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RjNWYzYzc2NWNmZGRjN2Q3OWRhZTNhY2ZlZGFiNDU3YTAwNWE4OGZhYWI0NzZhNzFmMjViNjRkYzVjMjYxYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2JhNDI2MzRmZWMyMzU4ODQwNTgwNzY5MWM2ZDgwZTBhM2QzODg5OTI5ZWMxMDA5NGZmODE5NWFhNDliZjA5MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjE4MmIzNzdhODVlNzU5Yjc5Mjc1OTY4MTgzM2VjMjc3NTEyYjI5ODI3YWRkNWJmZDEwZWQ3YWM1ZmU4ZDhjZSJ9"
+        },
+        {
+          "resource": "repo://RULES.md#L59-L63",
+          "version": "repo-lines-v1:sha256:f86d9c6163383682e63bbf31a1ca3b9b684ce38d45ec1007d2138454bd8cb182:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5MDM1ZDQ5OGM1MmQzZjAwMWQ2N2U2ZDAyZjExNTkzNWI1YTYwYTEyOTQ3Y2QwNzMyZTgwOTgwYTdmMDI1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTA5MGIyZThlYTg5ZDliNWU5MjM3ZDU3OGIwZGY3NjBhYTllNGIxMTJjYTQxOWI0NDNiMjFhODQ4NjIyMDhjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjAwNjJkOTcwOTI3Y2Y2NzFmOGVmNThkYzhkMzU1YWM2NTQyZWQ0NjIxMWZlYzAyZmFkNDAyYjFmMWVhNTA1ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTBjOWIxNGNjNWU4NDM5YWQ4NGMwYTJiMzFiYTMxZTU4NzhiMTQ3NzRhOGJiYzI4MzZiMTY5MjUwYjM1MzYyNiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L278-L281",
+          "version": "repo-lines-v1:sha256:abfcd65be61dc544cfc69ab59a8932cbaf3110ba03050ed3907b73522ee66c26:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjRiNTA2ZWQ1ZjI0MzQzNmFlYzRlODk2MTFmYTEwNmRjYmYyZTFmM2Q2Njg2OTVjNzU1N2IxZmM1MGY2YjdmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE5ZWNjMDYxMDY2ZmZkOThlNWZjMGY0ZTBhMzMwZTJkMWY2YmI0MjhjM2U4OGZiMTdmMGE0MTQzOTc0OWIxNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGFjZTAyODE2NDU2NjhhOWQzNzAyNTAzNjM2NjhiYmNmMjQwODU0NTY4OGRmZmRkYzZkYTUyMjBiMDIyOGMxYSJ9"
+        },
+        {
+          "resource": "repo://supabase/seeds/dev_profile_memberships.sql#L191-L198",
+          "version": "repo-lines-v1:sha256:a2fe43ce2176d0abf0e5bb08280e40a292d31669e5ee0b8444bcd2459ce46a50:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjAyNzE2ODM2ZThlNzIxNzNkYTA4MzlmMWE3ZmE3NmJmZTQxNmJiNjk2ODhiMTQxMDlmMTJjMGI2OTAzMGIwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWRhYmIzNDM3YjBjMzUzMjhhZGFiNGYxMDYxNjAzN2IwOTE0NzZjMTJiOTcwMGJlOTg5MWM4NTk5MzllYzMzNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDY2NjBhZGRkNjBjZTlhNzBkNDJlYzgyMjJjY2JiZWI2MTMzZjNiNGE1Y2FlODQ1Yjg1ZDYwM2EzYTQ2MTdlNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_59a52036515d43b48ba0820051297ea9",
+      "statement": "docs/DATA_MODEL.md is the in-repo ER reference and the source of migration status (applied vs pending, last checked against the live project 2026-09-06): it tracks all seven versions, states the live schema as 18 tables and 36 foreign keys, still draws the 15 pre-ADR-006 tables in four cluster diagrams with the three school-registry tables in a separate section, and carries an explicit same-PR maintenance rule — when a migration is added the file must be updated in the same PR because nothing enforces it automatically, and a row moves to applied only after the migration has actually run; docs/SUPABASE_SCHEMA_GUIDE.md is superseded for implementation (banner dated 2026-09-05) and kept for its design rationale and the TESDA boundary.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L1-L42",
+          "version": "repo-lines-v1:sha256:119b0d0465deef7af9503e75542e50b188e415272ea5b5552bab8d6de318051a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MDE4ODUxOGFjMmJhZjQyOWU2YmM4OThhMDFkYTEzMDhlYTZjMTgzOTc1Y2MxZWI3Y2NlY2Q3MzVhZDM2MmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlNWM5NGMwMmZhMWY3MDZlYzY2MTg2MzY0OWI0ZmY4ODJkYmRhNjE5OWZhMjBlMjIwODI2MWI5NWRiNzhkZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1MGUzOWU4MDE5ZWU0MzRkODU5YzJmMDliNjgxZWRkY2FhZmVmY2E1YWQ1YjgxOGJiNWZjN2UyNDFjNzM1OTcifQ"
+        },
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L387-L472",
+          "version": "repo-lines-v1:sha256:3f974a96401f64794a8efbc5ee7aa59b146f4a122ded4a7bde7164ecda0983bd:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NzFlMjRlZGVjOTg2NDM1MmNjOTMxNjU2NDVlZTQwOWQ1N2I2N2U4NGQ2YTM5M2RjZGJjZDdmMTNkM2QyYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ODQ2OGM4MTE5ZTY3YTQzYWQ0YzU2ZTZmNjI1Y2VhMDFiNGVmN2NhMGRhM2ZiYzIxZWIyMGRmM2FkNTU3MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/SUPABASE_SCHEMA_GUIDE.md#L1-L14",
+          "version": "repo-lines-v1:sha256:0e003f59c18c9728da84d8668dcd363e1063b14f383fe9cc8a61ab14a929117b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3ZWM0Yjk5MzY3YTU0YWZhNmVlNWZjZTQ0YzA3MWQxYjBhNTBiMWRjNTJmNGQzMmE2YjUyZGM5YjY0NTZlNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NDJiN2YyNTFjM2JlMDRiMTY3MDY0MDkzYTU1MWM2MDM0Y2M1OGM2NWMzNjU2NGRkYjQxMzJmNDEyY2UxNGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlNzMzNGMyMTVmZGM1Y2JhNTZkMjQyYmMwMGI5ZjM4NDY0NGM1YjUxNjY4MmMyNWE0OTZhYWJkZDMxNTM1MGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_92382234276e4935a6e59906460b0b54",
+      "statement": "docs/DATA_MODEL.md's version table (last checked against the live project 2026-09-06) records four of the seven checked-in migrations as applied — the canonical schema, trainer_credentials, the AKB rogue-table corrective, and the ADR-006 school registry — and three as pending — the dev operational seed (20260831120000), the admin write policies (20260904120000), and the invitation membership function (20260906120000); 20260906130000 was applied out of order while the three earlier versions were still pending because it depends on none of them, only the base schema, and Supabase records migrations by version, so one must never assume the highest applied version means everything below it has run.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L7-L24",
+          "version": "repo-lines-v1:sha256:fb31ff384ab231e6e34092d965ba875a847882a3f8e51edb6712711202b7dbf3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkZDFmYTBlZjJjODg2Yzc5NWQ0MWU2YzNmYzRkODc2MjY1YTdkMjQzMzUxZTRlYmE1ZmM1Y2ZiYzk4ZGMyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljNmY1NWQ0MGQ2YjIzZmQ4ZWIyNWFmZTVlNGI5ZjVmYjFiNjBjODdmNzMyMjQ0NDUyM2E5ZDQzOWQ2YzM5NDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiYTkwMGU1M2FjOTVjYWUxODQ4ODVkYzIwNjUwNTUzYTcyMjMzZTQ0NjQ0ODU3MjdlMjRiMGUxMGExNTYzMGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmOGJjN2VjOThmMDhiM2Y5NjhiODhlOGRjYjc4ZjU3NzhlYTY2NDkxNjY0MTY4NWU5Mjc5NTNhNjQyODM0NDUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L52-L54",
+          "version": "repo-lines-v1:sha256:5be64617064a55ef74b79c6459b507002f260efca7b57b4dae87e348b5834319:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdhOTRiYjhjNzhhM2QwM2FiNzk4NzZkNjZkMTY5NzBmN2NjMTZjMTMyNzhkYWM2MzBkNTAxODg0ODYzOGQzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY3ZjIzOGIwMDI0M2QxNWExYjgyOGFiOWQ1ZDM0MjMwMjk2YTljYWYxNTE1OTAwNWZlN2E2Mzg2Yzg3ODEzNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWFkNDg1OTUwY2ZiN2Q0YmFiNzFhZmM3ZTBjNzEyYTRjOTEzOTE4Nzc2YTlhNzIyMzcyNmI4MjgzNTE5N2YzZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGRmMzEyZTBkYTE3MTNmNTkzYmU5OGVhY2RiZWQ5ZmZhMDJiMWY0ZmEyZDkzYTU3ZTZkMjZlYzU5M2JkMzlmZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_05adc796362d4d92a4b60292ced0a8c5",
+      "statement": "The three pending migrations change behaviour rather than shape: until 20260904120000 runs, no client can write profiles or profile_tenant_memberships — the one exception being the platform-admin first-member seating policy from the applied ADR-006 migration — so /users/new cannot assign anyone, including the school admin that /schools/new expects you to seat next, and the two screens are a pair with the second not usable until that migration lands; until 20260906120000 runs, the ensure_profile_tenant_membership RPC does not exist, so an invitation grant's membership cannot land (the profile row itself still does, because the webhook runs on the service-role client); and 20260831120000 seeds the DEV- operational rows the dashboard and the isolation assertion need.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L30-L33",
+          "version": "repo-lines-v1:sha256:17e852cfaeddce41fa496c30a18ee15ac297ce0d6a3b854be5bb42809cfa57f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWNjNmE0MThlZmQ5ODIyNmE3OTk0Y2Y1YzU5YzAzMjlmNmY2NzI1NDhiYjM3ZDViZjJhODUwMWEyNDYyZWE2ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRhOTM0YjllOThiOWM5ZjVhYWY4YjcyNmJlNGI3MWQ2YmFjOWU5NDVhOTYwNWNkMTQwODcyZGEyOWE1MDVmZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzEyODJmMjQ2NjcyMzhhNTkxN2FkMDYwMWRjYzJlOTg4NDgyMTNkMGQzZjczZTBmMTQ1NjYxZGFkNzc0Zjc4NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODYzZDg4NWRlYmI0NDZhNDMwZmE5NWNhODZmOTc3YmVmYWIwZDIwNjBkMWUzYjk3MzRlZWQwMzYyNWM2ZmNjNyJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql#L1-L17",
+          "version": "repo-lines-v1:sha256:f11535d6e734ddc41c41848804253a3bb5a9ed0b184aeb90cc05ad13fda90887:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyOWFmYzNlNjY3MmNlYTQzMjM5M2YzMTI3ZThjNzliNDMzYWI5MWZhMmNkZmYwODdiYjVkYjg1OGJkYTU3YzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwZTM4ZjhmOTIzOTZjNzhlNWM2NDY0ZGE3NTAwYWRiNGZhNDQ3NzgzMDA1OTAxOTFjZGI5ZTAwZWM5NDI3Y2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3YWYyOWE3YWJjMjA1ZWIxOTM5ODMzYzIzYjM0M2M5ZjhlZTUxOTVmMjNhMmYzNDE0OTM1M2E4OTcyZDA0MjcifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql#L1-L35",
+          "version": "repo-lines-v1:sha256:72216c81345415f2209ff8c03894adc7c05a8cfd4727798058c485444846e353:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3MjZhOGU0ZDFjY2M5NGZkMWNjMTQyZDcxNTUzNTNlMzJmZTAzNmYwYTQ4MGEyNzQyNTc2NzRjYmJmMGZhMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NGE3MTRlZmUyMDY0OGEwYjEyNTAwYjdjZDk2ZTJkYzYxYWZmOGVkYTU2NmNlYzkwYzkzMmY2OTM4ZTA5MGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d7a034c8835b4f58bcceff722482460a",
+      "statement": "Migration 20260906130000 (ADR-006, applied 2026-09-06) adds the school registry: public.qualifications — the national reference table with unique TESDA code, title, nc_level, sector, is_active, and the set_updated_at trigger; public.tenant_qualifications — the per-school registration link row with tenant_id (ON DELETE CASCADE) and qualification_id (no delete behavior), unique (tenant_id, qualification_id), and the per-school facts copr_number (nullable, because a school is routinely entered while its certificate is still being issued), registration_status, delivery_mode, valid_until; public.platform_admins — profile_id as primary key referencing profiles ON DELETE CASCADE, note, created_at; six new tenants columns (tesda_provider_code, province, city_municipality, street_address, provider_type, provider_classification, the latter group unblocking the T2MIS export's hardcoded 'Private'/'TVIs' literals); and an idempotent seed of six qualifications keyed on (code). The COPR/CTPR naming split is deliberate: the column takes the certificate's name while the T2MIS export keeps TESDA's 'CTPR' header.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L127-L142",
+          "version": "repo-lines-v1:sha256:6e538e745204f68f86d6898a77ded4d2beae2b55c9a25660c1a3284e64f48a01:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjZDI1Y2UzNzRjNDQ1ZjE4ZmRkZWExNTBlYThiMzJlMDYwZmJjMDg4NzQ4NDZhZjc3YTU3NTcxODg2ZGM3OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkZTRiMDczNGEyNDI2YWQxN2M2OGExNDIxNzljMjhhOTE1ZTQ2M2U4NTlhYmQ3NmY0Mzg5MjE5NjlmZmY2YjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3YzI5MGEyYTcxMTk2MTVkNjhhM2QxMmZkNjYxNTkzY2Q1MTY5ZmVlNjM2M2E3NmY5M2E2MGIwZjQ0YmQ1YWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2MjY4MWI5YTI5NjA1Y2JmNGE3ZGY4ZTRjMWI4MDRjZDZhMzc4NTgyOTAyMjZhNzI2ZjhjYWQxMjIxZmQ0ZWIifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L149-L185",
+          "version": "repo-lines-v1:sha256:b37a0904dd4ac9cfedd3618b6e83915137fc2dda9394fe9bd341b673cfa59ee2:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5MTk4NmMyMjA0YWQwYjQyNGE4OWUwZjM5Zjc1NDVlYTRjNTkzMTc3OTk3OTY4MjQzNGRhNGQzMWIyNjdkNjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkZTVhMGFlYjIyOTg3YzVjZWE5NWZmZGI1ODliYjkwNmUzMzdiYTQ4ODI1ZjM3ODkzZmRiMTMwMmNiYTFhZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzZmFmNTk1NzU1YWEzZTFiY2QyMGQxNmE5YTUzYmNiNjBkMjc2ODk0OTBjYjJjNjllYTc4NGRkYzIwYjE0ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxNjRhZWM3NDM0OGE2YWZlMTFjYjJiNmE2Mzk5YjhlODQ2Yjc4ZDcxZDMyOWFmZTcyNTBlZmNjYjY5ZjMyY2UifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L207-L238",
+          "version": "repo-lines-v1:sha256:84bb731d7fcbfee8513c56f89f44111504207a77b22f68c23b2f698a48b5b7a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViOGJiNDkzZjE2YTA3NzY2OGRkYWEzNDZjY2JmZWM4ODgzNmIzOTVlMTcxZmI2OGI2ZmY3YWU3MzUwMjdiMzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZWRkNGI1MWRjZjE3ZjIxZDg3MDE2MjUyN2Y1YTgzM2ZhY2ZjZTExOWRkNTRjZmZjZmRkOTA4MDYwOWI1M2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkNGFmODU5MTczNzY5ZmU1ZWM1Mjc2YTVhOTk5MmI1Mjk3Nzg1NmVhOGJlZDk0M2Y2MDI0ZTVhZDEzOTJmMGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjMWI0OWNjMjBhYmU1ODkwMjcxMTUxZjBlYjdjODFmOTMwNDk2MmVlYzUyYzcxYmQ4ODgwYjBkZGZkNzczNzMifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L445-L466",
+          "version": "repo-lines-v1:sha256:02f41d1d216f9a961deac52834dd602b62ee00938b88392b0666fe0caceb4871:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiMWMwZjg1MmI0MTRiOTVmZjhhNDhmOGQ0YmFiYTMzOTBkNmRhM2NjNmQ3OGViOWU3N2Q5YjhlODYzOGVhMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxOGQzODU1OGEwNDFhMmFmYjAwN2E2MTA1NDExYzQyNWYzMGIxZGJlZmE0YWZmYmUxMmFiYzFhNDlmZjkzMGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1MTkzY2JjMGZmNDZjMTJkN2Y2OTA0YzBkYjIzMTRjYmNlMGI4MzFhZGE5ZDE4N2RmYzFmMjA2M2IzNDYxZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L65-L69",
+          "version": "repo-lines-v1:sha256:f1df085ee96e3fdb8657a7efaccb8c19fbc9b02cf63ce4b00709aab7879757b8:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZjM2Q4ZDhkYzI2OWJkZjdhOGU5NTg0ZmNlMWU3N2E2NzdjMjQzZjljNWVlNTc3MzFmYmVhMjNmZjU5ZTMyNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDk5NjdlYzFlZDM4MzZmOGViMTdhZmYxNzJiNWJmZWY3ZGU2MDQ4NWE0MzljNmNhMTFjNTkxZTE3NTU3MzlhZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE5NTBlMDc4MjZjOWFlNTM2M2EzMDgxOGE5YTc5MzI0OWNjMmIzNzA1YTlmYjVkZTU4Njk4Y2Y2NDZmYmVmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzVkMjUzZjlmZDQxY2Y3MGY1MDIzNmZiZjY1MTY3MGRhY2IzNDM1NmZlYTRkOTIzOGYxOGNmNzk0ZjQyYWI3NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_52b2c12776e6495f9b69fbb184ced2e8",
+      "statement": "platform_admins is deny-by-design: RLS is enabled and no policy is ever created, so every operation is denied for anon and authenticated and the role cannot be self-granted through any application path — the deny comes from RLS-with-no-policies, not from withholding privileges (Supabase's default privileges still grant all table privileges on the table to authenticated, verified after applying by a probe in which an authenticated insert fails with a row-level-security violation), and the Supabase linter's rls_enabled_no_policy (INFO) finding on the table is the design rather than a defect; the application learns the answer only through public.current_user_is_platform_admin(), a security definer function that returns only the caller's boolean, never the membership list (modules/tenancy/data/platform.ts caches it per request and treats every failure as not-a-platform-admin, the safe smaller surface); and conferring membership is a statement run against the project directly, gated by RULES §10.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L76-L91",
+          "version": "repo-lines-v1:sha256:1faefae963176664542f60432f67c6f9f5606e0908817594cffc600f55ef506c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyMDAyZmU5ZTE4MWVmMmZkOWJhMTVmZDM5ZWUxOTE3NGE0MzYwNjEwZWMzNDBkZGM0YjAxYjY0NzBkY2I1OTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiZDFhNTM5MmYxZmE0MjE4Mjc5ZjdjMTEyNDY0YjkwMjVlNGVjMzU5MWJmODRjZWQ4YjhkMDU1NDFiMjBkY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5ZjJmMDMwMjc1NWUxMWVmZDkzZGNkNTYyZGE3Njc1OTY3NTRkOWMwOWMyMDNlOGM1OGU2ZDVkMWUzNjBjODgifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/README.md#L58-L63",
+          "version": "repo-lines-v1:sha256:925734257caff7a2cb8bdc99221a5579e1227199e617f6f07a6445415256508c:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzI1YTVkMzdhYTMwMzYzYjVkYmJlNDgzYmVhY2U5MWFkMTUyMmY1MjNiZmNiYmEwNGY3MTk5ZDk4NTFiNzU2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdjMDZjNTYxZDVjMzI3MzQzNjg1MjY4YTQ2YjMzOTFmMzk5OGVlZTg5MGQyYmU1MWYwZDIxY2M0YTUzYWU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWZmMDk2OTQxNGFhM2U5MDA5MDEyYjg1ZWE1NDA3MDJiODJjZWI3N2U1NGE5OGJhYWNmZDg5OTFjZDExOWNhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/platform.ts#L1-L54",
+          "version": "repo-lines-v1:sha256:f645c11a7786052087f8c2c6cacc0c118a673b6b76fcfbf7ec9532be3eeae9be:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwZmFmYWMyMWE3YjJhNWQzNjEzMDE1NjIyMzRmODFmYTc5YTU1YWFiMmM5OGY2OThiMWNlN2Q0MTI4ZGM0YzcifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L71-L126",
+          "version": "repo-lines-v1:sha256:5c772ce09cce73bf848378af08e6a2b0a5ffe0f8a75d4e556de35d7cf4a51c85:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2MDdiMjY2Y2Y0ZDc0Mjk4MzRjMTA4M2U2ODIwMDczMzIzZDlhOTQyMTY1ZGEyNjkyZDliMzc0NTMyYjVhNGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiZjVlMjBkNWEzMTliYjkwN2NhNDk3ZWI3OWQzZjg4NjIzYjU1ZGEwMzE4OTAwOWRiODIwMzRhZjJkOTA2NzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiMzZjYmMzNmQxN2IzNWY1NjlmZDhmNWQxMWJlNmNkNTU5NDRkMDVhM2E2ZjVmYjk4YzdmOGJhZDhkOWE0N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMjdmZWYxOTU1Y2UzYzkwNzAwZWI4ZDZiMTA3ZTQwNWFhYjE1NGQ2NjVkOTgwOWM4ZjliNGMwYmM0NmU4M2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4940c608f3de467497aaffd34384479a",
+      "statement": "The platform admin's reach is the school registry only: tenants (SELECT/INSERT/UPDATE — no DELETE), qualifications (active-row SELECT for any authenticated user, FOR ALL for platform admins), tenant_qualifications (SELECT for tenant members or platform admins, FOR ALL for platform admins — writes platform-admin-only by scope decision P7), profiles (unassigned rows SELECT), and profile_tenant_memberships (all-rows SELECT, INSERT of first members only) — no policy grants batches, learners, documents, lamr_*, activity_log, or storage; granting app_private.is_platform_admin() access to any compliance table, or letting it seat itself into a tenant, is a boundary change that needs its own ADR (RULES §7.30, ADR-006 P3).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L95-L106",
+          "version": "repo-lines-v1:sha256:9024aa584059c73189d1d52bd97db7dd37efccecdc05a44c47cfadfb4026cb96:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmZmYzNjU2ZDk4YTBjMmMwYzQzZmFjYTA2MTUyNzdmYmQzMDNhODY0NzcwNDE1ODQ3ZTZmNmEyYjYxMTZjOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0OTZhMTUyYWY1OGY5ZTczZDZkZjVkZTA0NjRlM2FjNTc5NDI4MGE0MGI3YjNiNTBlZmRiOTM3ZmQzNTU0ZTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2OGZlZGI1OTljN2Q0MDY5NDI2NWMxMmY3NWE5YjJjZjRkZWNiZTliYjViNDU2YzRkZGIwOGVmNWQ5MGM5NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5ODY4OWZmNGRlZDRhMWRmZjE4M2FlOTdmYzYyNjQ2ODE0MTMzZmI5ZTFjZjQwMGVmMzZjMjhhZmEwZmQ1ZGIifQ"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L92-L126",
+          "version": "repo-lines-v1:sha256:7a3336c229eb48c0a5c8ca043587debe2e2bd5aa4166e2478ba3f462ccca3d4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0NzVhYmEwZTU0MTEyODlhMjZmZmY3ZjJjYzIzMGMyYTE3NDVmY2ZkNzQ3OTE1YzYzOGJmYWQ3ZTRjYjEzNmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4Y2Y2YzY4YzA3ODVjMDZmNjkyZGE5MDk1NGExNjRlOTdiZjQyZTIyNTE2ZjNmYTE5ODYwNTk5OGUwMThiZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1NGJmODY5ZDNiZWFmNWRhNmJmOWEwYzJlMGNiMzQyNmY3NmQ2YjgyOTlmMjhmOTY5ZGY2NTZiZDE5NzdmN2UifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L190-L295",
+          "version": "repo-lines-v1:sha256:90efb1331cf1bd01c407f667ababf9705447abfdae2096916dde1f2fac085dd5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YWI0ZWQ1N2IxOTE5MGVhMDIyZTFhNjgyNzhjOTJjZTZjNTMzZTI2N2JiMDg3YjE4OTMyODk1NjQ1ZGVkNjcyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjMGU2Y2I5YmYzM2UxOTI3MTQ4MDU1YTg0MjE5ZTBlZDU4Mjc2NmMzNmRmYWQwYzE5MDhmZjQzMTE4YWM3YjdlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1YWYwY2M0ZDQyNDc3MDM0ZTgxZTgxYThkZGIwZTllYzEzZDNhZjY1MzE3N2YyNTkzOGZmOWY3MzFhYjEwZmM3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4N2UzZGI4ZDM3ZjJiYTMwNzQ0YzZhNDhiZjY0ZDhmYTlmM2M5YWJmMzFmODFmMjdlODQ5NjcxYTZiY2VmYTk0In0"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L337-L372",
+          "version": "repo-lines-v1:sha256:d115b7840e63eca53efa2f2acf4098788caee615edec907b6577b386448951ee:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4N2I2YWRiODZmMDU4MDM1YWY3ZWYyNzgwYTA5ZTNiOGZhY2EwZjBlMDk0NGU5ZWU5YzRiYjIyOTlkNTQwZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1ZjBiYzM1OWY4ZjJjN2JkMDJiODViMTUyMmFkZmNjMDFiMDlkMDQ4ODcyMGJmODA4ZWQ0YTc3MzU0Nzc2MzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxZTYyY2UwMTNiMmU3N2YyNDlkZjM3NTAzMmQ2MzU4ZDhkZjRiNThlODdmMGRkOTc0NzE5YmVkYzNhY2FjNmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3fef89f49f5540ce9e8299075429646f",
+      "statement": "The 'Platform admins can seat a tenant's first members' INSERT policy on profile_tenant_memberships carries two load-bearing guards, neither removable: profile_id <> app_private.current_profile_id() — the operator seats other people, never themselves, which closes the escalation (can_access_tenant() resolves purely from membership rows, so an unconstrained INSERT there would let the operator hand themselves everything that function gates in one statement; the first draft, written as a plain with check (is_platform_admin()), lost exactly this boundary and was caught in review before the migration was applied) — and a not-exists subquery admitting only tenants that have no members yet (racy under concurrent inserts, tolerable because guard 1 holds regardless; worst case two seated members); guard 2 is correct only because the companion 'Platform admins can read tenant memberships' SELECT shows the caller every membership row — deleting or narrowing that SELECT silently weakens the INSERT — and there is no matching DELETE policy, because revoking a membership is the school admin's operation.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L103-L125",
+          "version": "repo-lines-v1:sha256:7ef17516925f79b36e256c3bb80396bcd25356ec66a5822e2b6d3f53b0582fd8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4ZWQ1ZWZjODk0Y2E0NWNjYjhiNThhMzJjYmRkZmM3Yzg2OWZmNjRkMjFiOTYxZDhiM2ZhNDBmMzIzMjdmYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0N2Q4NWU0MzE4MmU1MzNiZTgyMmY1YTc0OTVmMTVjMGE1NzhkMWMxOWJiNThjNGQ1ZmYyYmYyOTBiM2U2MjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1YWZhMDkxZmVmY2NhY2Y2YWQ3MGQ3YzhiMzgwNGJiMTczMGE3MWRhY2M5MjM5NjNlY2RjYzg5OTZkOGNiZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5YmQ0N2I4M2Y5ODIxMTIwODAyNjU5OWVjNjk2NDAxOWI2MTJmZmYyYTk0Yjk2Y2MxZWY0ODQ1YmY2Y2UyZmYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L297-L359",
+          "version": "repo-lines-v1:sha256:0ae649fa8dc9471288575cbdbb995b97393aa448ab3c49e557ec30e255d7976b:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwNzM4ZTlhYjU1ZDBiYmU4OTFhYjk4Y2U2N2Q1ZDE3OTIzNzgzMjMwY2E0M2JkNTliMjVlNTFiNWIzMzg4YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNmY4YTIyNDJkZDJiODcxN2EwYTg4MmM1ZTZlNDE5MzE5MDhmZDk2YmZkZDNhMDE1YTQ0ZWUxY2MzODU2OGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5MzEzNDA5MTE0MDRjMjhlZmRlMWI3YTE3MzgyNDQ4MjFmZjkzN2Q1NTkzZWM4ZmRhZjY5MzliMjIzYmJjOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjMjFmOTFmY2Q1NzY0MDViOTUyY2U0NjA1ODViYjI5ZjAwNmNlNGEwYjg5M2Q5MDNlZThmZGVhZTJiN2ExNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c4c3bf3345fc456992eb14c28b51184d",
+      "statement": "public.create_school(...) is a security invoker PL/pgSQL function granted to authenticated (revoked from public and anon) that inserts the tenant row and its tenant_qualifications link rows from a jsonb array in one transaction and returns the new tenant id — a school with no registered program cannot legally run a batch, and a partial write would be invisible — while RLS still evaluates every statement inside, so a caller who is not a platform admin gets a policy violation (42501) from the INSERT rather than a privilege; the data layer (modules/tenancy/data/schools.ts) tells the three failures apart: 42501 is denied, 23505 on tenants.code is duplicate-code, and a missing return id is sync-failed.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L144-L155",
+          "version": "repo-lines-v1:sha256:4fadb7b0c48e952d3c9f693547a84bc1b63b8427d4d2c92f5422f926d3deeaa0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhMGZjZGY2MmI1MGQ0YjBlODgzN2YwYmNjMTAzNTI1YTE4NGE5MjE3ODY1YjcyMTYyYzgwZWUxZWQ1NTMwZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZmM4YWVmMTY5MGU2OGI1YjFlNDE0NDQwNmZjZTliNDhkZjc2N2MwYTk1NTQ4MGEyNmQzMTY3ZGViNjJjMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZjVjNTIwMGVhNGViM2FjZWM0OTUwMzM0YWM5NTY4NTRkYWFlMTc4ODUxNDk2MTE2OTc0YmVjYzhjNWE1MjgifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/schools.ts#L110-L168",
+          "version": "repo-lines-v1:sha256:8c434d6b223e73d9f0485a13503c8c6e8a952eefd5af22bd660fa0bf33e85743:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxOWVjYzA2MTA2NmZmZDk4ZTVmYzBmNGUwYTMzMGUyZDFmNmJiNDI4YzNlODhmYjE3ZjBhNDE0Mzk3NDliMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql#L374-L443",
+          "version": "repo-lines-v1:sha256:059c5631a801cce859e73794661a5173668f04857a28e8becadbd5c46b2529ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiMWMwZjg1MmI0MTRiOTVmZjhhNDhmOGQ0YmFiYTMzOTBkNmRhM2NjNmQ3OGViOWU3N2Q5YjhlODYzOGVhMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMDlmZjE3ZWI5MGQwODc1NmEzNWRkMzc1NzNhNTg4YmYxYzQxNDE3NWM5N2YzYjNjYWNmYTRlZjIxYWMwNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0N2EyNmU3NTJjMmYxZjE5MjdjYzJlZDkxNzczYzY5MzIxYmMyZDk2NTgyMGFjMmU5NzgxYTZhOTA5Y2Y5MTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1MWMzYmI3ZDNjOWVkYWNhMmMxYWZkYTY0YTUyYmMyN2I4ZDU2M2ViYTVkYzhkZjgxZmFkMDgzYzhkMTk0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4861a2d8ee604ee794ad8861a3d06096",
+      "statement": "Migration 20260904120000 adds four admin-only write policies, additively (no existing policy is dropped or replaced, and Postgres OR-combines permissive policies): SELECT on profiles for unassigned profiles — deliberately not scoped to the admin's own tenants, because an unassigned profile has no tenant to scope by, with exposure bounded to name/email of users holding no access anywhere and ending the moment the profile is assigned; UPDATE on profiles for role/is_active on visible profiles, with using and with check both repeating the admin test so a profile cannot be moved out of the admin's visibility in the same statement; INSERT on profile_tenant_memberships scoped to tenants the admin belongs to (can_access_tenant, stopping an admin of school A from granting access to school B); and DELETE on profile_tenant_memberships under the same scope (otherwise the grant is a one-way door and correcting a mis-assignment needs a DBA); user administration is admin-only rather than can_manage_tenant by recorded scope decision, because a coordinator who could grant tenant access while an admin alone could set roles is a split boundary that drifts.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql#L26-L117",
+          "version": "repo-lines-v1:sha256:53d0c34db1fa974b17a57cc75ce191783ee477710b6564da4e19b76be8142fce:eyJzZWxlY3RlZExpbmVDb3VudCI6OTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxZmU4NDc4NGJlYTQ0NDMwNjA0MmQwMjk3Njg2MDQ3MWI2MjAxMWZjNzI3YzQ0ZDI4MWNhYzk5NjcwNTE0YmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmZDNjNTE1YjQxN2NjOGVmNThkYmFiOWYzMDljMjNiYTBjZmNmMWZiZTU2M2UyN2FmZDNiMTgzYTQxZDMxODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5edeada39eed4ac3b4de3ad35196897f",
+      "statement": "Migration 20260906120000 creates public.ensure_profile_tenant_membership(target_profile_id, target_tenant_id), a security invoker PL/pgSQL function granted to service_role only (revoked from public, anon, authenticated — the webhook has no session, unlike create_school, whose caller is a signed-in operator): it locks the parent profile row FOR UPDATE as a shared serialization point for all calls on that profile, returns without inserting when the profile already holds any membership, and otherwise inserts one with is_default = true — the atomic zero-membership gate makes true correct by construction, and narrows the provisioning invariant so a grant can never add a second school or move someone an admin has already placed; the webhook path (modules/auth/data/provisioning.ts) calls it on both the insert path and the update-repair path, accepts a 23505 duplicate as success, and logs and rethrows other failures so the webhook answers 500 and Clerk retries; tests/unit/auth-provisioning.test.ts pins the RPC call, the duplicate acceptance, and the rethrow.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L108-L146",
+          "version": "repo-lines-v1:sha256:98644a64ab2d6ff93ae3842b2122534ac483508e0b4098941fb2fd09ac7c4119:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1ZGE1ZGUyODA3M2U0ODMzYjQyZTRkNDg0OGU4ZGQzMDkxNWUwOWY4ODAxM2VlOTI3NjY4MjczOTI1OWUyMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MjcwNjhjMDNmNmZhM2M2OTA0OTZiY2E1OTk4ZDcxYTMxNmNmZTM2ZjJlNGYyNDY5MDBmNmQ3ZWIxODJlNTkifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql#L1-L35",
+          "version": "repo-lines-v1:sha256:72216c81345415f2209ff8c03894adc7c05a8cfd4727798058c485444846e353:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3MjZhOGU0ZDFjY2M5NGZkMWNjMTQyZDcxNTUzNTNlMzJmZTAzNmYwYTQ4MGEyNzQyNTc2NzRjYmJmMGZhMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NGE3MTRlZmUyMDY0OGEwYjEyNTAwYjdjZDk2ZTJkYzYxYWZmOGVkYTU2NmNlYzkwYzkzMmY2OTM4ZTA5MGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/auth-provisioning.test.ts#L57-L86",
+          "version": "repo-lines-v1:sha256:b8c398c0c772242a15caf727a6f593545280dca896af8c1f1d989c60a3f49490:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3ZDgxYTMzYWIzY2VhYWNhNTUwMWZhNWQyYTYzMDAxODVkZDE4ZTliNjllMWNjYjViMTM3ODI1MzI2NTEzMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f53145f79c274f85a3771939b281f682",
+      "statement": "The /users/new screen's unregistered path parks the admin's chosen grant (role + tenantId) on the Clerk invitation's publicMetadata under namespaced keys tvicamsRole/tvicamsTenantId — Backend-API-only, so the person signing up cannot forge it — and parses it all-or-nothing (modules/auth/domain/invitationMetadata.ts: a half-formed grant yields null and the least-privileged fallback), applying it in the user.created webhook when the invitation is accepted; the registered path runs findUserByEmail (case-insensitive ILIKE with escaped pattern characters plus an exact-match re-check so a wildcard can never assign access to the wrong person, and not-registered ambiguous by design, since distinguishing 'nobody has that address' from 'they belong to another school' would leak other tenants' membership) and assignUserAccess (the role UPDATE runs before the membership INSERT because it is the safer half to stop after, the INSERT always writes is_default: false because an RLS-scoped empty membership list means 'none this admin can see' rather than 'none', and an INSERT failure triggers a best-effort restorePriorRole compensation because a half-applied promotion to admin could read and set roles on the whole unassigned pool).",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/users/new/actions.ts#L77-L117",
+          "version": "repo-lines-v1:sha256:304f023c78c23949af420004115989454d16ff36a80054cc29e847f7f28163ee:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYzQ3NzBiNzcxYzMwNDNiZTU3ZmQ3YTE5NjQyYjFlY2M3YmI2ODA3MzE4NDM1N2I5NmY1MmIzMTg5MzU5MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhMTNiYTU0NWJmMTEzNWJhYWFmN2I5NTczOGI5Y2E1NDExMmU5NzY2NjhhODIwMTdkNWU1YjEzMGU2MWJkNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/auth/domain/invitationMetadata.ts#L1-L78",
+          "version": "repo-lines-v1:sha256:51de392c566fefc75fb9cddbc2ebecc1fdd1f6f147b7e52f7a1dfeb7f85ea792:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L147-L316",
+          "version": "repo-lines-v1:sha256:b3b3ce3ec6d60f9cdddf4cb709db8b7a785a38c61ca0296adb53351a0e112f5f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1YjllZjk3ZTVjMDYxNThjNGY4N2NhMjcyMWZhYTUwNzUyNWE1ZmFjNWU0Njk3MTMxYTEyM2YxNjQ2ZDgzZDExIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2YzdiNTA0MDIwYmM4ZjM5MzQ1OWM3OTczNzRjNjFlOTlhZTg1YWYxZDlmNGUxNDhlNGNmZDhiZjk4NGZhYWU2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce6ee121f13a4ed3858ef267a487db11",
+      "statement": "lib/supabase/database.types.ts now carries all 18 tables — the 15 pre-ADR-006 tables plus platform_admins, qualifications, and tenant_qualifications with the six new tenants columns — and, no longer empty, three function signatures (ensure_profile_tenant_membership, current_user_is_platform_admin, create_school); the ADR-006 shapes were written by hand from migration 20260906130000 and checked field-by-field against generate_typescript_types run on the live project, with two deliberate divergences (create_school's nullable text parameters are typed string | null rather than the generator's plain string, and current_user_is_platform_admin's Args stays Record<string, never>); the file still stubs every table's Relationships as [], the root of the four long-standing TS2352 casts in activity.ts, batches.ts, tenancy.ts, and users.ts, and adopting the generator's real Relationships arrays is a deliberate future cleanup.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:9d1d6b37557d3ad844f536798b26c223ac47a2fde23a95199a4b9d8b79f3a16c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhOTY1ZjE1ZGZhMDYzNmVlMTQwNjFkZGFiYWZlM2I5YzkwZmYwM2Q3MTE0OWJmMmQ5NDZiMDI4NDZmYWIxNDYifQ"
+        },
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L56-L619",
+          "version": "repo-lines-v1:sha256:a38a22cb609d8526729100b65f45de66abf562a77c02bd2c96625a2d8ccacf7d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTY0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyZTdkNjUzNmY0YTVhNWI4Zjc4ZjE5MTczOWY2MTEyNWQwZThhZjdiNWMzOGM3YmJiMDdiMDgzYzA2ZjY1NzZkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhZDllMTI1NDY0MjU1NzZkM2RlYWU4YzliOWRiZjEyOGQ1ZDZkZGFmNWQ3ZmU4NTc5MzQ5MjdkZWZmYTNiOWRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyZjgwYTFhZjBkNDZjYWEyMDY1MDgwOGQ5MGM3MmVhY2JmNjUwNTgwMWU4YzJmNjllMTliYzg5MjUxZTNlMWU4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MiwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkYjQ0NjJkMDcyMmZkZmMwNmJhN2JmZTVjMjEwOWU4YTNkZWQ2NDdlNzBjY2E2ODE1NTcwYTllODMxNWQwZDNiIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_782d6936bf7f435a815a892b8df61a52",
+      "statement": "Both assignment screens write through the anon-key createSupabaseServerClient so Postgres RLS decides — the service-role client is deliberately not used, its reservation being the Clerk webhook — and they gate on different axes: /users/new on resolveTrustedRole = 'admin' (never the ?role= preview override, which would let anyone preview their way into the Clerk-invitation branch that has no RLS behind it), and /schools/new on the current_user_is_platform_admin RPC snapshot (never profile_role — holding admin at a school grants nothing there, and the two axes are orthogonal); /schools/new works on the live project because migration 7 is applied, while /users/new's direct Postgres path stays RLS-denied until migration 5 runs.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L99-L120",
+          "version": "repo-lines-v1:sha256:405a4609f183d8889bd38366dab29a80eebbbb468426bb9d4ce22dce5f2676aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3ZDNiZjMxNWQ1NmNiZWNhNGVhYTcyYjYzZDJjYzY5ZDE2YTA3MmM1OWVlMjc2ODM5MzBlM2U1MDY5NTA4NjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjODYzYjdiNjI0NWNjNTc5M2Q3ZjgwYWU5Y2IzMjY0MzBmYzIxODRkNGYxZmIwODc4MmM1ZWQyZjYwYjdjY2MifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/users/new/page.tsx#L89-L108",
+          "version": "repo-lines-v1:sha256:34feab15acf94ac2526487d2bffec7c51ce6eaf526a32073c9b85010c03ae30b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4NTg4YjEwNWQ2ZjBhYjU0NDU5Y2FiMjlmNzZjOTMyYjNlMDJjZGFiN2FhNGMwZGJmNjg0MmRlMTUzZTEwMDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4NjdjNGNlNGEwMmNkOWNjYThmM2FjZWRiMzQxNTViNTgwNjA0OTllNjc5OTM2ZjQ5ZjQ4ZWQ1OTUzNWYxZWQifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/README.md#L48-L56",
+          "version": "repo-lines-v1:sha256:bffc0568e60cdde3a1bac6abc23e3c48bb4e77edcf9a565105bd33ecfdbf5747:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjhiYmE4NzE5ZTE4MDMwZGU3YTQ0OTdmZWMxNWM4NTRmOTU2ODIzYmFkNDg4MWE0YjA4M2RmNGFiNzZkMzE3NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjJlMzA1N2JjOWUzZjM0Y2NmMWRlOTJkMWM2ZmYwOWFkNzkzMGMzNGRjZTI1OTAxNzgyY2FjY2I4NTAzMjZmZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWEzMWI3NGIxMDAwMDA0NzRlZmJjMzUyYjNhNjM2NjI2OTY3MjBjNGVkNmQ1ZGNhYWJjYmU2M2M0ZDRhYjQ3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmE2MjQzYjU5NDU4YTlmNjY5NjFhZjdjNGE4ZGRlOTdmMThhZTU5YWMzMDRlYWIwMzlkMjZlZWYwNzhjZjc0NSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:da00373ef84cd1975f5bc660a4508e8cde9135ee8eeaa821e93f2c1519b415a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ZTljODJkMzE0MWRlYmYzYTUyMjUzYjA5ZTA0NDM0YzI2NmI1MmJmMjVmYmYxZTExNTkwN2UzNmJmNGMwM2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkMWJlMzFiMThiZWVmMzM4ZGI5MzEzOGU3Mjk0YzlmODUwYmQwMjNhZjhlZjMxMzg1OTY2Njc5OTcwODU2NWIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.4.3",
+    "at": "2026-09-04T12:35:42.157Z"
+  }
+}
