@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:368d2ddc74db3420e9050bb43997ee272557d428e124a7a9b60e26da2ff044c8",
+  "pageVersion": "sha256:3f7f78f4cb49fafcd80cfb6411e8083b2f8e44d12a4f34628de1361a203c5c7f",
   "claims": [
     {
       "id": "claim_b261aa00374b4985868752f47201bd09",
@@ -833,10 +833,142 @@
           "version": "repo-file-v1:sha256:8fa82ec9c13277d89304780190fab60cafa8688cff3cbaf78ec71881e678728e"
         }
       ]
+    },
+    {
+      "id": "claim_61fce75a0530409f9fcd4ab3c89178cd",
+      "statement": "modules/documents/domain/compliance.ts (the ADR-004 D6 single home for document-compliance rules) exports two deliberately opposite families: the measurement family (docRecordFor, isDocTracked, isDocOnFile, summarizeDocCompliance, summarizeBatchDocCompliance, criticalRequirements), which excludes untracked keys from numerator and denominator and returns null rather than 0 or 100 when nothing is tracked, and the ADR-004 D4 gate family (blockingDocuments, blockerCount, blockingDocumentNames), which fails closed so an untracked requirement blocks via DocBlockerReason 'untracked' | 'missing' | 'pending' (verified/submitted never block). A batch can therefore measure onFilePct 100 and still be blocked, and DocBlocker.key is internal: FR-06 AC-1 forbids rendering a raw document_key, so screens use the display labels returned by blockingDocumentNames.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-004-untracked-document-semantics.md#L59-L71",
+          "version": "repo-lines-v1:sha256:21e56c30fc985a6bebf1d0b6e666de29c27791dc5aae28839d96f6a4835b1f94:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkM2RiYzRlN2U3Y2JlNWRkYzg5MWIwODA3MTJmNjM1MWM5NGI3MjhlYzhiZDg1NTZmNDYxMmIwNzBkMjdiNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmYWZlYzc3NGMyMmJmNjNjZTkyOWYxYTYzMTBhNmFmYTE2ZDI5MjI2OWE1ODBlYzcyYjZkY2UwNjNiNDg3YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlNTBhYzdkNmQxOTk1YTIyYzZlNzk0ZGQxOWI1MzQ0NDBmNzI4NDEwNWFkMTgwMTI2YmYxYWNjYWRhN2ZmNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmOTdiYTU5ZTMzY2M3YzM5OTE2MTFhNDVjZmQzNmY1OTA1NDlmNDdkZTY4NGEyZDQ4ODQzMzhhNDBiYWE4OGQifQ"
+        },
+        {
+          "resource": "repo://modules/documents/domain/compliance.ts#L142-L277",
+          "version": "repo-lines-v1:sha256:d026ae46568b8e1c17097ace96ace5c42f0eaf63f3bbbab6508c5458c3d1243f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2NmJhMmI1OTk2NzMyZTcxMzkwZDNlMGNjNWI5YmZkZmU1OGFlM2Q2ZDM4M2NlYWEzMjc0YjM3NTk2NTVkZWJlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5OTRlZTY4MzJmZjE0NWM2MzU2ZTg1ODgwNGNkNGI4YzA1ZmMyYjlhYWI0ZGYxMDJkMzBiMWJmZDBjYWEwM2IxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://modules/documents/domain/compliance.ts#L27-L37",
+          "version": "repo-lines-v1:sha256:fe2460c3d158b7c3444381ab3b4e8d523c67add2afd96416a6b4e768b1f4dc67:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmZDA4ZTAxOGY5ZDdiZjU3ZWIwMTZjMzE5ZDZlZGQ0YjM3NDRjNTAwMGVjNDQ3Y2E5OThiMmRmNmI0NWMxNDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMGVjMGE3NmUyZjcwMWU2YzEwODgzZWQ4OTI5NjhhMGE1MWZhMWQ0ZmM4Nzg4MDFiNDcyN2QyNjRhMjA4NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkYThmYzk3MzA2NTgyZGUzMjFjNjRkMmIxYWEyNGE1MzAyNmQ5NzI5Y2M2YWVmNDY0ZGI4NjdlOWZlZGI3NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjOWNjYTk3ZTRlNGM3YjdjMDNlNGQ2ZTBhZTc5MDQ4MDdiYjM5YzBlNTkyOTJmMjc3ZGJkODY2MzBlNGRiZTQifQ"
+        },
+        {
+          "resource": "repo://tests/unit/doc-blockers.test.ts#L167-L184",
+          "version": "repo-lines-v1:sha256:e1d11c149d354bd28d3b5a18d6eb7971dcae78caf20f66cad0bd44e2b3499874:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxY2ZkYTQ1NDhmYzFiNjg5N2NjODVmMzYwZDYwNDYyNDIyOGUxZWRlMjA3YWQ1MzZjNTAzZTRhNzIzMjM4ZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_22302a0604af4505aa44c199603b38cd",
+      "statement": "tests/unit/doc-blockers.test.ts pins ADR-004 D4 as executable assertions — untracked requirements block, missing/pending block while verified/submitted clear, critical blockers are ordered first, blockerCount agrees with blockingDocuments().count, and blockingDocumentNames leaks no catalog document_key (FR-06 AC-1) — including a dedicated test asserting the gate and measurement families deliberately disagree (the same batch reads onFilePct 100 via summarizeBatchDocCompliance yet blockerCount 1). tests/unit/doc-compliance.test.ts pins the measurement side: untracked excluded from both numerator and denominator, null (unknown) when nothing is tracked, submitted on file but not verified, and the same rules inside deriveDashboardMetrics.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/doc-blockers.test.ts#L145-L184",
+          "version": "repo-lines-v1:sha256:61224929d846ac812f8d935bcfd4a4dbd5f61e7c07685a69c659a9ead090f638:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MGEyNzg1NzExYzlkNDVlOTlhMDcyMTdiZDk0ZjFiNWQ3MjE5ODZiOTU4MzI5ZTcxZjgzMzVmMDQ5ZTVlZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/doc-blockers.test.ts#L45-L97",
+          "version": "repo-lines-v1:sha256:4c15dc3b6144e46dca6d53d65ac687446d99bee2a3a22dc51833d6338bcb38b4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlNDVjOTNkOGZjMjFlNmIwODRiMDhjNjBjZDY2NTliNWU3ZWMxYTNhMWE3NGJiZWNmNmJjNTcwZWNmMWFiYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3M2U5ZWJkNjQ4ZDA2OTYyODQxNzgyZGFiOTg5OTc1NmU0MmRlZDQxMDkzZjUzYjUwYzdlNDBkZDYxMDU3MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2NjM3ZTQwZTRkOTJlNmMzNGRhYWIwZjk4ZjJkYjZlODMwM2UwYTMxNWMxMGFiZmRhNTBhMWJkM2U3MmVhODQifQ"
+        },
+        {
+          "resource": "repo://tests/unit/doc-compliance.test.ts#L157-L176",
+          "version": "repo-lines-v1:sha256:9d0b2ac4703724035a0c98e08034917204b7a7bb971617f8b30e6ff7d513e0a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiMmIxYTEzNTlkNWE2ZDE3Mzc2NDFjYWFiM2IxNzg1ZDIzODMwZTU4MmU4OWI0MjE3ODdmMGFiNmU2ZGFiMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/doc-compliance.test.ts#L88-L133",
+          "version": "repo-lines-v1:sha256:75e26fda6b40979c55b82c50265707c14af1eb17c45f9c047da128e562a33349:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5ZDEwNmU1MmQ0MmQ1NDA3YmYzODBjNDQxOTM3YTNjYmUwMTQwMGY0YjUxZTIxZjhmNTcyYWU4NjliNDdhMGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExNWVkZGU5NDE4Mzk1YTY2M2E1NjhhNzY4MzljYWU4ODE4MDExNmM0YWQyNjA1NDlmNDFlOGJlMzUxM2U2NzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3MDRmZDE1NjBkNzc1NDYzZGFiOWQxYjBlMzQzOGM5MjdmNDExMTcwNGE0YTBjNzQ2MjBjODYzZGE0MjVkMmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_acbf48cd067b4c49a77d867337280e7b",
+      "statement": "modules/documents/domain/evidencePath.ts is a pure (no I/O) security boundary for the compliance-evidence bucket: buildEvidencePath returns {tenant_id}/{batch_id}/{document_key}/{filename} only after validating tenant and batch ids as anchored UUIDs, document_key shape (lowercase alphanumerics plus _ and -, since keys are per-program configured data), and a filename that must not contain / or backslash, be '.' or '..', contain percent-encoded separators (%2f, %5c, %2e%2e), contain control characters, or exceed 200 characters — returning a discriminated EvidencePathResult instead of throwing. The validation is load-bearing because the bucket's RLS policies authorize every read, insert and update with app_private.can_access_tenant((storage.foldername(name))[1]::uuid): the first path segment is the tenant check, so a separator in any input would shift segments and relocate the object into a different tenant's path. validateEvidenceFile enforces EVIDENCE_MAX_BYTES = 52428800 (inclusive, matching the bucket's file_size_limit in the canonical migration) and a narrow MIME allowlist, and EVIDENCE_REJECTION_COPY gives each rejection reason one fixed user-facing sentence with no identifiers, table names, or emoji.",
+      "evidence": [
+        {
+          "resource": "repo://modules/documents/domain/evidencePath.ts#L1-L166",
+          "version": "repo-lines-v1:sha256:68858f00bae4e3884cd7b2b9cfb0e36cd213ed9e049953d7f3bcb69254392011:eyJzZWxlY3RlZExpbmVDb3VudCI6MTY2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmNWEzOTA3MmQwYmFmZWNiZDk2ZTkwMzU5YTk3MGE3YjI4MjhhMjJjMjA2MGMwNjJmZTFjZjUxMzBhNWY3YWU5In0"
+        },
+        {
+          "resource": "repo://modules/documents/domain/evidencePath.ts#L168-L212",
+          "version": "repo-lines-v1:sha256:08e8c39ae57fbbd75f3237f595a6a49ac4e52776129a2c1516c780233b9882c7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMxYjU3NWIyYjVhZDM0OTc0NjQ1ZWU4NWIwOTc4NWY4MTM4MTFmY2FhYjdiZjFlMmFhMWVlZWU2MDRmZDA5YjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L837-L872",
+          "version": "repo-lines-v1:sha256:7166c4804b3f9314f649f3d6cb150d26ecd5e2d191fe740b5ace31008016e39f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0NTE5ZTkzYzNjMjhiNTMwNzBjZGJhYzZiY2Y0YzI0YjMxMmY3MDM4MDQ0ZmE3ZjM1MGM0YzE0MjMwMjcwYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0ZDE2MDVlOGI3ZTk2NTUwYjJjZDA0OWIzMmIxODE1MDRkYWVhZmRkN2JlNGRmNTdjNWZhNmZkYWRkYTdhOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_24bc8ac3a59a43bdbc1b76494e5d9dbf",
+      "statement": "modules/documents/data/evidence.ts is the documents module's storage write path — the Supabase Storage half around the pure domain/evidencePath.ts: uploadEvidence validates the file and the path before any bytes are sent (rejected means 'we never sent the bytes'), uploads to the private compliance-evidence bucket with upsert:false so re-submitting evidence appends a new object rather than overwriting one an auditor may already have referenced, and returns the four-state EvidenceUploadResult (ok | rejected | sync-failed | unconfigured) instead of throwing, keeping the real error server-side and offering only fixed copy (UPLOAD_FAILED_MESSAGE) to the UI. getSignedEvidenceUrl re-validates the persisted documents.storage_path text (a plain, unconstrained column) before minting a time-limited signed URL (300-second default TTL), because the bucket is private and no public-URL path exists or may be added. No deleteEvidence is exposed: storage.objects has select/insert/update policies but no DELETE policy for this bucket, so deletion is refused for admins and coordinators too; the fix is a can_manage_tenant-gated policy deferred to the Phase 0.1 migration (#36).",
+      "evidence": [
+        {
+          "resource": "repo://modules/documents/data/evidence.ts#L131-L166",
+          "version": "repo-lines-v1:sha256:d2b7b44bbb5a840cbe364b25dfb823fec545329b94ad52a2d557e418ebc8b468:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/documents/data/evidence.ts#L39-L129",
+          "version": "repo-lines-v1:sha256:10af986f7bbbc4f38e29309263c6f865ec38d495f47ce237874889e3ad54bee0:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiOWFhNWMwN2RkZjdkYjFjYjNmNGZlYjU1NTQ4MjNkOGZjNTI5MDM4YmM2ZDNiYzA2ZDkzOTUxMDkzYzk1NjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkMWViNGQ4YzNhMGUyNTg3NzdkMDQxMzJiODJhYzU1ODdiMjFkYzhiMmFhMWU0NDRmODJiOGI3NzQ1YmE4Y2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MDBhMjQ5YzdhZGUwMDE1OTAzNzNiMWJjNjMyMWU2MWRjODQxYzM4ZDRhNDRiYzYxMWU5YTE0MDNlYjNjOTAifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L843-L872",
+          "version": "repo-lines-v1:sha256:a1df5d842e521eea7014fa0d438f4bb0dec1046f2ee1d0ade2d379c8aaac459c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MGJlOWUyMGMyNDFhOTgxYWJmZDNhODFkMDFhZjQyYzQ5OTQ2NzgxYjZjMjc5NGNkMjE0NTU1ZDNkZDllNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNzYwOWZjYWEyZGM5YmM1NzY2ZWZiOTlkMmE0MzhlMjE3MzMxZTQ5NmZkNjk0MjI1Y2Q2ZDk3ZDNiODViMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5285e6c761a44fa88ead7e443e243f94",
+      "statement": "The header of modules/documents/data/evidence.ts flags its storage functions as '⚠️ Unverified as of 2026-09-10': they are written but not exercised because two dashboard toggles (Clerk's Supabase integration and Supabase Third-Party Auth, issue #122) are still unset, so createSupabaseServerClient sends a token Postgres will not accept and every call fails with an RLS denial indistinguishable from a code defect; the file directs that it not be debugged against a live project until #122 is closed.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/server.ts#L40-L57",
+          "version": "repo-lines-v1:sha256:0c47119bbaaf42c997d536cc63ace4afd76ca0665c0de48ce0d2d0daf9b1932b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkZjAzNThkY2Q5ZjgyMjNkNWVjMWYxNGUzY2MxMDIzODNmODI0OTMzNWNjMmYzZDhjYjU3NWEyZWFiZGY5NWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRhNjA4NDBmZDRmOTMwYjk3ZDI1ZjE4YmE1NmVlYmEyZjNlZDVkZDQwZjM4NDliNmEyZDU0MGZmMmQ0MzI3YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwYWM3NTA5YTA5N2Q0ZjQzNGIzZDkxN2FmNDQ2MTBjMDMzNzU1ZWU5NDExNTU5Y2UxMDFkZjg3ZGRhNzliNzIifQ"
+        },
+        {
+          "resource": "repo://modules/documents/data/evidence.ts#L21-L28",
+          "version": "repo-lines-v1:sha256:84118186b54cffa5a4ea17906a882ddbb0a204b2b286c28a80865961936fb0d5:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWM3OTRiMGRmMWI2N2NkMTQ3MDI1YzljYTE3MjFkZTdmZjczN2FiNTNiNWIxYTI0OWMzMDk3ZDkzZjYyMzMyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjFkMDZhMDQ4NjQ0OTUyMjA1MzM3MzFhNzVmZjJkYmRiN2VlY2U1Nzg5YzU4Nzg5ZWMxMTUwYmJkNTcyNzUyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmZmODMwODM1MjU3ODVhODAyYzJjNzZjYzRlZjMzNzBmOWI2ZTA1MTBkODBjYjViZjg5NjMxNDNhYmFlNmI4ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODVmYzMwNWY4MjIxZTg4MzhkNmVkM2I4YWFlOGZkY2M1ODNhMzExYTU0YTM5MjJlZjJjMzk4MzZkZjhiM2FhNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_536f918f97f34db084bbb0fca168a093",
+      "statement": "The ADR-004 D4 gate functions and the evidence storage path are implemented and unit-tested but not yet consumed by the UI: the only importer of blockingDocuments/blockerCount/blockingDocumentNames is tests/unit/doc-blockers.test.ts, the only importers of evidencePath's functions are the data-layer evidence.ts and tests/unit/evidence-path.test.ts, and uploadEvidence/getSignedEvidenceUrl have no importers at all — while the measurement family is imported by live screens (TableView, DocumentStatusDonut, AlertsPanel, AnalyticsView, DocumentsView) and by batches'/billing's data/ layers. The gate and evidence functions must not therefore be described as live screen behavior.",
+      "evidence": [
+        {
+          "resource": "repo://modules/analytics/ui/AnalyticsView.tsx#L22-L22",
+          "version": "repo-lines-v1:sha256:616aef10c26b97a346044daef02ee9498787f79cce4f4b7924300d53f76eea8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE2YWVmMTBjMjZiOTdhMzQ2MDQ0ZGFlZjAyZWU5NDk4Nzg3Zjc5Y2NlNGY0Yjc5MjQzMDBkNTNmNzZlZWE4YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE2YWVmMTBjMjZiOTdhMzQ2MDQ0ZGFlZjAyZWU5NDk4Nzg3Zjc5Y2NlNGY0Yjc5MjQzMDBkNTNmNzZlZWE4YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzY0NjUzN2E4MGRhYWFhMTYwNWFkYTE0ZDNhOWFlMmU5MjFmM2VkNGI4NzgxMDM5ZTBlMjkzYmVjNjZjNmRjYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTQzYTgwOWJhN2JiMDlmOTdkYWU4ZmRiYWZlM2M1YThkZWFjY2FmMzZiYTQ1ZTJiNTZmZjc2YWYzZmI2N2FkZCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/ui/TableView.tsx#L20-L20",
+          "version": "repo-lines-v1:sha256:1eac992a3383cc650bd852845d0f8f3f399105c3d97a9367ac219722177ec1c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWVhYzk5MmEzMzgzY2M2NTBiZDg1Mjg0NWQwZjhmM2YzOTkxMDVjM2Q5N2E5MzY3YWMyMTk3MjIxNzdlYzFjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWVhYzk5MmEzMzgzY2M2NTBiZDg1Mjg0NWQwZjhmM2YzOTkxMDVjM2Q5N2E5MzY3YWMyMTk3MjIxNzdlYzFjOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2M3Zjg3MThjYzEyNzRlNzczOTQzNzMxOTRkMTA1ZWQ0NTBkYWJlYzUzNjc3YTU5MDQ5MGM2NjViNjgwNWFjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTcwMTJiYzk0MTdmYzI0YmNhYTQzNDYwMzExYjdjMmUwMzA4N2EyMGZjMWY4Nzc5MjZkYjEyYTRlMGYyNDkwZCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/ui/dashboard/AlertsPanel.tsx#L33-L33",
+          "version": "repo-lines-v1:sha256:616aef10c26b97a346044daef02ee9498787f79cce4f4b7924300d53f76eea8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE2YWVmMTBjMjZiOTdhMzQ2MDQ0ZGFlZjAyZWU5NDk4Nzg3Zjc5Y2NlNGY0Yjc5MjQzMDBkNTNmNzZlZWE4YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE2YWVmMTBjMjZiOTdhMzQ2MDQ0ZGFlZjAyZWU5NDk4Nzg3Zjc5Y2NlNGY0Yjc5MjQzMDBkNTNmNzZlZWE4YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWQ0MWFkMTU0NjQwNGMyMmJhYzQ3YjdiNWI0OWM5YTYxNmQ0ZmRiYTRhNzI4Y2YwMTZmNjExYmExZTE3NmIzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWVjMzk1NDc5MWVhYTJhZmE2OTFhMzQ1NTI2Y2I1NWY2ODM4Mzk2ZGUyNzk1NjMyMTMyZGY3NzdkNDMxYTE5MiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/ui/dashboard/DocumentStatusDonut.tsx#L14-L14",
+          "version": "repo-lines-v1:sha256:d8ba7463549f1102616cc9f51563280608e5751ff81c2de852fc29941d12a754:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhiYTc0NjM1NDlmMTEwMjYxNmNjOWY1MTU2MzI4MDYwOGU1NzUxZmY4MWMyZGU4NTJmYzI5OTQxZDEyYTc1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhiYTc0NjM1NDlmMTEwMjYxNmNjOWY1MTU2MzI4MDYwOGU1NzUxZmY4MWMyZGU4NTJmYzI5OTQxZDEyYTc1NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTVlY2E4NGU2MjY0ZmE2NGVlYWFiM2ZhNTQ5OTcxNDY1YzU2MjE0YjIwZjhjNmI5ZDBlZGM0MTE3YTg3MzAxOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWYwYWVkMjU3NTJkZjQ4MGZiODQwMjU3NjI2ODA1YjhhYjQyY2I2ZWI0YTM1ZGFmYTYxMTZiMGI0OTY1M2UxOCJ9"
+        },
+        {
+          "resource": "repo://modules/documents/data/evidence.ts#L39-L44",
+          "version": "repo-lines-v1:sha256:c30a0e4a532ca77f6f95a69ab30dac559a40a3e47a1d7a30841b649c51866c6f:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI5YWE1YzA3ZGRmN2RiMWNiM2Y0ZmViNTU1NDgyM2Q4ZmM1MjkwMzhiYzZkM2JjMDZkOTM5NTEwOTNjOTU2OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTMwMjRjYWY1NjEwYjNiOWQ3NDFiZDY4MzZiMTljYWM2NGY4Y2JkMzYxZjJmNDQ5MzdmY2M0NDY2ODBkNzZiOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQxZWI0ZDhjM2EwZTI1ODc3N2QwNDEzMmI4MmFjNTU4N2IyMWRjOGIyYWExZTQ0NGY4MmI4Yjc3NDViYThjYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjExZGZjOTE5NzczZTRjMTNmZmExZDIzYzliMzRkZGJhYjVkMjRlYTM5MDg1ZTAzZTcwOThkMDg2YjBhNzVhNSJ9"
+        },
+        {
+          "resource": "repo://modules/documents/ui/DocumentsView.tsx#L20-L20",
+          "version": "repo-lines-v1:sha256:f88a1b89c1966dc419e8b75e098980446a3b36e4fc039c4c900950b99dd12509:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjg4YTFiODljMTk2NmRjNDE5ZThiNzVlMDk4OTgwNDQ2YTNiMzZlNGZjMDM5YzRjOTAwOTUwYjk5ZGQxMjUwOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjg4YTFiODljMTk2NmRjNDE5ZThiNzVlMDk4OTgwNDQ2YTNiMzZlNGZjMDM5YzRjOTAwOTUwYjk5ZGQxMjUwOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzM3ZjlkNjM1ZjBjZTI4YTY2MTkzNWExYzg5MTkyMTY3YWU5MTY4NjI1ZGNjMmM1NzM0ZmMxNmFkM2FmMjNmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmY3ZTcwMDg2MGRhZjgwNzVmZjczZTc3NWJiMDQwY2RmYzM2MTllY2FhODYxMDg5MzNjNTkxZmU0MGYxN2E1YyJ9"
+        },
+        {
+          "resource": "repo://tests/unit/doc-blockers.test.ts#L14-L22",
+          "version": "repo-lines-v1:sha256:88901f9bd9814c5a6e19f1e427e17b2c40e1ee1755bea2938c694d0266e560db:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmZmYmJlNDdlMTgwZmEwNWZjZmE3NjdlNWFjNmFiMWEwMzg3MTJlZThmNzlkOTdkNDExZDVkMThmZThhZjU3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTViYmZmZmY0NGUxODVhZWRlZmYxZWRjNWIwY2U2NjBmZjRiNTA2OTNjYzk4YzQwY2I4ZmEyOTYzMGY5MWQwNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWY3OGMzNmQxOGMwNjUwYjk3ZDU4ZmY5NjA1NDM4ZjE0NzY5YTZkNDU5NDVhYmY3YzY5ZDFmZTY2YmNiNzNmMCJ9"
+        },
+        {
+          "resource": "repo://tests/unit/evidence-path.test.ts#L12-L20",
+          "version": "repo-lines-v1:sha256:1fc12ae40d38bc1fda209586173e8d16f770932346fda25e56b7399f3073e367:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTMwMjRjYWY1NjEwYjNiOWQ3NDFiZDY4MzZiMTljYWM2NGY4Y2JkMzYxZjJmNDQ5MzdmY2M0NDY2ODBkNzZiOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDczZmQwMzMyYzdlOTk0MTQxNTYwMzU5MzcwOWQ0NGUyMGRmNTA1OWY5ZDZiNWFiMGFhMmY1MjE2NTNmYWE4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjMzZWVlODM1N2QwN2FjZDdiMGRjYTNjYjkyNjU4OGE2ODZjZGFlNWJlNmMwNmM4MjBiZDVkZWQwZGFiYzZmNSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-09T23:50:06.293Z"
+    "at": "2026-09-11T02:46:03.436Z"
   }
 }

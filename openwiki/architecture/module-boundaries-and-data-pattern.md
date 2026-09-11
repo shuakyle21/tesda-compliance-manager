@@ -1,11 +1,11 @@
 ---
 type: Reference
 title: Module Boundaries and the Data Layer Pattern
-description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the ESLint-enforced import direction, each module's private data/ surface, the fetch → map → derive contract, and the four-state snapshot union (ok / no-tenant-access / sync-failed / unconfigured) that every data-driven screen maps onto.
-tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, snapshots, no-tenant-access, type-safety]
+description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the ESLint-enforced import direction, each module's private data/ surface, the fetch → map → derive contract, the four-state snapshot union (ok / no-tenant-access / sync-failed / unconfigured) that every data-driven screen maps onto, the documents module's ADR-004 gate-versus-measurement split, and its evidence-storage write path.
+tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, snapshots, no-tenant-access, type-safety, evidence-storage, document-compliance]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-09T23:50:06.293Z
+    at: 2026-09-11T02:46:03.436Z
 sources:
   - id: openwiki-source-4ddc2be5b2adc07e50368090
     resource: repo://app/(dashboard)/batch-cards/page.tsx
@@ -29,6 +29,8 @@ sources:
     resource: repo://CLAUDE.md
   - id: openwiki-source-39c3295efc089133e87a9c80
     resource: repo://CONTEXT.md
+  - id: openwiki-source-9c4f624af786337110d6df8a
+    resource: repo://docs/adr/ADR-004-untracked-document-semantics.md
   - id: openwiki-source-2fda883e9b76745f69f487f7
     resource: repo://eslint.config.mjs
   - id: openwiki-source-bac9ca9767a57004b7fbd175
@@ -39,6 +41,8 @@ sources:
     resource: repo://lib/supabase/service.ts
   - id: openwiki-source-4976e2df62af98c2fbd74920
     resource: repo://modules/activity/data/activity.ts
+  - id: openwiki-source-6787d888d949c1ba35fe2037
+    resource: repo://modules/analytics/ui/AnalyticsView.tsx
   - id: openwiki-source-203c5b1d1075c30ddbcc761a
     resource: repo://modules/attendance/README.md
   - id: openwiki-source-fa1460427741e716baf8631a
@@ -53,14 +57,28 @@ sources:
     resource: repo://modules/batches/domain/urgency.ts
   - id: openwiki-source-512d2efffc85412d8c1e789f
     resource: repo://modules/batches/ui/CardsView.tsx
+  - id: openwiki-source-2d6f2dee0ecac973576ac1a0
+    resource: repo://modules/batches/ui/dashboard/AlertsPanel.tsx
   - id: openwiki-source-22f1e37c371371edc123b5ae
     resource: repo://modules/batches/ui/dashboard/DashboardCallouts.tsx
   - id: openwiki-source-67dba75e6a6f46ad6f66212e
     resource: repo://modules/batches/ui/dashboard/DashboardKpiGrid.tsx
+  - id: openwiki-source-a2deebc15e6ad791c1a8091d
+    resource: repo://modules/batches/ui/dashboard/DocumentStatusDonut.tsx
+  - id: openwiki-source-7cb36b33e9628c982ac3ac0f
+    resource: repo://modules/batches/ui/TableView.tsx
   - id: openwiki-source-9a24e697708df788c06f44e3
     resource: repo://modules/billing/data/billing.ts
   - id: openwiki-source-fed00d96acb205744511b2bb
     resource: repo://modules/documents/data/documents.ts
+  - id: openwiki-source-05b5b2c042bb4f3b47496b1f
+    resource: repo://modules/documents/data/evidence.ts
+  - id: openwiki-source-764eda3eb972fdc48c5584a5
+    resource: repo://modules/documents/domain/compliance.ts
+  - id: openwiki-source-be3f0a5796d4e999957e9c91
+    resource: repo://modules/documents/domain/evidencePath.ts
+  - id: openwiki-source-fddaa3a3b7b0306dccc1c813
+    resource: repo://modules/documents/ui/DocumentsView.tsx
   - id: openwiki-source-927476d5ce1369bdfbff408b
     resource: repo://modules/import-export/data/learnerImport.ts
   - id: openwiki-source-3f1f3f4919f6d868d27df2e3
@@ -83,6 +101,8 @@ sources:
     resource: repo://shared/types.ts
   - id: openwiki-source-eb30361b2d93d2c44af8dc85
     resource: repo://shared/vocab.ts
+  - id: openwiki-source-03656dd9cbbc89345a506c19
+    resource: repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql
   - id: openwiki-source-bee9a19811f0683a75a227f5
     resource: repo://supabase/migrations/20260705070510_add_trainer_credentials.sql
   - id: openwiki-source-76fe323aec348484b7584741
@@ -97,9 +117,15 @@ sources:
     resource: repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql
   - id: openwiki-source-2020074c6fdeab02aae020b7
     resource: repo://tests/unit/batches.test.ts
+  - id: openwiki-source-892600aba8a4baaca4ccc7a9
+    resource: repo://tests/unit/doc-blockers.test.ts
+  - id: openwiki-source-dcc0272e0da8a35716ea3b26
+    resource: repo://tests/unit/doc-compliance.test.ts
   - id: openwiki-source-a018d6d3e536cc944d75e8a4
     resource: repo://tests/unit/documents.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-09-09T23:50:06.293Z" }
+  - id: openwiki-source-4029f22d57710f525e978978
+    resource: repo://tests/unit/evidence-path.test.ts
+generated: { by: "openwiki/0.5.0", at: "2026-09-11T02:46:03.436Z" }
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -133,6 +159,10 @@ flowchart TD
         BD2["domain/ — public surface"]
         BU1["ui/ — public surface"]
     end
+    subgraph DOC["modules/documents/"]
+        DD1["data/ — private (documents.ts, evidence.ts)"]
+        DD2["domain/ — public (compliance.ts, evidencePath.ts)"]
+    end
     subgraph SH["shared/ — leaf level"]
         S1["types.ts — UI domain types"]
         S2["ui/ — props-only primitives"]
@@ -155,6 +185,12 @@ flowchart TD
     BD1 --> P2
     BD1 --> S1
     BD1 --> BD2
+    BD1 --> DD2
+    A1 --> DD1
+    DD1 --> DD2
+    DD1 --> P1
+    DD1 --> P2
+    DD2 --> S1
     TD2 --> S1
     BU1 --> S1
     BU1 --> S2
@@ -162,9 +198,10 @@ flowchart TD
     SH -. "never: shared must not import modules or app" .-> TEN
     TEN -. "never: another module's data/ is private" .-> BD1
     BAT -. "never: another module's data/ is private" .-> TD1
+    DOC -. "never: another module's data/ is private" .-> BD1
 ```
 
-Solid arrows are allowed import directions; dashed arrows are rejected by `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). The tenancy/batches pair illustrates the cross-module rule with two real modules, and `A2` marks the small set of `app/` files whose whole job is to join two modules' private `data/` layers.
+Solid arrows are allowed import directions; dashed arrows are rejected by `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). The tenancy/batches/documents trio illustrates the cross-module rule with real modules — `BD1 → DD2` shows batches' private `data/` reaching documents' public `domain/` (compliance) but never its `data/` — and `A2` marks the small set of `app/` files whose whole job is to join two modules' private `data/` layers.
 
 ### `app/` — thin routes, plus the joins that can live nowhere else
 
@@ -172,8 +209,7 @@ Solid arrows are allowed import directions; dashed arrows are rejected by `impor
 
 Three `app/` files are deliberately *not* inside a module, because a module may not import another module's `data/` and these do exactly that:
 
-<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-- [`app/(dashboard)/tenant-access.ts`](/app/(dashboard)/tenant-access.ts) — `resolveTenantAccess()` joins `modules/auth/data/auth`'s `getAuthUserId()` with `modules/tenancy/data/tenancy`'s profile read and returns the verdict. It encodes no rule: the meaning of the verdict lives in `modules/tenancy/domain/access.ts`. It also deliberately uses `getAuthUserId()` (a local read of the session token) rather than `getCurrentUser()` (a Clerk Backend API fetch) because the id is all the join needs.
+- `app/(dashboard)/tenant-access.ts` — `resolveTenantAccess()` joins `modules/auth/data/auth`'s `getAuthUserId()` with `modules/tenancy/data/tenancy`'s profile read and returns the verdict. It encodes no rule: the meaning of the verdict lives in `modules/tenancy/domain/access.ts`. It also deliberately uses `getAuthUserId()` (a local read of the session token) rather than `getCurrentUser()` (a Clerk Backend API fetch) because the id is all the join needs.
 - `app/(dashboard)/users/new/actions.ts` — the create-user Server Action composes `modules/tenancy`'s Postgres write with `modules/auth`'s Clerk invitation; neither could call the other from inside its own module. Validation is delegated to `modules/tenancy/domain/userAccess`.
 - `app/(dashboard)/schools/new/actions.ts` — follows the same convention (it reads `getAuthUserId()` from `modules/auth/data/auth` and writes through `modules/tenancy/data/platform` + `schools`), and stays in `app/` because a Server Action is a route-level entry point: one place to look for "what can this app write".
 
@@ -185,7 +221,9 @@ The 14 domains are: auth (FR-01), tenancy (FR-02), batches (FR-03/04/05), docume
 - **`domain/`** — pure business rules, no I/O (e.g. `modules/batches/domain/urgency.ts`, `modules/billing/domain/readiness.ts`, `modules/tenancy/domain/access.ts`), unit-tested with fixed as-of dates. This is public to other modules.
 - **`ui/`** — domain-aware components. Also public to other modules, though in practice other modules reach for `domain/` logic, not each other's screens.
 
-A module's `data/` may import its own `domain/` (`modules/tenancy/data/tenancy.ts` takes its `Profile` type from `modules/tenancy/domain/profile`), another module's `domain/` (`modules/batches/data/metrics.ts` imports `docRecordFor`/`isDocTracked` from `modules/documents/domain/compliance`; so does `modules/billing/data/billing.ts`, for `isDocOnFile`), and anything in `shared/`. Since the mock-data retirement, `data/` layers import only types and pure functions from `shared/` — `modules/billing/data/billing.ts`, for example, imports `Batch`/`Tenant`/`DocumentRequirement` from `@/shared/types` and nothing else from `shared/`.
+A module's `data/` may import its own `domain/` (`modules/tenancy/data/tenancy.ts` takes its `Profile` type from `modules/tenancy/domain/profile`; `modules/documents/data/evidence.ts` takes `buildEvidencePath`/`validateEvidenceFile` from its own `domain/evidencePath`), another module's `domain/` (`modules/batches/data/metrics.ts` imports `docRecordFor`/`isDocTracked` from `modules/documents/domain/compliance`; so does `modules/billing/data/billing.ts`, for `isDocOnFile`), and anything in `shared/`. Since the mock-data retirement, `data/` layers import only types and pure functions from `shared/` — `modules/billing/data/billing.ts`, for example, imports `Batch`/`Tenant`/`DocumentRequirement` from `@/shared/types` and nothing else from `shared/`.
+
+**The documents module's cross-module surface.** `modules/documents/domain/compliance.ts` is the single home (ADR-004 D6) for "what does it mean when a batch has no record for a required document?", and it exports two deliberately opposite families. The **measurement family** — `docRecordFor`, `isDocTracked`, `isDocOnFile`, `summarizeDocCompliance`, `summarizeBatchDocCompliance`, `criticalRequirements` — is what live screens (TableView, DocumentStatusDonut, AlertsPanel, AnalyticsView, DocumentsView) and other modules' `data/` layers already route through: it excludes untracked keys from numerator *and* denominator, so a partial catalog never reads as a cleared checklist or a false alarm, and it yields `null` (unknown), never 0 or 100, when nothing is tracked. The **gate family** — `blockingDocuments`, `blockerCount`, `blockingDocumentNames`, with `DocBlockerReason` of `'untracked' | 'missing' | 'pending'` — implements ADR-004 D4 and answers FR-06 AC-2 ("which documents are holding this batch up, by name?"): it fails closed, so an untracked requirement *blocks*, while `verified`/`submitted` never do. The divergence between the families is the ADR, not a bug — the same batch can measure `onFilePct: 100` and still be blocked — and `tests/unit/doc-blockers.test.ts` pins that the two answers disagree. `DocBlocker.key` is internal: FR-06 AC-1 forbids rendering a raw `document_key`, so a screen renders the display labels from `blockingDocumentNames`, never `.key`. Wiring state, honestly: the gate family is implemented and unit-tested but **not yet consumed by any screen** — no `.tsx` imports it — so treat it as a ready public domain surface, not live screen behavior.
 
 ### `shared/` — leaf level
 
@@ -251,7 +289,26 @@ Variants within the convention:
 - **No derive layer** — `modules/documents/data/documents.ts` and `modules/batches/data/learners.ts` have nothing time-based to compute; fetch + map is the whole contract. `learners.ts` still owns one derived display decision: `seq` is the row's position in an explicitly ordered fetch (`last_name`, `first_name`, `id`) because the contract has no ordinal column.
 - **Derive-only data file** — `modules/batches/data/metrics.ts` has no I/O: `getDashboardMetrics(batches, criticalDocumentKeys)` is a pure function over a `Batch[]` the caller already loaded. It is currently **unwired** — the live dashboard and shell metrics strip use `deriveDashboardMetrics` from `modules/batches/domain/metrics.ts` instead, which takes the requirement catalog as a parameter and routes compliance through `modules/documents/domain/compliance`. Both share the same guarantee: every number is computed from the inputs, never hardcoded.
 - **Write paths** — `modules/import-export/data/learnerImport.ts`'s `importLearnersCsv` extends the shaping for mutations: parse and validate the CSV *before creating a Supabase client*, read the target batch's `tenant_id` back through an RLS-scoped SELECT (so a write can never target a tenant the caller couldn't already read), reconcile by ULI (no unique index on `uli`, so matching is application-level, not `ON CONFLICT`), then insert/update. Its header notes the one degree of deviation from the read contract: on `unconfigured` the caller must *disable the importer*, not pretend the import ran.
+- **Evidence storage (write path)** — `modules/documents/data/evidence.ts` is the documents module's storage surface for the private `compliance-evidence` bucket, and it keeps the same split as `documents.ts`: the pure half — path construction (`buildEvidencePath`), file validation (`validateEvidenceFile`), and the fixed user-facing copy per rejection (`EVIDENCE_REJECTION_COPY`) — lives in `modules/documents/domain/evidencePath.ts`, while this file is only the Supabase Storage calls wrapped around it. Both entry points return **four-state result unions instead of throwing** — `EvidenceUploadResult` and `SignedUrlResult` are each `ok | rejected | sync-failed | unconfigured`, mirroring the four-state snapshot discipline; FR-06 needs the UI to tell *invalid type*, *upload rejected*, and *upload failed* apart, and each `rejected` reason maps to exactly one fixed sentence in `EVIDENCE_REJECTION_COPY`. The path shape `{tenant_id}/{batch_id}/{document_key}/{filename}` is a security boundary, not string formatting: the bucket's RLS policies authorize every operation with `app_private.can_access_tenant((storage.foldername(name))[1]::uuid)` — the first segment is the tenant check — so ids, key, and filename are validated rather than merely interpolated, and `uploadEvidence` validates **before sending** so an invalid request costs no network round-trip. Upload runs with `upsert: false` — append-only: re-submitting evidence creates a new object and never overwrites one an auditor may already have referenced. `getSignedEvidenceUrl` **re-validates the persisted `documents.storage_path` text** (a plain, unconstrained column) before minting a time-limited signed URL (300-second default TTL); the bucket is private, so there is no public-URL path and one must not be added. There is no `deleteEvidence`, because `storage.objects` carries select/insert/update policies for this bucket but **no DELETE policy** — deletion is refused for admins and coordinators alike, and the fix is a `can_manage_tenant`-gated policy deferred to a Phase 0.1 migration (#36). ⚠ **Unverified as of 2026-09-10** (the file's own header, issue #122): with two dashboard toggles unset, `createSupabaseServerClient` sends a token Postgres will not accept, so every call here fails with an RLS denial indistinguishable from a code defect — do not debug this file against a live project until #122 is closed. Like the gate family above, it is unit-tested (through its `domain/` half) but not yet consumed by any screen.
 - **Pagination in the contract** — `getActivitySnapshot(limit, offset)` fetches `limit + 1` rows to derive `hasMore` without a separate count query, rather than fetching the whole feed and slicing in the page.
+
+The evidence write path's decision flow — the snapshot discipline applied to a storage surface:
+
+```mermaid
+flowchart TD
+    U["uploadEvidence(input)"] --> CFG{"isSupabaseConfigured()?"}
+    CFG -- "no" --> UNC["unconfigured"]
+    CFG -- "yes" --> VF{"validateEvidenceFile: size and MIME"}
+    VF -- "bad" --> RJ["rejected — fixed copy from EVIDENCE_REJECTION_COPY, no bytes sent"]
+    VF -- "good" --> VP{"buildEvidencePath: uuids, key, filename"}
+    VP -- "bad" --> RJ
+    VP -- "good" --> UP["storage.upload with upsert false — append-only object"]
+    UP --> ERR{"Storage error or thrown client?"}
+    ERR -- "yes" --> SF["sync-failed — error kept server-side, UI shows fixed copy"]
+    ERR -- "no" --> OKR["ok — path persisted as documents.storage_path text"]
+```
+
+Validation runs before any network round-trip, `rejected` and `unconfigured` cost nothing, and the `sync-failed` error string — like snapshot errors — stays server-side; the UI only ever sees fixed copy in the style of `UPLOAD_FAILED_MESSAGE` (RULES §1.6).
 
 ## The four-state snapshot contract
 
@@ -374,10 +431,12 @@ Two derive-layer sentinels guard the same kind of silent corruption: `daysUntil`
 
 - Fixture rows are typed against the real generated contract — `tests/unit/batches.test.ts` derives the module-private join-row shape with `Parameters<typeof mapBatchRow>[0]` instead of hand-duplicating it, and `tests/unit/documents.test.ts` imports `Database` directly. The `tests/` directory sits outside the lint zones, so test files may touch raw row types even though app code may not; fixture drift becomes a compile error.
 - Behavior is pinned at the boundary, including the failure modes that are silent: `tenant-access.test.ts` asserts `unknown` never behaves like `none` and that the fold replaces only `ok`; `batches.test.ts` asserts `selectBatchesForDisplay` returns `[]` for `unconfigured` and `sync-failed`.
+- **Domain rules get executable assertions of their own.** `tests/unit/doc-compliance.test.ts` pins the ADR-004 measurement rules — untracked out of numerator *and* denominator, `null` (never 0 or 100) when nothing is tracked, `submitted` on file but not verified — including inside `deriveDashboardMetrics`; `tests/unit/doc-blockers.test.ts` pins the D4 gate — untracked blocks, missing/pending block, critical blockers first, `blockerCount` agreeing with `blockingDocuments().count` — and asserts FR-06 AC-1 at the boundary: `blockingDocumentNames` returns display labels and leaks no catalog `document_key`. Its closing test exists to keep the two families honest: gate and measurement **deliberately disagree**, with the same batch reading `onFilePct: 100` measured yet `blockerCount: 1`.
+- **`tests/unit/evidence-path.test.ts` is a security test, not a formatting test.** Because the bucket's RLS policy reads the *first* path segment as the tenant, most of the file is separator-injection coverage — forward and backslash, `.` and `..`, percent-encoded `%2f`/`%5c`/`%2e%2e`, control characters, over-long names — each surface rejecting with its own reason (`invalid-filename`, `invalid-document-key`, `invalid-tenant-id`, `invalid-batch-id`), and the tenant id checked first so the reason is never misleading. It also pins `EVIDENCE_MAX_BYTES` to the bucket's `file_size_limit` in the canonical migration (a client that believes in a larger limit produces uploads the bucket silently rejects) and asserts `EVIDENCE_REJECTION_COPY` covers every rejection reason without identifiers, table names, or emoji.
 
 ## Extending the layout safely
 
-- **New entity contract** — mirror `modules/batches/data/batches.ts`: the four-state snapshot (extend it only with genuinely distinct states like `not-found` or `validation-failed`, and omit `no-tenant-access` where the data is not tenant-scoped), a pure exported mapper, total enum-bridge maps (`Partial` only for configured keys), `TODO(contract)` defaults for schema gaps, no tenant filtering in JS, `cache()` if the layout and the page both read it, and rows returned only on `ok`.
+- **New entity contract** — mirror `modules/batches/data/batches.ts`: the four-state snapshot (extend it only with genuinely distinct states like `not-found` or `validation-failed`, omit `no-tenant-access` where the data is not tenant-scoped, and for a write/storage surface return the same states as a result union instead of throwing — the `evidence.ts` variant), a pure exported mapper, total enum-bridge maps (`Partial` only for configured keys), `TODO(contract)` defaults for schema gaps, no tenant filtering in JS, `cache()` if the layout and the page both read it, and rows returned only on `ok`.
 - **New screen** — order the guards denied → sync-failed-with-zero-rows → no-tenant-access → empty → no-results, and reuse `shared/ui/EmptyState` / `NoTenantAccessState` / `InfoCallout` rather than writing new ones (RULES §4.24, §4.25).
 - **New module** — create `modules/<name>/{data,domain,ui}` and **add the name to the `domains` array in `eslint.config.mjs`** — that array is what generates the `data/`-privacy zones, so a missing entry silently leaves the module's `data/` importable by other modules. Empty modules get a README naming their FR.
 - **Cross-module need** — pass the value as a parameter, import the other module's `domain/`, or (only in `app/`) call both `data/` layers. Never add a `shared/` re-export of module code, and never reach for `lib/supabase/database.types.ts` outside a `data/` layer.
@@ -389,15 +448,8 @@ Two derive-layer sentinels guard the same kind of silent corruption: `daysUntil`
   5. `20260906120000_ensure_invitation_membership_atomic.sql` — the `ensure_profile_tenant_membership` function that applies an invitation's membership atomically (only while the profile holds none).
   6. `20260906130000_add_school_registry_and_platform_admin.sql` — the school registry (tenants' TESDA columns, `qualifications`, `tenant_qualifications`, `platform_admins`) and platform-admin RLS + RPCs (ADR-006).
 
-See [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) for the change procedure around this ledger.
-
 ## Related pages
 
-- [Design system and UI invariants](/openwiki/architecture/design-system.md) — the `shared/ui/` primitives and the six required screen states that snapshots map onto.
-- [Security and the auth chain](/openwiki/architecture/security-and-auth-chain.md) — why RLS, not this layering, is the boundary that matters.
-- [Batches and lifecycle](/openwiki/domains/batches-and-lifecycle.md) — the domain model the batches module fetches, maps, and derives.
-<!-- openwiki: broken internal link [/openwiki/workflows/add-a-data-driven-screen.md] file "/openwiki/workflows/add-a-data-driven-screen.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-- [Add a data-driven screen](/openwiki/workflows/add-a-data-driven-screen.md) — the same contract as a step-by-step change.
-- [Schema and migration change](/openwiki/workflows/schema-and-migration-change.md) — what happens on the other side of `database.types.ts`.
-- [Testing and verification](/openwiki/testing/testing-and-verification.md) — the unit-suite conventions referenced above.
-- [Configuration and runtime](/openwiki/operations/configuration-and-runtime.md) — the Supabase env vars that decide `ok` versus `unconfigured`.
+- [Quickstart](/openwiki/quickstart.md) — running the app against a Supabase project, including the env vars that decide `ok` versus `unconfigured`.
+- [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) — the schema and the `compliance-evidence` bucket policies whose first-segment tenant check the evidence path validates against; why RLS — not this layering — is the boundary that matters.
+- [Design System and UI invariants](/openwiki/architecture/design-system.md) — the `shared/ui/` primitives and the required screen states that snapshots (and the evidence result unions) map onto.

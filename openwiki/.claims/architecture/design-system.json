@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:242c7f7af4334ed68fc85128d33697efc18a7e4f4b49f19bba0cf99734f6fb09",
+  "pageVersion": "sha256:3421443652794229b2135420e9775c8745c22a18057b51e28cf32693ed7f2954",
   "claims": [
     {
       "id": "claim_82c1b483bc704ba18abe0152b73e0d3c",
@@ -268,15 +268,15 @@
     },
     {
       "id": "claim_cbbb131eb66046269857c5ff42ce65c5",
-      "statement": "assets/, preview/, screenshots/, ui_kits/, and uploads/ are ported verbatim from the design bundle and excluded from lint (eslint globalIgnores, which also ignores vendored .claude/** and .agents/** tooling); the PreToolUse hook script .claude/hooks/protect-static-dirs.sh blocks agent Edit/Write under those directories, exiting 2 with the instruction to edit the source design files first, and public/assets/ is explicitly exempt as the app's real runtime static directory. The registration file .claude/settings.json is gitignored by design (.claude/* with selective re-includes for hooks/, agents/, skills/) and absent from the checkout, so hook registration is per-machine local configuration - the version-controlled artifacts are the hook scripts and the [hook]/[deny] declarations in RULES.md. FIGMA FILES/, diagrams/, and .design-sync/ are review-level design artifacts, and FIGMA FILES/ and .design-sync/ are not currently materialized in the tree - Figma pages are referenced by node ID in code comments.",
+      "statement": "assets/, preview/, screenshots/, ui_kits/, and uploads/ are ported verbatim from the design bundle and excluded from lint (eslint globalIgnores, which also ignores vendored .claude/** and .agents/** tooling); the PreToolUse hook script .claude/hooks/protect-static-dirs.sh blocks agent Edit/Write under those directories, exiting 2 with the instruction to edit the source design files first, and public/assets/ is explicitly exempt as the app's real runtime static directory. The registration file .claude/settings.json is gitignored by design: .gitignore ignores .claude/* (the /* form is deliberate so Git still descends into re-included subdirs; a bare .claude/ would block them), fully re-includes !.claude/hooks/ and !.claude/agents/, and only partially re-includes skills/ - .claude/skills/* is ignored except !.claude/skills/mermaid/, so the only version-controlled shared skill is mermaid/ - making settings.json a per-machine local configuration absent from the checkout, with hook registration per-machine; the version-controlled artifacts are the hook scripts and the [hook]/[deny] declarations in RULES.md. FIGMA FILES/, diagrams/, and .design-sync/ are review-level design artifacts, and FIGMA FILES/ and .design-sync/ are not currently materialized in the tree - Figma pages are referenced by node ID in code comments.",
       "evidence": [
         {
           "resource": "repo://.claude/hooks/protect-static-dirs.sh#L17-L24",
           "version": "repo-lines-v1:sha256:c69835f4825cf5c0ebf3500b2508b0235af1fb1896cfc3cd0d253c0071eb2de4:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUzODQ5OGUzMjg1YTkzMzJlNmFmNTc2ZDlhMTBkZjdiY2RmZDFiMjEyNTk5MjYzYzM4YjBmYTgzNjEyYjk4OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc2OWQyMzdjZDQyMGI5ZDM4Yjk4MWEwYTRmNjc3MDE5MGE0YTgzZGNhMWZlNTZjNGY1YmExZTJjYmMwZWY3NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2QyZDFiMjBkM2NiMmI4MzEyNWI5YmM3YzIzY2QzZDNlZWM4OTRlZGIwYjYxZjY2OTI0MzEwZjgwNjRiNTQ1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjg5MWRiZGZjMDQwMmNkNGJhNjBmYWIxYmUzMjQ1ZGZlYzU1OWM1ZDdhZmM3ZTIxYjg3ZTc5NWE3M2QwNWU1ZiJ9"
         },
         {
-          "resource": "repo://.gitignore#L46-L55",
-          "version": "repo-lines-v1:sha256:8367dc4516a160c5c3f356dbe434e529f12276d1ade33d3193932568db8eeddc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViZjQwOWEzZGM3ZTQyZWJiYTczN2Y0MWVlMmE3ZThiMjA2ZGIwZjczYWY2NzdiZTBlMmM2MzcxYzQ3NDI0ZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1MGM0ZTQ2Yjg2OTMxMzM2OWQ0MTlkN2NlM2JmMjdiOTkwMzE3YTQ3NjJhMWM5NGVlODg5ZTVkZWVlOGQwNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExMTNjYzc4NDUzNzliZGE3NDlkOTVmZjVjNjlkMmM3OTI3N2Y0MjA4OTc4Y2RkNGQwNTlkZjVmMTNmMGQ0NzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkYjJjOWRiMmIzM2M2ODM2MjIxYjVkYTMxZWQ3ZDlhNmI3Y2M1OTBmZTQ0MmVhZjZiNTY1Mzc5OTk4Mzc3ODQifQ"
+          "resource": "repo://.gitignore#L46-L60",
+          "version": "repo-lines-v1:sha256:e621c1edf8b4cded63b450633aec139ed1617d0487011434aa64c4de07416c1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViZjQwOWEzZGM3ZTQyZWJiYTczN2Y0MWVlMmE3ZThiMjA2ZGIwZjczYWY2NzdiZTBlMmM2MzcxYzQ3NDI0ZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMzAyMDYzNWI2YjYwZWRkMzU0MGJhMjczOGI4ZDhiZjRmMGQ2NWUzOTE4ZGYwZWNkMzFhMzkxYTdlZTNjZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExMTNjYzc4NDUzNzliZGE3NDlkOTVmZjVjNjlkMmM3OTI3N2Y0MjA4OTc4Y2RkNGQwNTlkZjVmMTNmMGQ0NzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmMTJiMTJmNDg2NDBjYmM2NDE1OTcxYTg1ZGY4Zjg3MTFmNjNhM2Q1M2MxNmFhN2JiZGQ0NDlhMWY4ZGY3NGQifQ"
         },
         {
           "resource": "repo://RULES.md#L86-L91",
@@ -403,10 +403,38 @@
           "version": "repo-lines-v1:sha256:2d4c18404be9a74b7f4ffd180aa34f4cf43df39d59a681ad1a52151623441c95:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjQyYTE2ZDczYmQ5NmVkMzBmYTk4YmY2ODZiZGRhYmMyODA5ZjBmODY3OTlhZDg5YzJlYzQzNGE5ZDRhZjIyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWY2ZDg5Njc0MTQ5YTdmYjIwNjQxYzg5NjZhN2U5ZDQ0YmQ5MjA1NmUyNjNlMjcxMDc4MWMyN2VmZDUxM2E3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjQ0OGQyMDJjOWVlOWY2MWQ5ZGUzMGI2ZGI3NWQwZGJlNDlkYzYxYzQ1NDc3MjE5MzFlZjE1M2I0YzlmNzQ4NyJ9"
         }
       ]
+    },
+    {
+      "id": "claim_fc827b1785f546829847904d49f1fb74",
+      "statement": "The only openwiki/ path .gitignore ignores is openwiki/.run.json, OpenWiki's transient run state; the wiki pages under openwiki/ are committed, because a blanket openwiki/ entry would silently drop newly generated pages from the nightly OpenWiki update PR (git add skips ignored paths).",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore#L80-L84",
+          "version": "repo-lines-v1:sha256:f9bc793eaf66cb9382283daee01c318dc524da680da201a9baaac3360ffbed46:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2I2ZWM4OTNmZjgyZTA2OGZkZjM5NmQwZjczYjI1MjljMzVjN2QwMTU0Zjc3NGY5Nzk4MDcxZjQyZmVkMGVkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmRmZTU4OTY5MTk5OTdjYTI1ZGQzOWJiZGQ4M2IyNzQ3ODRhNDhmOGQwMzVkNzk1Y2MzMmE4MDYxNjk1NTNkMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjFiZjcxODMwOTRiYjA3ZDYzYzYyZTdjMDkwZTMyMDI4YjQ1YWQ2YzQ0OTc5NzlkZmJjMmRhMzA1ZjVjOTliMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e0b51c55bcd483d8d7a033f3874554b",
+      "statement": "EVIDENCE_REJECTION_COPY in modules/documents/domain/evidencePath.ts is the standing example of per-feature user copy living next to the domain rule it explains: one sentence per EvidenceRejection reason, with no emoji, no raw identifiers, and no internal table or column names - 'a coordinator sees what to do next' - the same bar RULES section 5 (TESDA framing) and section 1.6 (no leaking raw errors, table names, or internal IDs) apply to all UI copy.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L31-L31",
+          "version": "repo-lines-v1:sha256:7ad8eb6cdeec1944cd9d24f2fd4624de3b36e4e714d5e076f7fd9d7d8657de8a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2FkOGViNmNkZWVjMTk0NGNkOWQyNGYyZmQ0NjI0ZGUzYjM2ZTRlNzE0ZDVlMDc2ZjdmZDlkN2Q4NjU3ZGU4YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2FkOGViNmNkZWVjMTk0NGNkOWQyNGYyZmQ0NjI0ZGUzYjM2ZTRlNzE0ZDVlMDc2ZjdmZDlkN2Q4NjU3ZGU4YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjc3MDUzMzBjNDIwMzVkZGQ1YzU0Y2IzMTJmMDg1OTNhZjdjZDc0ZDI0ZjA5ZmQ5MDQ3NTcxZjQ4NDEzMDdiYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGRmYWQ5OWQyODdkOTUwMzA2MGM1NzMxY2RjNWMxY2JhMzkxMjg1NDNkYzcyYWRkYWZlMzBmOGNiNGZlZmY4MyJ9"
+        },
+        {
+          "resource": "repo://RULES.md#L83-L84",
+          "version": "repo-lines-v1:sha256:6d9fb4efeeb2296b40a89bdd7b924d23b54b68cb4d2a61aeb05d57175d27254d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTlmNGIwZjdiMzUwY2M1Y2Q4NjhlMTYwOWViYzcwZjc5NDk4NTYxNTU5ZWI2ZDVkOWY4MTdmYWFjODliN2M4NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDhlZWRiM2JhMjU2MTUwYTI5YzhjMDgzMzdhZTAwYTIyNzI5ODAzMmE5OWEyY2RlYzM0OGQxZWFhMTc3YTNjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzBmNmZkOWEwNjIwNmI0MzFkOTdjYmZjZjZkNDZhNjc0ZWQ0YmEyZWUzY2UxZTRjODkwMTM4ODYwYjMyNWI3YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTEyN2U4M2Q3MDkxN2UwMmRjOGUzZWJkM2JmOTQ2NzkxNGUwMDMzODM5MWI0MDc0YTNlMDA3ODczZWNjZTYxYSJ9"
+        },
+        {
+          "resource": "repo://modules/documents/domain/evidencePath.ts#L195-L212",
+          "version": "repo-lines-v1:sha256:fd29819cbaceb013781716c3411e7e12e6cc8c6e3e720ac37f925dad22937770:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4NmJiMjE3YTNkNGY0NDhkY2FiYTU0NzQ5NTIwMmE5ZDZkOTZkNDkyYjc4MDI5ZTc5YzcxNTAxMmRiMzFjNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-09T23:50:06.293Z"
+    "at": "2026-09-11T02:46:03.436Z"
   }
 }

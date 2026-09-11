@@ -2,9 +2,6 @@
 type: "Reference"
 title: "Supabase Data Model and RLS Policies"
 openwiki_generated: true
-verified:
-  - by: openwiki/0.4.3
-    at: 2026-09-04T12:35:42.157Z
 ---
 
 
