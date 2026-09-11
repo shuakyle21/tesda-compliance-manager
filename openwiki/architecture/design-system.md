@@ -6,7 +6,7 @@ tags: ["design-system", "ui-invariants", "css-tokens", "accessibility", "screen-
 openwiki_generated: true
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-09T23:50:06.293Z
+    at: 2026-09-11T02:46:03.436Z
 sources:
   - id: openwiki-source-10906e03e3f3530d2d51e5ab
     resource: repo://.claude/hooks/protect-static-dirs.sh
@@ -52,6 +52,8 @@ sources:
     resource: repo://modules/batches/ui/TableView.tsx
   - id: openwiki-source-998cecf14b03cb1c124f5871
     resource: repo://modules/billing/ui/BillingQueueView.tsx
+  - id: openwiki-source-be3f0a5796d4e999957e9c91
+    resource: repo://modules/documents/domain/evidencePath.ts
   - id: openwiki-source-1d56d4ea0a3a5a0ef9c322a5
     resource: repo://modules/shell/ui/MetricsRow.tsx
   - id: openwiki-source-7cb0b5f9c6ed9ed4128872a0
@@ -74,7 +76,7 @@ sources:
     resource: repo://shared/ui/NoTenantAccessState.tsx
   - id: openwiki-source-7dd3708406ba767fe786d831
     resource: repo://uploads/training-compliance-design-system.md
-generated: { by: "openwiki/0.5.0", at: "2026-09-09T23:50:06.293Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-11T02:46:03.436Z" }
 ---
 
 # Design System and UI Invariants
@@ -91,7 +93,7 @@ The design system in this repository exists because the product is a compliance 
 | [`uploads/training-compliance-design-system.md`](/uploads/training-compliance-design-system.md) | Original v1.0 spec — re-read before making a visual decision not covered by DESIGN.md |
 | [`ui_kits/admin/`](/ui_kits/admin/), [`assets/`](/assets/), [`preview/`](/preview/), [`screenshots/`](/screenshots/), [`uploads/`](/uploads/) | Design handoff bundle, ported verbatim — **do not edit** (see [Static directories](#do-not-edit-static-directories-and-design-sync)) |
 
-Related pages: [Module boundaries and data patterns](/openwiki/architecture/module-boundaries-and-data-pattern.md), [Architecture overview](/openwiki/architecture/overview.md), [Batches and lifecycle](/openwiki/domains/batches-and-lifecycle.md), [Quickstart](/openwiki/quickstart.md).
+Related pages: [Module boundaries and data patterns](/openwiki/architecture/module-boundaries-and-data-pattern.md), [Data model and RLS](/openwiki/architecture/data-model-and-rls.md), [Quickstart](/openwiki/quickstart.md).
 
 ## Token layer
 
@@ -215,11 +217,12 @@ flowchart TD
 
 - **UI copy must never imply official TESDA approval or submission** (RULES §5.27). This is an internal working layer; TESDA SIS/T2MIS/BSRS remain authoritative. Badges may show `APPROVED` / `NOT APPROVED` for the batch's own BSRS field, but no copy may frame anything as having been submitted to or approved by TESDA.
 - The voice (DESIGN.md §2) is **administrative, exact, never decorative**: direct and structural ("Training ongoing — Day 31 of 42."), no exclamation marks, no "we"/"you", Title Case for data-system nouns (*Batch*, *Scholar*, *Trainer*, *Billing Deadline*, *NTP*, *BSRS*, *NC II*), sentence case for buttons and inline text, **always include the unit** ("31 days", "71.4%" — naked numbers are forbidden), abbreviations explained on first use, and auto-remarks written as imperative-mode summaries. Vague urgency words ("soon", "shortly"), "Click here", and branded mascot language never appear.
+- Per-feature user copy lives next to the domain rule it explains, not in a shared copy module: `EVIDENCE_REJECTION_COPY` in `modules/documents/domain/evidencePath.ts` is the standing example — one sentence per rejection reason, no emoji, no raw identifiers, no internal table or column names ("a coordinator sees what to do next") — the same RULES §5 / §1.6 bar applied to every surface that names a failure.
 
 ## Do-not-edit static directories and design sync
 
 - **`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim** from the design bundle and excluded from lint (`eslint.config.mjs` `globalIgnores`, which also ignores the vendored `.claude/**`/`.agents/**` tooling). The PreToolUse hook script **`.claude/hooks/protect-static-dirs.sh` blocks agent edits there** — `Edit`/`Write` under any of the five directories exits 2 with the instruction to edit the source design file instead (or confirm with the user first). `public/assets/` is explicitly exempt — it is the app's real runtime static directory (served at the site root) that merely shares the name.
-- **Where the hook is registered:** the registration file `.claude/settings.json` is gitignored by design (`.gitignore` ignores `.claude/*` and re-includes only `skills/`, `hooks/`, and `agents/`), so it is a per-machine local configuration and is **not present in this checkout**. The version-controlled artifacts are the hook scripts themselves, the `[hook]`/`[deny]` declarations in RULES.md (which name `.claude/settings.json` as the registration point, including the Supabase `permissions.deny` entries in §10), and the CLAUDE.md documentation. Enforcement therefore exists on machines that keep the local settings file; the repo's durable record of the invariant is the script plus the `[hook]` rule.
+- **Where the hook is registered:** the registration file `.claude/settings.json` is gitignored by design — `.gitignore` ignores `.claude/*` (the `/*` form is deliberate, so Git still descends into re-included subdirs; a bare `.claude/` would block them), fully re-includes `!.claude/hooks/` and `!.claude/agents/`, and only *partially* re-includes `skills/`: after `!.claude/skills/` is restored, `.claude/skills/*` is ignored again and just `!.claude/skills/mermaid/` comes back, so the only version-controlled shared skill is `mermaid/`. The settings file is a per-machine local configuration and is **not present in this checkout**. The version-controlled artifacts are the hook scripts themselves, the `[hook]`/`[deny]` declarations in RULES.md (which name `.claude/settings.json` as the registration point, including the Supabase `permissions.deny` entries in §10), and the CLAUDE.md documentation. Enforcement therefore exists on machines that keep the local settings file; the repo's durable record of the invariant is the script plus the `[hook]` rule. The same file's only ignored `openwiki/` path is `openwiki/.run.json` (transient OpenWiki run state) — the wiki pages under `openwiki/` themselves are committed.
 - **`FIGMA FILES/`, `diagrams/`, `.design-sync/` are design artifacts, not app code** (RULES §6.29, review-level). `FIGMA FILES/` and `.design-sync/` are not currently materialized in the tree — Figma pages are referenced by node ID in code comments instead (e.g. `8:4330` for the primary navigation aside in `Sidebar`, `840:5128` for the billing packet queue in the billing route, `522:2367`/`382:3`/`394:723` for the three dashboard role variants). `diagrams/` holds the architecture/ER Mermaid sources plus rendered PNG/HTML.
 - **Design changes go to the source design files first.** The handoff bundle *is* the source: `ui_kits/admin/index.html` is the working no-build prototype of the dashboard views, `ui_kits/admin/*.jsx` are the prototype components the local ones were ported from, `preview/` holds standalone HTML sheets for type/color/spacing/components, and `assets/icons/` is the curated offline SVG subset of the Tabler icons. When spec and deviation conflict, the deviation wins and `colors_and_type.css` + `ui_kits/admin/` are the live ground truth.
 - A PostToolUse hook (`lint-edited-file.sh`) lints only the file an agent just edited (TS/JS) via `eslint_d` with a plain `eslint` fallback, so design-system and boundary violations surface immediately at edit time without tripping on pre-existing repo debt.
