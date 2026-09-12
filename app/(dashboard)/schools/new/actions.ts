@@ -15,7 +15,7 @@
  * convention — one place to look for "what can this app write".
  *
  * SECURITY. The platform-admin check below is defence in depth and usability,
- * not the boundary. The boundary is Postgres RLS (migration 20260906130000):
+ * not the boundary. The boundary is Postgres RLS (migration 20260906114735):
  * a caller who is not in `platform_admins` and reached this action anyway
  * would have their INSERT rejected by policy and would get `denied`. Unlike
  * the create-user action there is no un-RLS'd branch here — nothing touches
