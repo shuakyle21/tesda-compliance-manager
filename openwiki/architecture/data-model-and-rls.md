@@ -1,13 +1,98 @@
 ---
 type: "Reference"
 title: "Supabase Data Model and RLS Policies"
+description: "Reference for the TVI-CAMS Supabase schema (18 tables, 36 FKs, seven enums, three RPCs), the seven-migration ledger with applied/pending status, the per-table RLS policy map, storage policies for the private compliance-evidence bucket, the ADR-006 school registry and platform-admin boundary, profile provisioning, the database.types.ts regeneration contract, anon-key client wiring, and RULES section 10 agent-conduct guardrails."
+tags: ["supabase", "postgres", "row-level-security", "data-model", "migrations", "tenant-isolation", "platform-admin", "clerk", "nextjs"]
 openwiki_generated: true
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-12T00:47:40.613Z
+sources:
+  - id: openwiki-source-2d7c3fc74d559a77432d62af
+    resource: repo://.claude/hooks/check-mcp-health.sh
+  - id: openwiki-source-ea70eb6c045047448e446296
+    resource: repo://.gitignore
+  - id: openwiki-source-f5a489e5822d87c0b8fc66ef
+    resource: repo://.mcp.json
+  - id: openwiki-source-75140e138296a68cc258200e
+    resource: repo://app/(dashboard)/schools/new/page.tsx
+  - id: openwiki-source-6e6cc525e98e274ad6c10b29
+    resource: repo://app/(dashboard)/users/new/actions.ts
+  - id: openwiki-source-c03196c12ed34c5537bd329f
+    resource: repo://app/(dashboard)/users/new/page.tsx
+  - id: openwiki-source-c0ad955c03733d7d70ef6ec6
+    resource: repo://app/api/webhooks/clerk/route.ts
+  - id: openwiki-source-a2371d6362e5db4bc834ad03
+    resource: repo://CLAUDE.md
+  - id: openwiki-source-39c3295efc089133e87a9c80
+    resource: repo://CONTEXT.md
+  - id: openwiki-source-624c50c8276ea1f31b187ca3
+    resource: repo://docs/adr/ADR-005-demo-account-tenant-scoping.md
+  - id: openwiki-source-852d3a9765c4d719dcd1ae2c
+    resource: repo://docs/adr/ADR-006-platform-admin-and-school-registry.md
+  - id: openwiki-source-0d40866d6dce044e0547eef9
+    resource: repo://docs/DATA_MODEL.md
+  - id: openwiki-source-9d092323074e1bc2e9e99e75
+    resource: repo://docs/SUPABASE_SCHEMA_GUIDE.md
+  - id: openwiki-source-2fda883e9b76745f69f487f7
+    resource: repo://eslint.config.mjs
+  - id: openwiki-source-05f002e6c562443eaf0b089a
+    resource: repo://lib/supabase/client.ts
+  - id: openwiki-source-bac9ca9767a57004b7fbd175
+    resource: repo://lib/supabase/database.types.ts
+  - id: openwiki-source-e6f02f5d20be6272be761347
+    resource: repo://lib/supabase/server.ts
+  - id: openwiki-source-4afc6c67d0142492979e14f5
+    resource: repo://lib/supabase/service.ts
+  - id: openwiki-source-2aff630ed0688d80b1b707c8
+    resource: repo://modules/auth/data/provisioning.ts
+  - id: openwiki-source-ea48dab7d1c137cf2f1308ae
+    resource: repo://modules/auth/domain/invitationMetadata.ts
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
+  - id: openwiki-source-3f1f3f4919f6d868d27df2e3
+    resource: repo://modules/tenancy/data/platform.ts
+  - id: openwiki-source-2e2d8e1af455c1b26b721663
+    resource: repo://modules/tenancy/data/schools.ts
+  - id: openwiki-source-5b30b77204ee0533570c731e
+    resource: repo://modules/tenancy/data/users.ts
+  - id: openwiki-source-e0951a2b3560c90b2bd482f7
+    resource: repo://modules/tenancy/README.md
+  - id: openwiki-source-f7ae5e0747518115ed202c7e
+    resource: repo://RULES.md
+  - id: openwiki-source-d9a6154810528b0710445f92
+    resource: repo://shared/types.ts
+  - id: openwiki-source-d81538d8891efe37053aeccb
+    resource: repo://supabase/config.toml
+  - id: openwiki-source-03656dd9cbbc89345a506c19
+    resource: repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql
+  - id: openwiki-source-bee9a19811f0683a75a227f5
+    resource: repo://supabase/migrations/20260705070510_add_trainer_credentials.sql
+  - id: openwiki-source-76fe323aec348484b7584741
+    resource: repo://supabase/migrations/20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql
+  - id: openwiki-source-e41155c2222416a1b1c3d84b
+    resource: repo://supabase/migrations/20260831120000_seed_dev_operational_data.sql
+  - id: openwiki-source-6d151b9adff3e78556c9a327
+    resource: repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql
+  - id: openwiki-source-13117a840913dd27670d0422
+    resource: repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql
+  - id: openwiki-source-67635060d6a4945c43bef066
+    resource: repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql
+  - id: openwiki-source-4614a1f5d04b7b7127b1eefd
+    resource: repo://supabase/seed.sql
+  - id: openwiki-source-ab3c62d5452f5df905bfc01d
+    resource: repo://supabase/seeds/dev_profile_memberships.sql
+  - id: openwiki-source-ed8b9458b94ac5a0bce68fde
+    resource: repo://supabase/seeds/verify_user_admin_setup.sql
+  - id: openwiki-source-c25ad52388e27abc8c91b43f
+    resource: repo://tests/unit/auth-provisioning.test.ts
+generated: { by: "openwiki/0.5.0", at: "2026-09-12T00:47:40.613Z" }
 ---
 
 
 # Supabase Data Model and RLS Policies
 
-This page documents the database: what the schema is, how Postgres row-level security decides every authorization, which migration created what, and the contract that keeps the TypeScript types honest. TVI-CAMS is a single Next.js app talking directly to **one hosted Supabase project (Postgres + Storage)** with Clerk as identity — there is no separate backend and no staging environment (the code side of the chain — Clerk token → anon-key client → RLS — is covered by [Authentication and Authorization](/openwiki/workflows/authentication-and-authorization.md)). The live schema is **18 tables and 36 foreign keys**, produced by **seven checked-in migrations — four applied, three pending** — and the newest of the applied ones (ADR-006's school registry and platform admin) is the only migration after the 15-table era that changes table shape.
+This page documents the database: what the schema is, how Postgres row-level security decides every authorization, which migration created what, and the contract that keeps the TypeScript types honest. TVI-CAMS is a single Next.js app talking directly to **one hosted Supabase project (Postgres + Storage)** with Clerk as identity — there is no separate backend and no staging environment; the code side of the chain (Clerk token → anon-key client → RLS) is covered in [Client wiring and the anon-key pattern](#client-wiring-and-the-anon-key-pattern) below. The live schema is **18 tables and 36 foreign keys**, produced by **seven checked-in migrations — four applied, three pending** — and the newest of the applied ones (ADR-006's school registry and platform admin) is the only migration after the 15-table era that changes table shape.
 
 Three ground rules frame everything below:
 
@@ -25,15 +110,16 @@ The checked-in migration history is the only trustworthy description of the sche
 | 2 | `20260705070510` | [`add_trainer_credentials.sql`](/supabase/migrations/20260705070510_add_trainer_credentials.sql) | Adds `trainer_credentials` (one row per trainer profile) with its trigger, RLS, and two policies. | applied |
 | 3 | `20260717054607` | [`migrate_akb_tenant_and_drop_rogue_table.sql`](/supabase/migrations/20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql) | Corrective migration: reconciles a hand-created rogue `public.tenant` table by copying its one real record (AKB) into the canonical `public.tenants` and dropping the rogue table. | applied |
 | 4 | `20260831120000` | [`seed_dev_operational_data.sql`](/supabase/migrations/20260831120000_seed_dev_operational_data.sql) | Seeds **dev operational data** — five `DEV-`-prefixed batches, placeholder learner rosters, per-batch document rows, and the `documents_batch_id_document_key_key` unique index. Data only, no DDL. | **pending** |
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 | 5 | `20260904120000` | [`add_user_admin_write_policies.sql`](/supabase/migrations/20260904120000_add_user_admin_write_policies.sql) | Four admin-only write policies that make [`/users/new`](/app/(dashboard)/users/new/page.tsx) executable. Policies only, no DDL. | **pending** |
 | 6 | `20260906120000` | [`ensure_invitation_membership_atomic.sql`](/supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql) | `public.ensure_profile_tenant_membership(...)` — the atomic invitation-membership function used by the Clerk webhook. One function, no DDL. | **pending** |
 | 7 | `20260906130000` | [`add_school_registry_and_platform_admin.sql`](/supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql) | **ADR-006**: three tables (`qualifications`, `tenant_qualifications`, `platform_admins`), six new `tenants` columns, `app_private.is_platform_admin()`, `public.current_user_is_platform_admin()`, `public.create_school(...)`, the platform-admin policies, and an idempotent six-qualification seed. | applied |
 
-**Applied out of order.** `20260906130000` was applied on 2026-09-06 while `20260831120000`, `20260904120000`, and `20260906120000` were still pending — it depends on none of them, only on the base schema. Supabase records migrations by version, so applying the earlier three later is fine; **just do not assume "highest applied version" means everything below it has run.** Each row above was re-verified against the seven files in `supabase/migrations/`.
+**Applied out of order — and the checked-in history and the live schema currently differ.** `20260906130000` was applied on 2026-09-06 while `20260831120000`, `20260904120000`, and `20260906120000` were still pending — it depends on none of them, only on the base schema. Supabase records migrations by version, so applying the earlier three later is fine; **just do not assume "highest applied version" means everything below it has run.** As things stand, the live database has exactly the four applied rows above — not all seven files — so read the Status column, not the version numbers, when asking what the running schema contains. Each row was re-verified against the seven files in `supabase/migrations/`.
 
 **The three pending migrations change behaviour, not shape.** Most consequentially: until `20260904120000` runs, no client can write `profiles` or `profile_tenant_memberships`, so `/users/new` cannot assign anyone — **including the school admin that `/schools/new` expects you to seat next**. The two screens are a pair; the second is not usable until that migration lands. Until `20260906120000` runs, the `ensure_profile_tenant_membership` RPC does not exist, so the membership half of an invitation grant cannot land (the profile row itself still does, because the webhook runs on the service-role client). `20260831120000` seeds the dev operational rows the dashboard and the isolation assertion need.
 
-**New migrations are additive; migration 1 is canonical.** After any migration you regenerate `lib/supabase/database.types.ts`, then update the affected mappers and domain types (RULES §3.20, see [The `database.types.ts` regeneration contract](#the-databasetypes-ts-regeneration-contract)).
+**New migrations are additive; migration 1 is canonical.** After any migration you regenerate `lib/supabase/database.types.ts`, then update the affected mappers and domain types (RULES §3.20, see [The database types regeneration contract](#the-database-types-regeneration-contract)).
 
 Two further details matter for the history:
 
@@ -363,6 +449,7 @@ Note the path coupling: a document's `storage_path` must be laid out as `<tenant
 
 The assignment flow itself has shipped as two screens, both writing through the **anon-key** `createSupabaseServerClient` so Postgres RLS decides (the migration header's point: the write path is a Server Action carrying a Clerk session, so it must go through RLS — not the service-role client, whose reservation is the webhook):
 
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 - **`/users/new`** ([`modules/tenancy/data/users.ts`](/modules/tenancy/data/users.ts) + [`actions.ts`](/app/(dashboard)/users/new/actions.ts)) — the admin-only screen (gated on `resolveTrustedRole`, never the `?role=` override, which would let anyone preview their way into the Clerk-invitation branch that has no RLS behind it). Path 1, *registered email*: `findUserByEmail` (case-insensitive with escaped ILIKE patterns plus an exact-match re-check, so a wildcard can never assign access to the wrong person; `not-registered` is ambiguous by design — distinguishing "nobody has that address" from "they belong to another school" would leak other tenants' membership) then `assignUserAccess`, which runs the role UPDATE **before** the membership INSERT (the safer half to stop after) and, on INSERT failure, performs a best-effort `restorePriorRole` compensation — a half-applied promotion to `admin` could read and set roles on the whole unassigned pool, so a grant that fails should leave no trace. The INSERT always writes `is_default: false` (an RLS-scoped empty membership list means "none this admin can see", never "none"). Path 2, *unregistered email*: `inviteUser` parks the grant (role + tenantId) on the **Clerk invitation's `publicMetadata`** — Backend-API-only, so the signee cannot forge it — parsed all-or-nothing by [`modules/auth/domain/invitationMetadata.ts`](/modules/auth/domain/invitationMetadata.ts) (a half-formed grant yields `null` and the safe fallback), and applied by the webhook when the person signs up. **On the live project the direct path is RLS-denied until pending migration 5 runs** (no write policy), and the invitation's membership cannot land until pending migration 6 creates the RPC (the invitation itself and the profile row it produces still work — they live on the Clerk and service-role sides) — the screen is committed, its database side is not.
 - **`/schools/new`** ([`modules/tenancy/data/schools.ts`](/modules/tenancy/data/schools.ts) + [`platform.ts`](/modules/tenancy/data/platform.ts)) — the platform-operator screen: `listQualifications` (the national registry, readable by any signed-in user), `createSchool` (the `create_school` RPC, with failures told apart — `42501` → `denied`, `23505` on `tenants.code` → `duplicate-code`, anything else → `sync-failed`), and the platform gate. This screen **works on the live project** (migration 7 applied) — and it is the first half of the pair: a brand-new school can get its first member only through the applied platform-admin seating policy (a database capability the screen itself does not perform), while the admin grant path in `/users/new` that the onboarding story relies on is still pending — which is why the two screens are a pair until migration 5 lands.
 
@@ -394,7 +481,7 @@ ADR-005 still frames [`supabase/seeds/dev_profile_memberships.sql`](/supabase/se
 - **Part 2 — temporary demo promotion, deny-by-default by design.** One column on one row: `update profiles set role = 'admin'` for the demo's hardcoded Clerk ID; the commented-out revert sits at the bottom of the file. The promotion is guarded by a `do $$` block that raises unless `set local app.environment = 'local'` was set below `begin;` — because both parts share one transaction, aborting the guard rolls back Part 1 too, so a careless paste against a real database applies nothing. **Note the checked-in state: that opt-in line currently ships *uncommented*, so the guard is disarmed in the repo copy and the file promotes demo as written** — the header's deny-by-default description and the file's contents disagree, and the line should be verified (re-commented) before any paste. The membership is left *alone* — demo already holds exactly AKB, and an admin can only grant a tenant they belong to, so one membership exercises the whole screen. The promotion deliberately degrades the tenant-isolation canary (the DRAFT seed above) until it is reverted, and demo is promoted rather than either real admin account only because demo's credentials are the ones in `.env.local`.
 - **No `database.types.ts` impact:** policies only, no tables/columns/enums — the regeneration contract does not fire; what changes on landing is the `(5)` cells of the [policy map](#per-table-policy-map) and the `20260904120000` row of `docs/DATA_MODEL.md` (moved to applied).
 
-## The `database.types.ts` regeneration contract
+## The database types regeneration contract
 
 There are two type families, deliberately separate:
 
@@ -407,6 +494,7 @@ The contract on change (RULES §3.20): **after any migration, regenerate `databa
 
 ## Client wiring and the anon-key pattern
 
+<!-- openwiki: broken internal link [/lib/supabase] file "/lib/supabase" does not exist. Fix the href or restore the target, then delete this comment. -->
 The Supabase clients in [`lib/supabase/`](/lib/supabase) implement RULES §1.3:
 
 - **`createSupabaseServerClient`** (server) and **`useSupabaseClient`** (client islands) build an **anon-key** client whose `accessToken` callback returns the **Clerk session token** — Clerk's native third-party auth integration, not a custom JWT template (deprecated 1 Apr 2025; the schema needs no custom claims because RLS reads only `sub`). The callback is re-invoked on expiry, which a hand-set `Authorization` header cannot do; setting it also means never calling `supabase.auth.*` on these clients.
@@ -431,21 +519,22 @@ The app must therefore distinguish "not signed in" (client throws) from "signed 
 
 ## Operations and agent constraints (RULES §10)
 
-There is **one hosted project and no staging**, so an unreviewed statement lands on real tenant data. RULES §10 ([`RULES.md`](/RULES.md)) forbids executing statements against the live project without explicit user permission or an agreed plan that covers it — and [``.claude/settings.json``](/.claude/settings.json) enforces this with `permissions.deny`:
+There is **one hosted project and no staging**, so an unreviewed statement lands on real tenant data. RULES §10, rule 36 ([`RULES.md`](/RULES.md)) — a `[deny]`-level rule — forbids executing statements against the live project without explicit user permission or an agreed plan that covers it, and requires stating exactly what will run and why, then waiting. Its deny list, by any route (the Supabase MCP server, the CLI, or direct SQL), covers:
 
-- `mcp__supabase__execute_sql` — **denied entirely, including read-only `select`s** (the tool is denied, not the statement kind)
-- `mcp__supabase__apply_migration`, `deploy_edge_function`, and all branch operations (`create`/`delete`/`merge`/`rebase`/`reset`)
-- CLI routes: `supabase db push`, `supabase db reset`, `supabase migration up` (plain and `npx` variants)
+- `execute_sql` — **denied as a tool, including read-only `select`s** (the tool is denied, not the statement kind)
+- `apply_migration` and `deploy_edge_function`
+- all branch operations (`create`/`delete`/`merge`/`rebase`/`reset`)
+- the CLI routes `supabase db push`, `supabase db reset`, and `supabase migration up`
 - `psql`
 
-Consequently: **answer schema questions from the checked-in migrations and `lib/supabase/database.types.ts` first** — with the caveat that the seven migrations are not all applied, so the checked-in history and the live schema currently differ (see the status table). The read-only introspection tools (`list_tables`, `list_migrations`, `get_advisors`, `search_docs`) remain available for what those cannot answer — with the caveat that `list_tables` row counts are `reltuples` planner estimates, not counts.
+Rule 36 names `.claude/settings.json`'s `permissions.deny` as the enforcement point — and that file is a **per-machine local registration, not part of the repo**. [`.gitignore`](/.gitignore) ignores `.claude/*` (the `/*` form is deliberate, so Git still descends into the re-included subdirs), re-including only `!.claude/hooks/`, `!.claude/agents/`, and — after `!.claude/skills/` is restored and `.claude/skills/*` ignored again — `!.claude/skills/mermaid/`. The settings file is therefore **not present in this checkout**, and its deny entries are known from RULES.md's `[deny]` declarations, not from reading it. What is durable and in-repo: [`RULES.md`](/RULES.md) itself (rule 36 and the enforcement-level legend), [`.mcp.json`](/.mcp.json) (the Supabase MCP server registration, pointing at the hosted project `azywaivpyphhsblxjgtn` — the same single project the rule protects), and the version-controlled hook scripts in `.claude/hooks/` (e.g. `protect-static-dirs.sh`, `lint-edited-file.sh`, `check-mcp-health.sh`), which are the `[hook]`-level enforcement that travels with the repo.
+
+Consequently: **answer schema questions from the checked-in migrations, `supabase/seeds/`, and `lib/supabase/database.types.ts` first** — with the standing caveat that the checked-in history and the live schema currently differ (three pending migrations, and `20260906130000` applied out of order; see the [Migration history](#migration-history) status table). The read-only introspection tools (`list_tables`, `list_migrations`, `get_advisors`, `search_docs`) remain available for what those cannot answer — with the caveat that `list_tables` row counts are `reltuples` planner estimates, not counts.
 
 Local-stack configuration lives in [`supabase/config.toml`](/supabase/config.toml): `project_id = "tesda-compliance-manager-design-system-v"`, Postgres major version 17, migrations enabled, and `[db.seed] sql_paths = ["./seed.sql"]` — where [`supabase/seed.sql`](/supabase/seed.sql) is deliberately trivial because the real reference data is seeded idempotently by the canonical migration itself (so a fresh `db reset` reproduces tenants, programs, catalog, and bucket). Storage is enabled with a 50 MiB limit, matching the `compliance-evidence` bucket.
 
 ## Related pages
 
-- [Authentication and Authorization](/openwiki/workflows/authentication-and-authorization.md) — the Clerk side of the identity chain, the webhook, and the snapshot states that RLS zero-rows feed
-- [Module Boundaries and Data Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) — the `app → modules → shared → lib/supabase` import rules and the fetch → map → derive contract the data layers above follow
-- [System Overview](/openwiki/architecture/overview.md) — the whole system map this schema supports
-- [Runtime and Debugging](/openwiki/operations/runtime-and-debugging.md) — the environment setup and the live-DB guardrails around applying the three pending migrations
-ee pending migrations
+- [Quickstart and Task Routing](/openwiki/quickstart.md) — where to start, the env vars that decide `ok` versus `unconfigured`, and the current known states a schema change must account for (three pending migrations, applied out of order)
+- [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) — the `app → modules → shared → lib/supabase` import rules and the fetch → map → derive contract the data layers above follow
+- [Design System and UI Invariants](/openwiki/architecture/design-system.md) — the mandatory screen states that RLS zero-row and `sync-failed` paths render into, and the same `.claude/` gitignore and hook-registration facts from the UI side
