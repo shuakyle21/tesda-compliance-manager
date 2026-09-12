@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:5b1e5464bacb557c8b501a27d8f0c95eb6296721fbaa80f44a34acac24d64774",
+  "pageVersion": "sha256:1fbc2659e66e9405c3f109b5041b133011836daa4b9413500dbb5fbb2c4663c2",
   "claims": [
     {
       "id": "claim_2451e47bfaa74c17ab764a2de4103019",
@@ -306,11 +306,19 @@
     },
     {
       "id": "claim_5fbbe7f67dc340d9bfc87244d3851a71",
-      "statement": "RULES §10 forbids executing statements against the live Supabase project without explicit user permission or an agreed plan, and .claude/settings.json permissions.deny enforces this: mcp__supabase__execute_sql (denied as a tool, including read-only selects), apply_migration, deploy_edge_function, all branch operations, the CLI routes supabase db push / db reset / migration up (plain and npx), and psql; because there is one hosted project and no staging, schema questions must be answered from the checked-in migrations and lib/supabase/database.types.ts first, with only read-only introspection tools (list_tables, list_migrations, get_advisors, search_docs) remaining available — and list_tables row counts are reltuples planner estimates, not counts.",
+      "statement": "RULES §10 rule 36 ([deny]) forbids executing statements against the live Supabase project without explicit user permission or an agreed plan that covers it — state exactly what will run and why, then wait — and names .claude/settings.json's permissions.deny as the enforcement point: the deny list, by any route (the Supabase MCP server, the CLI, or direct SQL), covers execute_sql (denied as a tool, including read-only selects), apply_migration, deploy_edge_function, all branch operations (create/delete/merge/rebase/reset), the CLI routes supabase db push / supabase db reset / supabase migration up, and psql. .claude/settings.json is a per-machine local registration, not part of the repo: .gitignore ignores .claude/* (re-including only !.claude/hooks/, !.claude/agents/, and !.claude/skills/mermaid/), so the file is not present in this checkout and its deny entries are known from RULES.md's [deny] declaration rather than read from it; the durable in-repo records are RULES.md itself, .mcp.json (the Supabase MCP server registration pointing at hosted project azywaivpyphhsblxjgtn — the single project the rule protects), and the version-controlled hook scripts in .claude/hooks/. Because there is one hosted project and no staging, schema questions must be answered from the checked-in migrations, supabase/seeds/, and lib/supabase/database.types.ts first, with only the read-only introspection tools (list_tables, list_migrations, get_advisors, search_docs) remaining available for what those cannot answer — and list_tables row counts are reltuples planner estimates, not counts.",
       "evidence": [
         {
-          "resource": "repo://.claude/settings.json#L6-L31",
-          "version": "repo-lines-v1:sha256:45839e2bfd923d1c7e2c62a4086eddf360437ea638696850f5b7ef6a0345911b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NmQ5NGM2NGI5NGI1M2E4NDFmYmIwOWE2YWY2N2U5ZWUyMWMwOTcwMmFhMTE2Y2Q5OWIyZDY4ZDA3YWI1MjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkZDI0NDU4MmI2ZmIwM2QyM2I4NDE1YWJlY2QzNDZiMGM5ZjQ2NmI2Zjc1MmIwNjgxODljZTdlOWEyZGMzNTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllYjA0Y2ZjMDNmMmYzNDFmNjZhN2UxMjNkZjgxZmZhOTJjZDFiMGQ1ZDE1ZmJiNWU3OGU3MTkyYzI5YjkyMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5OGJhOWI5MDc0MWY3YjczNmJmNTBjNTY3N2JhZDM2NWE5NTAzMTdiYmUzOGZkNTBjYzNjNWFlN2U2MjVjMzAifQ"
+          "resource": "repo://.claude/hooks/check-mcp-health.sh#L1-L12",
+          "version": "repo-lines-v1:sha256:d9c6f226db0826e394ec4cea34f6e2f84eada6625a9b4811b9a3f7a712d72090:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4NzVmOTI4NTQ2YWVlNzg1NWNiMWRiOWFmYzhhYjNmMWE4YTM0ZDQzZGU1YmJkNjJmNzA3NmQ3YmE5ZjM5MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4ZDNiOWU4ODBhNzc5NzU0OTNkYzdlMzU5MTQ0YzAyOTVhNGY2OTRjZmUwYWY0ZjkyOGMyMjMwN2JjNWMzMjAifQ"
+        },
+        {
+          "resource": "repo://.gitignore#L46-L60",
+          "version": "repo-lines-v1:sha256:e621c1edf8b4cded63b450633aec139ed1617d0487011434aa64c4de07416c1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViZjQwOWEzZGM3ZTQyZWJiYTczN2Y0MWVlMmE3ZThiMjA2ZGIwZjczYWY2NzdiZTBlMmM2MzcxYzQ3NDI0ZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMzAyMDYzNWI2YjYwZWRkMzU0MGJhMjczOGI4ZDhiZjRmMGQ2NWUzOTE4ZGYwZWNkMzFhMzkxYTdlZTNjZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExMTNjYzc4NDUzNzliZGE3NDlkOTVmZjVjNjlkMmM3OTI3N2Y0MjA4OTc4Y2RkNGQwNTlkZjVmMTNmMGQ0NzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmMTJiMTJmNDg2NDBjYmM2NDE1OTcxYTg1ZGY4Zjg3MTFmNjNhM2Q1M2MxNmFhN2JiZGQ0NDlhMWY4ZGY3NGQifQ"
+        },
+        {
+          "resource": "repo://.mcp.json#L1-L8",
+          "version": "repo-lines-v1:sha256:2ceaac7dc4ac4512285dc646d5cc3b3acaa9bda8b4e1828cc078ef6a35e183fd:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDEwYjM2YWE3NGE1OWJjZjRhODgxODU4MzdmNjU4YWZhZjM2NDZlZmYyYmIxNmMzOTI4ZDBlOTMzNWU5NDVkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         },
         {
           "resource": "repo://RULES.md#L123-L137",
@@ -684,7 +692,7 @@
     }
   ],
   "verification": {
-    "by": "openwiki/0.4.3",
-    "at": "2026-09-04T12:35:42.157Z"
+    "by": "openwiki/0.5.0",
+    "at": "2026-09-12T00:47:40.613Z"
   }
 }

@@ -1,10 +1,12 @@
 ---
 type: "Reference"
 title: "Quickstart and Task Routing"
+description: "First-stop routing map for TVI-CAMS: what the system is, the doc-reading order, the three architecture pages, the invariants that gate every change, the verification loop, current known states, and the task-to-page routing table."
+tags: ["quickstart", "task-routing", "onboarding", "invariants", "verification", "tesda-compliance-manager", "nextjs", "supabase", "rls"]
 openwiki_generated: true
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-11T02:46:03.436Z
+    at: 2026-09-12T00:47:40.613Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example
@@ -40,7 +42,7 @@ sources:
     resource: repo://tests/unit/doc-blockers.test.ts
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-09-11T02:46:03.436Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-12T00:47:40.613Z" }
 ---
 
 
@@ -72,8 +74,7 @@ Orientation facts:
 
 | Page | Answers |
 | --- | --- |
-<!-- openwiki: broken internal link [/openwiki/architecture/data-model-and-rls.md#the-databasetypes-ts-regeneration-contract] heading anchor "the-databasetypes-ts-regeneration-contract" does not exist in "/openwiki/architecture/data-model-and-rls.md". Fix the href or restore the target, then delete this comment. -->
-| [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | The schema (18 tables, 36 FKs, seven enums), the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) (seven checked in — four applied, three pending, applied out of order), the [per-table RLS policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map), [storage policies](/openwiki/architecture/data-model-and-rls.md#storage-policies) for the private `compliance-evidence` bucket, the [ADR-006 school registry / platform admin boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), [profile provisioning](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration), the [`database.types.ts` regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-databasetypes-ts-regeneration-contract), and [RULES §10 agent-conduct guardrails](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10). |
+| [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | The schema (18 tables, 36 FKs, seven enums), the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) (seven checked in — four applied, three pending, applied out of order), the [per-table RLS policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map), [storage policies](/openwiki/architecture/data-model-and-rls.md#storage-policies) for the private `compliance-evidence` bucket, the [ADR-006 school registry / platform admin boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), [profile provisioning](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration), the [`database.types.ts` regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract), and [RULES §10 agent-conduct guardrails](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10). |
 | [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) | Where code goes ([layer model](/openwiki/architecture/module-boundaries-and-data-pattern.md#layer-model)), [lint-enforced import direction](/openwiki/architecture/module-boundaries-and-data-pattern.md#import-direction-is-lint-enforced), a [module's private `data/` surface](/openwiki/architecture/module-boundaries-and-data-pattern.md#a-modules-data-is-private), the [fetch → map → derive contract](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-data-contract-fetch--map--derive), the [four-state snapshot union](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-four-state-snapshot-contract), the two separate type families, total [enum bridges](/openwiki/architecture/module-boundaries-and-data-pattern.md#enum-bridges-total-maps-in-the-mapper-never-in-components), and the documents module's ADR-004 gate-versus-measurement split plus its evidence-storage write path. |
 | [Design System and UI Invariants](/openwiki/architecture/design-system.md) | The [token layer](/openwiki/architecture/design-system.md#token-layer), [iconography and the no-emoji rule](/openwiki/architecture/design-system.md#iconography-and-the-no-emoji-rule), [status by text + icon, never color alone](/openwiki/architecture/design-system.md#status-text--icon-never-color-alone), [the six mandatory screen states](/openwiki/architecture/design-system.md#the-six-mandatory-screen-states), [copy rules and product framing](/openwiki/architecture/design-system.md#copy-rules-and-product-framing), and [do-not-edit static directories](/openwiki/architecture/design-system.md#do-not-edit-static-directories-and-design-sync). |
 
@@ -96,8 +97,7 @@ pnpm exec tsc --noEmit  # strict typecheck — there is no dedicated script
 pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.example
 ```
 
-<!-- openwiki: broken internal link [/tests/unit] file "/tests/unit" does not exist. Fix the href or restore the target, then delete this comment. -->
-- `pnpm test` runs the unit suite in [`tests/unit/`](/tests/unit) — mappers and module `domain/` layers, asserted with **fixed as-of dates** so time-dependent rules stay deterministic. **Node 22+ is required:** Vitest 4's rolldown crashes at startup on older Node with a bundler stack trace, not a test failure.
+- `pnpm test` runs the unit suite in `tests/unit/` (its include pattern is set in [`vitest.config.mts`](/vitest.config.mts)) — mappers and module `domain/` layers, asserted with **fixed as-of dates** so time-dependent rules stay deterministic. **Node 22+ is required:** Vitest 4's rolldown crashes at startup on older Node with a bundler stack trace, not a test failure.
 - `pnpm test:e2e` boots the app via `pnpm dev` (the webServer in [`playwright.config.ts`](/playwright.config.ts)) and signs in with **Clerk test keys only** (`pk_test_*` / `sk_test_*`, never production keys) per [`.env.example`](/.env.example).
 - When RLS/tenant-isolation tests exist, they run against the real Supabase project — no mocks (RULES §9); the real-Supabase integration suite is still outstanding.
 
@@ -119,8 +119,7 @@ pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.e
 | Document-compliance semantics (untracked, gate vs. measurement, evidence paths) | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) + [`docs/adr/ADR-004-untracked-document-semantics.md`](/docs/adr/ADR-004-untracked-document-semantics.md) |
 | UI rules, tokens, states, copy, icons | [design-system](/openwiki/architecture/design-system.md) |
 | Domain vocabulary; locked domain facts (progress math, ≥5 absences ineligible, one RQM code = one batch, ULI, packet lifecycle) | [`CONTEXT.md`](/CONTEXT.md) + [RULES.md, Locked domain facts](/RULES.md) |
-<!-- openwiki: broken internal link [/docs/adr] file "/docs/adr" does not exist. Fix the href or restore the target, then delete this comment. -->
-| Billing/packet questions (ADR-001, ADR-003 precedence) | [`docs/adr/`](/docs/adr) — consult the ADR before changing schema or billing math (RULES §7) |
+| Billing/packet questions (ADR-001, ADR-003 precedence) | `docs/adr/` — consult the ADR before changing schema or billing math (RULES §7); start with [ADR-001](/docs/adr/ADR-001-billing-and-domain-model.md) |
 | Verifying a change | The [verification loop](#verification-loop) above |
 | Touching the live database in any way | RULES §10 — explicit permission first; see [data-model-and-rls, Operations and agent constraints](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10) |
 
