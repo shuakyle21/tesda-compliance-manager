@@ -203,6 +203,125 @@ async function restorePriorRole(
   }
 }
 
+/** The caller's own Supabase client, threaded through the write helpers. */
+type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+
+/** Either the profile to grant access to, or the snapshot to return instead. */
+type AssignmentTarget =
+  | { ok: true; user: ExistingUser }
+  | { ok: false; snapshot: UserAssignmentSnapshot };
+
+/** Looks the target up and restates a lookup snapshot as an assignment one. */
+async function resolveAssignmentTarget(email: string): Promise<AssignmentTarget> {
+  const lookup = await findUserByEmail(email);
+  if (lookup.status === 'unconfigured') return { ok: false, snapshot: { status: 'unconfigured' } };
+  if (lookup.status === 'sync-failed') {
+    return { ok: false, snapshot: { status: 'sync-failed', error: lookup.error } };
+  }
+  if (lookup.status === 'not-registered') {
+    return { ok: false, snapshot: { status: 'not-registered' } };
+  }
+  return { ok: true, user: lookup.user };
+}
+
+/**
+ * Tells an RLS refusal apart from a real failure.
+ *
+ * Both writes below need this distinction and must draw it the same way: a
+ * `with check` violation is `denied` (the caller may not do this), anything
+ * else is `sync-failed` (the write broke). Only the message of the latter is
+ * worth logging, and neither reaches the screen.
+ */
+function writeFailureSnapshot(error: { code?: string; message: string }): UserAssignmentSnapshot {
+  if (error.code === RLS_VIOLATION) return { status: 'denied' };
+  return { status: 'sync-failed', error: error.message };
+}
+
+/**
+ * A name the admin typed fills a blank, but never overwrites one the person
+ * already set on their own Clerk account.
+ */
+function fullNamePatch(
+  command: UserAccessCommand,
+  user: ExistingUser,
+): { full_name?: string } {
+  return command.fullName && !user.fullName ? { full_name: command.fullName } : {};
+}
+
+/**
+ * The first of the two statements: set the role.
+ *
+ * Returns the snapshot to stop on, or `null` when the role is set and the
+ * caller should carry on to the membership.
+ */
+async function setTargetRole(
+  supabase: SupabaseServerClient,
+  user: ExistingUser,
+  command: UserAccessCommand,
+): Promise<UserAssignmentSnapshot | null> {
+  const { data: updated, error } = await supabase
+    .from('profiles')
+    .update({ role: UI_TO_DB_ROLE[command.role], ...fullNamePatch(command, user) })
+    .eq('id', user.profileId)
+    .select('id');
+
+  if (error) return writeFailureSnapshot(error);
+  // Zero rows means the policy's `using` clause excluded this row.
+  if (!updated?.length) return { status: 'denied' };
+  return null;
+}
+
+/**
+ * The second statement: grant the school, undoing the role if it fails.
+ *
+ * Returns the snapshot to stop on, or `null` on success.
+ */
+async function grantMembership(
+  supabase: SupabaseServerClient,
+  user: ExistingUser,
+  tenantId: string,
+): Promise<UserAssignmentSnapshot | null> {
+  const { error } = await supabase.from('profile_tenant_memberships').insert({
+    profile_id: user.profileId,
+    tenant_id: tenantId,
+    // Always false, never "true if this looks like their first school".
+    // `user.tenantIds` comes from an RLS-scoped join — the membership read
+    // policy is `can_access_tenant(tenant_id)` — so an admin of school A
+    // sees an empty list for someone who already belongs to school B. Using
+    // that emptiness would write a *second* default membership, and nothing
+    // in the schema forbids one: `mapProfileRow` then picks whichever
+    // `is_default` row comes back first, so where the person lands turns on
+    // row order. In a multi-tenant compliance tool that is a silent
+    // wrong-school landing.
+    //
+    // Costs nothing: `mapProfileRow` falls back to `memberships[0]` when no
+    // membership is flagged, so a person with one school still lands in it.
+    // The only writer of `true` is the invitation path in
+    // `modules/auth/data/provisioning.ts`, where the profile is brand new
+    // and the service-role client can see that it genuinely has no others.
+    is_default: false,
+  });
+
+  if (!error) return null;
+
+  // The role UPDATE already committed and PostgREST gives us no transaction
+  // to roll it back with, so undo it explicitly: a grant that failed should
+  // leave no trace of itself. This matters beyond tidiness — a half-applied
+  // promotion to `admin` can read and set roles on every unassigned profile
+  // (policies 1 and 2 of 20260904120000), so leaving the role behind widens
+  // access the admin never finished granting.
+  //
+  // Reachable only when the target has no memberships, so policy 2 still
+  // matches the row and this restore lands. Had they belonged to another
+  // school, the original UPDATE would already have been denied.
+  //
+  // Best effort, not a transaction: if the restore fails we are exactly where
+  // we would have been without it, and the log says so.
+  await restorePriorRole(supabase, user.profileId, user.role);
+
+  return writeFailureSnapshot(error);
+}
+
 /**
  * Sets a person's role and grants them a school.
  *
@@ -236,79 +355,24 @@ export async function assignUserAccess(
 ): Promise<UserAssignmentSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
-  const lookup = await findUserByEmail(command.email);
-  if (lookup.status === 'unconfigured') return { status: 'unconfigured' };
-  if (lookup.status === 'sync-failed') return { status: 'sync-failed', error: lookup.error };
-  if (lookup.status === 'not-registered') return { status: 'not-registered' };
+  const target = await resolveAssignmentTarget(command.email);
+  if (!target.ok) return target.snapshot;
 
-  const { user } = lookup;
+  const { user } = target;
   const alreadyMember = user.tenantIds.includes(command.tenantId);
 
   try {
     const supabase = await createSupabaseServerClient();
 
-    const { data: updated, error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        role: UI_TO_DB_ROLE[command.role],
-        // A name the admin typed fills a blank, but never overwrites one the
-        // person already set on their own Clerk account.
-        ...(command.fullName && !user.fullName ? { full_name: command.fullName } : {}),
-      })
-      .eq('id', user.profileId)
-      .select('id');
-
-    if (updateError) {
-      if (updateError.code === RLS_VIOLATION) return { status: 'denied' };
-      return { status: 'sync-failed', error: updateError.message };
-    }
-    // Zero rows means the policy's `using` clause excluded this row.
-    if (!updated || updated.length === 0) return { status: 'denied' };
+    const roleFailure = await setTargetRole(supabase, user, command);
+    if (roleFailure) return roleFailure;
 
     if (alreadyMember) {
       return { status: 'assigned', profileId: user.profileId, alreadyMember: true };
     }
 
-    const { error: membershipError } = await supabase.from('profile_tenant_memberships').insert({
-      profile_id: user.profileId,
-      tenant_id: command.tenantId,
-      // Always false, never "true if this looks like their first school".
-      // `user.tenantIds` comes from an RLS-scoped join — the membership read
-      // policy is `can_access_tenant(tenant_id)` — so an admin of school A
-      // sees an empty list for someone who already belongs to school B. Using
-      // that emptiness would write a *second* default membership, and nothing
-      // in the schema forbids one: `mapProfileRow` then picks whichever
-      // `is_default` row comes back first, so where the person lands turns on
-      // row order. In a multi-tenant compliance tool that is a silent
-      // wrong-school landing.
-      //
-      // Costs nothing: `mapProfileRow` falls back to `memberships[0]` when no
-      // membership is flagged, so a person with one school still lands in it.
-      // The only writer of `true` is the invitation path in
-      // `modules/auth/data/provisioning.ts`, where the profile is brand new
-      // and the service-role client can see that it genuinely has no others.
-      is_default: false,
-    });
-
-    if (membershipError) {
-      // The role UPDATE already committed and PostgREST gives us no
-      // transaction to roll it back with, so undo it explicitly: a grant that
-      // failed should leave no trace of itself. This matters beyond tidiness —
-      // a half-applied promotion to `admin` can read and set roles on every
-      // unassigned profile (policies 1 and 2 of 20260904120000), so leaving
-      // the role behind widens access the admin never finished granting.
-      //
-      // Reachable only when the target has no memberships, so policy 2 still
-      // matches the row and this restore lands. Had they belonged to another
-      // school, the original UPDATE would already have been denied.
-      //
-      // Best effort, not a transaction: if the restore fails we are exactly
-      // where we would have been without it, and the log says so.
-      await restorePriorRole(supabase, user.profileId, user.role);
-
-      if (membershipError.code === RLS_VIOLATION) return { status: 'denied' };
-      return { status: 'sync-failed', error: membershipError.message };
-    }
+    const membershipFailure = await grantMembership(supabase, user, command.tenantId);
+    if (membershipFailure) return membershipFailure;
 
     return { status: 'assigned', profileId: user.profileId, alreadyMember: false };
   } catch (err) {
