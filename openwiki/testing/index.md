@@ -1,0 +1,3 @@
+# Files
+
+- [Demo Data and the Six-State Validation Plan](demo-data-and-validation.md) - Reference for docs/DEMO_DATA_VALIDATION_PLAN.md: why the demo account as it exists cannot validate every function, screen, and state; the two gating decisions (internal-only audience vs external reviewers; one demo account vs one per role, which reverses ADR-005 decisions 2-3); the Phase 0 migration-history reconciliation (issue #230); workstreams A-D (AKB breadth dataset, role accounts plus empty-table seeding, the route-by-state six-state matrix, and the three-layer proof of validation); and the definition of done.
