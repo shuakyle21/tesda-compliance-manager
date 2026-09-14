@@ -1,12 +1,12 @@
 ---
 type: "Reference"
 title: "Quickstart and Task Routing"
-description: "First-stop routing map for TVI-CAMS: what the system is, the doc-reading order, the three architecture pages, the invariants that gate every change, the verification loop, current known states, and the task-to-page routing table."
+description: "First-stop routing map for TVI-CAMS: what the system is, the doc-reading order, the three architecture pages, the invariants that gate every change, the verification loop, the current known states (four pending migrations — three behaviour changes plus the ADR-001 billing-domain shape change — and the #230 repo-vs-database drift), and the task-to-page routing table."
 tags: ["quickstart", "task-routing", "onboarding", "invariants", "verification", "tesda-compliance-manager", "nextjs", "supabase", "rls"]
 openwiki_generated: true
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-12T00:47:40.613Z
+    at: 2026-09-14T00:32:23.166Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example
@@ -18,8 +18,12 @@ sources:
     resource: repo://CONTEXT.md
   - id: openwiki-source-0d40866d6dce044e0547eef9
     resource: repo://docs/DATA_MODEL.md
+  - id: openwiki-source-f40c5e629f69e6ce0839fdf0
+    resource: repo://docs/DEMO_DATA_VALIDATION_PLAN.md
   - id: openwiki-source-2fda883e9b76745f69f487f7
     resource: repo://eslint.config.mjs
+  - id: openwiki-source-2aff630ed0688d80b1b707c8
+    resource: repo://modules/auth/data/provisioning.ts
   - id: openwiki-source-05b5b2c042bb4f3b47496b1f
     resource: repo://modules/documents/data/evidence.ts
   - id: openwiki-source-764eda3eb972fdc48c5584a5
@@ -38,11 +42,13 @@ sources:
     resource: repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql
   - id: openwiki-source-13117a840913dd27670d0422
     resource: repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql
+  - id: openwiki-source-9db8826ef803807be7854211
+    resource: repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql
   - id: openwiki-source-892600aba8a4baaca4ccc7a9
     resource: repo://tests/unit/doc-blockers.test.ts
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-09-12T00:47:40.613Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-14T00:32:23.166Z" }
 ---
 
 
@@ -74,7 +80,7 @@ Orientation facts:
 
 | Page | Answers |
 | --- | --- |
-| [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | The schema (18 tables, 36 FKs, seven enums), the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) (seven checked in — four applied, three pending, applied out of order), the [per-table RLS policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map), [storage policies](/openwiki/architecture/data-model-and-rls.md#storage-policies) for the private `compliance-evidence` bucket, the [ADR-006 school registry / platform admin boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), [profile provisioning](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration), the [`database.types.ts` regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract), and [RULES §10 agent-conduct guardrails](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10). |
+| [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | The schema — the live applied shape (18 tables, 36 FKs, seven enums) versus the checked-in target (25 tables, 52 FKs, eight enums once the pending migrations land), the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) (eight checked in — four applied, four pending, applied out of order, with the #230 repo-vs-database drift caveat), the pending [ADR-001 billing domain](/openwiki/architecture/data-model-and-rls.md#the-adr-001-billing-domain-migration-8-pending) (the newest, a shape change), the [per-table RLS policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map) including the seven billing-domain tables, [storage policies](/openwiki/architecture/data-model-and-rls.md#storage-policies) for the private `compliance-evidence` bucket, the [ADR-006 school registry / platform admin boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), [profile provisioning](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration), the [`database.types.ts` regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract), and [RULES §10 agent-conduct guardrails](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10). |
 | [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) | Where code goes ([layer model](/openwiki/architecture/module-boundaries-and-data-pattern.md#layer-model)), [lint-enforced import direction](/openwiki/architecture/module-boundaries-and-data-pattern.md#import-direction-is-lint-enforced), a [module's private `data/` surface](/openwiki/architecture/module-boundaries-and-data-pattern.md#a-modules-data-is-private), the [fetch → map → derive contract](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-data-contract-fetch--map--derive), the [four-state snapshot union](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-four-state-snapshot-contract), the two separate type families, total [enum bridges](/openwiki/architecture/module-boundaries-and-data-pattern.md#enum-bridges-total-maps-in-the-mapper-never-in-components), and the documents module's ADR-004 gate-versus-measurement split plus its evidence-storage write path. |
 | [Design System and UI Invariants](/openwiki/architecture/design-system.md) | The [token layer](/openwiki/architecture/design-system.md#token-layer), [iconography and the no-emoji rule](/openwiki/architecture/design-system.md#iconography-and-the-no-emoji-rule), [status by text + icon, never color alone](/openwiki/architecture/design-system.md#status-text--icon-never-color-alone), [the six mandatory screen states](/openwiki/architecture/design-system.md#the-six-mandatory-screen-states), [copy rules and product framing](/openwiki/architecture/design-system.md#copy-rules-and-product-framing), and [do-not-edit static directories](/openwiki/architecture/design-system.md#do-not-edit-static-directories-and-design-sync). |
 
@@ -103,9 +109,10 @@ pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.e
 
 ## Current known states a change task must account for
 
-1. **Three pending migrations.** `20260831120000` (dev operational seeds), `20260904120000` (user-admin write policies), and `20260906120000` (the `ensure_profile_tenant_membership` RPC) are checked in but not yet applied on the live project — they change behaviour, not shape. Consequences: `/users/new` cannot yet assign anyone (the admin grant path is RLS-denied), and the membership half of an invitation cannot land. `20260906130000` (ADR-006) was applied **out of order** on top of them — do not assume "highest applied version" means everything below it has run. Full status: [data-model-and-rls, Migration history](/openwiki/architecture/data-model-and-rls.md#migration-history).
-2. **Evidence upload I/O is unverified until issue #122.** The Supabase Storage calls in [`modules/documents/data/evidence.ts`](/modules/documents/data/evidence.ts) are written but not exercised: two dashboard toggles (Clerk's Supabase integration and Supabase Third-Party Auth) are still unset, so every call fails with an RLS denial that is indistinguishable from a code defect. Do not debug that file against a live project until #122 is closed.
-3. **Blocker-gate functions are not yet wired to UI.** `blockingDocuments` / `blockerCount` / `blockingDocumentNames` in [`modules/documents/domain/compliance.ts`](/modules/documents/domain/compliance.ts) (ADR-004 D4) are implemented and unit-tested (`tests/unit/doc-blockers.test.ts`) but no screen imports them — treat the gate family as a ready public domain surface, not live screen behavior.
+1. **Four pending migrations.** `20260831120000` (dev operational seeds), `20260904120000` (user-admin write policies), `20260906120000` (the `ensure_profile_tenant_membership` RPC), and `20260910120000` (the ADR-001 billing domain) are checked in but not yet applied on the live project. The first three change behaviour; the fourth is a **shape change** — seven new tables, the `billing_type` enum, new `batches`/`learners`/`program_billing_rules` columns, RLS policies, and the compliance-evidence storage DELETE policy. Consequences: `/users/new` cannot yet assign anyone (the admin grant path is RLS-denied), and the membership half of an invitation cannot land. `20260906130000` (ADR-006) was applied **out of order** on top of them — do not assume "highest applied version" means everything below it has run. Full status: [data-model-and-rls, Migration history](/openwiki/architecture/data-model-and-rls.md#migration-history).
+2. **#230: the repo and the live database have drifted** (verified 2026-09-10). The live migration table disagrees with the checked-in history: the three pending migrations are **untracked** on the live table, the school-registry migration is recorded under version `20260906114735` while its file is named `20260906130000` (the same migration under two versions), and `public.ensure_profile_tenant_membership` is the one real gap — absent on the live even though [`modules/auth/data/provisioning.ts`](/modules/auth/data/provisioning.ts) calls it. Verification found the database *ahead* of its own records rather than behind: the dev seed data and the user-admin write policies exist, applied by hand. So no clean `db push` or naive version-ordering assumption is safe — reconcile #230 before either. Details: [data-model-and-rls, Migration history](/openwiki/architecture/data-model-and-rls.md#migration-history).
+3. **Evidence upload I/O is unverified until issue #122.** The Supabase Storage calls in [`modules/documents/data/evidence.ts`](/modules/documents/data/evidence.ts) are written but not exercised: two dashboard toggles (Clerk's Supabase integration and Supabase Third-Party Auth) are still unset, so every call fails with an RLS denial that is indistinguishable from a code defect. Do not debug that file against a live project until #122 is closed.
+4. **Blocker-gate functions are not yet wired to UI.** `blockingDocuments` / `blockerCount` / `blockingDocumentNames` in [`modules/documents/domain/compliance.ts`](/modules/documents/domain/compliance.ts) (ADR-004 D4) are implemented and unit-tested (`tests/unit/doc-blockers.test.ts`) but no screen imports them — treat the gate family as a ready public domain surface, not live screen behavior.
 
 ## Task → page routing
 

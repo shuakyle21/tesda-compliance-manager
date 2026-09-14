@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:06fe9cb302739f85da4344e104542e115f850d5bff76227d0633a83e0b71644f",
+  "pageVersion": "sha256:0e82d854d72e7a4f808a7ce6617aec3ed471436c3bf0cee0bf2c08e33e6ab47b",
   "claims": [
     {
       "id": "claim_989cf53fa86c46e3a2f936984aa0acee",
@@ -156,7 +156,7 @@
     },
     {
       "id": "claim_bfc905ff86cd479180ed3f7d20bc785f",
-      "statement": "Of the seven checked-in migrations, four are applied and three are pending on the live project — 20260831120000 (dev operational seeds), 20260904120000 (user-admin write policies), and 20260906120000 (ensure_profile_tenant_membership RPC); they change behaviour rather than shape (until 20260904120000 runs no client can write profiles or memberships so /users/new cannot assign anyone), and 20260906130000 (ADR-006) was applied out of order on top of them, so 'highest applied version' does not mean everything below has run.",
+      "statement": "The checked-in migration history is eight files — four applied and four pending on the live project per the records: 20260831120000 (dev operational seeds), 20260904120000 (user-admin write policies), 20260906120000 (the ensure_profile_tenant_membership RPC), and 20260910120000 (the ADR-001 billing domain); the first three change behaviour, the fourth is a shape change (seven new tables, the billing_type enum, new batches/learners/program_billing_rules columns, RLS policies, and the compliance-evidence storage DELETE policy). Per the ledger, until 20260904120000 runs no client can write profiles or profile_tenant_memberships so /users/new cannot assign anyone, and the membership half of an invitation cannot land; 20260906130000 (ADR-006) was applied out of order on top of the pending ones, so 'highest applied version' does not mean everything below it has run.",
       "evidence": [
         {
           "resource": "repo://docs/DATA_MODEL.md#L7-L33",
@@ -173,6 +173,10 @@
         {
           "resource": "repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql",
           "version": "repo-file-v1:sha256:72216c81345415f2209ff8c03894adc7c05a8cfd4727798058c485444846e353"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L1-L54",
+          "version": "repo-lines-v1:sha256:d446bcd9b3e29768adf245fa7763c3865e93ee17e72f021f604660b4f5d47723:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiNDFhYmU0YTM3ZDlhMDZiYzYyZTE2NTg4Y2NkM2VkNmJjNTgwMzFiN2EwMmIwMGE5ZWMzNTg4OTQ0Nzc1ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYmU2MTU0N2E2NDM2NDVjNjQwNjgyZGI5NTYwZDdiYTlkNjI5ZGE1NjNkYjg4NDdhNzY2Mzg1ZTkwNzFiMGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3NDZmY2E1YjQxMmNhMDM1NDYwZjQyM2QxODQ1ZTQxNGI3NjU1MTU1ZDczZWZjNjFiY2NkMzBhMDI1MmYwNjUifQ"
         }
       ]
     },
@@ -217,10 +221,46 @@
           "version": "repo-lines-v1:sha256:63a669f69d0ffaf5922d05e81860543756ba65cd16a52f07a83da02d70601132:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTEzZWFmMzE5NmJkZTg3YzQ1YTdjOWI1ZTdjNjViMjg5ZWIzMzE1MWMwZGRkZjQ0ZTUxNjk4NDg0MjE2MDE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1MzUwYWRkZDkzYjk3M2ZkOTJiZDRhOGZmMWM3NGM4ZWYxMGI3NTI3ZWY5ZGE1ZDNhNTYwZDJkNjIyZDU2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODVhYzg2YjUzMzhjMzI1NmZkMDMwZmFlYTI4ZDBmZDE4MmVjMDUzNDI5ZTY4YjRhZmY5Y2YwNjBmMzQ1ZmYzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGQ4ZTMzZjBiMWIxYjY3NjcxNDZmNmViOTE4NDAxN2E5ZDNkMTg3MDU5NWZkOGI3YWY0NmE1NTVmMGE0YzM1MyJ9"
         }
       ]
+    },
+    {
+      "id": "claim_8bbf016e6b8749609c8c5af4be395685",
+      "statement": "The live database has drifted from the checked-in repo (issue #230, verified 2026-09-10): the live migration table records only the four applied versions, the three pending checked-in migrations (20260831120000, 20260904120000, 20260906120000) are untracked, the school-registry migration is recorded under version 20260906114735 while its file is named 20260906130000 (the same migration under two versions), and public.ensure_profile_tenant_membership is the one real gap — absent on the live even though modules/auth/data/provisioning.ts calls it. Verification found the database ahead of its own records rather than behind (the dev seed data and the user-admin write policies exist, applied by hand), so no clean db push or naive version-ordering assumption is safe until #230 is reconciled.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DEMO_DATA_VALIDATION_PLAN.md#L78-L100",
+          "version": "repo-lines-v1:sha256:84c54b882e0dbd9c1a2ba1f1ef770d096c8463f77d0041d58cbb779bd7b61ea3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZTI2OWFjZTY5MmQwZmQ0ZjI1YmI5ZWEzNWZlOGViMzgwZTMzMGExNjYxMTJkODMyOTA2MWFhMzcwZWM2NGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2ODAxYWUxOGVlNTFlMWU1ZDM0NDgyMTRiMGMyNTJlYjkyNGMzZDFkODQ3YmUzYThhMjE2ZDFhMDRmYjc5OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1YmY3YTY4YjRhZTY2OGM5ZGQ0Mjc0M2NkOWRmODY1NmQ0ZDIxZjYxNTY1YjVjZjEwMThmZDM0ZDVkYmMxZjMifQ"
+        },
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L134-L134",
+          "version": "repo-lines-v1:sha256:3aca725151ab3f276c233d5fdadc927386189948e40e74e2b2de1c050aae8f8a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FjYTcyNTE1MWFiM2YyNzZjMjMzZDVmZGFkYzkyNzM4NjE4OTk0OGU0MGU3NGUyYjJkZTFjMDUwYWFlOGY4YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FjYTcyNTE1MWFiM2YyNzZjMjMzZDVmZGFkYzkyNzM4NjE4OTk0OGU0MGU3NGUyYjJkZTFjMDUwYWFlOGY4YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNiZGFmMGNiMTU0NzM4Y2NmNjgzMTQyOGI0YjkxMzYzMzFkODlmM2E5NDkxYzU1YTk5Zjg1NmEwZTk5Njc2ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTFkNThhODAyYTBkOWI4NzI4YzljZGVhMzk3ZmRlNGQ0NzhlZGI5N2ExNWU1NWNkNjgwNzE1MTQyNjNjNDBiYyJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L64-L74",
+          "version": "repo-lines-v1:sha256:a6c5dabf9ca64cc198002697c3bf32ef2dd12cfc21c246aa86e000dae4dd9357:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxZDI2NWNkNGQ4NTJlOTMxMjdjMDZlZTZlYTAxMjdmMTdlMWE5OThlODBlZjlhNjA3NjI3NTExNTE3NWY3ZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNDJmN2UxMzBmNzc5MzYxYzYzZWM4NDQ2NWVhZTkzYjQ2ZTQ0NDkxNWVmYWI4ZjAwMWM5ZDU4NzQ4MTE2YjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjY2M4Mzk1YzI2Mzk4ZDMyZGU1ZTcxMTNkYWU1OTZkZWMyYWFjNzk1ZDY3NjEyMzBjZGM2ODgzYTJjNmE4YmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkMTg1M2FhZDBiZTQwNGYxZmQxYzJlZWFmZTRkMjJlZWQ2OWIyNzQyZDRjNmFmZWZkNDI4ZDcwY2Y3MmE5MzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5eea79a9397e44b19b87e33a7e95729d",
+      "statement": "Per the records the live Supabase schema is 18 tables, 36 foreign keys, and seven enums, while the checked-in target is 25 tables, 52 foreign keys, and eight enums once the pending migrations land: the eighth migration (20260910120000) adds the seven tables program_modules, scholarship_cost_schedule, learner_identities, attendance_records, batch_trainer_assignments, billing_records, and tenant_settings with 16 new foreign keys and the billing_type enum, and is the only pending migration that changes shape.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DATA_MODEL.md#L26-L28",
+          "version": "repo-lines-v1:sha256:7bdd8c01747c5b7f102b6123b6f22e846f0d9ed12d518990048c24997ffac0a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkMTFjYjBmMTIwMDhmMjQzMzQ4MjJlZTg4M2ZlMzUxNzFiYjJhZGU2MTE4Mzg4NDhlNTBkOTQ0NjUzNzIwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjIzNGQ5ZDYxNzkxNGUxNGE2Yzg0NzdhOGU2MzkwNjk0ZDBlMjdlYmVhZGUwZWQ0NWU0YmM5ZGUwMWM1ZDYxYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGY4NzE4ZjI0YzU2NmIxOWU0ZGQ0MmM4OWJhZGZlYzkyM2YyMDVmZDk0MDVkNGMyNTZjMzFkMjFjNTcyNTliMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmNiNzJlNzdmOWFiNGMzZTYzMGZhOTYzZjQxM2I4NGUxYjg5ZTJlNWYwOTQ2YTMxMmVjYmJjZTI5MjdkNjZhZiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L109-L275",
+          "version": "repo-lines-v1:sha256:d5727a7371eed8f97e6e3dbb47dab505ce4eae2945f96a5a73a2813394477d58:eyJzZWxlY3RlZExpbmVDb3VudCI6MTY3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxOThkMTFkNGQyNjYyNzQwZmNiY2JhN2ZiNDQxYTc2Y2Q1YzRmYjA0YTEyYjIzY2FhZTgxYmE5OWY1ZDYyNjNkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0OTk2N2VjMWVkMzgzNmY4ZWIxN2FmZjE3MmI1YmZlZjdkZTYwNDg1YTQzOWM2Y2ExMWM1OTFlMTc1NTczOWFlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0MjVmZWE1NmM3ZmZmMTg1MDQ1NGRlZWJiZmE1NDQxMzZjZjg3ZTg0ODYzNGE4MTYzN2VmMDAzMjMwNDgxZWE4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhNzIxMDI5Y2E4MzYyMDU1MTEwOTE3MmUwOThkMTA5YzE2NjkzNDUzZTJjYTVhZGM1ODA3YzJjY2U4YTVjYWU3In0"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L77-L91",
+          "version": "repo-lines-v1:sha256:2f18d7f7e5fcec7b84d3b4a8858d1cb0f3bea9b81cc31a585e11590bc89edc8a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwNzJkNzU0MTVmZWE0MDc1MmJiYmUxMzMzNDZiNDMyOTIwMjQyNWYxMWI5NDgzYzZmMjhmNjdjNmUxYTljYTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YTljZTdlZjc1Njk0MDM3Nzg4NzM2NGM3YTM0ODBlZjY0ODBjNDQwMTExZDBlMThmMjY3NjhmODg5ZDBlNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhYjkxOWY0NmFiZWMwOWZiZWUyMTk5ZGNhZWI2NGYyZDVhMzAzNDQ0MmM0MzYzYjk0ODNjN2YyNjA3MzVkODYifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-12T00:47:40.613Z"
+    "at": "2026-09-14T00:32:23.166Z"
   }
 }
