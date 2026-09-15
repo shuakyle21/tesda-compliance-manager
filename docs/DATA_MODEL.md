@@ -9,19 +9,32 @@ as of these seven versions. **Applied** means present in the live Supabase proje
 | `20260528160300` | `create_tenant_scoped_schema` — canonical schema, 14 tables, RLS | applied |
 | `20260705070510` | `add_trainer_credentials` | applied |
 | `20260717054607` | `migrate_akb_tenant_and_drop_rogue_table` | applied |
-| `20260831120000` | `seed_dev_operational_data` (data only, no DDL) | **pending** |
-| `20260904120000` | [`add_user_admin_write_policies`](../supabase/migrations/20260904120000_add_user_admin_write_policies.sql) (RLS policies only, no DDL) | **pending** |
-| `20260906120000` | [`ensure_invitation_membership_atomic`](../supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql) (one function, no DDL) | **pending** |
-| `20260906130000` | [`add_school_registry_and_platform_admin`](../supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql) — 3 tables, 6 `tenants` columns, 2 functions, RLS ([ADR-006](adr/ADR-006-platform-admin-and-school-registry.md)) | applied |
+| `20260831120000` | [`seed_dev_operational_data`](../supabase/seeds/20260831120000_seed_dev_operational_data.sql) (data only, no DDL) — **moved to `supabase/seeds/`**, no longer a migration | not recorded; rows present |
+| `20260904120000` | [`add_user_admin_write_policies`](../supabase/migrations/20260904120000_add_user_admin_write_policies.sql) (RLS policies only, no DDL) | **applied, not recorded** |
+| `20260906120000` | [`ensure_invitation_membership_atomic`](../supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql) (one function, no DDL) | **genuinely missing** |
+| `20260906114735` | [`add_school_registry_and_platform_admin`](../supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql) — 3 tables, 6 `tenants` columns, 2 functions, RLS ([ADR-006](adr/ADR-006-platform-admin-and-school-registry.md)) | applied |
 
-The status column was last checked against the live project on **2026-09-06**, when
-`20260906130000` was applied and `database.types.ts` verified field-by-field against the
-regenerated types.
+Status re-verified against the live project on **2026-09-10** by catalog query
+(`pg_proc`, `pg_policies`), not inferred — see [#230](https://github.com/shuakyle21/tesda-compliance-manager/issues/230).
+Two entries changed:
 
-**Applied out of order.** `20260906130000` was applied while `20260831120000`, `20260904120000`
-and `20260906120000` were still pending, because it depends on none of them — only on the base
-schema. Supabase records migrations by version, so applying the earlier three later is fine; just
-do not assume "highest applied version" means everything below it has run.
+- `20260904120000` was listed as pending. Its four policies are in fact present; it was
+  applied by hand without being recorded.
+- `20260831120000`'s fixture rows are present in the hosted project. The file has been moved
+  out of `migrations/` — it self-describes as "a DEV fixture, not real data" and should never
+  have been something tooling applies automatically. Moving it does not remove the rows.
+
+**"Recorded" and "applied" are different things here.** The database is *ahead* of its own
+migration table: objects exist that the table does not know about. So neither this ledger nor
+`list_migrations` alone is authoritative — check objects by name (`pg_proc`, `pg_policies`).
+
+**Version ≠ filename.** `add_school_registry_and_platform_admin` is recorded as
+`20260906114735`, and its file was renamed to match (it was `20260906130000`). Supabase keys
+the migration table on the version string, so a filename that disagrees with the record makes
+`db push` try to re-run an applied migration.
+
+The one real gap is `public.ensure_profile_tenant_membership`, which
+`modules/auth/data/provisioning.ts` calls and which does not exist.
 
 The live schema is therefore **18 tables and 36 foreign keys**. The four cluster diagrams below
 still draw the 15 pre-existing tables; the three new ones have their own section at the end
@@ -384,7 +397,7 @@ happens in `DB_TO_UI_STAGE` in `modules/batches/data/batches.ts` and nowhere els
 
 ---
 
-## School registry (applied 2026-09-06 — migration `20260906130000`)
+## School registry (applied 2026-09-06 — migration `20260906114735`)
 
 Added by [ADR-006](adr/ADR-006-platform-admin-and-school-registry.md). Three tables and six
 `tenants` columns. Drawn separately from the four clusters above; folding it in is a tidy-up

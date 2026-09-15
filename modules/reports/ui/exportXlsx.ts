@@ -148,7 +148,7 @@ export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onRe
     const t = tenantOf(b.tenantId);
     const reg = (t.region || '').split('·');
     // `region` is free text shaped like "Region IV-A, Laguna", so it was split
-    // to fill two columns. The dedicated columns (migration 20260906130000)
+    // to fill two columns. The dedicated columns (migration 20260906114735)
     // are authoritative where recorded; the split stays as the fallback for
     // the three schools seeded before those columns existed.
     const region = (reg[0] || '').trim();

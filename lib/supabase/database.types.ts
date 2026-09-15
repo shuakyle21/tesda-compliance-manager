@@ -4,7 +4,7 @@
  * `platform_admins`, `qualifications`, `tenant_qualifications`, the six new
  * `tenants` columns and the `create_school` /
  * `current_user_is_platform_admin` functions were written by hand from
- * `supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql`.
+ * `supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql`.
  *
  * That migration is now APPLIED (2026-09-06), and these hand-written shapes
  * were checked field-by-field against `generate_typescript_types` run on the

@@ -14,7 +14,7 @@
 > hosted project will not trust it.
 >
 > Appendix A's seeding phase also landed: 5 batches / 89 learners / 40 documents are in
-> the project (migration `20260831120000_seed_dev_operational_data.sql`).
+> the project (`supabase/seeds/20260831120000_seed_dev_operational_data.sql`).
 
 > **Status update — 2026-09-05. Phase 5 landed, and it diverged from this plan.**
 > This document's A.7 decision was to **keep `shared/mocks`** as the `unconfigured`

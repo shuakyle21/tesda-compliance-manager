@@ -11,7 +11,7 @@
  * shape — so the two write paths in this module read the same way.
  *
  * Validation here is a usability contract, not a security one. Postgres RLS
- * (migration 20260906130000) decides who may actually create a school.
+ * (migration 20260906114735) decides who may actually create a school.
  */
 
 /**

@@ -5,7 +5,7 @@ Date: 2026-09-06
 Owner: System Architecture
 Supersedes: `docs/MASTER_PRD_SRS.md` **FR-02** — "Super Admin is not implemented and must not
 be assumed in production behavior."
-Implemented by: `supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql`
+Implemented by: `supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql`
 
 ## Context
 
