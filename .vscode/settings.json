@@ -1,4 +1,5 @@
 {
   "todo-tree.ripgrep.rgPath": "/usr/local/bin/rg",
-  "js/ts.experimental.useTsgo": true
+  "js/ts.experimental.useTsgo": true,
+  "extensions.experimental.enableAgentsWindowCapability": true
 }
