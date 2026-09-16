@@ -1,0 +1,29 @@
+name: Qodana
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}  # the PR head commit, not the merge commit
+          fetch-depth: 0  # full history required for pull request analysis
+
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2026.2
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
