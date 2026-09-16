@@ -7,7 +7,7 @@
  * billing-ready badge, and click-to-open BatchModal. Client Component.
  */
 
-import { useMemo, useState, type CSSProperties, type MouseEvent } from 'react';
+import { useMemo, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
@@ -89,7 +89,7 @@ export function TableView({
   );
 }
 
-function Th({ children, align }: { children: React.ReactNode; align?: 'left' | 'right' }) {
+function Th({ children, align }: { children: ReactNode; align?: 'left' | 'right' }) {
   return (
     <th style={{
       textAlign: align || 'left', padding: '0 12px', height: 36,

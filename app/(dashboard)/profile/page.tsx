@@ -11,6 +11,7 @@
  * Figma: Auth · Profile (node 741:2515, Screens page).
  */
 import { redirect } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { getCurrentUser } from '@/modules/auth/data/auth';
 import { Icon } from '@/shared/ui/Icon';
 import { SignOutButton } from '@/modules/auth/ui/SignOutButton';
@@ -421,8 +422,8 @@ function PCard({
 }: {
   icon: IconName;
   title: string;
-  action?: React.ReactNode;
-  children: React.ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section style={{
@@ -453,7 +454,7 @@ function PCard({
   );
 }
 
-function PRow({ label, last, children }: { label: string; last?: boolean; children: React.ReactNode }) {
+function PRow({ label, last, children }: { label: string; last?: boolean; children: ReactNode }) {
   return (
     <div style={{
       display: 'grid', gridTemplateColumns: '130px 1fr', gap: 12, alignItems: 'baseline',
@@ -480,7 +481,7 @@ function SecRow({
   desc: string;
   status?: string;
   statusTone?: string;
-  action?: React.ReactNode;
+  action?: ReactNode;
   last?: boolean;
 }) {
   return (

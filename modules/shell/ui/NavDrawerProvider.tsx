@@ -13,7 +13,7 @@
  * (87e4718b… · components/Sidebar.jsx `open`/`onClose`).
  */
 
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 
 type NavDrawerCtx = {
   open: boolean;
@@ -25,7 +25,7 @@ type NavDrawerCtx = {
 
 const NavDrawerContext = createContext<NavDrawerCtx | null>(null);
 
-export function NavDrawerProvider({ children }: { children: React.ReactNode }) {
+export function NavDrawerProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const openDrawer = useCallback(() => setOpen(true), []);

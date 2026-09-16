@@ -15,6 +15,7 @@
  */
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
@@ -22,7 +23,7 @@ import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { CreateUserForm } from '@/modules/tenancy/ui/CreateUserForm';
 import { createUserAction } from './actions';
 
-function PageShell({ children }: { children: React.ReactNode }) {
+function PageShell({ children }: { children: ReactNode }) {
   return (
     <div className="page">
       <div className="page-head">
