@@ -41,7 +41,7 @@ export async function GET() {
   // "Supabase rejected the token"; without it every signed-out request reports
   // a dashboard misconfiguration that does not exist.
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.from('profiles').select('id').maybeSingle();
+  const { data, error } = await supabase.from('profiles').select('id').limit(1).maybeSingle();
 
   if (error?.message?.includes(NO_CLERK_TOKEN_MESSAGE)) {
     return NextResponse.json({

@@ -1,8 +1,8 @@
-import { verifyWebhook } from '@clerk/nextjs/webhooks';
-import { NextRequest, NextResponse } from 'next/server';
+import {verifyWebhook} from '@clerk/nextjs/webhooks';
+import {NextRequest, NextResponse} from 'next/server';
 import {
-  deactivateProfileFromClerkUser,
-  upsertProfileFromClerkUser,
+    deactivateProfileFromClerkUser,
+    upsertProfileFromClerkUser,
 } from '@/modules/auth/data/provisioning';
 
 /**
@@ -17,36 +17,36 @@ import {
  * exclusion is needed for this route to receive Clerk's request.
  */
 export async function POST(req: NextRequest) {
-  let event;
-  try {
-    event = await verifyWebhook(req);
-  } catch (error) {
-    console.error('Clerk webhook verification failed', error);
-    return new NextResponse('Verification failed', { status: 400 });
-  }
-
-  try {
-    if (event.type === 'user.created' || event.type === 'user.updated') {
-      const { id, email_addresses, first_name, last_name, public_metadata } = event.data;
-      const email = email_addresses[0]?.email_address ?? null;
-      const fullName = [first_name, last_name].filter(Boolean).join(' ') || null;
-      // `public_metadata` carries the role/school grant when the user arrived
-      // through an admin's invitation (Clerk copies invitation metadata onto
-      // the user on sign-up). Backend-API-only, so it cannot be forged by the
-      // person signing up; provisioning applies it on insert only. See
-      // `modules/auth/domain/invitationMetadata.ts`.
-      await upsertProfileFromClerkUser({ id, email, fullName, publicMetadata: public_metadata });
+    let event;
+    try {
+        event = await verifyWebhook(req);
+    } catch (error) {
+        console.error('Clerk webhook verification failed', error);
+        return new NextResponse('Verification failed', {status: 400});
     }
 
-    if (event.type === 'user.deleted') {
-      if (event.data.id) {
-        await deactivateProfileFromClerkUser(event.data.id);
-      }
-    }
-  } catch (error) {
-    console.error(`Failed to sync profile for Clerk event "${event.type}"`, error);
-    return new NextResponse('Sync failed', { status: 500 });
-  }
+    try {
+        if (event.type === 'user.created' || event.type === 'user.updated') {
+            const {id, email_addresses, first_name, last_name, public_metadata} = event.data;
+            const email = email_addresses[0]?.email_address ?? null;
+            const fullName = [first_name, last_name].filter(Boolean).join(' ') || null;
+            // `public_metadata` carries the role/school grant when the user arrived
+            // through an admin's invitation (Clerk copies invitation metadata onto
+            // the user on sign-up). Backend-API-only, so it cannot be forged by the
+            // person signing up; provisioning applies it on insert only. See
+            // `modules/auth/domain/invitationMetadata.ts`.
+            await upsertProfileFromClerkUser({id, email, fullName, publicMetadata: public_metadata});
+        }
 
-  return NextResponse.json({ received: true });
+        if (event.type === 'user.deleted') {
+            if (event.data.id) {
+                await deactivateProfileFromClerkUser(event.data.id);
+            }
+        }
+    } catch (error) {
+        console.error(`Failed to sync profile for Clerk event "${event.type}"`, error);
+        return new NextResponse('Sync failed', {status: 500});
+    }
+
+    return NextResponse.json({received: true});
 }
