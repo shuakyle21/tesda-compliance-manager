@@ -108,7 +108,7 @@ function resolveOperations(isTrainerRoute: boolean, isAdmin: boolean, isPlatform
   return [...base, ...admin, ...platform];
 }
 
-interface SidebarProps {
+export interface SidebarProps {
   /**
    * The only role signal a Server Component layout can derive today (no real
    * role model until TES-34 — see layout.tsx's TRAINER OMISSION note). Mirrors
@@ -133,36 +133,39 @@ interface SidebarProps {
   /**
    * Signed-in person's real display name, resolved server-side by the layout
    * from their `profiles` row (the same `getProfileSnapshot` call the role
-   * checks above already read). Null when no profile has resolved yet — the
-   * user card then shows `NO_NAME_LABEL`/`NO_NAME_MARK` rather than a
-   * plausible-looking name.
+   * checks above already read). Required, not defaulted — the caller must
+   * say explicitly whether a name resolved; `null` is the honest "it
+   * didn't" case, rendered as `NO_NAME_LABEL`/`NO_NAME_MARK`, never a
+   * silently-omitted prop that happens to fall back to the same thing.
    */
-  fullName?: string | null;
+  fullName: string | null;
   /**
    * Signed-in person's real DB role (`profiles.role`, already bridged to
    * `UserRole` by the tenancy mapper). This is the same trusted role
-   * `isAdmin` is derived from, not the `?role=` preview override.
+   * `isAdmin` is derived from, not the `?role=` preview override. Required
+   * for the same reason `fullName` is.
    */
-  role?: UserRole | null;
+  role: UserRole | null;
   /**
    * Schools this profile actually belongs to (`profileSnapshot.profile.tenants`),
-   * passed down by the layout. Empty until a real membership row exists —
-   * the school switcher then renders locked rather than listing a fabricated
+   * passed down by the layout. Required — an empty array is the caller's
+   * explicit "no real membership row exists yet," not an unset default; the
+   * school switcher then renders locked rather than listing a fabricated
    * catalog.
    */
-  tenants?: Tenant[];
+  tenants: Tenant[];
   /** The membership flagged `is_default`, used to seed the switcher's selection. */
-  defaultTenantId?: string | null;
+  defaultTenantId: string | null;
 }
 
 export function Sidebar({
   isTrainerRoute = false,
   isAdmin = false,
   isPlatformAdmin = false,
-  fullName = null,
-  role = null,
-  tenants = [],
-  defaultTenantId = null,
+  fullName,
+  role,
+  tenants,
+  defaultTenantId,
 }: SidebarProps) {
   const pathname = usePathname();
   const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
@@ -282,9 +285,9 @@ export function Sidebar({
  * non-interactive, and a null `tenant` shows the "School not set" placeholder
  * rather than a name.
  */
-function SchoolSwitcher({ tenant, tenants = [], open, onToggle, onClose, onSelect }: {
+function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, onSelect }: {
   tenant: Tenant | null;
-  tenants?: Tenant[];
+  tenants: Tenant[];
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
@@ -352,11 +355,11 @@ function SchoolSwitcher({ tenant, tenants = [], open, onToggle, onClose, onSelec
 }
 
 /** Operations overlays (Import CSV / Settings) and their completion toast. */
-function SidebarOverlays({ activeOp, tenant, fullName = null, role = null, onClose }: {
+function SidebarOverlays({ activeOp, tenant, fullName, role, onClose }: {
   activeOp: 'import' | 'settings' | null;
   tenant: Tenant | null;
-  fullName?: string | null;
-  role?: UserRole | null;
+  fullName: string | null;
+  role: UserRole | null;
   onClose: () => void;
 }) {
   const [toast, setToast] = useState<ToastData | null>(null);

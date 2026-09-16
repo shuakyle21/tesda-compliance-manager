@@ -26,7 +26,7 @@ vi.mock('@/modules/shell/ui/NavDrawerProvider', () => ({ useNavDrawer: hooks.use
 
 import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
-import { Sidebar } from '@/modules/shell/ui/Sidebar';
+import { Sidebar, type SidebarProps } from '@/modules/shell/ui/Sidebar';
 import type { Tenant } from '@/shared/types';
 import { Toast } from '@/shared/ui/Toast';
 
@@ -53,6 +53,18 @@ const TENANT_FIXTURE: Tenant = {
   plan: '',
   activeBatches: 0,
   totalScholars: 0,
+};
+
+/**
+ * `fullName`/`role`/`tenants`/`defaultTenantId` are required Sidebar props —
+ * there is no silent default a caller can omit its way into. Tests that
+ * don't care about identity/tenant state still have to say so explicitly.
+ */
+const NO_IDENTITY: Pick<SidebarProps, 'fullName' | 'role' | 'tenants' | 'defaultTenantId'> = {
+  fullName: null,
+  role: null,
+  tenants: [],
+  defaultTenantId: null,
 };
 
 type Effect = () => void | (() => void);
@@ -82,7 +94,7 @@ function componentElement(root: unknown, component: unknown): ReactElement<Recor
 
 function privateComponent(name: string): PrivateComponent {
   arrangeSidebarState();
-  const element = elementsIn(Sidebar({})).find(
+  const element = elementsIn(Sidebar({ ...NO_IDENTITY })).find(
     (candidate) => typeof candidate.type === 'function' && candidate.type.name === name,
   );
   expect(element, `expected Sidebar to contain ${name}`).toBeDefined();
@@ -151,7 +163,7 @@ describe('Sidebar Escape handling', () => {
     hooks.useNavDrawer.mockReturnValue({ open: true, closeDrawer, collapsed: false, toggleCollapsed: vi.fn() });
     const { document, listeners } = fakeDocument();
 
-    Sidebar({});
+    Sidebar({ ...NO_IDENTITY });
     const cleanup = (hooks.useEffect.mock.calls[0][0] as Effect)();
     listeners.get('keydown')!({ key: 'Escape' } as KeyboardEvent);
 
@@ -168,7 +180,7 @@ describe('Sidebar Escape handling', () => {
     hooks.useNavDrawer.mockReturnValue({ open: true, closeDrawer, collapsed: false, toggleCollapsed: vi.fn() });
     const { listeners } = fakeDocument();
 
-    Sidebar({});
+    Sidebar({ ...NO_IDENTITY });
     (hooks.useEffect.mock.calls[0][0] as Effect)();
     listeners.get('keydown')!({ key: 'Escape' } as KeyboardEvent);
 
@@ -181,7 +193,7 @@ describe('Sidebar Escape handling', () => {
     hooks.useNavDrawer.mockReturnValue({ open: true, closeDrawer, collapsed: false, toggleCollapsed: vi.fn() });
     const { listeners } = fakeDocument();
 
-    Sidebar({});
+    Sidebar({ ...NO_IDENTITY });
     (hooks.useEffect.mock.calls[0][0] as Effect)();
     listeners.get('keydown')!({ key: 'Escape' } as KeyboardEvent);
 
@@ -195,7 +207,7 @@ describe('Sidebar Escape handling', () => {
     hooks.useNavDrawer.mockReturnValue({ open: true, closeDrawer, collapsed: false, toggleCollapsed: vi.fn() });
     const { listeners } = fakeDocument();
 
-    Sidebar({});
+    Sidebar({ ...NO_IDENTITY });
     (hooks.useEffect.mock.calls[0][0] as Effect)();
     listeners.get('keydown')!({ key: 'Enter' } as KeyboardEvent);
 
@@ -257,6 +269,7 @@ describe('SchoolSwitcher', () => {
     const SchoolSwitcher = privateComponent('SchoolSwitcher');
     const tree = SchoolSwitcher({
       tenant: null,
+      tenants: [],
       open: false,
       onToggle: vi.fn(),
       onClose: vi.fn(),
@@ -270,7 +283,7 @@ describe('SchoolSwitcher', () => {
 
   it('renders with no resolved school by default from the Sidebar', () => {
     arrangeSidebarState();
-    const switcher = elementsIn(Sidebar({})).find(
+    const switcher = elementsIn(Sidebar({ ...NO_IDENTITY })).find(
       (candidate) => typeof candidate.type === 'function' && candidate.type.name === 'SchoolSwitcher',
     );
 
@@ -288,6 +301,7 @@ describe('SchoolSwitcher', () => {
 
     SchoolSwitcher({
       tenant: TENANT_FIXTURE,
+      tenants: [TENANT_FIXTURE],
       open: true,
       onToggle: vi.fn(),
       onClose,
@@ -315,7 +329,7 @@ describe('SidebarOverlays', () => {
     hooks.useState.mockReturnValue([null, setToast]);
     const onClose = vi.fn();
 
-    const tree = SidebarOverlays({ activeOp: 'import', tenant: TENANT_FIXTURE, onClose });
+    const tree = SidebarOverlays({ activeOp: 'import', tenant: TENANT_FIXTURE, fullName: null, role: null, onClose });
     const modal = componentElement(tree, ImportCsvModal);
     (modal.props.onImported as (message: string) => void)('124 batches updated');
 
@@ -357,7 +371,7 @@ describe('SidebarOverlays', () => {
     const SidebarOverlays = privateComponent('SidebarOverlays');
     hooks.useState.mockReturnValue([null, vi.fn()]);
 
-    const tree = SidebarOverlays({ activeOp: 'settings', tenant: null, onClose: vi.fn() });
+    const tree = SidebarOverlays({ activeOp: 'settings', tenant: null, fullName: null, role: null, onClose: vi.fn() });
     const modal = componentElement(tree, SettingsModal);
 
     expect(modal.props).toMatchObject({
@@ -374,7 +388,7 @@ describe('SidebarOverlays', () => {
     const toast = { title: 'Import complete', message: '3 batches updated' };
     hooks.useState.mockReturnValue([toast, setToast]);
 
-    const tree = SidebarOverlays({ activeOp: null, tenant: TENANT_FIXTURE, onClose: vi.fn() });
+    const tree = SidebarOverlays({ activeOp: null, tenant: TENANT_FIXTURE, fullName: null, role: null, onClose: vi.fn() });
     expect(elementsIn(tree).some((element) => element.type === ImportCsvModal || element.type === SettingsModal)).toBe(false);
     const toastElement = componentElement(tree, Toast);
     expect(toastElement.props).toMatchObject(toast);
