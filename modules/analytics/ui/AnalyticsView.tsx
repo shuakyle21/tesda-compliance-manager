@@ -20,6 +20,7 @@
 import { BarChart, BarList, DonutChart, Card, Title, Text, Grid, Col } from '@tremor/react';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
+import { ALERT_CATEGORY_LABEL, alertCategoryCounts } from '@/modules/batches/domain/alerts';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export function AnalyticsView({
@@ -58,16 +59,13 @@ export function AnalyticsView({
   const scholarData = batches.map((b) => ({ name: b.id, Scholars: b.scholars }));
   const avgScholars = scholarData.reduce((s, r) => s + r.Scholars, 0) / scholarData.length;
 
-  // Static demo counts — the original SVG version hardcoded the same figures;
-  // a real alerts_log data contract (out of TES-30's current scope) would
-  // replace this with a live category count.
-  const alertsData = [
-    { name: 'Billing critical', value: 8 },
-    { name: 'Doc missing', value: 6 },
-    { name: 'BSRS approved', value: 3 },
-    { name: 'NTP lag', value: 2 },
-    { name: 'Weekly digest', value: 4 },
-  ];
+  // Live counts from the same alerts engine AlertsPanel uses (batches.ts,
+  // computed on read) — no alerts_log table exists, so this can never drift
+  // from what the dashboard's alerts panel is actually showing.
+  const alertCounts = alertCategoryCounts(batches, documentRequirements);
+  const alertsData = Object.entries(alertCounts)
+    .filter(([, value]) => value > 0)
+    .map(([category, value]) => ({ name: ALERT_CATEGORY_LABEL[category as keyof typeof ALERT_CATEGORY_LABEL], value }));
 
   return (
     <Grid numItemsMd={2} className="gap-6">
@@ -125,15 +123,19 @@ export function AnalyticsView({
       </Col>
       <Col>
         <Card>
-          <Title>Alerts sent (30 days)</Title>
-          <Text>by category</Text>
-          <DonutChart
-            data={alertsData}
-            category="value"
-            index="name"
-            colors={['rose', 'amber', 'emerald', 'red', 'blue']}
-            className="mt-4"
-          />
+          <Title>Current alerts</Title>
+          <Text>by category · computed live from batches</Text>
+          {alertsData.length ? (
+            <DonutChart
+              data={alertsData}
+              category="value"
+              index="name"
+              colors={['red', 'amber', 'emerald', 'rose', 'blue']}
+              className="mt-4"
+            />
+          ) : (
+            <Text className="mt-4">No alerts — every batch is within its compliance windows.</Text>
+          )}
         </Card>
       </Col>
     </Grid>
