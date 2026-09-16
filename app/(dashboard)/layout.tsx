@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import type { ReactNode } from 'react';
 import { requireAuthenticatedUser } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { deriveTenantAccess, getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
@@ -12,7 +13,7 @@ import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/d
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { withTenantAccess } from '@/modules/tenancy/domain/access';
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const clerkUserId = await requireAuthenticatedUser();
   const headerList = await headers();
   const pathname = headerList.get('x-pathname') ?? '';

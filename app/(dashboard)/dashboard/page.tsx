@@ -9,6 +9,7 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { EgaceOutcomes } from '@/modules/batches/ui/dashboard/EgaceOutcomes';
 import { DocumentStatusDonut } from '@/modules/batches/ui/dashboard/DocumentStatusDonut';
@@ -408,7 +409,7 @@ async function resolveTrustedDashboardRole(): Promise<TrustedRoleResult> {
   };
 }
 
-function RoleLookupFailedView({ header }: { header: React.ReactNode }) {
+function RoleLookupFailedView({ header }: { header: ReactNode }) {
   return (
     <div className="dashboard-view">
       {header}
@@ -422,7 +423,7 @@ function RoleLookupFailedView({ header }: { header: React.ReactNode }) {
   );
 }
 
-function DeniedView({ header }: { header: React.ReactNode }) {
+function DeniedView({ header }: { header: ReactNode }) {
   return (
     <div className="dashboard-view">
       {header}
@@ -435,7 +436,7 @@ function DeniedView({ header }: { header: React.ReactNode }) {
   );
 }
 
-function NoTenantAccessView({ header }: { header: React.ReactNode }) {
+function NoTenantAccessView({ header }: { header: ReactNode }) {
   return (
     <div className="dashboard-view">
       {header}
@@ -444,7 +445,7 @@ function NoTenantAccessView({ header }: { header: React.ReactNode }) {
   );
 }
 
-function EmptyBatchesView({ header }: { header: React.ReactNode }) {
+function EmptyBatchesView({ header }: { header: ReactNode }) {
   return (
     <div className="dashboard-view">
       {header}
@@ -458,7 +459,7 @@ function EmptyBatchesView({ header }: { header: React.ReactNode }) {
   );
 }
 
-function SyncFailedView({ header, message }: { header: React.ReactNode; message: string }) {
+function SyncFailedView({ header, message }: { header: ReactNode; message: string }) {
   return (
     <div className="dashboard-view">
       {header}
@@ -482,7 +483,7 @@ function DashboardPanel({
   title: string;
   icon: IconName;
   meta?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="dash-panel">

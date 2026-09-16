@@ -20,6 +20,7 @@
  */
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { getPlatformAdminSnapshot } from '@/modules/tenancy/data/platform';
@@ -27,7 +28,7 @@ import { listQualifications } from '@/modules/tenancy/data/schools';
 import { CreateSchoolForm } from '@/modules/tenancy/ui/CreateSchoolForm';
 import { createSchoolAction } from './actions';
 
-function PageShell({ children }: { children: React.ReactNode }) {
+function PageShell({ children }: { children: ReactNode }) {
   return (
     <div className="page">
       <div className="page-head">

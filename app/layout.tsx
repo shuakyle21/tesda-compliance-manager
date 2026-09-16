@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { clerkLocalization } from "@/modules/auth/ui/clerkLocalization";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
-import React from "react";
+import type { ReactNode } from "react";
 
 const ibmPlexSans = IBM_Plex_Sans({
   weight: ["300", "400", "500", "600"],
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   // TODO 4c: Swap font class variable names once Step 4a is done.
   // Also add `bg-[var(--color-bg)]` on <body> so the warm off-white

@@ -12,7 +12,7 @@
  * discipline (ADR-002) keeps it from implying official TESDA standing.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 import type { BillingCard } from '@/modules/billing/data/billing';
 import { buildStatement, type StatementColumn } from '@/modules/billing/domain/statement';
@@ -187,7 +187,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
   );
 }
 
-function MetaCell({ label, mono, children }: { label: string; mono?: boolean; children: React.ReactNode }) {
+function MetaCell({ label, mono, children }: { label: string; mono?: boolean; children: ReactNode }) {
   return (
     <div>
       <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>{label}</div>
