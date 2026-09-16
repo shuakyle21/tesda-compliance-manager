@@ -256,7 +256,7 @@ export function Sidebar({
           <Link href="/profile" className="sb-user" aria-label="My account" onClick={closeDrawer}>
             <span className="user-avatar" style={{ background: 'var(--color-teal)' }}>{initialsOf(fullName)}</span>
             <span className="sb-user-text">
-              <span className="sb-user-name">{fullName ?? NO_NAME_LABEL}</span>
+          userName={fullName?.trim() || NO_NAME_LABEL}
               {role && <span className={`role-tag ${role}`}>{role}</span>}
             </span>
             <Icon name="chevron-right" size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
