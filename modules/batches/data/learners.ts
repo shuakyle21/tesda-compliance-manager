@@ -41,12 +41,27 @@ type LearnerRow = Database['public']['Tables']['learners']['Row'];
  * columns makes that a compile-time decision instead of a silent one.
  */
 export const LEARNER_ROSTER_COLUMNS =
-  'last_name, first_name, middle_name, extension_name, uli, assessment_result' as const;
+  'id, last_name, first_name, middle_name, extension_name, uli, assessment_result' as const;
 
-/** Exactly the projection {@link LEARNER_ROSTER_COLUMNS} returns. */
+/**
+ * Exactly the projection {@link LEARNER_ROSTER_COLUMNS} returns.
+ *
+ * `id` is selected even though the mapper ignores it. The fetch orders by it as
+ * its final tiebreak, and ordering by an unprojected column is a PostgREST
+ * behaviour this code would rather not depend on — a rejected order would come
+ * back as a request error and surface as `sync-failed`, which reads to the user
+ * as an outage rather than as the bug it is. Requesting the column costs one
+ * field and removes the question.
+ */
 type LearnerRosterRow = Pick<
   LearnerRow,
-  'last_name' | 'first_name' | 'middle_name' | 'extension_name' | 'uli' | 'assessment_result'
+  | 'id'
+  | 'last_name'
+  | 'first_name'
+  | 'middle_name'
+  | 'extension_name'
+  | 'uli'
+  | 'assessment_result'
 >;
 
 /** Total map: every DB assessment_result value has a UI string (`''` = not yet assessed). */

@@ -15,8 +15,10 @@ const columns = LEARNER_ROSTER_COLUMNS.split(',').map((c) => c.trim());
  * request that widens the projection, rather than silently in production.
  */
 describe('LEARNER_ROSTER_COLUMNS', () => {
-  it('requests only the columns the roster mapper actually reads', () => {
+  it('requests only the columns the roster needs — mapper fields plus the sort key', () => {
     expect(columns).toEqual([
+      // Selected for the order tiebreak and the list key, not for display.
+      'id',
       'last_name',
       'first_name',
       'middle_name',
@@ -40,6 +42,7 @@ describe('LEARNER_ROSTER_COLUMNS', () => {
 
 describe('mapLearnerRow', () => {
   const row = {
+    id: 'learner-1',
     last_name: 'Cruz',
     first_name: 'Karina',
     middle_name: 'Reyes',

@@ -105,7 +105,7 @@ export function rosterBody({
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 2 }}>
       {data.learners.map((scholar) => (
         <li
-          key={`${scholar.seq}-${scholar.uli || scholar.lastName}`}
+          key={scholar.seq}
           style={{
             display: 'flex',
             alignItems: 'center',
