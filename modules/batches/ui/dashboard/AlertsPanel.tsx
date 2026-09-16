@@ -28,47 +28,12 @@
 
 import Link from 'next/link';
 import { Icon, type IconName } from '@/shared/ui/Icon';
-import { isBillingReady } from '@/modules/billing/domain/readiness';
-import { urgencyTier } from '@/modules/batches/domain/urgency';
-import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
+import { batchAlerts, type AlertTone } from '@/modules/batches/domain/alerts';
+import { criticalRequirements } from '@/modules/documents/domain/compliance';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
-type Tone = 'green' | 'amber' | 'red';
-type AlertRow = { text: string; tone: Tone };
-
-const TONE_RANK: Record<Tone, number> = { red: 0, amber: 1, green: 2 };
-const TONE_ICON: Record<Tone, IconName> = { red: 'alert-triangle', amber: 'alert-circle', green: 'shield-check' };
-
-function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): AlertRow[] {
-  const rows: AlertRow[] = [];
-  // isBillingReady() is the threshold-only prep signal (see readiness.ts) —
-  // it does not check documents, so this row must not claim the batch is
-  // actually ready to bill. billingGate() is the compound gate for that claim.
-  if (isBillingReady(b)) rows.push({ tone: 'green', text: `${b.id} reached the billing progress threshold.` });
-  if (b.bsrs) rows.push({ tone: 'green', text: `${b.id} BSRS approved — eligible for billing.` });
-  // Same "billing stage already done" guard BatchTimeline uses to hide
-  // completed cohorts — without it, a finished batch's now-negative
-  // daysToBilling reads as a critical alert instead of disappearing.
-  const billDone = b.lifecycle.find((s) => s.key === 'bill')?.status === 'done';
-  if (!billDone && urgencyTier(b.daysToBilling) === 'critical') {
-    rows.push({ tone: 'red', text: `${b.id} billing window opens in ${b.daysToBilling} days.` });
-  }
-  // Only flag missing critical docs once this batch actually tracks at least
-  // one critical requirement — an untracked key (ADR-004) means "not synced
-  // yet", not "missing" (see the docsTracked guard in page.tsx for the same
-  // distinction). summarizeBatchDocCompliance() excludes untracked keys from
-  // both `missing` and its denominator, so this can't fire on a batch whose
-  // catalog just doesn't overlap the mock's critical-doc keys.
-  const docCompliance = summarizeBatchDocCompliance(b, criticalDocs);
-  if (docCompliance.tracked > 0 && docCompliance.missing > 0) {
-    rows.push({
-      tone: 'amber',
-      text: `${b.id} missing ${docCompliance.missing} critical document${docCompliance.missing > 1 ? 's' : ''}.`,
-    });
-  }
-  if (b.ntpLag > 7) rows.push({ tone: 'red', text: `${b.id} NTP-to-start lag exceeded 7 days.` });
-  return rows;
-}
+const TONE_RANK: Record<AlertTone, number> = { red: 0, amber: 1, green: 2 };
+const TONE_ICON: Record<AlertTone, IconName> = { red: 'alert-triangle', amber: 'alert-circle', green: 'shield-check' };
 
 export function AlertsPanel({
   batches,
