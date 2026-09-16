@@ -15,14 +15,14 @@
  * `hasNotifUnread`) is referenced in its template but never implemented
  * anywhere in its script — dead markup, not a real spec. Rather than invent
  * one, the bell links to Activity Log, the one place unread compliance
- * events actually exist; the badge count is the same static demo number
- * Sidebar's Activity Log row shows (there is no real unread tracking yet).
+ * events actually exist. There is no real unread-count tracking in the
+ * schema yet (no read/seen column on `activity_log`), so the bell carries no
+ * badge rather than a fabricated number.
  */
 
 import Link from 'next/link';
 import { Icon } from '@/shared/ui/Icon';
 import { useNavDrawer } from './NavDrawerProvider';
-import { ACTIVITY_UNREAD } from './Sidebar';
 
 interface TopbarProps {
   /** Activity Log isn't in the trainer nav (design's `NAVS.trainer`) and
@@ -43,9 +43,8 @@ export function Topbar({ isTrainerRoute = false }: TopbarProps) {
         </button>
       )}
       {!isTrainerRoute && (
-        <Link href="/activity-log" className="topbar-bell icon-btn" aria-label={`Notifications, ${ACTIVITY_UNREAD} unread`} title="Notifications" style={{ marginLeft: 'auto', position: 'relative' }}>
+        <Link href="/activity-log" className="topbar-bell icon-btn" aria-label="Notifications" title="Notifications" style={{ marginLeft: 'auto', position: 'relative' }}>
           <Icon name="bell" size={17} />
-          {ACTIVITY_UNREAD > 0 && <span className="sb-badge topbar-bell-badge">{ACTIVITY_UNREAD}</span>}
         </Link>
       )}
     </div>

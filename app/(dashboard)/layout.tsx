@@ -28,6 +28,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const dbRole = profileSnapshot.status === 'ok' ? profileSnapshot.profile.role : null;
   const isAdmin = (await resolveTrustedRole(dbRole)) === 'admin';
 
+  // Real identity + tenant list for the Sidebar's user card and school
+  // switcher, read off the same snapshot rather than a second fetch.
+  const fullName = profileSnapshot.status === 'ok' ? profileSnapshot.profile.fullName : null;
+  const tenants = profileSnapshot.status === 'ok' ? profileSnapshot.profile.tenants : [];
+  const defaultTenantId = profileSnapshot.status === 'ok' ? profileSnapshot.profile.defaultTenantId : null;
+
   // Platform operator (ADR-006), for the "Add school" row. A separate axis
   // from `isAdmin`: it is not read from `profiles.role` at all, but from the
   // `platform_admins` table via a `security definer` RPC, because that table
@@ -59,7 +65,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <NavDrawerProvider>
       <div className="app-layout">
-        <Sidebar isTrainerRoute={isTrainerRoute} isAdmin={isAdmin} isPlatformAdmin={isPlatformAdmin} />
+        <Sidebar
+          isTrainerRoute={isTrainerRoute}
+          isAdmin={isAdmin}
+          isPlatformAdmin={isPlatformAdmin}
+          fullName={fullName}
+          role={dbRole}
+          tenants={tenants}
+          defaultTenantId={defaultTenantId}
+        />
         <div className="main-area">
           <MobileHeader />
           <main className="main-content">
