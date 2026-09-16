@@ -25,6 +25,7 @@
  * load-bearing and runs before it.
  */
 
+import { revalidatePath } from 'next/cache';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { inviteUser, type InvitationSnapshot } from '@/modules/auth/data/invitations';
@@ -92,6 +93,11 @@ function assignmentFormState(
 ): CreateUserFormState | null {
   switch (assignment.status) {
     case 'assigned':
+      // A role or membership change alters what the dashboard layout renders
+      // for that person — the Sidebar's admin-only rows and school switcher are
+      // read from the profile on every dashboard route. `'layout'` from `/`
+      // reaches it: `(dashboard)` is a route group with no URL segment.
+      revalidatePath('/', 'layout');
       return {
         status: 'assigned',
         email: command.email,

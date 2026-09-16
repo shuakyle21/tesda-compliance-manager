@@ -5,6 +5,7 @@ import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { deriveTenantAccess, getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { isPlatformAdmin as resolveIsPlatformAdmin } from '@/modules/tenancy/data/platform';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
+import { QueryProvider } from '@/modules/shell/ui/QueryProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
 import { Topbar } from '@/modules/shell/ui/Topbar';
@@ -64,26 +65,28 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       : deriveDashboardMetrics(selectBatchesForDisplay(batchesSnapshot), []);
 
   return (
-    <NavDrawerProvider>
-      <div className="app-layout">
-        <Sidebar
-          isTrainerRoute={isTrainerRoute}
-          isAdmin={isAdmin}
-          isPlatformAdmin={isPlatformAdmin}
-          fullName={fullName}
-          role={dbRole}
-          tenants={tenants}
-          defaultTenantId={defaultTenantId}
-        />
-        <div className="main-area">
-          <MobileHeader />
-          <main className="main-content">
-            <Topbar isTrainerRoute={isTrainerRoute} />
-            {metrics && <MetricsRow metrics={metrics} hideBilling={isTrainerRoute} />}
-            {children}
-          </main>
+    <QueryProvider>
+      <NavDrawerProvider>
+        <div className="app-layout">
+          <Sidebar
+            isTrainerRoute={isTrainerRoute}
+            isAdmin={isAdmin}
+            isPlatformAdmin={isPlatformAdmin}
+            fullName={fullName}
+            role={dbRole}
+            tenants={tenants}
+            defaultTenantId={defaultTenantId}
+          />
+          <div className="main-area">
+            <MobileHeader />
+            <main className="main-content">
+              <Topbar isTrainerRoute={isTrainerRoute} />
+              {metrics && <MetricsRow metrics={metrics} hideBilling={isTrainerRoute} />}
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </NavDrawerProvider>
+      </NavDrawerProvider>
+    </QueryProvider>
   );
 }

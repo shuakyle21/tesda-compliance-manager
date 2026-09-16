@@ -19,11 +19,35 @@
  * but the EGACE report screen will render blank until the schema grows.
  */
 
-import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
+import {
+  isSupabaseConfiguredInBrowser,
+  type BrowserSupabaseClient,
+} from '@/lib/supabase/client';
 import type { Database, AssessmentResult as DbAssessmentResult } from '@/lib/supabase/database.types';
 import type { ScholarRow } from '@/shared/types';
 
 type LearnerRow = Database['public']['Tables']['learners']['Row'];
+
+/**
+ * The only columns the roster mapper reads, named explicitly because this query
+ * runs in the browser.
+ *
+ * `select('*')` would be harmless today — `learners` currently carries identity
+ * plus `assessment_result` and nothing else. But `ScholarRow` already models
+ * `salary`, `contact`, `email`, and `dob` (see the header's contract gap), and
+ * RLS is row-level: the day a migration adds those columns, `select('*')` would
+ * begin shipping salary and contact details to every browser that opens a
+ * roster, in a diff that touches only SQL and so reads as unrelated. Naming the
+ * columns makes that a compile-time decision instead of a silent one.
+ */
+export const LEARNER_ROSTER_COLUMNS =
+  'last_name, first_name, middle_name, extension_name, uli, assessment_result' as const;
+
+/** Exactly the projection {@link LEARNER_ROSTER_COLUMNS} returns. */
+type LearnerRosterRow = Pick<
+  LearnerRow,
+  'last_name' | 'first_name' | 'middle_name' | 'extension_name' | 'uli' | 'assessment_result'
+>;
 
 /** Total map: every DB assessment_result value has a UI string (`''` = not yet assessed). */
 const ASSESSMENT_RESULT_TO_UI: Record<DbAssessmentResult, string> = {
@@ -50,7 +74,7 @@ const ASSESSMENT_RESULT_TO_UI: Record<DbAssessmentResult, string> = {
  * @param seq - The 1-based sequence number for this scholar
  * @returns Mapped scholar row with identity, assessment result, and placeholder fields
  */
-export function mapLearnerRow(row: LearnerRow, seq: number): ScholarRow {
+export function mapLearnerRow(row: LearnerRosterRow, seq: number): ScholarRow {
   return {
     seq,
     lastName: row.last_name,
@@ -87,7 +111,9 @@ export function mapLearnerRow(row: LearnerRow, seq: number): ScholarRow {
 }
 
 // ---------------------------------------------------------------------------
-// Fetch — server-only, same snapshot shaping as BatchesSnapshot (TES-8 AC6).
+// Fetch — browser-side, same snapshot shaping as BatchesSnapshot (TES-8 AC6).
+// The roster is an on-demand drill-in read, so it runs through the Clerk-wired
+// browser client and is cached by TanStack Query. RLS still scopes every row.
 // ---------------------------------------------------------------------------
 /** `no-tenant-access` is folded in by the caller — see the note on `BatchesSnapshot`. */
 export type LearnersSnapshot =
@@ -106,14 +132,16 @@ export type LearnersSnapshot =
  * excluded from a billing roster) is a caller/domain policy decision, not a
  * fetch-time filter this contract should make silently.
  */
-export async function getBatchLearnersSnapshot(batchId: string): Promise<LearnersSnapshot> {
-  if (!isSupabaseConfigured()) return { status: 'unconfigured' };
+export async function fetchBatchLearners(
+  supabase: BrowserSupabaseClient,
+  batchId: string,
+): Promise<LearnersSnapshot> {
+  if (!isSupabaseConfiguredInBrowser()) return { status: 'unconfigured' };
 
   try {
-    const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from('learners')
-      .select('*')
+      .select(LEARNER_ROSTER_COLUMNS)
       .eq('batch_id', batchId)
       .order('last_name', { ascending: true })
       .order('first_name', { ascending: true })
