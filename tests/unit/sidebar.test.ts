@@ -92,11 +92,24 @@ function componentElement(root: unknown, component: unknown): ReactElement<Recor
   return element!;
 }
 
+function namedElement(root: unknown, name: string): ReactElement<Record<string, unknown>> | undefined {
+  return elementsIn(root).find((candidate) => typeof candidate.type === 'function' && candidate.type.name === name);
+}
+
+function elementWithClassName(root: unknown, className: string): ReactElement<Record<string, unknown>> | undefined {
+  return elementsIn(root).find((candidate) => candidate.props.className === className);
+}
+
+/** Every `NavRow` in the tree, regardless of which nav group rendered it. */
+function navRowLabels(root: unknown): string[] {
+  return elementsIn(root)
+    .filter((candidate) => typeof candidate.type === 'function' && candidate.type.name === 'NavRow')
+    .map((candidate) => (candidate.props.item as { label: string }).label);
+}
+
 function privateComponent(name: string): PrivateComponent {
   arrangeSidebarState();
-  const element = elementsIn(Sidebar({ ...NO_IDENTITY })).find(
-    (candidate) => typeof candidate.type === 'function' && candidate.type.name === name,
-  );
+  const element = namedElement(Sidebar({ ...NO_IDENTITY }), name);
   expect(element, `expected Sidebar to contain ${name}`).toBeDefined();
 
   // The caller is about to exercise the extracted component in isolation.
@@ -283,9 +296,7 @@ describe('SchoolSwitcher', () => {
 
   it('renders with no resolved school by default from the Sidebar', () => {
     arrangeSidebarState();
-    const switcher = elementsIn(Sidebar({ ...NO_IDENTITY })).find(
-      (candidate) => typeof candidate.type === 'function' && candidate.type.name === 'SchoolSwitcher',
-    );
+    const switcher = namedElement(Sidebar({ ...NO_IDENTITY }), 'SchoolSwitcher');
 
     expect(switcher?.props.tenant).toBeNull();
   });
@@ -395,5 +406,131 @@ describe('SidebarOverlays', () => {
 
     (toastElement.props.onDismiss as () => void)();
     expect(setToast).toHaveBeenCalledWith(null);
+  });
+});
+
+describe('Sidebar user card', () => {
+  it('shows initials from the first and last name, the full name, and a matching role tag', () => {
+    arrangeSidebarState();
+    const tree = Sidebar({ ...NO_IDENTITY, fullName: 'Karina Cruz', role: 'coordinator' });
+
+    expect(textIn(elementWithClassName(tree, 'user-avatar'))).toBe('KC');
+    expect(textIn(elementWithClassName(tree, 'sb-user-name'))).toBe('Karina Cruz');
+    const roleTag = elementWithClassName(tree, 'role-tag coordinator');
+    expect(roleTag).toBeDefined();
+    expect(textIn(roleTag)).toBe('coordinator');
+  });
+
+  it('falls back to a single initial for a one-word name', () => {
+    arrangeSidebarState();
+    const tree = Sidebar({ ...NO_IDENTITY, fullName: 'Cher', role: null });
+
+    expect(textIn(elementWithClassName(tree, 'user-avatar'))).toBe('C');
+  });
+
+  it('collapses extra internal whitespace the same way as a normal two-word name', () => {
+    arrangeSidebarState();
+    const tree = Sidebar({ ...NO_IDENTITY, fullName: '  Karina   Cruz  ', role: null });
+
+    expect(textIn(elementWithClassName(tree, 'user-avatar'))).toBe('KC');
+  });
+
+  it('shows an honest placeholder and omits the role tag when no identity is resolved', () => {
+    arrangeSidebarState();
+    const tree = Sidebar({ ...NO_IDENTITY });
+
+    expect(textIn(elementWithClassName(tree, 'user-avatar'))).toBe('—');
+    expect(textIn(elementWithClassName(tree, 'sb-user-name'))).toBe('Name not set');
+    expect(elementsIn(tree).some((el) => typeof el.props.className === 'string' && el.props.className.startsWith('role-tag'))).toBe(false);
+  });
+});
+
+describe('Sidebar operations list', () => {
+  it('shows only the base operations by default', () => {
+    arrangeSidebarState();
+    const labels = navRowLabels(Sidebar({ ...NO_IDENTITY }));
+
+    expect(labels).toContain('Import records');
+    expect(labels).toContain('Settings');
+    expect(labels).not.toContain('Add user');
+    expect(labels).not.toContain('Add school');
+  });
+
+  it('adds the admin-only row for an admin on a non-trainer route', () => {
+    arrangeSidebarState();
+    const labels = navRowLabels(Sidebar({ ...NO_IDENTITY, isAdmin: true }));
+
+    expect(labels).toContain('Add user');
+    expect(labels).not.toContain('Add school');
+  });
+
+  it('adds the platform-operator row for a platform admin on a non-trainer route', () => {
+    arrangeSidebarState();
+    const labels = navRowLabels(Sidebar({ ...NO_IDENTITY, isPlatformAdmin: true }));
+
+    expect(labels).toContain('Add school');
+    expect(labels).not.toContain('Add user');
+  });
+
+  // A trainer route never gains either extra list, even when both role
+  // flags are true — the two checks are independent, the way the two roles
+  // are, but neither survives the trainer-route gate.
+  it('strips every operation but Settings on a trainer route, regardless of role flags', () => {
+    arrangeSidebarState();
+    const labels = navRowLabels(Sidebar({
+      ...NO_IDENTITY,
+      isTrainerRoute: true,
+      isAdmin: true,
+      isPlatformAdmin: true,
+    }));
+
+    expect(labels).toContain('Settings');
+    expect(labels).not.toContain('Import records');
+    expect(labels).not.toContain('Add user');
+    expect(labels).not.toContain('Add school');
+  });
+});
+
+describe('Sidebar tenant seeding', () => {
+  // Sidebar seeds its `tenant` state lazily via useState's initializer, which
+  // this file mocks — so the only way to exercise the seeding logic itself is
+  // to capture that initializer (the second useState call: orgOpen, tenant,
+  // activeOp) and invoke it directly, the same way Escape-handling tests
+  // above capture and invoke the useEffect callback.
+  function captureTenantSeed(): Tenant | null {
+    return (hooks.useState.mock.calls[1][0] as () => Tenant | null)();
+  }
+
+  it('seeds the membership flagged as default when one exists among several', () => {
+    const other: Tenant = { ...TENANT_FIXTURE, id: 'tnt_other', name: 'Other Farm School' };
+    arrangeSidebarState();
+
+    Sidebar({ ...NO_IDENTITY, tenants: [other, TENANT_FIXTURE], defaultTenantId: TENANT_FIXTURE.id });
+
+    expect(captureTenantSeed()).toBe(TENANT_FIXTURE);
+  });
+
+  it('falls back to the first tenant when no membership is flagged as default', () => {
+    arrangeSidebarState();
+
+    Sidebar({ ...NO_IDENTITY, tenants: [TENANT_FIXTURE], defaultTenantId: null });
+
+    expect(captureTenantSeed()).toBe(TENANT_FIXTURE);
+  });
+
+  it('resolves to null when the profile has no memberships at all', () => {
+    arrangeSidebarState();
+
+    Sidebar({ ...NO_IDENTITY });
+
+    expect(captureTenantSeed()).toBeNull();
+  });
+
+  it('falls back to the first tenant when the flagged default id matches none of them', () => {
+    arrangeSidebarState();
+
+    Sidebar({ ...NO_IDENTITY, tenants: [TENANT_FIXTURE], defaultTenantId: 'tnt_does_not_exist' });
+
+    expect(captureTenantSeed()).toBe(TENANT_FIXTURE);
   });
 });
