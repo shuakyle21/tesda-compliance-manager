@@ -32,14 +32,14 @@ export type Json =
 
 export type ProfileRole = 'admin' | 'coordinator' | 'trainer' | 'viewer';
 export type LifecycleStage =
-  | 'aou'
-  | 'ntp'
-  | 'tip'
-  | 'training'
-  | 'assessment'
-  | 'billing'
-  | 'completed'
-  | 'blocked';
+  | 'AOU' //Affidavit of Undertaking
+  | 'NTP' //Notice to Proceed
+  | 'tip' //Training Induction Program
+  | 'training' //Training
+  | 'assessment' //Assessment
+  | 'billing' //Billing
+  | 'completed' //Completed
+  | 'blocked'; //Blocked
 export type BatchStatus = 'pending' | 'ongoing' | 'completed' | 'blocked';
 export type DocumentStatus = 'missing' | 'pending' | 'submitted' | 'verified';
 export type DocumentAudience = 'admin' | 'coordinator' | 'trainer' | 'viewer' | 'all';
