@@ -1,0 +1,15 @@
+### Health check — no auth required
+GET {{baseUrl}}/api/health
+
+### OpenAPI spec — no auth required
+GET {{baseUrl}}/api/openapi.json
+
+### Auth chain debug — requires a Clerk session cookie (dev only, 404s in production)
+# Get the cookie value: sign in at {{baseUrl}}/sign-in in your browser, open DevTools →
+# Application → Cookies, copy the `__session` cookie, and paste it into
+# requests/http-client.private.env.json under "clerkSessionCookie" (gitignored, never commit it).
+GET {{baseUrl}}/api/debug/auth-check
+Cookie: {{clerkSessionCookie}}
+
+### Auth chain debug — signed out (expect verdict: "no-clerk-session")
+GET {{baseUrl}}/api/debug/auth-check
