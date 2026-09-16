@@ -3,9 +3,6 @@ type: Reference
 title: Module Boundaries and the Data Layer Pattern
 description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the ESLint-enforced import direction, each module's private data/ surface, the fetch → map → derive contract, the four-state snapshot union (ok / no-tenant-access / sync-failed / unconfigured) that every data-driven screen maps onto, the documents module's ADR-004 gate-versus-measurement split, and its evidence-storage write path.
 tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, snapshots, no-tenant-access, type-safety, evidence-storage, document-compliance]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-11T02:46:03.436Z
 sources:
   - id: openwiki-source-4ddc2be5b2adc07e50368090
     resource: repo://app/(dashboard)/batch-cards/page.tsx
