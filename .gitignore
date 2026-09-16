@@ -70,6 +70,9 @@ next-env.d.ts
 .idea/
 .design-sync/
 
+# WebStorm HTTP Client: private vars (session cookies, tokens) — never commit
+requests/http-client.private.env.json
+
 # Obsidian vault workspace state (repo doubles as a vault)
 .obsidian/
 
