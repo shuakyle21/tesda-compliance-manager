@@ -4,9 +4,6 @@ title: "Supabase Data Model and RLS Policies"
 description: "Reference for the TVI-CAMS Supabase schema — live 18 tables / 36 FKs / seven enums, checked-in target 25 tables / 52 FKs / eight enums once the pending ADR-001 billing domain lands — the eight-migration ledger (four applied, four pending) with the #230 repo-vs-database drift, the per-table RLS policy map including the seven billing-domain tables, storage policies for the private compliance-evidence bucket, the ADR-006 school registry and platform-admin boundary, profile provisioning, the database.types.ts regeneration contract, anon-key client wiring, and RULES section 10 agent-conduct guardrails."
 tags: ["supabase", "postgres", "row-level-security", "data-model", "migrations", "tenant-isolation", "platform-admin", "billing", "clerk", "nextjs"]
 openwiki_generated: true
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-14T00:32:23.166Z
 sources:
   - id: openwiki-source-2d7c3fc74d559a77432d62af
     resource: repo://.claude/hooks/check-mcp-health.sh
