@@ -74,6 +74,24 @@ describe('rosterBody states', () => {
     expect(text).not.toContain('learners');
   });
 
+  it('keeps showing the last good rows when a refresh fails, with a staleness warning', () => {
+    // TanStack keeps `data` populated across an error, so a failed *background*
+    // refetch arrives as isError with rows still in hand. Reachable in the
+    // ordinary path: open a batch, close it, wait past staleTime, reopen, and
+    // have the refetch hiccup. Those rows are the best answer available —
+    // replacing a roster someone is reading with an error panel would discard
+    // real information to report a transient problem.
+    const tree = rosterBody({
+      data: { status: 'ok', learners: [scholar()] },
+      isPending: false,
+      isError: true,
+    });
+
+    const text = textIn(tree);
+    expect(text).toContain('Cruz, Karina R.');
+    expect(text).toContain('may be out of date');
+  });
+
   it('says the roster is unavailable when Supabase is unconfigured', () => {
     const tree = rosterBody({ data: { status: 'unconfigured' }, ...settled });
     expect(tree.type).toBe(EmptyState);

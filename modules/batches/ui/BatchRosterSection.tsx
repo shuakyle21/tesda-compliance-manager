@@ -12,7 +12,7 @@
  * misread compliance status is an operational failure, not a cosmetic one.
  */
 
-import { Icon } from '@/shared/ui/Icon';
+import { Icon, type IconName } from '@/shared/ui/Icon';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
@@ -37,9 +37,12 @@ export function BatchRosterSection({ batchId }: { batchId: string }) {
 
   return (
     <div className="nm-section">
+      {/* Deliberately not "Scholars": `BatchScholarsGrid` directly above already
+          uses that title and the same icon for the enrolment counts. Two
+          identical headings in a row read as a rendering fault. */}
       <div className="nm-section-title">
-        <Icon name="users" size={13} />
-        Scholars
+        <Icon name="file-text" size={13} />
+        Scholar roster
       </div>
       {rosterBody({ data, isPending, isError })}
     </div>
@@ -58,9 +61,17 @@ export function rosterBody({
   isPending: boolean;
   isError: boolean;
 }) {
-  // Order matters: on a failure `data` is also undefined, so an absence check
-  // ahead of the error check would leave the roster "loading" forever.
-  if (isError) {
+  // A failed *refresh* still holds the rows from the last good fetch — TanStack
+  // keeps `data` populated across an error. Those rows are the best available
+  // answer, so they stay on screen with the refresh failure stated above them.
+  // Replacing a roster someone is reading with an error panel would lose real
+  // information to report a transient one.
+  const refreshFailed = isError && data !== undefined;
+
+  // Order matters below: on a *first* load failure `data` is undefined too, so
+  // an absence check ahead of the error check would leave this "loading" for
+  // good.
+  if (isError && !data) {
     return (
       <InfoCallout variant="warning">
         Sync with Supabase failed — this batch&apos;s roster could not be loaded.
@@ -102,8 +113,15 @@ export function rosterBody({
   }
 
   return (
-    <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 2 }}>
-      {data.learners.map((scholar) => (
+    <>
+      {refreshFailed && (
+        <InfoCallout variant="warning">
+          Couldn&apos;t refresh this roster — the names below are from the last
+          successful sync and may be out of date.
+        </InfoCallout>
+      )}
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 2 }}>
+        {data.learners.map((scholar) => (
         <li
           key={scholar.seq}
           style={{
@@ -148,16 +166,23 @@ export function rosterBody({
                 color: 'var(--color-text-secondary)',
               }}
             >
-              <Icon
-                name={scholar.assessmentResult === 'Competent' ? 'check' : 'clock'}
-                size={13}
-              />
+              <Icon name={assessmentIcon(scholar.assessmentResult)} size={13} />
               {scholar.assessmentResult}
             </span>
           )}
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </>
   );
+}
+
+/**
+ * "Not Yet Competent" is an assessed outcome, not work in progress, so it must
+ * not borrow the clock. A scholar who has not been assessed at all maps to an
+ * empty string upstream and renders no status here rather than a guess.
+ */
+function assessmentIcon(result: string): IconName {
+  return result === 'Competent' ? 'check' : 'alert-triangle';
 }
 

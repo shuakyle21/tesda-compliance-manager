@@ -1,3 +1,9 @@
+'use client';
+
+// Marked so that importing this from a Server Component fails at build time
+// rather than at runtime on a `useAuth` call, now that a `data/` layer depends
+// on it (`modules/batches/data/learners.ts`).
+
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from '@clerk/nextjs';
 import { useMemo } from 'react';

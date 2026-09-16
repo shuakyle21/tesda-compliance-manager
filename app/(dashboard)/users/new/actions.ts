@@ -25,7 +25,6 @@
  * load-bearing and runs before it.
  */
 
-import { revalidatePath } from 'next/cache';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { inviteUser, type InvitationSnapshot } from '@/modules/auth/data/invitations';
@@ -93,11 +92,12 @@ function assignmentFormState(
 ): CreateUserFormState | null {
   switch (assignment.status) {
     case 'assigned':
-      // A role or membership change alters what the dashboard layout renders
-      // for that person — the Sidebar's admin-only rows and school switcher are
-      // read from the profile on every dashboard route. `'layout'` from `/`
-      // reaches it: `(dashboard)` is a route group with no URL segment.
-      revalidatePath('/', 'layout');
+      // Deliberately no `revalidatePath` here. The dashboard layout calls
+      // `auth()`, so it is dynamically rendered and no server cache holds it —
+      // what a revalidation would actually clear is the *caller's* client-side
+      // Router Cache. The person whose sidebar this write changes is the
+      // assignee, in a different session entirely, which no call from here can
+      // reach. They see the new role on their next request regardless.
       return {
         status: 'assigned',
         email: command.email,

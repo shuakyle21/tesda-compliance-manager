@@ -22,7 +22,15 @@ import { useSupabaseClient } from '@/lib/supabase/client';
 import { fetchBatchLearners } from '@/modules/batches/data/learners';
 import { unwrapSnapshot } from '@/shared/snapshotQuery';
 
-/** Hierarchical, so a future write to this batch can invalidate `['batch', id]`. */
+/**
+ * Hierarchical, so a future write to this batch can invalidate `['batch', id]`.
+ *
+ * Safe without a tenant dimension only because a batch id is globally unique
+ * and RLS re-scopes every fetch. The QueryClient is per-mount but survives
+ * client-side navigation, a school switch included, so any future key that is
+ * *not* keyed on a globally unique id — `['batches', 'list']`, say — must carry
+ * the tenant id, or one school's rows will be served to the next.
+ */
 export function batchLearnersKey(batchId: string) {
   return ['batch', batchId, 'learners'] as const;
 }

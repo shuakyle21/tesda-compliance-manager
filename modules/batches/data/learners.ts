@@ -19,6 +19,12 @@
  * but the EGACE report screen will render blank until the schema grows.
  */
 
+'use client';
+
+// The one browser-side fetcher in a `data/` folder of server-side ones
+// (`batches.ts`, `metrics.ts`). Marked so the distinction is visible at the top
+// of the file rather than inferable only from which Supabase client it imports.
+
 import {
   isSupabaseConfiguredInBrowser,
   type BrowserSupabaseClient,
@@ -130,7 +136,14 @@ export function mapLearnerRow(row: LearnerRosterRow, seq: number): ScholarRow {
 // The roster is an on-demand drill-in read, so it runs through the Clerk-wired
 // browser client and is cached by TanStack Query. RLS still scopes every row.
 // ---------------------------------------------------------------------------
-/** `no-tenant-access` is folded in by the caller — see the note on `BatchesSnapshot`. */
+/**
+ * `no-tenant-access` is currently unreachable: the routes that can open a batch
+ * short-circuit to `NoTenantAccessState` before rendering the island this query
+ * runs in, so a caller with no school never gets this far. The arm is kept
+ * because a URL-addressed drill-in (`/trainer/classes/[batchId]/...`) takes its
+ * id from the URL rather than from an already-authorized list, and will need to
+ * fold it in exactly as the page routes do.
+ */
 export type LearnersSnapshot =
   | { status: 'ok'; learners: ScholarRow[] }
   | { status: 'no-tenant-access' }
@@ -142,10 +155,16 @@ export type LearnersSnapshot =
  * `id`) for a stable, readable, and — critically — deterministic sequence:
  * `last_name` alone ties for learners who share a surname, and an unordered
  * tiebreak would let `seq` reshuffle between identical queries (the contract
- * has no explicit ordinal column). Returns every learner regardless of
- * `is_active` — whether a dropped-out scholar belongs on a given screen (e.g.
- * excluded from a billing roster) is a caller/domain policy decision, not a
- * fetch-time filter this contract should make silently.
+ * has no explicit ordinal column).
+ *
+ * Returns every learner regardless of `is_active`, and — because `is_active` is
+ * not in the projection — gives the caller no way to tell an active scholar
+ * from a dropped-out one. That is a deliberate narrowing, not an oversight: the
+ * roster reads as a plain list of who is on the batch. A screen that must act
+ * on the ADR-007 dropout distinction (excluding a dropout from a billing
+ * roster, say) has to widen {@link LEARNER_ROSTER_COLUMNS} and carry the flag
+ * through `ScholarRow` first. It must not infer the distinction from what is
+ * here.
  */
 export async function fetchBatchLearners(
   supabase: BrowserSupabaseClient,
