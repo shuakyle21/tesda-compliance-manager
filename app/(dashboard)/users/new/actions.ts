@@ -27,57 +27,69 @@
 
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
-import { inviteUser } from '@/modules/auth/data/invitations';
+import { inviteUser, type InvitationSnapshot } from '@/modules/auth/data/invitations';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
-import { assignUserAccess } from '@/modules/tenancy/data/users';
+import { assignUserAccess, type UserAssignmentSnapshot } from '@/modules/tenancy/data/users';
 import {
   validateUserAccessDraft,
   type CreateUserFormState,
+  type UserAccessCommand,
 } from '@/modules/tenancy/domain/userAccess';
 
-export async function createUserAction(
-  _previous: CreateUserFormState,
-  formData: FormData,
-): Promise<CreateUserFormState> {
+/**
+ * The caller is an admin, and these are the schools they may place someone in.
+ *
+ * An admin may only place someone in a school they belong to themselves — the
+ * same rule the RLS policy enforces, carried here so the admin gets a
+ * field-level message instead of a bare denial.
+ */
+type CallerAuthorization =
+  | { ok: true; allowedTenantIds: string[] }
+  | { ok: false; state: CreateUserFormState };
+
+/**
+ * Resolves the caller and confirms they may grant access at all.
+ *
+ * Every rejection is a form state rather than a throw, so the action can
+ * return it unchanged.
+ */
+async function authorizeAdminCaller(): Promise<CallerAuthorization> {
   const clerkUserId = await getAuthUserId();
-  if (!clerkUserId) return { status: 'denied' };
+  if (!clerkUserId) return { ok: false, state: { status: 'denied' } };
 
   const profileSnapshot = await getProfileSnapshot(clerkUserId);
-  if (profileSnapshot.status === 'unconfigured') return { status: 'unconfigured' };
-  if (profileSnapshot.status === 'sync-failed') return { status: 'failed' };
+  if (profileSnapshot.status === 'unconfigured') {
+    return { ok: false, state: { status: 'unconfigured' } };
+  }
+  if (profileSnapshot.status === 'sync-failed') {
+    return { ok: false, state: { status: 'failed' } };
+  }
   // `not-found` means the caller has no profile row at all — no role, no
   // tenants, nothing to grant from.
-  if (profileSnapshot.status !== 'ok') return { status: 'denied' };
+  if (profileSnapshot.status !== 'ok') return { ok: false, state: { status: 'denied' } };
 
   // `resolveTrustedRole`, never `resolveRouteRole`: the latter honours a
   // `?role=` query override, which would let any signed-in user claim admin
   // and reach the Clerk invitation branch that RLS does not cover.
   const trustedRole = await resolveTrustedRole(profileSnapshot.profile.role);
-  if (trustedRole !== 'admin') return { status: 'denied' };
+  if (trustedRole !== 'admin') return { ok: false, state: { status: 'denied' } };
 
-  // An admin may only place someone in a school they belong to themselves —
-  // the same rule the RLS policy enforces, applied here so the admin gets a
-  // field-level message instead of a bare denial.
-  const allowedTenantIds = profileSnapshot.profile.tenants.map((tenant) => tenant.id);
+  return {
+    ok: true,
+    allowedTenantIds: profileSnapshot.profile.tenants.map((tenant) => tenant.id),
+  };
+}
 
-  const validation = validateUserAccessDraft(
-    {
-      fullName: formData.get('fullName'),
-      email: formData.get('email'),
-      role: formData.get('role'),
-      tenantId: formData.get('tenantId'),
-    },
-    allowedTenantIds,
-  );
-
-  if (!validation.ok) return { status: 'invalid', errors: validation.errors };
-
-  const { command } = validation;
-
-  // Path 1 — they have already signed up: set the role and grant the school
-  // directly, and they have access on their next request.
-  const assignment = await assignUserAccess(command);
-
+/**
+ * Translates the Postgres write into a form state.
+ *
+ * `null` means `not-registered` — nobody has signed up with that address, so
+ * there is no state to report yet and the caller moves on to the invitation.
+ */
+function assignmentFormState(
+  assignment: UserAssignmentSnapshot,
+  command: UserAccessCommand,
+): CreateUserFormState | null {
   switch (assignment.status) {
     case 'assigned':
       return {
@@ -94,8 +106,51 @@ export async function createUserAction(
       console.error('createUserAction: assignment failed', assignment.error);
       return { status: 'failed' };
     case 'not-registered':
-      break;
+      return null;
   }
+}
+
+/** Translates the Clerk invitation into a form state. */
+function invitationFormState(
+  invitation: InvitationSnapshot,
+  email: string,
+): CreateUserFormState {
+  switch (invitation.status) {
+    case 'invited':
+      return { status: 'invited', email };
+    case 'duplicate':
+      return { status: 'duplicate', email };
+    case 'failed':
+      console.error('createUserAction: invitation failed', invitation.error);
+      return { status: 'failed' };
+  }
+}
+
+export async function createUserAction(
+  _previous: CreateUserFormState,
+  formData: FormData,
+): Promise<CreateUserFormState> {
+  const caller = await authorizeAdminCaller();
+  if (!caller.ok) return caller.state;
+
+  const validation = validateUserAccessDraft(
+    {
+      fullName: formData.get('fullName'),
+      email: formData.get('email'),
+      role: formData.get('role'),
+      tenantId: formData.get('tenantId'),
+    },
+    caller.allowedTenantIds,
+  );
+
+  if (!validation.ok) return { status: 'invalid', errors: validation.errors };
+
+  const { command } = validation;
+
+  // Path 1 — they have already signed up: set the role and grant the school
+  // directly, and they have access on their next request.
+  const assigned = assignmentFormState(await assignUserAccess(command), command);
+  if (assigned) return assigned;
 
   // Path 2 — nobody has signed up with that address. There is no `profiles`
   // row to write (`clerk_user_id` is NOT NULL), so the grant travels on a
@@ -105,13 +160,5 @@ export async function createUserAction(
     tenantId: command.tenantId,
   });
 
-  switch (invitation.status) {
-    case 'invited':
-      return { status: 'invited', email: command.email };
-    case 'duplicate':
-      return { status: 'duplicate', email: command.email };
-    case 'failed':
-      console.error('createUserAction: invitation failed', invitation.error);
-      return { status: 'failed' };
-  }
+  return invitationFormState(invitation, command.email);
 }
