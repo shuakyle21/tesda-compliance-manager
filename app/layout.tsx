@@ -1,42 +1,9 @@
-/**
- * STEP 4 — Root Layout
- *
- * WHY THIS FILE EXISTS:
- * layout.tsx at the root of `app/` wraps every page in your application.
- * It renders once and persists across navigations — perfect for:
- *   - Loading fonts (next/font — zero layout shift, self-hosted automatically)
- *   - Setting <html> and <body> attributes
- *   - Global metadata (title, description, Open Graph)
- *
- * NEXT.JS CONCEPT: The App Router uses nested layouts. This root layout
- * wraps everything. The dashboard layout (app/(dashboard)/layout.tsx)
- * adds the shell (Topbar, MetricsRow, Tabs) on top of this.
- *
- * DOCS: https://nextjs.org/docs/app/building-your-application/routing/layouts-and-templates
- * FONTS: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
- */
-
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { clerkLocalization } from "@/modules/auth/ui/clerkLocalization";
 import type { Metadata } from "next";
-// TODO 4a: Replace Geist with IBM_Plex_Sans and IBM_Plex_Mono.
-// LEARN Ch 3 — Optimizing Fonts and Images: https://nextjs.org/learn/dashboard-app/optimizing-fonts-images
-//
-// The variable names declared here MUST match the --font-* variables
-// you map in globals.css @theme (e.g. `--font-ibm-plex-sans`).
-//
-// Example pattern (verify exact export name from next/font/google):
-//   import { IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
-//   const ibmPlexSans = IBM_Plex_Sans({
-//     weight: ['300', '400', '500', '600'],
-//     subsets: ['latin'],
-//     variable: '--font-ibm-plex-sans',
-//   });
-//
-// TIP: Request only the weights you use — 300, 400, 500, 600 per the spec.
-// next/font downloads only those variants, reducing the font payload.
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import React from "react";
 
 const ibmPlexSans = IBM_Plex_Sans({
   weight: ["300", "400", "500", "600"],
@@ -49,17 +16,6 @@ const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   variable: "--font-ibm-plex-mono",
 });
-
-// ---------------------------------------------------------------------------
-// TODO 4b: Update the Metadata export.
-// LEARN Ch 16 — Adding Metadata: https://nextjs.org/learn/dashboard-app/adding-metadata
-//
-// Change title and description to match the product:
-//   title: 'Training Compliance System'
-//   description: 'TESDA Farm School Scholarship Compliance Dashboard'
-//
-// DOCS: https://nextjs.org/docs/app/api-reference/functions/generate-metadata
-// ---------------------------------------------------------------------------
 export const metadata: Metadata = {
   title: "Training Compliance System",
   description: "TESDA Farm School Scholarship Compliance Dashboard",
@@ -83,7 +39,7 @@ export default function RootLayout({
       lang="en"
       className={`${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[var(--color-bg)]">
+      <body className="min-h-full flex flex-col bg-(--color-bg)">
         <ClerkProvider localization={clerkLocalization}>{children}</ClerkProvider>
       </body>
     </html>
