@@ -17,6 +17,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { useBatchLearners } from '@/modules/batches/data/useBatchLearners';
+import type { LearnersSnapshot } from '@/modules/batches/data/learners';
 import type { ScholarRow } from '@/shared/types';
 
 function fullName(scholar: ScholarRow): string {
@@ -25,22 +26,51 @@ function fullName(scholar: ScholarRow): string {
     .join(' ');
 }
 
-function RosterBody({ batchId }: { batchId: string }) {
+/**
+ * The roster's six states. Kept in one component rather than split behind a
+ * wrapper so a unit test can call it directly and assert which state renders —
+ * the `no-tenant-access` vs. empty distinction in particular is mandated, not
+ * cosmetic, and worth pinning.
+ */
+export function BatchRosterSection({ batchId }: { batchId: string }) {
   const { data, isPending, isError } = useBatchLearners(batchId);
 
-  if (isPending) {
-    return (
-      <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Loading roster…</div>
-    );
-  }
+  return (
+    <div className="nm-section">
+      <div className="nm-section-title">
+        <Icon name="users" size={13} />
+        Scholars
+      </div>
+      {rosterBody({ data, isPending, isError })}
+    </div>
+  );
+}
 
-  // `sync-failed` is the only arm that throws, and the message is ours, never
-  // the database's — see `shared/snapshotQuery.ts`.
+/** The snapshot arms that can reach the UI — `sync-failed` throws instead. */
+type ResolvedRoster = Exclude<LearnersSnapshot, { status: 'sync-failed' }>;
+
+export function rosterBody({
+  data,
+  isPending,
+  isError,
+}: {
+  data: ResolvedRoster | undefined;
+  isPending: boolean;
+  isError: boolean;
+}) {
+  // Order matters: on a failure `data` is also undefined, so an absence check
+  // ahead of the error check would leave the roster "loading" forever.
   if (isError) {
     return (
       <InfoCallout variant="warning">
         Sync with Supabase failed — this batch&apos;s roster could not be loaded.
       </InfoCallout>
+    );
+  }
+
+  if (isPending || !data) {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Loading roster…</div>
     );
   }
 
@@ -131,14 +161,3 @@ function RosterBody({ batchId }: { batchId: string }) {
   );
 }
 
-export function BatchRosterSection({ batchId }: { batchId: string }) {
-  return (
-    <div className="nm-section">
-      <div className="nm-section-title">
-        <Icon name="users" size={13} />
-        Scholars
-      </div>
-      <RosterBody batchId={batchId} />
-    </div>
-  );
-}
