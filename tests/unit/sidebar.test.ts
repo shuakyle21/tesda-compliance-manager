@@ -31,9 +31,11 @@ import type { Tenant } from '@/shared/types';
 import { Toast } from '@/shared/ui/Toast';
 
 /**
- * Local fixture. The Sidebar has no live tenant list (TES-34) and no longer
- * reads a mock catalog, so a resolved tenant is only ever something a caller
- * hands the private components directly — the Sidebar itself renders null.
+ * Local fixture. The Sidebar takes its tenant list from the `tenants` prop
+ * (populated by the layout from the caller's real memberships) — a resolved
+ * `tenant` is only ever something a caller hands the private components
+ * directly, so tests exercise `SchoolSwitcher`/`SidebarOverlays` with a
+ * fixture rather than the top-level `Sidebar({})`, which has no props here.
  */
 const TENANT_FIXTURE: Tenant = {
   id: 'tnt_fixture',
@@ -203,16 +205,17 @@ describe('Sidebar Escape handling', () => {
 });
 
 describe('SchoolSwitcher', () => {
-  // There is no live tenant-listing source yet (TES-34), so the switcher's only
+  // With 0 or 1 memberships passed in via `tenants`, the switcher's only
   // reachable state is locked: no school choices are ever offered, and the
   // trigger must not pretend to be a menu.
-  it('stays locked and offers no school choices when no tenant list exists', () => {
+  it('stays locked and offers no school choices when the tenant list has no more than one school', () => {
     const SchoolSwitcher = privateComponent('SchoolSwitcher');
     const onToggle = vi.fn();
     const onSelect = vi.fn();
 
     const tree = SchoolSwitcher({
       tenant: TENANT_FIXTURE,
+      tenants: [TENANT_FIXTURE],
       open: true,
       onToggle,
       onClose: vi.fn(),
@@ -236,6 +239,7 @@ describe('SchoolSwitcher', () => {
     const SchoolSwitcher = privateComponent('SchoolSwitcher');
     const tree = SchoolSwitcher({
       tenant: TENANT_FIXTURE,
+      tenants: [TENANT_FIXTURE],
       open: false,
       onToggle: vi.fn(),
       onClose: vi.fn(),
@@ -326,13 +330,19 @@ describe('SidebarOverlays', () => {
     hooks.useState.mockReturnValue([null, setToast]);
     const onClose = vi.fn();
 
-    const tree = SidebarOverlays({ activeOp: 'settings', tenant: TENANT_FIXTURE, onClose });
+    const tree = SidebarOverlays({
+      activeOp: 'settings',
+      tenant: TENANT_FIXTURE,
+      fullName: 'Rosa Mendiola',
+      role: 'coordinator',
+      onClose,
+    });
     const modal = componentElement(tree, SettingsModal);
 
     expect(modal.props).toMatchObject({
       workspaceName: TENANT_FIXTURE.name,
       workspaceMeta: `${TENANT_FIXTURE.code} · ${TENANT_FIXTURE.region}`,
-      userName: 'Karina Cruz',
+      userName: 'Rosa Mendiola',
       userLabel: 'coordinator',
       onClose,
     });
@@ -341,9 +351,9 @@ describe('SidebarOverlays', () => {
     expect(setToast).toHaveBeenCalledWith({ title: 'Settings saved' });
   });
 
-  // No tenant resolved (the Sidebar's real state today): Settings must say so
-  // rather than label the workspace with a fabricated school.
-  it('labels Settings honestly when no school is resolved', () => {
+  // No tenant/identity resolved: Settings must say so rather than label the
+  // workspace or the user with a fabricated school/name/role.
+  it('labels Settings honestly when no school or identity is resolved', () => {
     const SidebarOverlays = privateComponent('SidebarOverlays');
     hooks.useState.mockReturnValue([null, vi.fn()]);
 
@@ -353,6 +363,8 @@ describe('SidebarOverlays', () => {
     expect(modal.props).toMatchObject({
       workspaceName: 'School not set',
       workspaceMeta: 'Tenant setup pending',
+      userName: 'Name not set',
+      userLabel: '—',
     });
   });
 

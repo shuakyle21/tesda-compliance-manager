@@ -17,17 +17,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
-import type { Tenant } from '@/shared/types';
+import type { Tenant, UserRole } from '@/shared/types';
 import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
 import { useNavDrawer } from './NavDrawerProvider';
 
-type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings'; badge?: number };
-
-// Static demo count, same fidelity as the design's own hardcoded `badge:3` —
-// there is no real unread-activity tracking yet. Exported so the Topbar bell
-// (which links to the same Activity Log) shows the same number.
-export const ACTIVITY_UNREAD = 3;
+type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings' };
 
 const WORKSPACE: NavItem[] = [
   { label: 'Dashboard', icon: 'layout-dashboard', href: '/dashboard' },
@@ -40,23 +35,29 @@ const WORKSPACE: NavItem[] = [
   { label: 'Billing', icon: 'receipt', href: '/billing' },
   { label: 'Analytics', icon: 'chart-bar', href: '/analytics' },
   { label: 'Report', icon: 'file-invoice', href: '/report' },
-  { label: 'Activity Log', icon: 'timeline', href: '/activity-log', badge: ACTIVITY_UNREAD },
+  { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
 ];
-
-/**
- * Schools this user can switch between. There is no live tenant-listing source
- * yet — the Sidebar is a client island and the layout has no tenant context to
- * pass down (blocked on TES-34) — so the list is empty and the switcher renders
- * locked rather than listing a fabricated catalog. Once a real list is plumbed
- * in as a prop, `canSwitch` and the dropdown below light up unchanged.
- */
-const AVAILABLE_TENANTS: Tenant[] = [];
 
 // Shown in place of a school name/meta while no tenant is resolved. Deliberately
 // states the absence instead of naming a plausible-looking school.
 const NO_TENANT_NAME = 'School not set';
 const NO_TENANT_META = 'Tenant setup pending';
 const NO_TENANT_MARK = '—';
+
+// Shown in place of a name/initials while no signed-in profile name is
+// resolved. Deliberately states the absence instead of a plausible-looking
+// name, same convention as NO_TENANT_NAME above.
+const NO_NAME_LABEL = 'Name not set';
+const NO_NAME_MARK = '—';
+
+function initialsOf(fullName: string | null): string {
+  if (!fullName) return NO_NAME_MARK;
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return NO_NAME_MARK;
+  const first = parts[0]![0] ?? '';
+  const last = parts.length > 1 ? parts[parts.length - 1]![0] ?? '' : '';
+  return (first + last).toUpperCase();
+}
 
 const ACCOUNT: NavItem[] = [
   { label: 'My Account', icon: 'user', href: '/profile' },
@@ -96,6 +97,17 @@ const PLATFORM_OPERATIONS: NavItem[] = [
   { label: 'Add school', icon: 'building', href: '/schools/new' },
 ];
 
+// A trainer is never an admin/platform-admin here, but the guards are
+// explicit rather than implied so the two conditions cannot drift apart
+// later; a trainer route never gains either extra list because the two role
+// checks are independent, the way the two roles are.
+function resolveOperations(isTrainerRoute: boolean, isAdmin: boolean, isPlatformAdmin: boolean): NavItem[] {
+  const base = isTrainerRoute ? OPERATIONS.filter((o) => o.op === 'settings') : OPERATIONS;
+  const admin = isAdmin && !isTrainerRoute ? ADMIN_OPERATIONS : [];
+  const platform = isPlatformAdmin && !isTrainerRoute ? PLATFORM_OPERATIONS : [];
+  return [...base, ...admin, ...platform];
+}
+
 interface SidebarProps {
   /**
    * The only role signal a Server Component layout can derive today (no real
@@ -118,32 +130,52 @@ interface SidebarProps {
    * resolved it shows the smaller menu rather than the larger one.
    */
   isPlatformAdmin?: boolean;
+  /**
+   * Signed-in person's real display name, resolved server-side by the layout
+   * from their `profiles` row (the same `getProfileSnapshot` call the role
+   * checks above already read). Null when no profile has resolved yet — the
+   * user card then shows `NO_NAME_LABEL`/`NO_NAME_MARK` rather than a
+   * plausible-looking name.
+   */
+  fullName?: string | null;
+  /**
+   * Signed-in person's real DB role (`profiles.role`, already bridged to
+   * `UserRole` by the tenancy mapper). This is the same trusted role
+   * `isAdmin` is derived from, not the `?role=` preview override.
+   */
+  role?: UserRole | null;
+  /**
+   * Schools this profile actually belongs to (`profileSnapshot.profile.tenants`),
+   * passed down by the layout. Empty until a real membership row exists —
+   * the school switcher then renders locked rather than listing a fabricated
+   * catalog.
+   */
+  tenants?: Tenant[];
+  /** The membership flagged `is_default`, used to seed the switcher's selection. */
+  defaultTenantId?: string | null;
 }
 
 export function Sidebar({
   isTrainerRoute = false,
   isAdmin = false,
   isPlatformAdmin = false,
+  fullName = null,
+  role = null,
+  tenants = [],
+  defaultTenantId = null,
 }: SidebarProps) {
   const pathname = usePathname();
   const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
-  const baseOperations = isTrainerRoute
-    ? OPERATIONS.filter((o) => o.op === 'settings')
-    : OPERATIONS;
-  // A trainer is never an admin here, but the guard is explicit rather than
-  // implied so the two conditions cannot drift apart later.
-  // A trainer route never gains either extra list; the two role checks are
-  // independent because the two roles are.
-  const adminOperations = isAdmin && !isTrainerRoute ? ADMIN_OPERATIONS : [];
-  const platformOperations = isPlatformAdmin && !isTrainerRoute ? PLATFORM_OPERATIONS : [];
-  const operations = [...baseOperations, ...adminOperations, ...platformOperations];
+  const operations = resolveOperations(isTrainerRoute, isAdmin, isPlatformAdmin);
 
-  // School selector. `tenant` is null until a real tenant list exists (TES-34);
-  // the dropdown layer is kept so the Esc ordering below stays intact and so
-  // wiring a live list in later is a one-line change.
+  // School selector. Seeded from the caller's default membership when one
+  // exists, falling back to the first tenant in the list, then to null when
+  // the profile belongs to none.
   const [orgOpen, setOrgOpen] = useState(false);
   const closeOrg = useCallback(() => setOrgOpen(false), []);
-  const [tenant, setTenant] = useState<Tenant | null>(() => AVAILABLE_TENANTS[0] ?? null);
+  const [tenant, setTenant] = useState<Tenant | null>(
+    () => tenants.find((t) => t.id === defaultTenantId) ?? tenants[0] ?? null,
+  );
 
   // Operations overlays (Import CSV / Settings); their completion toast lives in <SidebarOverlays>.
   const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
@@ -183,15 +215,9 @@ export function Sidebar({
           </button>
         </div>
 
-        {/* Sync status */}
-        <button type="button" className="sb-sync sb-sync-top">
-          <span className="synced-dot" />
-          <span>Synced 4 min ago · Supabase</span>
-          <Icon name="refresh" size={13} style={{ marginLeft: 'auto', color: 'var(--color-text-muted)' }} />
-        </button>
-
         <SchoolSwitcher
           tenant={tenant}
+          tenants={tenants}
           open={orgOpen}
           onToggle={() => setOrgOpen((o) => !o)}
           onClose={closeOrg}
@@ -225,17 +251,23 @@ export function Sidebar({
         {/* User card — links to My Account (/profile) */}
         <div className="sb-user-wrap">
           <Link href="/profile" className="sb-user" aria-label="My account" onClick={closeDrawer}>
-            <span className="user-avatar" style={{ background: 'var(--color-teal)' }}>KC</span>
+            <span className="user-avatar" style={{ background: 'var(--color-teal)' }}>{initialsOf(fullName)}</span>
             <span className="sb-user-text">
-              <span className="sb-user-name">Karina Cruz</span>
-              <span className="role-tag coordinator">coordinator</span>
+              <span className="sb-user-name">{fullName ?? NO_NAME_LABEL}</span>
+              {role && <span className={`role-tag ${role}`}>{role}</span>}
             </span>
             <Icon name="chevron-right" size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
           </Link>
         </div>
       </aside>
 
-      <SidebarOverlays activeOp={activeOp} tenant={tenant} onClose={() => setActiveOp(null)} />
+      <SidebarOverlays
+        activeOp={activeOp}
+        tenant={tenant}
+        fullName={fullName}
+        role={role}
+        onClose={() => setActiveOp(null)}
+      />
     </>
   );
 }
@@ -245,19 +277,21 @@ export function Sidebar({
  * Esc handler must close this dropdown *before* the drawer, and the Settings
  * modal reads the selected tenant. Click-outside dismissal is owned here.
  *
- * With no live tenant list (TES-34) `AVAILABLE_TENANTS` is empty, so
- * `canSwitch` is false: the control renders locked and non-interactive, and a
- * null `tenant` shows the "School not set" placeholder rather than a name.
+ * `tenants` comes from the caller's real membership list. When it has 0 or 1
+ * entries, `canSwitch` is false: the control renders locked and
+ * non-interactive, and a null `tenant` shows the "School not set" placeholder
+ * rather than a name.
  */
-function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
+function SchoolSwitcher({ tenant, tenants = [], open, onToggle, onClose, onSelect }: {
   tenant: Tenant | null;
+  tenants?: Tenant[];
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
   onSelect: (t: Tenant) => void;
 }) {
   const orgRef = useRef<HTMLDivElement>(null);
-  const canSwitch = AVAILABLE_TENANTS.length > 1;
+  const canSwitch = tenants.length > 1;
 
   // Click-outside closes the school dropdown.
   useEffect(() => {
@@ -282,7 +316,7 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
           <span className="sb-org-name">{tenant?.name ?? NO_TENANT_NAME}</span>
           <span className="sb-org-meta">
             {canSwitch
-              ? `${AVAILABLE_TENANTS.length} schools · registrar`
+              ? `${tenants.length} schools · registrar`
               : (tenant?.region || NO_TENANT_META)}
           </span>
         </span>
@@ -292,7 +326,7 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
       {open && canSwitch && (
         <div className="dropdown sb-org-dd">
           <div className="dd-section">Registrar · your schools</div>
-          {AVAILABLE_TENANTS.map((t, i) => (
+          {tenants.map((t, i) => (
             <button
               type="button"
               key={t.id}
@@ -318,9 +352,11 @@ function SchoolSwitcher({ tenant, open, onToggle, onClose, onSelect }: {
 }
 
 /** Operations overlays (Import CSV / Settings) and their completion toast. */
-function SidebarOverlays({ activeOp, tenant, onClose }: {
+function SidebarOverlays({ activeOp, tenant, fullName = null, role = null, onClose }: {
   activeOp: 'import' | 'settings' | null;
   tenant: Tenant | null;
+  fullName?: string | null;
+  role?: UserRole | null;
   onClose: () => void;
 }) {
   const [toast, setToast] = useState<ToastData | null>(null);
@@ -339,8 +375,8 @@ function SidebarOverlays({ activeOp, tenant, onClose }: {
         <SettingsModal
           workspaceName={tenant?.name ?? NO_TENANT_NAME}
           workspaceMeta={tenant ? `${tenant.code} · ${tenant.region}` : NO_TENANT_META}
-          userName="Karina Cruz"
-          userLabel="coordinator"
+          userName={fullName ?? NO_NAME_LABEL}
+          userLabel={role ?? NO_NAME_MARK}
           onClose={onClose}
           onSaved={() => {
             onClose();
@@ -358,7 +394,6 @@ function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boo
     <>
       <Icon name={item.icon} size={17} />
       <span>{item.label}</span>
-      {!!item.badge && <span className="sb-badge">{item.badge}</span>}
     </>
   );
 
