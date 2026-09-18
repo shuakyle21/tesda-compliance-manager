@@ -35,6 +35,13 @@ FIGMA FILES/
 diagrams/
 .design-sync/
 
+# ...except the design-system spec itself, which lives under uploads/ and is
+# real evidence, not a ported artifact: design-system.md cites it as the
+# upstream source that says WCAG 2.1 AA where RULES.md demands 2.2 AA.
+# Excluding it made the evidence resolver hard-fail on an existing Claim and
+# killed the whole run. The 2.6 MB PDF beside it stays out.
+!uploads/training-compliance-design-system.md
+
 # Hand-maintained Obsidian vault notes whose titles mirror the OpenWiki
 # taxonomy. Claims belong grounded in code, not in parallel prose that drifts.
 wiki/
