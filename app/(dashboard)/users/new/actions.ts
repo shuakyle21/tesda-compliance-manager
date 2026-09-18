@@ -92,6 +92,12 @@ function assignmentFormState(
 ): CreateUserFormState | null {
   switch (assignment.status) {
     case 'assigned':
+      // Deliberately no `revalidatePath` here. The dashboard layout calls
+      // `auth()`, so it is dynamically rendered and no server cache holds it —
+      // what a revalidation would actually clear is the *caller's* client-side
+      // Router Cache. The person whose sidebar this write changes is the
+      // assignee, in a different session entirely, which no call from here can
+      // reach. They see the new role on their next request regardless.
       return {
         status: 'assigned',
         email: command.email,
