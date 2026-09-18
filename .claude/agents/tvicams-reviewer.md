@@ -109,9 +109,10 @@ ESLint enforces the import direction, so only flag what it cannot see:
 ### 6. Domain facts
 
 Flag any code contradicting the locked facts at the bottom of `RULES.md` —
-progress formula, the ≥5-absence ineligibility threshold, one RQM code per
-batch, ULI as the permanent learner key, tenant context in the URL path,
-alerts computed on read, the packet lifecycle from ADR-003.
+progress formula, the 20%-of-total_sessions / 3-consecutive-unexcused-absence
+dropout rule (ADR-007), one RQM code per batch, ULI as the permanent learner
+key, tenant context in the URL path, alerts computed on read, the packet
+lifecycle from ADR-003.
 
 Before flagging anything about billing or schema, check
 `docs/adr/ADR-001-billing-and-domain-model.md` and
