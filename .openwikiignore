@@ -1,0 +1,47 @@
+# Paths the OpenWiki doc agent must not read, document, or cite.
+#
+# This file is load-bearing for run time, not just tidiness: OpenWiki has no
+# .gitignore support of any kind, so without these rules the agent can reach
+# ~192k files under node_modules/ alone (against 489 tracked files). Activating
+# any rule here also enables OpenWiki's guard against unbounded root globs.
+#
+# Syntax is gitignore-style and last-match-wins.
+
+# Dependencies and build output.
+node_modules/
+.next/
+out/
+build/
+coverage/
+test-results/
+playwright-report/
+tsconfig.tsbuildinfo
+pnpm-lock.yaml
+
+# Secrets. Gitignored, so absent from CI checkouts, but present on disk for
+# local `openwiki` runs — these must never be quoted into a generated page.
+.env.local
+.env*.local
+requests/http-client.private.env.json
+
+# Design bundle and handoff artifacts, ported verbatim from the design bundle.
+# Excluded from lint/build and protected by .claude/hooks/protect-static-dirs.sh.
+assets/
+preview/
+screenshots/
+ui_kits/
+uploads/
+FIGMA FILES/
+diagrams/
+.design-sync/
+
+# Hand-maintained Obsidian vault notes whose titles mirror the OpenWiki
+# taxonomy. Claims belong grounded in code, not in parallel prose that drifts.
+wiki/
+
+# Vendored third-party skill reference docs, not app code.
+.claude/skills/
+
+# Editor and tooling local state.
+.idea/
+.vscode/
