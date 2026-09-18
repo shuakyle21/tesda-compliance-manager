@@ -34,10 +34,6 @@ jobs:
       - name: Run OpenWiki
         id: openwiki
         continue-on-error: false
-        # Must stay step-level, not job-level. A step timeout leaves the runner
-        # alive so `cancelled()` stays false and the steps below still bank the
-        # pages this run finished; the job's default 360-min timeout instead tears
-        # the job down, sets `cancelled()`, and discards every completed page.
         timeout-minutes: 240
         run: openwiki code --update --print
         env:
