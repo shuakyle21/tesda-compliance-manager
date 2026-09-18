@@ -34,6 +34,7 @@ jobs:
       - name: Run OpenWiki
         id: openwiki
         continue-on-error: false
+        timeout-minutes: 240
         run: openwiki code --update --print
         env:
           # This project talks to an OpenAI-compatible router, not api.openai.com
