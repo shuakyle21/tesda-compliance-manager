@@ -37,7 +37,7 @@ jobs:
         run: |
           for attempt in 1 2 3; do
             echo "OpenWiki attempt ${attempt}/3"
-            if openwiki code --update --printe; then
+            if openwiki code --update --print; then
               exit 0
             fi
 
