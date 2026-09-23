@@ -5,8 +5,8 @@ description: "Non-negotiable UI rules of the Training Compliance System: the CSS
 tags: ["design-system", "ui-invariants", "css-tokens", "accessibility", "screen-states", "nextjs-app-router"]
 openwiki_generated: true
 verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-11T02:46:03.436Z
+  - by: openwiki/0.5.2
+    at: 2026-09-23T01:03:06.890Z
 sources:
   - id: openwiki-source-10906e03e3f3530d2d51e5ab
     resource: repo://.claude/hooks/protect-static-dirs.sh

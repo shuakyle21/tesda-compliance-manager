@@ -9,11 +9,11 @@
       "completedRunId": "236e0469-16ae-4b0b-833b-ea3f7430ddcb"
     },
     "/openwiki/architecture/design-system.md": {
-      "pageVersion": "sha256:3421443652794229b2135420e9775c8745c22a18057b51e28cf32693ed7f2954",
-      "completedBy": "openwiki/0.5.0",
-      "completedRunId": "767af754-ad8f-4033-b24f-a7de25e7e510",
-      "gitHead": "89e169e99b6256b85aca2aad8761153ae27c92ee",
-      "sourceFingerprint": "sha256:c6f401f44af074fcdbdcd429019611b78d01218585f8aea1106432cf3a25fb77"
+      "pageVersion": "sha256:3ef88bc79741849cdf7c55649b0574b2ca8431b668f0cdd48c7fc5e37879be95",
+      "completedBy": "openwiki/0.5.2",
+      "completedRunId": "ba8d2145-2e59-4e79-9080-d6154152f3dc",
+      "gitHead": "ccd1652601ca554d2e336b8f9eb37c7ce5b0cb50",
+      "sourceFingerprint": "sha256:a8f9246c7e3935db9b736cda41260177b892f36d894adfc6242da7c3f36133a1"
     },
     "/openwiki/architecture/module-boundaries-and-data-pattern.md": {
       "gitHead": "24e62a7c686dbb7273e12b5495e3cf1ed5f204d2",
@@ -23,11 +23,11 @@
       "completedRunId": "767af754-ad8f-4033-b24f-a7de25e7e510"
     },
     "/openwiki/quickstart.md": {
+      "gitHead": "89e169e99b6256b85aca2aad8761153ae27c92ee",
+      "sourceFingerprint": "sha256:c6f401f44af074fcdbdcd429019611b78d01218585f8aea1106432cf3a25fb77",
       "pageVersion": "sha256:8f7565ae2cc74370cddf379965600f2038db771fa01fc33d4e842b3dcef24820",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "66573139-70f9-48b4-a843-3dfee97d2ba0",
-      "gitHead": "89e169e99b6256b85aca2aad8761153ae27c92ee",
-      "sourceFingerprint": "sha256:c6f401f44af074fcdbdcd429019611b78d01218585f8aea1106432cf3a25fb77"
+      "completedRunId": "66573139-70f9-48b4-a843-3dfee97d2ba0"
     }
   }
 }
