@@ -191,6 +191,10 @@ create table public.attendance_records (
   time_in time,
   time_out time,
   present boolean not null default false,
+  -- ADR-007 Elig-3: only meaningful when present = false. Defaults to
+  -- unexcused -- an absence not explicitly marked excused must count toward
+  -- the dropout threshold, not silently understate it.
+  excused boolean not null default false,
   notes text,
   marked_by uuid references public.profiles(id) on delete set null,
   marked_at timestamptz,
@@ -255,9 +259,9 @@ comment on table public.billing_records is
 -- generated .docx (ADR-001 W1 keeps the school's own template), plus the
 -- tenant-level overrides ADR-001 allows.
 --
--- `max_absences` here OVERRIDES `program_billing_rules.max_absences` when set.
--- Null means "use the program rule" -- a nullable override, never a duplicate
--- default, so the two cannot silently disagree.
+-- `max_absence_percent` here OVERRIDES `program_billing_rules.max_absence_percent`
+-- when set. Null means "use the program rule" -- a nullable override, never a
+-- duplicate default, so the two cannot silently disagree.
 create table public.tenant_settings (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null unique references public.tenants(id) on delete cascade,
@@ -268,15 +272,15 @@ create table public.tenant_settings (
   letterhead_ref text,
   addressee text,
   partial_billing_enabled boolean not null default false,
-  max_absences integer check (max_absences >= 0),
+  max_absence_percent numeric(5, 2) check (max_absence_percent > 0 and max_absence_percent <= 100),
   progress_threshold_percent integer check (progress_threshold_percent between 0 and 100),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-comment on column public.tenant_settings.max_absences is
-  'Tenant override for program_billing_rules.max_absences (ADR-001 Elig). Null '
-  'means inherit the program rule.';
+comment on column public.tenant_settings.max_absence_percent is
+  'Tenant override for program_billing_rules.max_absence_percent (ADR-007 '
+  'Elig-2). Null means inherit the program rule.';
 
 -- ---------------------------------------------------------------------------
 -- 4. Columns on existing tables (additive)
@@ -328,17 +332,24 @@ create index if not exists learners_uli_idx
   on public.learners (uli)
   where uli is not null;
 
--- ADR-001 Elig: "ineligible for allowance if absences >= 5 ... stored as
--- max_absences = 4 in program rules; tenant override allowed". ADR-001:187 puts
--- the cap on the program/qualification axis. The default is 4, not 5 -- the rule
--- is `absences > max_absences`, i.e. a 5th absence disqualifies.
+-- ADR-007 Elig-2 (supersedes ADR-001 Elig): TESDA Omnibus Guidelines allow a
+-- trainee to miss up to 20% of total training hours; exceeding that, OR
+-- accumulating 3 consecutive unexcused absences (attendance_records.excused,
+-- Elig-3/Elig-4), drops the scholar from the program. ADR-001:187 puts the cap
+-- on the program/qualification axis; the percent is applied against the
+-- batch's snapshotted `total_sessions` (E2), not a fixed count. Allowed
+-- absences = floor(total_sessions * percent / 100); the next absence beyond
+-- that disqualifies.
 alter table public.program_billing_rules
-  add column if not exists max_absences integer not null default 4 check (max_absences >= 0);
+  add column if not exists max_absence_percent numeric(5, 2) not null default 20.00
+    check (max_absence_percent > 0 and max_absence_percent <= 100);
 
-comment on column public.program_billing_rules.max_absences is
-  'ADR-001 Elig. A scholar with more than this many absences is ineligible for '
-  'allowance -- default 4, so the 5th absence disqualifies. Overridable per '
-  'tenant via tenant_settings.max_absences.';
+comment on column public.program_billing_rules.max_absence_percent is
+  'ADR-007 Elig-2. A scholar whose absences exceed this percent of the batch''s '
+  'total_sessions (floored) is dropped from the program -- default 20, per '
+  'TESDA Omnibus Guidelines. A 3-consecutive-unexcused-absence streak '
+  '(attendance_records.excused) drops the scholar independently of this '
+  'threshold. Overridable per tenant via tenant_settings.max_absence_percent.';
 
 -- ---------------------------------------------------------------------------
 -- 5. Indexes
