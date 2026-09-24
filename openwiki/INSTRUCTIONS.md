@@ -6,6 +6,12 @@ batches. It tracks batch lifecycle, documents, attendance, LAMR evidence, and ge
 official TESDA billing documents. The audience is a coding agent about to change this
 repository safely.
 
+Focus on usage and business rules: how to work in the codebase, the domain rules (batch
+lifecycle, billing, attendance, documents, tenancy), the data contract, and the
+invariants that gate a change. Visual design (CSS, tokens, fonts, colours, icons, layout
+assets) is out of scope; the rule-level design constraints live in `RULES.md` §4 and are
+cited from there, never re-derived from stylesheets.
+
 TESDA SIS/T2MIS/BSRS remain the authoritative systems; this app is an internal working
 layer only. Never write copy implying official approval or submission.
 
@@ -18,7 +24,7 @@ rule). Document the ADR precedence chain; never the superseded PRD wording.
 
 ## Page set — fixed, do not expand
 
-Exactly these five pages. Do not plan a sixth, do not rename, do not delete, and do not
+Exactly these four pages. Do not plan a fifth, do not rename, do not delete, and do not
 plan generated `index.md` pages:
 
 - `/openwiki/quickstart.md` — task → page routing, the verification loop, the invariants
@@ -34,9 +40,15 @@ plan generated `index.md` pages:
 - `/openwiki/architecture/data-model-and-rls.md` — schema, enums, the migration ledger,
   the `database.types.ts` regeneration contract, `app_private.*` RLS helpers and the
   per-table policy map.
-- `/openwiki/architecture/design-system.md` — semantic tokens, no emoji, Tabler line
-  icons, IBM Plex, status by text + icon never colour alone, WCAG 2.2 AA, the six required
-  states on every data screen, component layering.
+
+## Retired page — `design-system.md`
+
+`/openwiki/architecture/design-system.md` was deliberately removed. Do not recreate it or
+any other page about visual design. `quickstart.md`, `overview.md`,
+`data-model-and-rls.md`, and `module-boundaries-and-data-pattern.md` still link to it:
+delete those links (and any table row that only routes to it), and where a pointer to UI
+rules is still needed, link `RULES.md` §4 instead. Removing a dead link is a permitted
+edit on the grandfathered pages below.
 
 ## Existing oversized pages are grandfathered
 
@@ -51,7 +63,10 @@ that are still accurate. Leaving an accurate long page untouched is the correct 
 - `node_modules/`, `.next/`, `test-results/`, `pnpm-lock.yaml`, `tsconfig.tsbuildinfo`.
 - Design-bundle and handoff directories, ported verbatim and excluded from lint/build:
   `assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/`, `FIGMA FILES/`,
-  `diagrams/`, `.design-sync/`.
+  `diagrams/` (at any depth, including `docs/diagrams/`), `.design-sync/`.
+- Visual design sources: every `*.css` file, `docs/design/`, `docs/DESIGN.md`,
+  `docs/UI_UX_MODAL_AUDIT.md`, `tremor.config.mjs`, `postcss.config.mjs`, `public/`, and
+  binary assets (images, fonts, PDFs). These are token-heavy and carry no business rules.
 - `wiki/` — hand-maintained Obsidian vault notes whose titles duplicate this wiki. Never
   ground a Claim in it.
 - `.claude/skills/` — vendored third-party skill reference docs, not app code.
@@ -77,4 +92,4 @@ that are still accurate. Leaving an accurate long page untouched is the correct 
 5. Stay inside your own page's topic. Link a neighbour rather than re-explaining it.
 6. Prefer 5–10 targeted greps and partial reads over whole-file reads of large files.
 7. Never grow a page past its ceiling to absorb new material, and never widen a page's
-   purpose. The five-page set is the budget and it is already spent.
+   purpose. The four-page set is the budget and it is already spent.

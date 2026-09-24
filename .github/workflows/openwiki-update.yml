@@ -38,7 +38,9 @@ jobs:
 
       - name: Run OpenWiki
         id: openwiki
-        # Leaves time inside the job timeout for the cleanup and PR steps below.
+        # Must stay below GitHub's 360-minute job limit: if the job limit fires
+        # first, the job is cancelled and the PR step below (which banks the
+        # pages finished so far) is skipped.
         timeout-minutes: 330
         run: |
           for attempt in 1 2 3; do

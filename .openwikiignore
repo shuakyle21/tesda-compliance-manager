@@ -35,12 +35,34 @@ FIGMA FILES/
 diagrams/
 .design-sync/
 
-# ...except the design-system spec itself, which lives under uploads/ and is
-# real evidence, not a ported artifact: design-system.md cites it as the
-# upstream source that says WCAG 2.1 AA where RULES.md demands 2.2 AA.
-# Excluding it made the evidence resolver hard-fail on an existing Claim and
-# killed the whole run. The 2.6 MB PDF beside it stays out.
-!uploads/training-compliance-design-system.md
+# Visual design sources. The wiki covers usage and business rules only; the
+# design-system page was retired, and UI rules are cited from RULES.md §4.
+# These files are token-heavy (stylesheets, token dumps, audits) and carry no
+# domain logic. Before ignoring anything else, grep openwiki/.claims/ for it:
+# the evidence resolver hard-fails the whole run on a Claim whose evidence
+# path is excluded here.
+*.css
+docs/design/
+docs/DESIGN.md
+docs/UI_UX_MODAL_AUDIT.md
+tremor.config.mjs
+postcss.config.mjs
+public/
+
+# Binary and rendered assets.
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.otf
+*.pdf
+*.html
 
 # Hand-maintained Obsidian vault notes whose titles mirror the OpenWiki
 # taxonomy. Claims belong grounded in code, not in parallel prose that drifts.
