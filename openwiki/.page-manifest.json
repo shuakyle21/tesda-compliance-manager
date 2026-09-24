@@ -16,11 +16,11 @@
       "completedRunId": "767af754-ad8f-4033-b24f-a7de25e7e510"
     },
     "/openwiki/quickstart.md": {
+      "gitHead": "89e169e99b6256b85aca2aad8761153ae27c92ee",
+      "sourceFingerprint": "sha256:c6f401f44af074fcdbdcd429019611b78d01218585f8aea1106432cf3a25fb77",
       "pageVersion": "sha256:8f7565ae2cc74370cddf379965600f2038db771fa01fc33d4e842b3dcef24820",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "66573139-70f9-48b4-a843-3dfee97d2ba0",
-      "gitHead": "89e169e99b6256b85aca2aad8761153ae27c92ee",
-      "sourceFingerprint": "sha256:c6f401f44af074fcdbdcd429019611b78d01218585f8aea1106432cf3a25fb77"
+      "completedRunId": "66573139-70f9-48b4-a843-3dfee97d2ba0"
     }
   }
 }

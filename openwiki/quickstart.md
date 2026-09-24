@@ -4,9 +4,6 @@ title: "Quickstart and Task Routing"
 description: "First-stop routing map for TVI-CAMS: what the system is, the doc-reading order, the architecture and workflow pages, the invariants that gate every change, the verification loop, the current known states of the live database (2026-09-10 catalog-verified, issue #230), and the task-to-page routing table."
 tags: ["quickstart", "task-routing", "onboarding", "invariants", "verification", "tesda-compliance-manager", "nextjs", "supabase", "rls", "school-registry", "platform-admin"]
 openwiki_generated: true
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-16T00:53:47.837Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example
