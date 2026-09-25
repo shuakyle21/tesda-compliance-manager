@@ -1,12 +1,9 @@
 ---
 type: "Reference"
 title: "Quickstart and Task Routing"
-description: "First-stop routing map for TVI-CAMS: what the system is, the doc-reading order, the architecture and workflow pages, the invariants that gate every change, the verification loop, the current known states of the live database (2026-09-10 catalog-verified, issue #230), and the task-to-page routing table."
+description: "First-stop routing map for TVI-CAMS: what the system is, the doc-reading order, the fixed four-page wiki set, the invariants that gate every change, the verification loop, the current known states of the live database (2026-09-10 catalog-verified, issue #230), and the task-to-page routing table."
 tags: ["quickstart", "task-routing", "onboarding", "invariants", "verification", "tesda-compliance-manager", "nextjs", "supabase", "rls", "school-registry", "platform-admin"]
 openwiki_generated: true
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-16T00:53:47.837Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example
@@ -68,7 +65,10 @@ sources:
     resource: repo://tests/unit/user-access.test.ts
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-09-16T00:53:47.837Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-25T01:01:03.665Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-25T01:01:03.665Z
 ---
 
 
@@ -97,16 +97,15 @@ Orientation facts:
 3. [`CLAUDE.md`](/CLAUDE.md) — architecture guidance and the *why* behind the invariants.
 4. [`RULES.md`](/RULES.md) — the *what*: the non-negotiable checklist, each rule tagged with its enforcement level (hook / deny / lint / types / RLS / review). **Read it before any code change.** Where CLAUDE.md and RULES.md appear to disagree, **RULES.md wins** and the drift should be fixed.
 
-## The architecture and workflow pages
+## The fixed four-page wiki
+
+The wiki is a fixed budget of four pages: this routing map plus the three architecture pages below. There is no fifth page — a task whose answer does not fit one of them routes to the in-repo docs (`RULES.md`, `CONTEXT.md`, `docs/adr/`), not to a new wiki page.
 
 | Page | Answers |
 | --- | --- |
 | [Architecture Overview](/openwiki/architecture/overview.md) | The map: stack at a glance, request path, the auth chain in one breath, the four-layer import model, the domain-module catalog, docs precedence and the ADR set, do-not-edit design bundles, and build/run/test. |
 | [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | The schema — the live applied shape (18 tables, 36 FKs, seven enums) versus the checked-in target (25 tables, 52 FKs, eight enums once the ADR-001 billing domain lands), the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) with the 2026-09-10 catalog-verified state per version, the pending [ADR-001 billing domain](/openwiki/architecture/data-model-and-rls.md#the-adr-001-billing-domain-migration-8-pending) (a shape change), the [per-table RLS policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map) including the seven billing-domain tables, [storage policies](/openwiki/architecture/data-model-and-rls.md#storage-policies) for the private `compliance-evidence` bucket, the [ADR-006 school registry / platform admin boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), [profile provisioning](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration), the [`database.types.ts` regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract), and [RULES §10 agent-conduct guardrails](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10). |
 | [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) | Where code goes ([layer model](/openwiki/architecture/module-boundaries-and-data-pattern.md#layer-model)), [lint-enforced import direction](/openwiki/architecture/module-boundaries-and-data-pattern.md#import-direction-is-lint-enforced), a [module's private `data/` surface](/openwiki/architecture/module-boundaries-and-data-pattern.md#a-modules-data-is-private), the [fetch → map → derive contract](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-data-contract-fetch--map--derive), the [four-state snapshot union](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-four-state-snapshot-contract), the two separate type families, total [enum bridges](/openwiki/architecture/module-boundaries-and-data-pattern.md#enum-bridges-total-maps-in-the-mapper-never-in-components), and the documents module's ADR-004 gate-versus-measurement split plus its evidence-storage write path. |
-| [Design System and UI Invariants](/openwiki/architecture/design-system.md) | The [token layer](/openwiki/architecture/design-system.md#token-layer), [iconography and the no-emoji rule](/openwiki/architecture/design-system.md#iconography-and-the-no-emoji-rule), [status by text + icon, never color alone](/openwiki/architecture/design-system.md#status-text--icon-never-color-alone), [the six mandatory screen states](/openwiki/architecture/design-system.md#the-six-mandatory-screen-states), [copy rules and product framing](/openwiki/architecture/design-system.md#copy-rules-and-product-framing), and [do-not-edit static directories](/openwiki/architecture/design-system.md#do-not-edit-static-directories-and-design-sync). |
-<!-- openwiki: broken internal link [/openwiki/workflows/school-provisioning.md] file "/openwiki/workflows/school-provisioning.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-| [School Provisioning and the Platform Admin Workflow](/openwiki/workflows/school-provisioning.md) | The end-to-end ADR-006 flow: how the platform operator enrolls as admin, creates a school with its registered programs through `/schools/new`, seats the school's first admin, and hands off — including the RLS boundary that keeps this a provisioning-only role, the failure states each step can surface, and what works today versus what is still blocked on #230. |
 
 ## Invariants that gate every change
 
@@ -151,13 +150,13 @@ pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.e
 | --- | --- |
 | Before any code change (all families) | [`RULES.md`](/RULES.md) — the checklist, each rule tagged with its enforcement level |
 | Schema, RLS policies, migrations, enums, triggers, the `compliance-evidence` bucket | [data-model-and-rls](/openwiki/architecture/data-model-and-rls.md) |
-<!-- openwiki: broken internal link [/openwiki/workflows/school-provisioning.md] file "/openwiki/workflows/school-provisioning.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-| Provisioning a new school; platform admin; school registry; qualifications/COPR | [school-provisioning](/openwiki/workflows/school-provisioning.md) — the end-to-end workflow (operator enrollment, `/schools/new`, seating the first admin, handoff) — plus the schema/policy side in [data-model-and-rls, School registry and platform admin](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006) |
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+| Provisioning a new school; platform admin; school registry; qualifications/COPR | [data-model-and-rls, School registry and platform admin (ADR-006)](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006) plus the write-path sources: [`app/(dashboard)/schools/new/actions.ts`](/app/(dashboard)/schools/new/actions.ts), [`modules/tenancy/domain/schoolDraft.ts`](/modules/tenancy/domain/schoolDraft.ts), [`modules/tenancy/data/platform.ts`](/modules/tenancy/data/platform.ts), [`modules/tenancy/data/schools.ts`](/modules/tenancy/data/schools.ts) |
 | Adding a migration or regenerating `database.types.ts` | [data-model-and-rls](/openwiki/architecture/data-model-and-rls.md) + the [`docs/DATA_MODEL.md`](/docs/DATA_MODEL.md) ledger (updated in the same PR) |
 | Where code goes; import boundaries; cross-module rules; adding a module | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) |
 | New entity data layer; snapshot/error states; enum bridges; the `no-tenant-access` fold | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) |
 | Document-compliance semantics (untracked, gate vs. measurement, evidence paths) | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) + [`docs/adr/ADR-004-untracked-document-semantics.md`](/docs/adr/ADR-004-untracked-document-semantics.md) |
-| UI rules, tokens, states, copy, icons | [design-system](/openwiki/architecture/design-system.md) |
+| UI rules, tokens, states, copy, icons | [`RULES.md` §4](/RULES.md) (design system, spec-mandated) and [§5](/RULES.md) (copy and product framing); [CLAUDE.md](/CLAUDE.md) explains the why — there is no wiki page for this family |
 | Domain vocabulary; locked domain facts (progress math, ≥5 absences ineligible, one RQM code = one batch, ULI, packet lifecycle) | [`CONTEXT.md`](/CONTEXT.md) + [RULES.md, Locked domain facts](/RULES.md) |
 | Billing/packet questions (ADR-001, ADR-003 precedence) | `docs/adr/` — consult the ADR before changing schema or billing math (RULES §7); start with [ADR-001](/docs/adr/ADR-001-billing-and-domain-model.md) |
 | Verifying a change | The [verification loop](#verification-loop) above |
@@ -168,6 +167,3 @@ pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.e
 - [Architecture Overview](/openwiki/architecture/overview.md)
 - [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md)
 - [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md)
-- [Design System and UI Invariants](/openwiki/architecture/design-system.md)
-<!-- openwiki: broken internal link [/openwiki/workflows/school-provisioning.md] file "/openwiki/workflows/school-provisioning.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-- [School Provisioning and the Platform Admin Workflow](/openwiki/workflows/school-provisioning.md)
