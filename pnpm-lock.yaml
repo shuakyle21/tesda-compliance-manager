@@ -20,6 +20,9 @@ importers:
       '@tabler/icons-react':
         specifier: ^3.44.0
         version: 3.46.0(react@19.2.4)
+      '@tanstack/react-query':
+        specifier: ^5.103.0
+        version: 5.103.0(react@19.2.4)
       '@tremor/react':
         specifier: ^3.18.7
         version: 3.18.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1760,6 +1763,14 @@ packages:
 
   '@tanstack/query-core@5.102.0':
     resolution: {integrity: sha512-tvBzr11Q7StuMCEsIJdqX8TAWt6WZIzfw/yrSAjObZDerwTTPeCxeLXN2R8ZSn4ZxFpQV819Xn8QmoO+vtnDvw==}
+
+  '@tanstack/query-core@5.103.0':
+    resolution: {integrity: sha512-PfafnHQHEu7mZDsSalxSW/EBxPgF77k3atIJeQbqbb1Z7DmK2mH6YLJyqrvbbDk5M6Ua/egs7LLEs04a8robxA==}
+
+  '@tanstack/react-query@5.103.0':
+    resolution: {integrity: sha512-Kn/cvTrNwFYpS/q1MYghMsVTSinmAKV1U2AnM3/x07PiczvC+nMoySqNpQK1jgDzVCOIHk5LlF2FhTlJKQmPAQ==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@tanstack/react-virtual@3.14.10':
     resolution: {integrity: sha512-SRyoUbdFMRHuYXMijV5H4ZarQWpXkj3iANq8OFre+pybeVap8ZJjZ3Nz9bVjx4d8PfobVUQUdKyyyHYk3E+djw==}
@@ -7138,6 +7149,13 @@ snapshots:
       tailwindcss: 4.3.3
 
   '@tanstack/query-core@5.102.0': {}
+
+  '@tanstack/query-core@5.103.0': {}
+
+  '@tanstack/react-query@5.103.0(react@19.2.4)':
+    dependencies:
+      '@tanstack/query-core': 5.103.0
+      react: 19.2.4
 
   '@tanstack/react-virtual@3.14.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
