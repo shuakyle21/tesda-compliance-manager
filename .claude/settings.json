@@ -1,0 +1,86 @@
+{
+  "env": {
+    "ISSUE_PREFIX": "TES",
+    "BASE_BRANCH": "main"
+  },
+  "permissions": {
+    "deny": [
+      "mcp__supabase__execute_sql",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__deploy_edge_function",
+      "mcp__supabase__create_branch",
+      "mcp__supabase__delete_branch",
+      "mcp__supabase__merge_branch",
+      "mcp__supabase__rebase_branch",
+      "mcp__supabase__reset_branch",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__execute_sql",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__apply_migration",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__deploy_edge_function",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__create_branch",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__delete_branch",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__merge_branch",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__rebase_branch",
+      "mcp__bd43a5a2-6ad8-459d-9038-666971f8df1e__reset_branch",
+      "Bash(supabase db push:*)",
+      "Bash(supabase db reset:*)",
+      "Bash(supabase migration up:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(npx supabase db reset:*)",
+      "Bash(npx supabase migration up:*)",
+      "Bash(psql:*)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(git reset --hard *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)"
+    ],
+    "ask": [
+      "Bash(git checkout -- *)",
+      "Bash(git restore *)",
+      "Bash(git clean *)",
+      "Bash(git stash *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/check-mcp-health.sh",
+            "statusMessage": "Checking MCP connectivity..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/protect-static-dirs.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/lint-edited-file.sh",
+            "statusMessage": "Linting edited file..."
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "linear@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "nopus@nopus": true,
+    "hookify@claude-plugins-official": true
+  }
+}

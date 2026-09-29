@@ -53,6 +53,12 @@ skills-lock.json
 # ... and the agents, which encode RULES.md and are only useful to a reviewer
 # if they travel with the repo
 !.claude/agents/
+# ... and the shared settings, which wire up the hooks above (checked in but
+# inert without this) and hold the permission rules that keep destructive
+# commands out of everyone's sessions. `settings.local.json` stays ignored
+# below — that is the per-developer file and belongs to whoever's machine it
+# is on.
+!.claude/settings.json
 
 # project-scoped Claude skills (kept local, not shared with the team) ...
 .claude/skills/*
