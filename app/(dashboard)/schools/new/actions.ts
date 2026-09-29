@@ -28,6 +28,7 @@ import { createSchool, listQualifications } from '@/modules/tenancy/data/schools
 import {
   validateSchoolDraft,
   type CreateSchoolFormState,
+  type SchoolCommand,
   type SchoolProgramDraft,
 } from '@/modules/tenancy/domain/schoolDraft';
 
@@ -55,52 +56,59 @@ function readProgramDrafts(formData: FormData): SchoolProgramDraft[] {
   }));
 }
 
-export async function createSchoolAction(
-  _previous: CreateSchoolFormState,
-  formData: FormData,
-): Promise<CreateSchoolFormState> {
+/** The caller may register a school, or here is the state to return instead. */
+type PlatformAuthorization = { ok: true } | { ok: false; state: CreateSchoolFormState };
+
+/** The qualification ids on offer, or the state to return instead. */
+type AllowedQualifications =
+  | { ok: true; ids: string[] }
+  | { ok: false; state: CreateSchoolFormState };
+
+/**
+ * Confirms the caller is signed in and a platform admin.
+ *
+ * Every rejection is a form state rather than a throw, so the action can
+ * return it unchanged.
+ */
+async function authorizePlatformAdmin(): Promise<PlatformAuthorization> {
   const clerkUserId = await getAuthUserId();
-  if (!clerkUserId) return { status: 'denied' };
+  if (!clerkUserId) return { ok: false, state: { status: 'denied' } };
 
   const platform = await getPlatformAdminSnapshot();
-  if (platform.status === 'unconfigured') return { status: 'unconfigured' };
-  if (platform.status === 'sync-failed') return { status: 'failed' };
-  if (!platform.isPlatformAdmin) return { status: 'denied' };
+  if (platform.status === 'unconfigured') {
+    return { ok: false, state: { status: 'unconfigured' } };
+  }
+  if (platform.status === 'sync-failed') return { ok: false, state: { status: 'failed' } };
+  if (!platform.isPlatformAdmin) return { ok: false, state: { status: 'denied' } };
 
-  // Validating the submitted qualification ids against the list actually on
-  // offer turns a foreign-key failure into "choose a qualification from the
-  // list", which the operator can act on.
+  return { ok: true };
+}
+
+/**
+ * Reads the qualifications actually on offer.
+ *
+ * Validating the submitted qualification ids against this list turns a
+ * foreign-key failure into "choose a qualification from the list", which the
+ * operator can act on.
+ */
+async function loadAllowedQualifications(): Promise<AllowedQualifications> {
   const qualifications = await listQualifications();
-  if (qualifications.status === 'unconfigured') return { status: 'unconfigured' };
+  if (qualifications.status === 'unconfigured') {
+    return { ok: false, state: { status: 'unconfigured' } };
+  }
   if (qualifications.status === 'sync-failed') {
     console.error('createSchoolAction: qualifications lookup failed', qualifications.error);
-    return { status: 'failed' };
+    return { ok: false, state: { status: 'failed' } };
   }
 
-  const allowedQualificationIds = qualifications.qualifications.map((q) => q.id);
+  return { ok: true, ids: qualifications.qualifications.map((q) => q.id) };
+}
 
-  const validation = validateSchoolDraft(
-    {
-      code: formData.get('code'),
-      name: formData.get('name'),
-      region: formData.get('region'),
-      schoolType: formData.get('schoolType'),
-      tesdaProviderCode: formData.get('tesdaProviderCode'),
-      province: formData.get('province'),
-      cityMunicipality: formData.get('cityMunicipality'),
-      streetAddress: formData.get('streetAddress'),
-      providerType: formData.get('providerType'),
-      providerClassification: formData.get('providerClassification'),
-      programs: readProgramDrafts(formData),
-    },
-    allowedQualificationIds,
-  );
-
-  if (!validation.ok) return { status: 'invalid', errors: validation.errors };
-
-  const { command } = validation;
-  const result = await createSchool(command);
-
+/** Translates the write into a form state. */
+function schoolFormState(
+  result: Awaited<ReturnType<typeof createSchool>>,
+  command: SchoolCommand,
+): CreateSchoolFormState {
   switch (result.status) {
     case 'created':
       return {
@@ -121,4 +129,38 @@ export async function createSchoolAction(
       console.error('createSchoolAction: create failed', result.error);
       return { status: 'failed' };
   }
+}
+
+export async function createSchoolAction(
+  _previous: CreateSchoolFormState,
+  formData: FormData,
+): Promise<CreateSchoolFormState> {
+  const authorization = await authorizePlatformAdmin();
+  if (!authorization.ok) return authorization.state;
+
+  const allowed = await loadAllowedQualifications();
+  if (!allowed.ok) return allowed.state;
+
+  const validation = validateSchoolDraft(
+    {
+      code: formData.get('code'),
+      name: formData.get('name'),
+      region: formData.get('region'),
+      schoolType: formData.get('schoolType'),
+      tesdaProviderCode: formData.get('tesdaProviderCode'),
+      province: formData.get('province'),
+      cityMunicipality: formData.get('cityMunicipality'),
+      streetAddress: formData.get('streetAddress'),
+      providerType: formData.get('providerType'),
+      providerClassification: formData.get('providerClassification'),
+      programs: readProgramDrafts(formData),
+    },
+    allowed.ids,
+  );
+
+  if (!validation.ok) return { status: 'invalid', errors: validation.errors };
+
+  const { command } = validation;
+
+  return schoolFormState(await createSchool(command), command);
 }
