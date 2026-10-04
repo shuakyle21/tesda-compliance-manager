@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type SubmitEvent } from 'react';
 import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
 import { startGoogleSignIn } from '@/modules/auth/domain/oauthSignIn';
+import { sanitizeRedirectUrl } from '@/modules/auth/domain/redirectUrl';
 import styles from './sign-in.module.css';
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL;
@@ -34,7 +35,10 @@ export function SignInCard() {
   const { isLoaded } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
-  const redirectUrl = params.get("redirect_url") || "/";
+  // `redirect_url` is attacker-controlled (it arrives in the query string of
+  // a sign-in link), so only a same-origin relative path is honored —
+  // anything else falls back to "/". See sanitizeRedirectUrl.
+  const redirectUrl = sanitizeRedirectUrl(params.get("redirect_url"));
 
   const [view, setView] = useState<'signin' | 'forgot' | 'mfa' | 'trust'>('signin');
   // Sign-up modal state — owned here (the auth screen) per the handoff; the

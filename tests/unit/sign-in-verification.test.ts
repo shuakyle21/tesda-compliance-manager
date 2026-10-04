@@ -255,6 +255,17 @@ describe('handleSignIn', () => {
     expect(push).toHaveBeenCalledWith('/batches?__decorated=1');
   });
 
+  it('falls back to "/" when redirect_url is a cross-origin target', async () => {
+    const signIn = makeSignIn();
+    signIn.password.mockImplementation(leaves(signIn, 'complete'));
+
+    const { root, push } = renderCard({ signIn, searchParams: 'redirect_url=https://evil.com' });
+    await submit(cardChild(root, 'SignInView'));
+
+    expect(signIn.finalize).toHaveBeenCalled();
+    expect(push).toHaveBeenCalledWith('/?__decorated=1');
+  });
+
   it('clears a stale sign-in attempt before starting a new one', async () => {
     const signIn = makeSignIn('needs_client_trust');
     signIn.password.mockImplementation(leaves(signIn, 'complete'));
