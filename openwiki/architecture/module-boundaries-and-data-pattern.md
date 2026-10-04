@@ -18,6 +18,8 @@ sources:
     resource: repo://app/(dashboard)/report/page.tsx
   - id: openwiki-source-0555213af97e8aa00bf4b119
     resource: repo://app/(dashboard)/schools/new/actions.ts
+  - id: openwiki-source-75140e138296a68cc258200e
+    resource: repo://app/(dashboard)/schools/new/page.tsx
   - id: openwiki-source-34483bdeb5950b355468581b
     resource: repo://app/(dashboard)/tenant-access.ts
   - id: openwiki-source-6e6cc525e98e274ad6c10b29
@@ -88,6 +90,8 @@ sources:
     resource: repo://modules/tenancy/domain/access.ts
   - id: openwiki-source-5be4fd1a47d9a6f2741928aa
     resource: repo://modules/tenancy/domain/profile.ts
+  - id: openwiki-source-d3e84a9ace1c1da681c2a858
+    resource: repo://modules/tenancy/domain/userAccess.ts
   - id: openwiki-source-f7ae5e0747518115ed202c7e
     resource: repo://RULES.md
   - id: openwiki-source-a4e0261d1d83ecd919690ff7
@@ -104,14 +108,18 @@ sources:
     resource: repo://supabase/migrations/20260705070510_add_trainer_credentials.sql
   - id: openwiki-source-76fe323aec348484b7584741
     resource: repo://supabase/migrations/20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql
-  - id: openwiki-source-e41155c2222416a1b1c3d84b
-    resource: repo://supabase/migrations/20260831120000_seed_dev_operational_data.sql
   - id: openwiki-source-6d151b9adff3e78556c9a327
     resource: repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql
+  - id: openwiki-source-fc8bca54fd802af39662de6c
+    resource: repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql
   - id: openwiki-source-13117a840913dd27670d0422
     resource: repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql
-  - id: openwiki-source-67635060d6a4945c43bef066
-    resource: repo://supabase/migrations/20260906130000_add_school_registry_and_platform_admin.sql
+  - id: openwiki-source-9db8826ef803807be7854211
+    resource: repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql
+  - id: openwiki-source-d888b22083376431bb299336
+    resource: repo://supabase/seeds/20260831120000_seed_dev_operational_data.sql
+  - id: openwiki-source-a05cedbd998904c07b2c5395
+    resource: repo://supabase/seeds/README.md
   - id: openwiki-source-2020074c6fdeab02aae020b7
     resource: repo://tests/unit/batches.test.ts
   - id: openwiki-source-892600aba8a4baaca4ccc7a9
@@ -122,7 +130,10 @@ sources:
     resource: repo://tests/unit/documents.test.ts
   - id: openwiki-source-4029f22d57710f525e978978
     resource: repo://tests/unit/evidence-path.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-09-11T02:46:03.436Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-09-25T01:01:03.665Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-09-25T01:01:03.665Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -208,7 +219,7 @@ Three `app/` files are deliberately *not* inside a module, because a module may 
 
 - `app/(dashboard)/tenant-access.ts` — `resolveTenantAccess()` joins `modules/auth/data/auth`'s `getAuthUserId()` with `modules/tenancy/data/tenancy`'s profile read and returns the verdict. It encodes no rule: the meaning of the verdict lives in `modules/tenancy/domain/access.ts`. It also deliberately uses `getAuthUserId()` (a local read of the session token) rather than `getCurrentUser()` (a Clerk Backend API fetch) because the id is all the join needs.
 - `app/(dashboard)/users/new/actions.ts` — the create-user Server Action composes `modules/tenancy`'s Postgres write with `modules/auth`'s Clerk invitation; neither could call the other from inside its own module. Validation is delegated to `modules/tenancy/domain/userAccess`.
-- `app/(dashboard)/schools/new/actions.ts` — follows the same convention (it reads `getAuthUserId()` from `modules/auth/data/auth` and writes through `modules/tenancy/data/platform` + `schools`), and stays in `app/` because a Server Action is a route-level entry point: one place to look for "what can this app write".
+- `app/(dashboard)/schools/new/actions.ts` — follows the same convention (it reads `getAuthUserId()` from `modules/auth/data/auth` and the platform-admin verdict from `modules/tenancy/data/platform`, and writes through `modules/tenancy/data/schools` via the `create_school` RPC). Its header records that, unlike the create-user action, it composes only `modules/tenancy` — so it *could* have lived in the module — and that it stays in `app/` because a Server Action is a route-level entry point: one place to look for "what can this app write".
 
 ### `modules/<domain>/` — one module per PRD FR
 
@@ -239,7 +250,7 @@ Because `shared/mocks/seed.ts` was the thing that made a per-module split of `sh
 - `service.ts` — a service-role client that **bypasses RLS entirely**; reserved for trusted server-to-server writes with no Clerk session (the Clerk `user.created` webhook provisioning `profiles` via `modules/auth/data/provisioning.ts`). `SUPABASE_SERVICE_ROLE_KEY` must never be read outside this file — the ordinary write paths (`modules/tenancy/data/users.ts`, `modules/import-export/data/learnerImport.ts`) all go through the anon client so RLS decides.
 - `database.types.ts` — the raw-row contract: `Row`/`Insert`/`Update` for 18 tables, seven Postgres enums (`profile_role`, `lifecycle_stage`, `batch_status`, `document_status`, `document_audience`, `assessment_result`, `activity_action`), three RPC signatures, and `Views: Record<string, never>`.
 
-That file is **hand-maintained, not currently regenerated**: its own header says the ADR-006 additions were written by hand from `20260906130000_add_school_registry_and_platform_admin.sql` and checked field-by-field against a generator run, and it stubs every table's `Relationships` as `[]`. That stub is why supabase-js cannot infer embedded joins, which is the root of the `as` casts on join rows in `batches.ts`, `activity.ts`, `tenancy.ts`, and `users.ts`. Adopting the generator's real `Relationships` arrays is a known, deliberately deferred cleanup that would retire all four casts.
+That file is **hand-maintained, not currently regenerated**: its own header says the ADR-006 additions were written by hand from `20260906114735_add_school_registry_and_platform_admin.sql` — now APPLIED (2026-09-06) — and checked field-by-field against `generate_typescript_types` run on the live project, with two deliberate divergences from the generator (`create_school`'s nullable text parameters typed `string | null`, and `current_user_is_platform_admin`'s `Args` kept as `Record<string, never>`). It stubs every table's `Relationships` as `[]`. That stub is why supabase-js cannot infer embedded joins, which is the root of the `as` casts (the header names them four long-standing TS2352s) on join rows in `batches.ts`, `activity.ts`, `tenancy.ts`, and `users.ts`. Adopting the generator's real `Relationships` arrays is a known, deliberately deferred cleanup that would retire all four casts.
 
 ## Import direction is lint-enforced
 
@@ -357,7 +368,7 @@ Modules also extend the union with states that are genuinely different in kind, 
 
 ### Request-level de-duplication
 
-`getBatchesSnapshot`, `getProfileSnapshot`, and `getPlatformAdminSnapshot` are wrapped in React's `cache()`, not because they are slow but because **`app/(dashboard)/layout.tsx` and every page in the route group call them independently in the same request**. The layout reads the profile snapshot (for the admin nav row and the shell metrics strip) and the batches snapshot (for `MetricsRow`), and the page repeats both reads for its own body; without `cache()` each call would be its own Supabase round-trip. `cache()` scopes the sharing to one request, so a second navigation still re-queries. Route helpers that need a profile *and* an identity read (`resolveTenantAccess`, the create-user action) rely on the same property: calling them from several places in one render costs one query.
+`getBatchesSnapshot`, `getProfileSnapshot`, and `getPlatformAdminSnapshot` are wrapped in React's `cache()`, not because they are slow but because **`app/(dashboard)/layout.tsx` and every page in the route group call them independently in the same request**. The layout reads the profile snapshot (for the admin nav row, the Sidebar user card, and the tenant-access fold), the batches snapshot (for `MetricsRow`), and the platform-admin snapshot through the boolean `isPlatformAdmin()` helper (for the "Add school" row); the page repeats the two tenant reads for its own body, and the schools/new page and its action read `getPlatformAdminSnapshot` directly — without `cache()` each call would be its own Supabase round-trip. `cache()` scopes the sharing to one request, so a second navigation still re-queries. Route helpers that need a profile *and* an identity read (`resolveTenantAccess`, the create-user action) rely on the same property: calling them from several places in one render costs one query.
 
 ### Guard ordering is an invariant, not a style choice
 
@@ -440,13 +451,15 @@ Two derive-layer sentinels guard the same kind of silent corruption: `daysUntil`
 - **After any migration** — regenerate `lib/supabase/database.types.ts`, then update affected mappers and domain types (RULES §3.20). Migrations are additive on the canonical `supabase/migrations/20260528160300_create_tenant_scoped_schema.sql` (schema + RLS, which also seeds the tenants, TWSP/CFSP programs, and the 8-key requirement catalog idempotently). The full ledger in `supabase/migrations/` today:
   1. `20260705070510_add_trainer_credentials.sql` — the `trainer_credentials` table + RLS.
   2. `20260717054607_migrate_akb_tenant_and_drop_rogue_table.sql` — a guarded corrective: it copies the lone AKB record out of the hand-made, non-conforming `public.tenant` (singular) table into the canonical `tenants`, then drops the rogue table; the guard short-circuits on databases rebuilt from this history, where the table never existed.
-  3. `20260831120000_seed_dev_operational_data.sql` — dev fixture batches/learners/documents ported from the then-present `shared/mocks/seed.ts`, with `DEV-`-prefixed batch codes and NULL `official_system_reference` so the seed can never look like authoritative TESDA data; it also adds the unique `documents (batch_id, document_key)` index that makes re-runs idempotent.
-  4. `20260904120000_add_user_admin_write_policies.sql` — the user-admin write policies on `profiles` / `profile_tenant_memberships` behind `modules/tenancy/data/users.ts`.
+  3. `20260904120000_add_user_admin_write_policies.sql` — the user-admin write policies on `profiles` / `profile_tenant_memberships` behind `modules/tenancy/data/users.ts`.
+  4. `20260906114735_add_school_registry_and_platform_admin.sql` — the school registry (tenants' TESDA columns, `qualifications`, `tenant_qualifications`, `platform_admins`) and platform-admin RLS + RPCs (ADR-006); renamed from `20260906130000_…` to match the version the live database records (issue #230).
   5. `20260906120000_ensure_invitation_membership_atomic.sql` — the `ensure_profile_tenant_membership` function that applies an invitation's membership atomically (only while the profile holds none).
-  6. `20260906130000_add_school_registry_and_platform_admin.sql` — the school registry (tenants' TESDA columns, `qualifications`, `tenant_qualifications`, `platform_admins`) and platform-admin RLS + RPCs (ADR-006).
+  6. `20260910120000_add_adr001_billing_domain.sql` — the ADR-001 billing domain: seven new tables, additive columns on three existing tables, a widened RLS helper, and a closed storage-policy gap; single-shot (its guards cover `add column` / `create index` only), and deliberately no `batches.billing_deadline`.
+
+  The dev fixture that used to sit here — `20260831120000_seed_dev_operational_data.sql` — moved to `supabase/seeds/`, because as a migration the tooling would apply it to every database, including the hosted project; it is no longer part of the ledger ([dev-only seeds](/openwiki/architecture/data-model-and-rls.md#dev-only-seeds)).
 
 ## Related pages
 
 - [Quickstart](/openwiki/quickstart.md) — running the app against a Supabase project, including the env vars that decide `ok` versus `unconfigured`.
 - [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) — the schema and the `compliance-evidence` bucket policies whose first-segment tenant check the evidence path validates against; why RLS — not this layering — is the boundary that matters.
-- [Design System and UI invariants](/openwiki/architecture/design-system.md) — the `shared/ui/` primitives and the required screen states that snapshots (and the evidence result unions) map onto.
+- [`RULES.md`](/RULES.md) §4 (Design system, spec-mandated) — the required screen states every data screen implements (rule 24: loading, empty, no-results, error/sync-failed, permission-denied, stale-data) and the `shared/ui/` primitives to reuse rather than parallel (rule 25); snapshots and the evidence result unions map onto exactly these.
