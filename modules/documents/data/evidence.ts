@@ -40,6 +40,7 @@ import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase
 import {
   buildEvidencePath,
   validateEvidenceFile,
+  type EvidencePathResult,
   type EvidenceRejection,
 } from '@/modules/documents/domain/evidencePath';
 
@@ -77,6 +78,50 @@ export type SignedUrlResult =
  * for server-side logging, never for rendering.
  */
 const UPLOAD_FAILED_MESSAGE = 'The file could not be uploaded. Try again.';
+
+/**
+ * The message to report for a value thrown out of the Storage client.
+ *
+ * Both calls below need this and must answer it the same way: a real `Error`
+ * carries a message worth logging, anything else falls back to the opaque
+ * text. Neither reaches the screen.
+ */
+function thrownMessage(cause: unknown): string {
+  return cause instanceof Error ? cause.message : UPLOAD_FAILED_MESSAGE;
+}
+
+/**
+ * Re-parse a stored object key back through the builder that produced it.
+ *
+ * The trailing segments are rejoined with `/` rather than taking the fourth
+ * segment alone, and that is load-bearing. A key carrying more segments than
+ * the canonical `{tenant}/{batch}/{key}/{filename}` shape reassembles into a
+ * filename containing a separator, which `isSafeFilename` rejects. Reading
+ * only the fourth segment would instead validate a *different*, shorter path
+ * than the one the caller goes on to sign.
+ */
+function revalidateStoredPath(storagePath: string): EvidencePathResult {
+  const [tenantId = '', batchId = '', documentKey = '', ...rest] = storagePath.split('/');
+  return buildEvidencePath(tenantId, batchId, documentKey, rest.join('/'));
+}
+
+/**
+ * Read the signing call's two-field reply as one outcome.
+ *
+ * Storage can fail in two ways here and both are failures: it reports an
+ * error, or it reports none and still hands back no URL. Treating the second
+ * as success would return `ok` with an empty link, so the absent URL is
+ * checked alongside the error rather than after it.
+ */
+function signedUrlOutcome(
+  data: { signedUrl?: string } | null,
+  error: { message: string } | null,
+): SignedUrlResult {
+  if (error || !data?.signedUrl) {
+    return { status: 'sync-failed', error: error?.message ?? UPLOAD_FAILED_MESSAGE };
+  }
+  return { status: 'ok', url: data.signedUrl };
+}
 
 /**
  * Upload one evidence file.
@@ -121,10 +166,7 @@ export async function uploadEvidence(input: {
     if (error) return { status: 'sync-failed', error: error.message };
     return { status: 'ok', path: path.path };
   } catch (cause) {
-    return {
-      status: 'sync-failed',
-      error: cause instanceof Error ? cause.message : UPLOAD_FAILED_MESSAGE,
-    };
+    return { status: 'sync-failed', error: thrownMessage(cause) };
   }
 }
 
@@ -142,9 +184,7 @@ export async function getSignedEvidenceUrl(
 ): Promise<SignedUrlResult> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
-  const [tenantId = '', batchId = '', documentKey = '', ...rest] = storagePath.split('/');
-  const filename = rest.join('/');
-  const revalidated = buildEvidencePath(tenantId, batchId, documentKey, filename);
+  const revalidated = revalidateStoredPath(storagePath);
   if (!revalidated.ok) return { status: 'rejected', reason: revalidated.reason };
 
   try {
@@ -153,14 +193,8 @@ export async function getSignedEvidenceUrl(
       .from(EVIDENCE_BUCKET)
       .createSignedUrl(storagePath, expiresIn);
 
-    if (error || !data?.signedUrl) {
-      return { status: 'sync-failed', error: error?.message ?? UPLOAD_FAILED_MESSAGE };
-    }
-    return { status: 'ok', url: data.signedUrl };
+    return signedUrlOutcome(data, error);
   } catch (cause) {
-    return {
-      status: 'sync-failed',
-      error: cause instanceof Error ? cause.message : UPLOAD_FAILED_MESSAGE,
-    };
+    return { status: 'sync-failed', error: thrownMessage(cause) };
   }
 }
