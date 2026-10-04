@@ -30,8 +30,8 @@ _Avoid_: Learner id, student number
 `sessions_held ÷ total_sessions`, where `total_sessions = nominal_hours ÷ 8`, snapshotted on the batch at creation. Attendance-derived, never time-elapsed. Answers "how far through training is this batch."
 _Avoid_: % complete, days elapsed, duration progress
 
-**Ineligible (scholar)**:
-A scholar with **≥5 absences**, excluded from the allowance. This is the only eligibility rule (no attendance-% rule). Note: stored as `max_absences = 4`, but copy always states the rule as "≥5".
+**Dropped (scholar)**:
+A scholar whose absences exceed **20% of the batch's `total_sessions`** (TESDA Omnibus Guidelines; stored as `program_billing_rules.max_absence_percent = 20.00`, tenant-overridable), **or** who accrues **3 consecutive unexcused absences**, is dropped from the program (ADR-007, supersedes the earlier fixed ≥5-absence rule). Dropout is a computed signal, not an automatic write — a registrar still flips `learners.is_active` by hand.
 
 ### Documents
 
