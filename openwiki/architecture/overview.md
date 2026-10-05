@@ -4,9 +4,6 @@ title: "Architecture Overview"
 description: "TVI-CAMS architecture map: stack at a glance, request path, the Clerk to Supabase RLS auth chain, the lint-enforced four-layer import model, the 14-module catalog, docs precedence and the ADR chain, do-not-edit design bundles, and build/run/test."
 tags: [architecture, overview, nextjs, supabase, clerk, module-boundaries, billing, adr]
 openwiki_generated: true
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-25T01:01:03.665Z
 sources:
   - id: openwiki-source-10906e03e3f3530d2d51e5ab
     resource: repo://.claude/hooks/protect-static-dirs.sh

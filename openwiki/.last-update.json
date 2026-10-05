@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-10-04T02:14:24.248Z",
+  "updatedAt": "2026-10-05T03:47:00.279Z",
   "command": "update",
   "gitHead": "b34df3c5c8e6edf3ee91e8762218913087929f1c",
   "model": "auto",
-  "status": "complete",
+  "status": "interrupted",
   "language": "en"
 }

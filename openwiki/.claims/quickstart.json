@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:8a7bd64c01163d2545ccb225214539435a388dd9e3afd33f0d3a789f85e178f0",
+  "pageVersion": "sha256:549c718f6d8668c9df50d8fd2963e94e466eb9ff03c06a690fa68fea85583407",
   "claims": [
     {
       "id": "claim_989cf53fa86c46e3a2f936984aa0acee",
@@ -328,37 +328,59 @@
     },
     {
       "id": "claim_fe2d2c65dc8f4cf286265f83a2ce73b4",
-      "statement": "The Vitest unit suite (pnpm test, include pattern tests/unit/**/*.test.ts in vitest.config.mts) now spans 21 spec files in tests/unit/, including school-draft.test.ts, user-access.test.ts, sidebar.test.ts, sign-in-verification.test.ts, and tenant-access.test.ts.",
+      "statement": "The Vitest unit suite (`pnpm test`; include pattern `tests/unit/**/*.test.ts` in `vitest.config.mts`) now spans 22 spec files in `tests/unit/`. This window added `tests/unit/redirect-url.test.ts` (pure-function coverage of `modules/auth/domain/redirectUrl.sanitizeRedirectUrl`) and extended `tests/unit/sign-in-verification.test.ts` with `redirect_url` open-redirect cases (a cross-origin target falls back to `/`; a same-origin target is pushed through Clerk's `decorateUrl`).",
       "evidence": [
         {
-          "resource": "repo://tests/unit/school-draft.test.ts",
-          "version": "repo-file-v1:sha256:6458275d23606de2656a0feae1ee33a5287172f96546e791f41286debec8b951"
+          "resource": "repo://modules/auth/domain/redirectUrl.ts#L12-L24",
+          "version": "repo-lines-v1:sha256:3ab1682226c5059164c64b64731cbbc4e834050e115e345fa56cebd54feb16f1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmY2NhZjVlZTdiYzE0MzFlZmQ5YjBkYzBhMWRlMWQ1NzFlNmUxZjdlM2Y4ZTY0ZTRkMGQyNGNjYzhkMWZjZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMzY5ZDcwMjk0ZTgzNjRlNjliYmZhN2VkNTdmMDI5MTc3NTI0NGRmMjQxZGFlYWM3ODVlZDFmZmZhMzc0OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://tests/unit/sidebar.test.ts",
-          "version": "repo-file-v1:sha256:f35a30ae472f712c63bdffdb5c6811a5cddb9fbd2af7aa6bbe3fb3df504b3779"
+          "resource": "repo://tests/unit/redirect-url.test.ts",
+          "version": "repo-file-v1:sha256:e3a03c2e79cc4d9b167dffa8f14e36793e0086f5d729fbd232e8df6188450cdb"
         },
         {
-          "resource": "repo://tests/unit/sign-in-verification.test.ts",
-          "version": "repo-file-v1:sha256:40154b9f9034acd5a64bb120a1de25c31d1039e580eae455fb41cf29d8919944"
-        },
-        {
-          "resource": "repo://tests/unit/tenant-access.test.ts",
-          "version": "repo-file-v1:sha256:586ac25d99522f7839223885c8cec517c0e0e2b42c0fe3217d08fe5d7bc7821b"
-        },
-        {
-          "resource": "repo://tests/unit/user-access.test.ts",
-          "version": "repo-file-v1:sha256:5846e03f05e9c7fa4efce9e98e88e6053b6f2e4c124f13ca0945e76115e3ce87"
+          "resource": "repo://tests/unit/sign-in-verification.test.ts#L245-L267",
+          "version": "repo-lines-v1:sha256:b5a29731bf7d994d04f1183f869e535c73f92d9db5dd51db77058b89a072d0d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjMjE2ZTcxZmJkNmQ2MTVlN2U0YWFiN2U1YWU3MTY1ZGJmNmQ2MDNkNDg3NTdhNzlmM2I4ZWMzOTNjYTQxODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMxNjA4NjMxMjg0YTZiMDU4OTM3NDE1MjNhM2NiZGU4ZDg5Y2FhNDdmMzdkNTM2ZWZkMjZiMTEwZTZjMTg2OTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyNjIwOGE2MzM4ZDM0ODljYTM0YmIxYjI0MzNmZWY0MjUxMTM1NTFlMDA0YzIyNjBmMmJmNjllZGM2MzBiNDcifQ"
         },
         {
           "resource": "repo://vitest.config.mts#L11-L14",
           "version": "repo-lines-v1:sha256:d7505e5b3ea407a5bf4ac105b0d8dee1f0c7f69b39dcc93c42c9b923053f2604:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTkzNmRmN2E1YTNhYWYxODBjZmZkMWQ2NWM2NDZlZjZhZWEzNTJjYzI3Nzc0Njg2MTk5Y2Q4ZmIzZTg5OWM3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDk0NTI3Zjc2M2I2MjJhY2MxMDFhNDlkMTRmNzYzZTVhODkxNjVlODg5YjY0NjZhMjlkYjQwMzQ3ODg1NDNkNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
         }
       ]
+    },
+    {
+      "id": "claim_35dbf4c3da1842c2b137504dce127470",
+      "statement": "The post-sign-in open-redirect defense lives in the pure domain function `sanitizeRedirectUrl` (`modules/auth/domain/redirectUrl.ts`), which `app/sign-in/[[...sign-in]]/sign-in-page.tsx` invokes on the attacker-controlled `redirect_url` query param: a trimmed value passes through only if it is a same-origin relative path (single leading slash, no URL scheme, no protocol-relative `//host` form, no backslash tricks); anything else falls back to \"/\". All post-verification navigations — the `finalize` callbacks and the `startGoogleSignIn` OAuth attempt — target that sanitized value through Clerk's `decorateUrl` rather than a bare URL.",
+      "evidence": [
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L181-L181",
+          "version": "repo-lines-v1:sha256:8e733f9996bf932bc9f8185d070f4ae79f011d4923f8d2d92deddf00c60489c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGU3MzNmOTk5NmJmOTMyYmM5ZjgxODVkMDcwZjRhZTc5ZjAxMWQ0OTIzZjhkMmQ5MmRlZGRmMDBjNjA0ODljMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGU3MzNmOTk5NmJmOTMyYmM5ZjgxODVkMDcwZjRhZTc5ZjAxMWQ0OTIzZjhkMmQ5MmRlZGRmMDBjNjA0ODljMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmRlNjE5ZjQ3Yjg4OGQzZDM5MGUwYWY2Y2YzZDQ5MzdiZjY5YTRiZTNlZWU2YjRlYjRjOTAyMjQ1ZDYzNDgxMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQ3YzFjODVkMDA5ZjNhNmFjOTJhNjZjYWE1ZjVhMjlkMWYzYzVmNGJlZjM1NTY2ODkxMzc2ZWM5MGQ5M2MxMSJ9"
+        },
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L38-L41",
+          "version": "repo-lines-v1:sha256:b925c0feef7e1e77f24424b4670fe9a6e46ae4d22ba6b1159d57f91a040508f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNlNDQ3MTU2OTE3YzljNjYyZTRiZWQ1NmQ4NDQyOTRmMjI1NTgzNDI1ZTZkY2NhMGNmZTE2ZjEwOGQxNDZiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDcwMGI5ZDdiNGZlMDA5YWZiNmFkZmFlZTc1ODcxYmZlZGZhM2Q2ZDJhZTExMGZhMmE0ZmVkYmJmZDUxOGUxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTM3MDY5NWUyNmUxNDFkMmRjNjVjOWE0NDZlNDcxZmU4YzFmZDVjYzQ5MzJlY2MxYzY2Y2Y2OGNkMWYyMjg5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODJmNTc0NGRmZDY1ZTZiNzA3NWE2M2EwMzY2ZjMyMmJjNDNjZjQ0ZjYyMjA4N2RkNWU5ZTlkNmQ5OGFkMDkxMyJ9"
+        },
+        {
+          "resource": "repo://modules/auth/domain/oauthSignIn.ts#L26-L39",
+          "version": "repo-lines-v1:sha256:5ebfc09253ef139b47c756ecda0ba3185d3a4cb7203614f7744f0948c4021d04:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5Njc5ZTE0NWMzNWY3Y2EyMjYyMDdjMDA0NzI2NTJmOThmNGFhZjVlMDhhMTc5MTEzOGQzOTdkNWMwOWY0ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4OGU2ZmE5NWEyZDM4ODI0MmIxMjk1NDUxZjRmOGQyYzJlZWNmYjYxYjcyYzMxOTUxZjEzYThmYWM5NjAwYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/auth/domain/redirectUrl.ts#L12-L24",
+          "version": "repo-lines-v1:sha256:3ab1682226c5059164c64b64731cbbc4e834050e115e345fa56cebd54feb16f1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmY2NhZjVlZTdiYzE0MzFlZmQ5YjBkYzBhMWRlMWQ1NzFlNmUxZjdlM2Y4ZTY0ZTRkMGQyNGNjYzhkMWZjZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMzY5ZDcwMjk0ZTgzNjRlNjliYmZhN2VkNTdmMDI5MTc3NTI0NGRmMjQxZGFlYWM3ODVlZDFmZmZhMzc0OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/redirect-url.test.ts",
+          "version": "repo-file-v1:sha256:e3a03c2e79cc4d9b167dffa8f14e36793e0086f5d729fbd232e8df6188450cdb"
+        },
+        {
+          "resource": "repo://tests/unit/sign-in-verification.test.ts#L245-L267",
+          "version": "repo-lines-v1:sha256:b5a29731bf7d994d04f1183f869e535c73f92d9db5dd51db77058b89a072d0d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjMjE2ZTcxZmJkNmQ2MTVlN2U0YWFiN2U1YWU3MTY1ZGJmNmQ2MDNkNDg3NTdhNzlmM2I4ZWMzOTNjYTQxODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMxNjA4NjMxMjg0YTZiMDU4OTM3NDE1MjNhM2NiZGU4ZDg5Y2FhNDdmMzdkNTM2ZWZkMjZiMTEwZTZjMTg2OTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyNjIwOGE2MzM4ZDM0ODljYTM0YmIxYjI0MzNmZWY0MjUxMTM1NTFlMDA0YzIyNjBmMmJmNjllZGM2MzBiNDcifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-25T01:01:03.665Z"
+    "at": "2026-10-05T01:24:06.485Z"
   }
 }

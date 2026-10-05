@@ -11,6 +11,8 @@ sources:
     resource: repo://.nvmrc
   - id: openwiki-source-75140e138296a68cc258200e
     resource: repo://app/(dashboard)/schools/new/page.tsx
+  - id: openwiki-source-d9ee1df1a1fa6105c9c562bf
+    resource: repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx
   - id: openwiki-source-a2371d6362e5db4bc834ad03
     resource: repo://CLAUDE.md
   - id: openwiki-source-39c3295efc089133e87a9c80
@@ -23,6 +25,10 @@ sources:
     resource: repo://eslint.config.mjs
   - id: openwiki-source-2aff630ed0688d80b1b707c8
     resource: repo://modules/auth/data/provisioning.ts
+  - id: openwiki-source-fff5b0f28701e5c247650fab
+    resource: repo://modules/auth/domain/oauthSignIn.ts
+  - id: openwiki-source-d8c97a76fddda28591be8a4c
+    resource: repo://modules/auth/domain/redirectUrl.ts
   - id: openwiki-source-05b5b2c042bb4f3b47496b1f
     resource: repo://modules/documents/data/evidence.ts
   - id: openwiki-source-764eda3eb972fdc48c5584a5
@@ -53,22 +59,16 @@ sources:
     resource: repo://supabase/seeds/README.md
   - id: openwiki-source-892600aba8a4baaca4ccc7a9
     resource: repo://tests/unit/doc-blockers.test.ts
-  - id: openwiki-source-b602958ed9a6de9282d8520d
-    resource: repo://tests/unit/school-draft.test.ts
-  - id: openwiki-source-0a5743f3b49f658216da5228
-    resource: repo://tests/unit/sidebar.test.ts
+  - id: openwiki-source-34d1790c8509224339ebf77e
+    resource: repo://tests/unit/redirect-url.test.ts
   - id: openwiki-source-5840c4db50eac7206a874ca9
     resource: repo://tests/unit/sign-in-verification.test.ts
-  - id: openwiki-source-0fd3605db2590862922583b6
-    resource: repo://tests/unit/tenant-access.test.ts
-  - id: openwiki-source-fe5bad314b3fc436410eb4b1
-    resource: repo://tests/unit/user-access.test.ts
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-09-25T01:01:03.665Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-05T01:24:06.485Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-25T01:01:03.665Z
+    at: 2026-10-05T01:24:06.485Z
 ---
 
 
@@ -126,7 +126,7 @@ pnpm exec tsc --noEmit  # strict typecheck — there is no dedicated script
 pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.example
 ```
 
-- `pnpm test` runs the unit suite in `tests/unit/` (its include pattern is set in [`vitest.config.mts`](/vitest.config.mts)) — the suite now spans **21 spec files** (including `school-draft.test.ts`, `user-access.test.ts`, `sidebar.test.ts`, `sign-in-verification.test.ts`, and `tenant-access.test.ts`) — mappers and module `domain/` layers, asserted with **fixed as-of dates** so time-dependent rules stay deterministic. **Node 22+ is required:** Vitest 4's rolldown crashes at startup on older Node with a bundler stack trace, not a test failure (it calls `util.styleText` with an array argument, which throws `ERR_INVALID_ARG_VALUE` on Node 21 or older).
+- `pnpm test` runs the unit suite in `tests/unit/` (its include pattern is set in [`vitest.config.mts`](/vitest.config.mts)) — the suite now spans **22 spec files**. This window added `redirect-url.test.ts` (pure-function coverage of `sanitizeRedirectUrl` in `modules/auth/domain/redirectUrl.ts`) and extended `sign-in-verification.test.ts` with `redirect_url` open-redirect cases (a cross-origin target falls back to `/`; a same-origin target is pushed through Clerk's `decorateUrl`). Mappers and module `domain/` layers are asserted with **fixed as-of dates** so time-dependent rules stay deterministic. **Node 22+ is required:** Vitest 4's rolldown crashes at startup on older Node with a bundler stack trace, not a test failure (it calls `util.styleText` with an array argument, which throws `ERR_INVALID_ARG_VALUE` on Node 21 or older).
 - `pnpm test:e2e` boots the app via `pnpm dev` (the webServer in [`playwright.config.ts`](/playwright.config.ts)) and signs in with **Clerk test keys only** (`pk_test_*` / `sk_test_*`, never production keys) per [`.env.example`](/.env.example).
 - When RLS/tenant-isolation tests exist, they run against the real Supabase project — no mocks (RULES §9); the real-Supabase integration suite is still outstanding.
 
@@ -152,6 +152,7 @@ pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.e
 | Schema, RLS policies, migrations, enums, triggers, the `compliance-evidence` bucket | [data-model-and-rls](/openwiki/architecture/data-model-and-rls.md) |
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 | Provisioning a new school; platform admin; school registry; qualifications/COPR | [data-model-and-rls, School registry and platform admin (ADR-006)](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006) plus the write-path sources: [`app/(dashboard)/schools/new/actions.ts`](/app/(dashboard)/schools/new/actions.ts), [`modules/tenancy/domain/schoolDraft.ts`](/modules/tenancy/domain/schoolDraft.ts), [`modules/tenancy/data/platform.ts`](/modules/tenancy/data/platform.ts), [`modules/tenancy/data/schools.ts`](/modules/tenancy/data/schools.ts) |
+| Sign-in flow work: post-sign-in redirect handling, MFA, device trust, password reset, user-facing error shaping | [Architecture Overview, The auth chain in one breath](/openwiki/architecture/overview.md#the-auth-chain-in-one-breath) + `modules/auth` — the redirect defense is a pure domain rule in [`modules/auth/domain/redirectUrl.ts`](/modules/auth/domain/redirectUrl.ts) (`sanitizeRedirectUrl`: same-origin relative paths only, `/` fallback), [`modules/auth/domain/oauthSignIn.ts`](/modules/auth/domain/oauthSignIn.ts) wires it into the OAuth attempt, and the page that reads the attacker-controlled `redirect_url` param is `app/sign-in/[[...sign-in]]/sign-in-page.tsx` — + [`RULES.md`](/RULES.md) for the security-boundary and error-shaping rules; covered by `tests/unit/redirect-url.test.ts` and `tests/unit/sign-in-verification.test.ts` |
 | Adding a migration or regenerating `database.types.ts` | [data-model-and-rls](/openwiki/architecture/data-model-and-rls.md) + the [`docs/DATA_MODEL.md`](/docs/DATA_MODEL.md) ledger (updated in the same PR) |
 | Where code goes; import boundaries; cross-module rules; adding a module | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) |
 | New entity data layer; snapshot/error states; enum bridges; the `no-tenant-access` fold | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) |

@@ -127,6 +127,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## OpenWiki
 
-@AGENTS.md
+See [AGENTS.md](AGENTS.md) for OpenWiki agent instructions.
 
 <!-- OPENWIKI:END -->
