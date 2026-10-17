@@ -136,6 +136,20 @@ reviewing, or merging code.
     what those cannot answer — note that `list_tables` row counts are `reltuples` planner
     estimates, not counts.
 
+37. **A review agent is read-only, and lives in the repo.** Any agent whose job is to
+    review — `code-reviewer`, `tvicams-reviewer` — declares a `tools:` list without `Edit`
+    or `Write`, and is committed under `.claude/agents/` so every reviewer on the team runs
+    the same one. A reviewer that edits the code it is reviewing destroys the independence
+    that makes the review worth having, and a reviewer that exists only in one person's
+    `~/.claude/agents/` gives the team inconsistent results they cannot compare.
+    `tools:` in the agent's own frontmatter is what enforces this — `permissions.deny` is
+    session-wide and cannot be scoped to one agent. **[review]**
+
+    Reviewers keep `Bash` deliberately, so they can run `git diff` and the lint/typecheck/
+    test suite and verify a claim rather than take the author's word for it. It is for
+    inspection only; the deny and ask rules in `.claude/settings.json` block the
+    destructive commands for every session, reviewer or not.
+
 ---
 
 ## Locked domain facts
