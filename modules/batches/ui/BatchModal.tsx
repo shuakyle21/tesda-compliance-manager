@@ -13,6 +13,7 @@ import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
+import { BatchRosterSection } from './BatchRosterSection';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
@@ -232,6 +233,8 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
           </div>
 
           <BatchScholarsGrid batch={batch} />
+
+          <BatchRosterSection batchId={batch.id} />
 
           <div className="nm-section">
             <div className="nm-section-title"><Icon name="info-circle" size={13} />Remarks</div>

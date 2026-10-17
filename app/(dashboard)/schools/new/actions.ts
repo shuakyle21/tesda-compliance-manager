@@ -22,6 +22,7 @@
  * Clerk — so RLS covers the whole path.
  */
 
+import { revalidatePath } from 'next/cache';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { getPlatformAdminSnapshot } from '@/modules/tenancy/data/platform';
 import { createSchool, listQualifications } from '@/modules/tenancy/data/schools';
@@ -103,6 +104,11 @@ export async function createSchoolAction(
 
   switch (result.status) {
     case 'created':
+      // The dashboard layout reads the caller's profile to render the Sidebar's
+      // school switcher, so a school created here is absent from that list
+      // until the layout re-runs. `'layout'` from `/` reaches it: `(dashboard)`
+      // is a route group and contributes no URL segment of its own.
+      revalidatePath('/', 'layout');
       return {
         status: 'created',
         tenantId: result.tenantId,
