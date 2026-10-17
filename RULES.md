@@ -143,7 +143,7 @@ reviewing, or merging code.
 Not rules about code, but constants that code must not contradict:
 
 - progress = `sessions_held / total_sessions` (nominal hours ÷ 8, snapshotted on the batch)
-- a scholar with **≥5 absences is ineligible**
+- a scholar is **dropped from the program if absences exceed 20% of the batch's `total_sessions`, or on 3 consecutive unexcused absences** (ADR-007, supersedes the earlier ≥5-absence rule)
 - **one RQM code = one batch** (NTP authorization lives on the batch)
 - **ULI is the permanent learner key**
 - tenant context lives in the **URL path segment**
