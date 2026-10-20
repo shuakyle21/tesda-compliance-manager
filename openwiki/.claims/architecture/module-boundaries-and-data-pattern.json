@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:54b27cf1234c59a03790336ca4d97db162c709d4bb9406f4d510cd96300eb1d0",
+  "pageVersion": "sha256:d67c2e397b5aa9d1b9f92d8b12aa9fd78ba9c0343fdacc2fcedfd29f366481fe",
   "claims": [
     {
       "id": "claim_b261aa00374b4985868752f47201bd09",
@@ -985,10 +985,36 @@
           "version": "repo-lines-v1:sha256:1fc12ae40d38bc1fda209586173e8d16f770932346fda25e56b7399f3073e367:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTMwMjRjYWY1NjEwYjNiOWQ3NDFiZDY4MzZiMTljYWM2NGY4Y2JkMzYxZjJmNDQ5MzdmY2M0NDY2ODBkNzZiOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDczZmQwMzMyYzdlOTk0MTQxNTYwMzU5MzcwOWQ0NGUyMGRmNTA1OWY5ZDZiNWFiMGFhMmY1MjE2NTNmYWE4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjMzZWVlODM1N2QwN2FjZDdiMGRjYTNjYjkyNjU4OGE2ODZjZGFlNWJlNmMwNmM4MjBiZDVkZWQwZGFiYzZmNSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_650f8ea84e3a4d8bbb6247bbf6132a6b",
+      "statement": "modules/tenancy/data/users.ts exposes a write-side result union that is deliberately distinct from the four-state read snapshot contract rather than a fifth read variant: UserLookupSnapshot returns found | not-registered | sync-failed | unconfigured, and UserAssignmentSnapshot returns assigned (profileId, alreadyMember) | not-registered | denied | sync-failed | unconfigured. denied is drawn from a Postgres 42501 with-check violation or an UPDATE that matched zero rows so an RLS refusal is never reported as sync-failed, and not-registered means 'no profile this caller can see' (the invitation half of the flow, not an error) — the distinction app/(dashboard)/users/new/actions.ts relies on to choose between assigning access and inviting.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/users/new/actions.ts#L83-L95",
+          "version": "repo-lines-v1:sha256:9089e3aab533f568712a33dba298d3bf2aa2459b42a2a7f688ea05cf67dda729:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MGVkYmQ0ZDc3ZTY1NzVkNDZiYTQzZGM1MjUyNWIwYTExZDY0NDY1MGE1MTY5N2I3NWFjMTM2YzQ1NGY4OWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0NTMzNjhhZDFhNTc2ZjM2NTY2YjcyMTlkMTU2OWVkNTBkMWZmOTU4ZGViMGRkODczYjY3Y2Y0NWJkYTIxNzQifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L227-L238",
+          "version": "repo-lines-v1:sha256:d00ebe4c0e3375e2ac81060bb3c9dc47b94bbe79c09813585b08ee36b0f90eaa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3N2UwNjE3YzcyNDJhMjJhMTMwYzhmYWM2MTM5ODM4NTBkMTU3MTQxMGM2NDI0ZjMzNDZkNGY4NzY3ODM1NzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzMmQxZWExNzkxZmNhNTc4OTVjYTA0MGEyOGNkZmU0MjI4OTUyZGMzODg5ZmI5NjQ3NDdmNDM5YjI2NjBiMTgifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L250-L272",
+          "version": "repo-lines-v1:sha256:955520b13afdb305bdc4c331d5de5ed6b2680b263c713a6d476749f663ca0bfc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzOWM2ZGM3NGRkYTFmMmU3YjllMzcyOTNhNmUzYmNiNWQ3MWU3NzAyZDgzODYxYTQ2NmMwNmRmODQ3MjRmODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkYjkzNDlmYzAzYzRkZWRlYzhkN2IxY2Y3ZDllNjczYmE0NTcwMzgwNGQ1NDljNDUxZTM2ZjJlY2U2ZjRkMDcifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L325-L381",
+          "version": "repo-lines-v1:sha256:16bc377eb414b6da8b3dfe7183b5a5e878aa853f168c272b1e1bb3ebb56213ce:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5OGJjMDg2NDQ4NGE5YWE0NWM3YzU3NzI5NjA5NDE2YmIyMTEzOGQ1ZWMwYzk1OWQ3NmRkZjBiMDNjMDcyNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L59-L104",
+          "version": "repo-lines-v1:sha256:66902b5af85b99abb1db464fd6b44945061fabc7bb08acfdf5857636c83c4cc6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVmZjdiYWI4YTdkMjY5MjUyNDdjZmFhZThmZWZkZmIwNDM3MThlN2U1YWE1ZjgxY2JjYjRhMTRjNDIxNTMyNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1YWZiMTAxZTk0NWMwYTMzYjI3NGE3ODA1ODk1MjBlOGE5OWFiYjQwMGE3ODI0NWM3YmVmYzI2MTZiZThlM2EifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-25T01:01:03.665Z"
+    "at": "2026-10-20T01:21:35.552Z"
   }
 }
