@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:af5d15c74b1d5ec6f63685d4ae48853917972f5a1ad0d5c8a31a3afcdafec534",
+  "pageVersion": "sha256:93d0dcef86eb13524371fc3244304c3c901416ec32ccc1e074ec4577a2573d02",
   "claims": [
     {
       "id": "claim_2451e47bfaa74c17ab764a2de4103019",
@@ -669,16 +669,24 @@
       "statement": "The /users/new screen's unregistered path parks the admin's chosen grant (role + tenantId) on the Clerk invitation's publicMetadata under namespaced keys tvicamsRole/tvicamsTenantId — Backend-API-only, so the person signing up cannot forge it — and parses it all-or-nothing (modules/auth/domain/invitationMetadata.ts: a half-formed grant yields null and the least-privileged fallback), applying it in the user.created webhook when the invitation is accepted; the registered path runs findUserByEmail (case-insensitive ILIKE with escaped pattern characters plus an exact-match re-check so a wildcard can never assign access to the wrong person, and not-registered ambiguous by design, since distinguishing 'nobody has that address' from 'they belong to another school' would leak other tenants' membership) and assignUserAccess (the role UPDATE runs before the membership INSERT because it is the safer half to stop after, the INSERT always writes is_default: false because an RLS-scoped empty membership list means 'none this admin can see' rather than 'none', and an INSERT failure triggers a best-effort restorePriorRole compensation because a half-applied promotion to admin could read and set roles on the whole unassigned pool).",
       "evidence": [
         {
-          "resource": "repo://app/(dashboard)/users/new/actions.ts#L77-L117",
-          "version": "repo-lines-v1:sha256:f55e0948648a243fbbc3676ec47a3f1d13480d21d2a5de0b4ed11dfb0472f491:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYzQ3NzBiNzcxYzMwNDNiZTU3ZmQ3YTE5NjQyYjFlY2M3YmI2ODA3MzE4NDM1N2I5NmY1MmIzMTg5MzU5MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhMTNiYTU0NWJmMTEzNWJhYWFmN2I5NTczOGI5Y2E1NDExMmU5NzY2NjhhODIwMTdkNWU1YjEzMGU2MWJkNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://modules/auth/domain/invitationMetadata.ts#L39-L78",
+          "version": "repo-lines-v1:sha256:7bb99b7cac1256624a9b70faf10aa580faf435ccf3c687641fce007cf0bd7f99:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiMWNmMDc2NjFlY2NhNDgyYTk5YmFhZjcxNWYyNzA4NGMwNzlhNzEzYTQ2OWQzMjMwNDEwMzkzYzIyOGYzOWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlMjFlM2E2ZTgwNmYzNGJlNmM1YjUzZGQ4OWY4OWZiMDA3OTUzMTNiZDkyM2I3N2I5ZjZmYTc3NTM2NjkzZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://modules/auth/domain/invitationMetadata.ts#L1-L78",
-          "version": "repo-lines-v1:sha256:51de392c566fefc75fb9cddbc2ebecc1fdd1f6f147b7e52f7a1dfeb7f85ea792:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://modules/tenancy/data/users.ts#L147-L177",
+          "version": "repo-lines-v1:sha256:37d664bd32aa7ea3867f261d16a80fbe14fcc9ecd6d44c0ad15735152a00ddef:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViOWVmOTdlNWMwNjE1OGM0Zjg3Y2EyNzIxZmFhNTA3NTI1YTVmYWM1ZTQ2OTcxMzFhMTIzZjE2NDZkODNkMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZjN2I1MDQwMjBiYzhmMzkzNDU5Yzc5NzM3NGM2MWU5OWFlODVhZjFkOWY0ZTE0OGU0Y2ZkOGJmOTg0ZmFhZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0OTBmMDM4NjhiMmI0NjFmM2I4MzIwZDY5MDcxYTdjZTEwYmRkN2ZlNTQ0NTMwZmUwMzM2ZGJlYzBmYTE4MGQifQ"
         },
         {
-          "resource": "repo://modules/tenancy/data/users.ts#L147-L316",
-          "version": "repo-lines-v1:sha256:b3b3ce3ec6d60f9cdddf4cb709db8b7a785a38c61ca0296adb53351a0e112f5f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1YjllZjk3ZTVjMDYxNThjNGY4N2NhMjcyMWZhYTUwNzUyNWE1ZmFjNWU0Njk3MTMxYTEyM2YxNjQ2ZDgzZDExIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2YzdiNTA0MDIwYmM4ZjM5MzQ1OWM3OTczNzRjNjFlOTlhZTg1YWYxZDlmNGUxNDhlNGNmZDhiZjk4NGZhYWU2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+          "resource": "repo://modules/tenancy/data/users.ts#L183-L323",
+          "version": "repo-lines-v1:sha256:32843a5ac4fbdb7a50ecf83f358a7bbe5dc0d654ba022c68be367c02e2fe21f9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxYmI1YWU5M2UyMGE4NzM4NGU5YWVlNDJjOGFhMmUzM2NlNmFjODc3MzJkZjRhYjA0ZGJjOGIzZDQ5NjgzN2M4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlMzk3ZTJmN2U0MzAxMWM1NzhhNmQ3N2YxMDNmMzdhMzY5NTdiN2UzYTRhMzJmMjlmYzRjZjg5OTJjZTlhNzYyIn0"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L353-L381",
+          "version": "repo-lines-v1:sha256:0daa9df43ecee037059c79bb5932910294c8f4880821206279e5abcc7a4092d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0YTY2M2E2MDljNzliZTQ2ZTgzM2RjNThjMjRjOWQ5ZDM2MjliODI0MDlkN2JkMTBjOGFiNjhkZjliYjY3NTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmNzgyZWNjMDdjN2YyMzJmMjRjNDYzMDNmNzQ1ZTIwZGEyODdhY2VlODk5ZGIyMTRiMDBmMzg4NWY4OWRlODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql#L58-L105",
+          "version": "repo-lines-v1:sha256:10151dda11bc485b31b0910df055803ea24bda75a5a359b878d18f032aa7add5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1MDQ0ZTc5NzRmODA3Mjk1YzhkZGY2ODMwMThmMTA3ODFlMzg2MWI4M2Y5ZmNjMzk2MDU1OTFiMDJiOTZjODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0N2EyNmU3NTJjMmYxZjE5MjdjYzJlZDkxNzczYzY5MzIxYmMyZDk2NTgyMGFjMmU5NzgxYTZhOTA5Y2Y5MTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5Y2QwNWY0NjE2OTFhMzQ5ODY5NGZjMWQ1ODE1ODkyYWZmN2U3ODYwYTUzYjE5NzM2OWQ2N2E2ZGU5YWZkYTcifQ"
         }
       ]
     },
@@ -999,10 +1007,20 @@
           "version": "repo-lines-v1:sha256:2222d2d84bfb4e1e336802839e0ea15b3a3995351be1c4117653b7f4f351c31e:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzJjOTQyOTc3OGEwMDYyMTVkNzMxNzVmYjNlZGIzNWZiN2VkMGZmODgwMDRhZTgwNzFhN2U5YjAyZWNjYTk3OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDhkNzljN2RmMWE4MzdmNjI2MTNmY2YyZTczZDlkNTNhNGI2Nzg3MWRlZDk4ODVjNWU3ZDhiYjQwNzRiMDYwNiJ9"
         }
       ]
+    },
+    {
+      "id": "claim_f388c07bf07745fca764844c8b2b9252",
+      "statement": "The 2026-09-10 #230 record in supabase/migrations/README.md notes a live public.tenants policy named 'Tenants selectable by Clerk user' that no checked-in migration defines and that omits the is_active check its reviewed counterpart enforces, so the live policy set for tenants cannot be fully reproduced from the repository and the documented tenants entry describes checked-in intent rather than every policy currently enforcing it.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/README.md#L64-L66",
+          "version": "repo-lines-v1:sha256:ae65a8c298fcc6f99167d55e88741ecba7367ee41c28a7c10ea7c002f959223f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzc3OWNkNGIwMmNjODllN2E3M2VkZGMzZDdhYjNiMjRhMzY0ODJkYWNjZjlmNmY4MTMzMDc0NDlmYjRmMTU1NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2U5YTRjNTUzOWVkMGIwNjhhOWU4OWUzODcwNzFmOTk1OWE2YjJiZmQzNTU4OTMyNjFkODc1YmI2MDBiY2YwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2U4MDRjNDE2ZmVjYjdlYmYzYzJmNjA2OWQ2NDRmZDE5MmFmYzI2Njc2OWYxNDRmYzEyMGNiMjU1OGE0ODVjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-25T01:01:03.665Z"
+    "at": "2026-10-20T01:21:35.552Z"
   }
 }

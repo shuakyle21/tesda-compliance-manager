@@ -130,10 +130,10 @@ sources:
     resource: repo://tests/unit/documents.test.ts
   - id: openwiki-source-4029f22d57710f525e978978
     resource: repo://tests/unit/evidence-path.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-09-25T01:01:03.665Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-20T01:21:35.552Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-25T01:01:03.665Z
+    at: 2026-10-20T01:21:35.552Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -364,6 +364,7 @@ Modules also extend the union with states that are genuinely different in kind, 
 
 - `ProfileSnapshot` adds **`not-found`**: authenticated with Clerk but no `profiles` row yet — the webhook raced or failed. "No access yet" is not an error.
 - `LearnerImportSnapshot` adds **`validation-failed`** (`errors: string[]`) for a structurally bad CSV, checked before any Supabase client exists; partially valid files return `ok` with a `skipped` row list.
+- `UserLookupSnapshot` and `UserAssignmentSnapshot` in [`modules/tenancy/data/users.ts`](/modules/tenancy/data/users.ts) are a separate **write-side result union**, not a fifth read variant: they keep `sync-failed`/`unconfigured`, add `not-registered` (no profile for that address — the other half of the flow, not an error), and replace the read states with `found` and `assigned` (`profileId`, `alreadyMember`), plus `denied` for an RLS refusal — a Postgres `42501` `with check` violation, or an UPDATE that matched zero rows because the policy excluded them — so "you may not do this" is never reported as "the write broke".
 - `ActivitySnapshot`'s `ok` arm carries `hasMore`, `BatchesSnapshot`'s carries `dataAsOf`, `BatchDocumentsSnapshot`'s carries a backfilled status map — the union discriminates state; the payload varies per contract.
 
 ### Request-level de-duplication
