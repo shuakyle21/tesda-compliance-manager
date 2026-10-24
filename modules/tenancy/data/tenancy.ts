@@ -142,7 +142,7 @@ export const getProfileSnapshot = cache(async (clerkUserId: string): Promise<Pro
     if (error) return { status: 'sync-failed', error: error.message };
     if (!data) return { status: 'not-found' };
 
-    return { status: 'ok', profile: mapProfileRow(data as ProfileRowWithTenants) };
+    return { status: 'ok', profile: mapProfileRow(data as unknown as ProfileRowWithTenants) };
   } catch (err) {
     // Network / client-construction failures land here, not in `error` above.
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };

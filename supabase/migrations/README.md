@@ -41,25 +41,30 @@ To confirm a specific migration actually landed, check its objects **by name** �
 *sets*: several migrations add policies to the same tables, so a set comparison
 returns a superset and reads as a match no matter what is missing.
 
-## State as of 2026-09-10 (#230)
+## State as of 2026-10-04 (Phase 1 migration truth)
 
-Verified by catalog query, not inferred:
+Verified by catalog query (`list_migrations`, `pg_proc`, `pg_policies`), not inferred.
+`20260904120000` was repair-recorded (policies verified identical live);
+`20260906120000` was applied via transactional migration;
+`20260910120000` was repair-recorded (full object inventory verified live —
+enum, 7 tables, 17 columns, 9 indexes, 6 triggers, 15 policies, 2 seed rows).
 
 | File | Recorded | Objects present |
 | --- | --- | --- |
 | `20260528160300_create_tenant_scoped_schema` | ✅ | ✅ |
 | `20260705070510_add_trainer_credentials` | ✅ | ✅ |
 | `20260717054607_migrate_akb_tenant_and_drop_rogue_table` | ✅ | ✅ |
-| `20260904120000_add_user_admin_write_policies` | ❌ | ✅ applied by hand |
+| `20260904120000_add_user_admin_write_policies` | ✅ | ✅ |
 | `20260906114735_add_school_registry_and_platform_admin` | ✅ | ✅ |
-| `20260906120000_ensure_invitation_membership_atomic` | ❌ | ❌ **missing** |
+| `20260906120000_ensure_invitation_membership_atomic` | ✅ | ✅ |
+| `20260910120000_add_adr001_billing_domain` | ✅ | ✅ |
 
 `20260906114735_…` was renamed from `20260906130000_…` by this PR so its
 filename matches the version actually recorded. All ten of its policies plus
 `app_private.is_platform_admin()` were verified present first.
 
-**Outstanding:** `public.ensure_profile_tenant_membership` does not exist,
-though `modules/auth/data/provisioning.ts` calls it. See #230.
+**Resolved 2026-10-04:** `public.ensure_profile_tenant_membership` now exists
+(service_role-only grant verified); `modules/auth/data/provisioning.ts` RPC path unblocked.
 
 Also unaccounted for: `public.tenants` carries a policy
 `"Tenants selectable by Clerk user"` that no migration in this directory
