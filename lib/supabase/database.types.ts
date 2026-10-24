@@ -32,8 +32,8 @@ export type Json =
 
 export type ProfileRole = 'admin' | 'coordinator' | 'trainer' | 'viewer';
 export type LifecycleStage =
-  | 'AOU' //Affidavit of Undertaking
-  | 'NTP' //Notice to Proceed
+  | 'aou' //Affidavit of Undertaking
+  | 'ntp' //Notice to Proceed
   | 'tip' //Training Induction Program
   | 'training' //Training
   | 'assessment' //Assessment
