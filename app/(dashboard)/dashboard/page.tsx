@@ -27,7 +27,8 @@ import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { getActivitySnapshot } from '@/modules/activity/data/activity';
-import { getCurrentUser } from '@/modules/auth/data/auth';
+import { getAuthUserId, getCurrentUser } from '@/modules/auth/data/auth';
+import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { withTenantAccess } from '@/modules/tenancy/domain/access';
 import { resolveTenantAccess } from '../tenant-access';
 import {
@@ -44,32 +45,32 @@ type DashboardRole = OfficeRole;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 const ROLE_COPY: Record<DashboardRole, {
-  name: string;
   roleLabel: string;
   subtitle: string;
   permissionNote: string;
   figmaNode: string;
 }> = {
-  // Full names, matching the identity Sidebar's user card shows for each role
-  // (design's `ROLES[role].name` in TVI-CAMS.dc.html) — the greeting row
-  // below reads as "who is this" the same way the sidebar does, not a
-  // separate "Good day" salutation.
+  // Role-keyed copy only. This map used to carry a `name` per role, from the
+  // design's `ROLES[role].name` in TVI-CAMS.dc.html, back when the Sidebar's
+  // user card was hardcoded the same way. The Sidebar was wired to the real
+  // profile in `44783f7` and this map was not, so an admin was greeted as
+  // "Rosa C. Mendiola, Viewer" while the sidebar beside it showed their own
+  // name. Identity now comes from `profiles.full_name`, the same source the
+  // Sidebar reads — never from a literal in this file (RULES.md rule 19:
+  // no fabricated data, in a tool whose whole job is compliance evidence).
   coordinator: {
-    name: 'Karina Cruz',
     roleLabel: 'Coordinator',
     subtitle: 'Monitor assigned schools, urgent billing windows, and document readiness.',
     permissionNote: 'Coordinator actions enabled for assigned tenants.',
     figmaNode: '522:2367',
   },
   admin: {
-    name: 'Rodel Esteban',
     roleLabel: 'Admin',
     subtitle: 'School-level oversight for operational readiness and compliance blockers.',
     permissionNote: 'Admin controls available for the active school.',
     figmaNode: '382:3',
   },
   viewer: {
-    name: 'Rosa C. Mendiola',
     roleLabel: 'Viewer',
     subtitle: 'Read-only audit view of batch readiness, evidence, and recent activity.',
     permissionNote: 'Read-only access. Write actions are hidden and server-denied.',
@@ -87,6 +88,13 @@ const SUMMARY_CARDS: { title: string; icon: IconName; meta?: string }[] = [
 // now comes from the freshest batch row's `updated_at`; this is only the policy
 // threshold, not the data itself.
 const DATA_STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24h
+
+// Must stay the same words as the Sidebar's own `NO_NAME_LABEL`: the greeting
+// row and the user card sit on screen together, so a provisioned-but-unnamed
+// profile must not read two different ways. `?.trim() ||` rather than `??`
+// because a whitespace-only `full_name` is "no name", not a name made of
+// spaces — the same reason `initialsOf()` collapses it to a dash.
+const NO_NAME_LABEL = 'Name not set';
 
 // "Jun 19, 2026 · 14:02"-style stamp from a real timestamp.
 function formatDataStamp(date: Date): string {
@@ -220,6 +228,21 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const dashboardRole = resolveDisplayRole(firstParam(params.role), trustedRole);
   const roleCopy = ROLE_COPY[dashboardRole];
 
+  // Real signed-in name for the greeting row, from the same `profiles` read the
+  // layout gives the Sidebar. `getProfileSnapshot` is `cache()`-wrapped, so the
+  // layout having already called it in this request makes this cost no extra
+  // query. A failed or absent profile renders the honest placeholder — never a
+  // stand-in name, and never blank.
+  //
+  // Deliberately independent of `dashboardRole`: `?role=` previews a *variant*,
+  // so it may relabel the role beside the name, but it must never change whose
+  // name this is.
+  const clerkUserId = await getAuthUserId().catch(() => null);
+  const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
+  const signedInName = profileSnapshot?.status === 'ok'
+    ? profileSnapshot.profile.fullName
+    : null;
+
   // ---- Live load (TES-8 AC6) ----
   // Attempt the real Supabase fetch. `ok` → live rows (already RLS-scoped, so
   // no manual tenant filter). `sync-failed`/`unconfigured` render empty —
@@ -337,7 +360,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
           card copy the design doesn't show. */}
       <section className="dash-greeting" aria-labelledby="dashboard-role-heading">
         <div id="dashboard-role-heading" className="dash-greeting-title">
-          {roleCopy.name}
+          {signedInName?.trim() || NO_NAME_LABEL}
           <span className={`dash-greeting-role role-tag ${dashboardRole}`}>
             {roleCopy.roleLabel}
           </span>
