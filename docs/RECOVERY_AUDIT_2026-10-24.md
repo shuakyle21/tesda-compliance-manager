@@ -53,7 +53,7 @@ One rule shapes everything: **this tool has no official standing.** TESDA's own 
 
 1. **`pnpm build` fails.** [verified] The bundle compiles in 9s, then the typecheck step stops on errors. `main` cannot be deployed as it stands. On `origin/main` that is **9 errors**; on this branch, which already carries PR #278's fixes, **5**.
 2. **The sidebar user name is malformed JSX on `main`.** [verified] Not just a test failure.
-3. **The Supabase project is paused (`INACTIVE`).** [verified] Every data screen will show its empty / sync-failed state until it is resumed.
+3. ~~**The Supabase project is paused (`INACTIVE`).**~~ **Resolved the same day** — starting `pnpm dev` woke it, it now reports `ACTIVE_HEALTHY`, and it serves live tenant-scoped rows. See §G3; this was idle-pause, not an outage. Of the three, only the two code bugs were real, and both are now fixed (#281).
 
 I never ran `pnpm dev`, so "runs locally" is not something I can claim.
 
@@ -88,9 +88,9 @@ Status key per your definitions. "Required tests" = what would have to exist bef
 
 | Feature | Status | Where | Supporting commits / issues | Missing | Required tests | Confidence |
 |---|---|---|---|---|---|---|
-| **Auth chain (Clerk → Supabase → RLS)** | IMPLEMENTED BUT UNVERIFIED | `lib/supabase/server.ts`, `proxy.ts`, `app/(dashboard)/layout.tsx` | `942e827`; memory `live_data_cutover_map` | Two dashboard toggles (Clerk + Supabase Third-Party Auth) unverifiable from here | Live sign-in → RLS round-trip; token-rejection path | Medium |
+| **Auth chain (Clerk → Supabase → RLS)** | IMPLEMENTED BUT UNVERIFIED | `lib/supabase/server.ts`, `proxy.ts`, `app/(dashboard)/layout.tsx` | `942e827`; memory `live_data_cutover_map` | ~~Two dashboard toggles unverifiable from here~~ — **chain verified live 2026-10-24, see §G3**; session-refresh rough edge remains | Token-rejection path; session-refresh loop | **High** (observed working) |
 | **Tenant isolation (RLS)** | IMPLEMENTED BUT UNVERIFIED | `supabase/migrations/20260528160300_*.sql` | #52, #233 open | **The security boundary, with zero tests** | Cross-tenant read denial; viewer write denial; `is_active` enforcement | **Low** |
-| **Dashboard (FR-03/04/05)** | IMPLEMENTED BUT UNVERIFIED | `app/(dashboard)/dashboard/page.tsx`, `modules/batches/**` | `0f32159`, `b2c7732`; #65, #137 open | Role variants (#137); `billingDeadline` stands in as `end_date` (#130) | Live snapshot → render for each of the 4 roles | High on code, none on live data |
+| **Dashboard (FR-03/04/05)** | IMPLEMENTED BUT UNVERIFIED | `app/(dashboard)/dashboard/page.tsx`, `modules/batches/**` | `0f32159`, `b2c7732`; #65, #137 open | Role variants (#137); `billingDeadline` stands in as `end_date` (#130). **Fabricated persona names fixed 2026-10-24** — the header greeted every user as `Rosa C. Mendiola, Viewer` while the sidebar showed their real name, because `44783f7` de-faked the Sidebar and left this route's `ROLE_COPY` map behind | Live snapshot → render for each of the 4 roles | High on code; live data observed for one role |
 | **Batch lifecycle** | PARTIALLY IMPLEMENTED | `modules/batches/domain/urgency.ts`, `data/batches.ts` | `urgency.test.ts`, `batches.test.ts` | Status transitions + validation not built (Plan §2.4); its `LifecycleStage` type is the broken one (G2) | Transition legality table; stage-map totality | Medium |
 | **Documents & evidence (FR-06)** | IMPLEMENTED BUT UNVERIFIED | `modules/documents/**` | `doc-compliance`, `doc-blockers`, `evidence-path` tests; #40, #43 open | Trainer-scoped upload (#43); readiness matrix (#40) | Live upload round-trip; signed-URL expiry | Medium-high |
 | **Billing engine (FR-09)** | PARTIALLY IMPLEMENTED | `modules/billing/**` (6 domain files) | PR #85 merged; `billing-readiness.test.ts`; #71–#74 open | **`.docx` generation not built** (#73); cost-schedule seed (#72) | Golden-file test per template; tranche gate at each threshold | High on math, none on output docs |
@@ -193,10 +193,46 @@ Produces 5 `tsc` errors and fails `pnpm build`.
 
 **Good news:** runtime is fine. `DB_TO_UI_STAGE` uses lowercase keys that match the real database values, so queries and mapping work correctly. A types-only defect. Fix = two string literals.
 
-### G3. Supabase project is paused [verified]
-Project `azywaivpyphhsblxjgtn` (`tesda-compliance-manager`) reports `status: INACTIVE`; `list_migrations` timed out while `get_project` answered, which is the signature of a paused instance. Until it is resumed, every data screen shows an honest empty state and no schema claim can be re-verified.
+### G3. ~~Supabase project is paused~~ — **resolved the same day; the auth chain is now verified working** [verified]
 
-[inferred] Free-tier projects pause after inactivity and resume from the dashboard with data intact — but I have not confirmed that for this project, so treat "nothing is lost" as an expectation, not a fact.
+> **Correction, 2026-10-24.** This section reported `status: INACTIVE` and concluded that "every
+> data screen shows an honest empty state and no schema claim can be re-verified". Both halves
+> turned out to be wrong within hours, and the correction is the most load-bearing update in this
+> document, so the original reading is kept here rather than overwritten.
+
+**What the audit saw.** Project `azywaivpyphhsblxjgtn` (`tesda-compliance-manager`) reported
+`status: INACTIVE`, and `list_migrations` timed out while `get_project` answered — the signature of
+a paused instance.
+
+**What actually happened.** Starting `pnpm dev` woke it. The project now reports
+**`ACTIVE_HEALTHY`**, and `/dashboard` served **live tenant-scoped rows** — AKB Technical
+Vocational Inc., 3 schools, 4 active batches, 89 scholars, 75% average progress — under the real
+signed-in identity.
+
+**Why that matters more than the pause did.** It is the first end-to-end proof that
+**Clerk → Supabase → RLS works**. §D rated that chain `IMPLEMENTED BUT UNVERIFIED` at medium
+confidence, and memory `live-data-cutover-map` suspected two unset dashboard toggles. RLS-scoped
+rows reaching a page under a real identity settles it: the toggles are set and the chain is live.
+No amount of reading could have established that — a paused free-tier project reads as broken
+infrastructure from the API and as working the moment anything connects.
+
+**The lesson worth keeping,** since it will recur: `INACTIVE` on this project is not an outage and
+not data loss. It is idle-pause, and it self-resolves on first connection. Check it by connecting,
+not by asking the API.
+
+**Two caveats that stand.**
+
+- The dev-server log carries `Clerk: Refreshing the session token resulted in an infinite redirect
+  loop ... keys do not match`, and a restart left the client reporting "You're already signed in"
+  while the server threw `No Clerk session token available`. So the chain works, but session
+  handling has a real rough edge worth its own look. Not a blocker — data flowed.
+- Row counts above are what the page rendered, not a `count(*)`. Confirming them needs
+  `execute_sql`, which RULES rule 36 gates behind explicit permission.
+
+**Do not run `rm -rf .next` while `next dev` is running.** It deletes
+`.next/dev/routes-manifest.json` out from under the server, and every route then 500s with `ENOENT`
+until it is restarted. It looks exactly like a code regression and is not one. Stop the dev server
+first, or build in a separate checkout.
 
 ### G4. PR #243 and the repo now disagree about whether its migration is applied — **do not merge as-is** [verified that they disagree]
 PR #243 edits the migration `20260910120000_add_adr001_billing_domain.sql` **in place**, justified in its own description: *"still unapplied to the live project (confirmed via list_migrations, 2026-09-15)."*
@@ -208,7 +244,7 @@ Two later records say it has since been applied — `supabase/migrations/README.
 **The single fact that settles it,** once Supabase is back: does `program_billing_rules` have `max_absences` or `max_absence_percent`, and does `attendance_records` have an `excused` column?
 
 ### G5. The security boundary has no tests [verified]
-RLS and tenant isolation decide every authorization outcome and have zero automated coverage. Issue #52 open since 2026-07-25. Issue #233 flags a `public.tenants` policy missing its `is_active` check. The repo's own CLAUDE.md calls real-Supabase RLS tests "outstanding." `get_advisors` returned an empty list, but against a paused project that is **not** a clean bill of health.
+RLS and tenant isolation decide every authorization outcome and have zero automated coverage. Issue #52 open since 2026-07-25. Issue #233 flags a `public.tenants` policy missing its `is_active` check. The repo's own CLAUDE.md calls real-Supabase RLS tests "outstanding." `get_advisors` returned an empty list, but it was run while the project was paused, so that is **not** a clean bill of health. The project is live again (§G3), so it is worth re-running before anyone treats the empty result as meaningful.
 
 ### G6. Docs contradict each other on the eligibility rule [verified]
 `RULES.md:146`, `CONTEXT.md`, CLAUDE.md and the wiki all still state "≥5 absences is ineligible." ADR-007 replaces it with 20% / 3-consecutive-unexcused — and ADR-007 exists only on the unmerged branch. Right now the repo teaches a retired rule to anyone, human or agent, who reads it. PR #243 itself lists four more prose docs it knowingly left stale.
@@ -273,8 +309,8 @@ reading cannot tell a regression from existing breakage: [verified]
 No regression and no repair, correctly — none of those failures were Next's. That baseline
 also independently confirms §B's split of **9 errors on `main` versus 5 on #278's branch**.
 What it does **not** show is any runtime behaviour: the build never reaches route generation
-because the typecheck gate stops it, and §G3's paused project leaves no data to exercise a
-page against. §H task 1 is what would let a Next upgrade reach a successful build at all.
+because the typecheck gate stops it. (§H task 1 has since landed, so the build does reach route
+generation — and §G3's project is live, so pages now render real data.)
 
 One alert this does **not** clear, against the expectation above: `source-map-js`
 `CVE-2026-93749` (high). Version 1.2.2 enters the tree, but Next 16.4.3 still bundles
@@ -373,7 +409,9 @@ If you instead branch from `main`, start from **9** errors, not 5, and expect th
 
 Going green on all three re-establishes something you currently do not have: **a trustworthy baseline.** Right now you cannot tell a new breakage from the existing two.
 
-One judgement call inside task 1: RULES §20 says regenerate `database.types.ts` rather than hand-patch it. But the file is hand-maintained (its own header says so, and it stubs every `Relationships` as `[]`), and regenerating needs the paused project. Hand-patching the two literals is the pragmatic move — just say so in the commit message.
+One judgement call inside task 1: RULES §20 says regenerate `database.types.ts` rather than hand-patch it. But the file is hand-maintained (its own header says so, and it stubs every `Relationships` as `[]`), and at the time regenerating needed the project, which was paused. Hand-patching the two literals was the pragmatic move — said so in the commit message.
+
+**Update:** both fixes landed in **PR #281**, and §G3's project is live again, so the constraint that justified hand-patching has lifted. Regenerating `database.types.ts` properly — which would also populate the stubbed `Relationships` and retire the four `as unknown as` join casts from PR #278 — is now possible and worth its own task.
 
 Then do task 3 while the lesson is fresh.
 
@@ -382,7 +420,7 @@ Then do task 3 while the lesson is fresh.
 ## J. Questions only you can answer
 
 1. **PR #243 / ADR-007.** The migration it edits in place now looks applied (G4). Rework ADR-007 as a *new* additive migration, or do you have reason to believe `20260910120000` really is unapplied?
-2. **Supabase.** May I resume the paused project and run read-only metadata calls (`list_migrations`, `list_tables`) to settle the schema questions? RULES §36 and your standing rule require an explicit yes.
+2. **Supabase.** The project woke on its own (§G3), so resuming is moot — but the schema questions are still open, and §G4 in particular needs one live column check. May I run `execute_sql` for that? RULES §36 and your standing rule require an explicit yes.
 3. **Linear.** The MCP server is unauthenticated, so **Phase 2's Linear half is not done.** I could not compare issue status against code, nor check whether the stale-bot damage was repaired on the Linear side. Authorize via `/mcp` if you want that finished.
 4. **PR #278's handoff doc.** It says "Not pushed, no PR" and "Nothing has been committed or pushed" — but it lists three commits and sits inside open PR #278, which it never mentions. Correct it before merging? (This is task 0.)
 5. **The four idle PRs** (#236, #237, #251, #252) and the three stranded branches in F — revive, or close and delete?
@@ -395,9 +433,9 @@ Then do task 3 while the lesson is fresh.
 ## What I could not verify
 
 - **Linear** — server unauthenticated. No issue/milestone comparison against code. Phase 2 is incomplete on this side.
-- **Live Supabase schema, RLS policies, functions** — project paused; `list_migrations` timed out. The migration state table is inherited from earlier sessions, not re-checked today.
+- **Live Supabase schema, RLS policies, functions** — not re-checked. `list_migrations` timed out while the project was paused, and the migration state table is still inherited from earlier sessions. The project is live again (§G3), so this is now answerable rather than blocked — it just needs doing, and §G4's column check needs `execute_sql` permission.
 - **Clerk dashboard config** — server unauthenticated. The two toggles the live-data cutover needs stay unconfirmed.
 - **Runtime behaviour of any screen** — no live database and no dev server run, so nothing was exercised in a browser.
 - **Deployment** — no host or Vercel deployment was inspected; I do not know whether anything is deployed anywhere.
-- **`get_advisors`** returned an empty list, which against a paused project means nothing.
+- **`get_advisors`** returned an empty list, run while the project was paused, so it means nothing. Re-runnable now (§G5).
 - **Dependency fixes (§G9)** — nothing was bumped, installed or re-scanned. The reachability findings come from grep and `pnpm why`, which prove no *static* import path exists; they do not rule out dynamic or transitive calls, and they say nothing about whether a patched version builds cleanly.
