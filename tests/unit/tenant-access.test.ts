@@ -74,7 +74,7 @@ describe('deriveTenantAccess', () => {
 });
 
 describe('withTenantAccess', () => {
-  const ok = { status: 'ok' as const, batches: [], dataAsOf: null };
+  const ok = { status: 'ok' as const, batches: [], dataAsOf: null, fetchedAt: '2026-10-24T00:00:00.000Z' };
   const failed = { status: 'sync-failed' as const, error: 'boom' };
   const unconfigured = { status: 'unconfigured' as const };
 

@@ -19,6 +19,8 @@ function fixtureRow(overrides: Partial<BatchRowWithProgram> = {}): BatchRowWithP
     learner_count: 25,
     start_date: '2026-01-15',
     end_date: '2026-06-18',
+    billing_deadline: '2026-06-20',
+    total_sessions: 45,
     current_stage: 'training',
     status: 'ongoing',
     progress_percent: 60,
@@ -30,6 +32,7 @@ function fixtureRow(overrides: Partial<BatchRowWithProgram> = {}): BatchRowWithP
     updated_at: '2026-01-01T00:00:00.000Z',
     scholarship_programs: { code: 'TWSP', program_document_requirements: [] },
     documents: [],
+    attendance_records: [],
     ...overrides,
   };
 }
@@ -144,29 +147,38 @@ describe('mapBatchRow — days-to-billing (as-of date sensitive)', () => {
     vi.useRealTimers();
   });
 
-  it('computes daysToBilling as whole days from the fixed as-of date to end_date', () => {
-    const batch = mapBatchRow(fixtureRow({ end_date: '2026-06-18' }));
-    expect(batch.daysToBilling).toBe(17);
+  it('computes daysToBilling as whole days from the fixed as-of date to billing_deadline', () => {
+    const batch = mapBatchRow(fixtureRow({ end_date: '2026-06-18', billing_deadline: '2026-06-20' }));
+    expect(batch.daysToBilling).toBe(19);
   });
 
-  it('returns Infinity (no known deadline) when end_date is null', () => {
-    const batch = mapBatchRow(fixtureRow({ end_date: null }));
+  it('returns Infinity (no known deadline) when billing_deadline is null', () => {
+    const batch = mapBatchRow(fixtureRow({ billing_deadline: null }));
     expect(batch.daysToBilling).toBe(Number.POSITIVE_INFINITY);
   });
 
-  it('returns Infinity rather than NaN for an unparseable end_date', () => {
-    const batch = mapBatchRow(fixtureRow({ end_date: 'not-a-date' }));
+  it('returns Infinity rather than NaN for an unparseable billing_deadline', () => {
+    const batch = mapBatchRow(fixtureRow({ billing_deadline: 'not-a-date' }));
     expect(batch.daysToBilling).toBe(Number.POSITIVE_INFINITY);
     expect(Number.isNaN(batch.daysToBilling)).toBe(false);
   });
 
-  // NOTE: billingDeadline currently stands in as end_date (TODO(contract) in
-  // batches.ts, tracked on TES-30 — see the LAMR/program_modules chain in
-  // Linear). This assertion pins today's known stand-in behavior, not the
-  // intended contract; update it once a real billing_deadline column lands.
-  it('stands in billingDeadline with end_date until a real column exists', () => {
-    const batch = mapBatchRow(fixtureRow({ end_date: '2026-06-18' }));
-    expect(batch.billingDeadline).toBe('Jun 18, 2026');
+  it('preserves the canonical billing deadline instead of substituting end_date', () => {
+    const batch = mapBatchRow(fixtureRow({ end_date: '2026-06-18', billing_deadline: '2026-06-20' }));
+    expect(batch.billingDeadline).toBe('2026-06-20');
+  });
+
+  it('derives completed sessions from distinct attended dates', () => {
+    const batch = mapBatchRow(fixtureRow({
+      attendance_records: [
+        { attendance_date: '2026-01-15', present: true },
+        { attendance_date: '2026-01-15', present: true },
+        { attendance_date: '2026-01-16', present: false },
+        { attendance_date: '2026-01-17', present: true },
+      ],
+    }));
+    expect(batch.completedSessions).toBe(2);
+    expect(batch.totalSessions).toBe(45);
   });
 });
 
@@ -182,13 +194,13 @@ describe('mapBatchRow — days-to-billing (as-of date sensitive)', () => {
 // ---------------------------------------------------------------------------
 describe('selectBatchesForDisplay', () => {
   it('returns an empty list — not a substitute — when ok carries zero rows', () => {
-    const result = selectBatchesForDisplay({ status: 'ok', batches: [], dataAsOf: null });
+    const result = selectBatchesForDisplay({ status: 'ok', batches: [], dataAsOf: null, fetchedAt: '2026-10-24T00:00:00.000Z' });
     expect(result).toEqual([]);
   });
 
   it('returns live batches when the snapshot is ok and non-empty', () => {
     const live = [mapBatchRow(fixtureRow({ id: 'live-1', batch_code: 'LIVE-1' }))];
-    const result = selectBatchesForDisplay({ status: 'ok', batches: live, dataAsOf: null });
+    const result = selectBatchesForDisplay({ status: 'ok', batches: live, dataAsOf: null, fetchedAt: '2026-10-24T00:00:00.000Z' });
     expect(result.map((b) => b.id)).toEqual(['LIVE-1']);
   });
 
@@ -200,5 +212,55 @@ describe('selectBatchesForDisplay', () => {
   it('renders empty — never mock data — when the snapshot is sync-failed', () => {
     const result = selectBatchesForDisplay({ status: 'sync-failed', error: 'boom' });
     expect(result).toEqual([]);
+  });
+});
+
+describe('mapBatchRow — dashboard contract (unavailable is null, never zero)', () => {
+  it('reads an absent billing_deadline column (migration not applied) as not recorded', () => {
+    const row = fixtureRow();
+    delete (row as Partial<BatchRowWithProgram>).billing_deadline;
+    const batch = mapBatchRow(row);
+    expect(batch.billingDeadline).toBeNull();
+    expect(batch.daysToBilling).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it('reports session progress as unavailable when no attendance is recorded', () => {
+    const batch = mapBatchRow(fixtureRow({ total_sessions: 45, attendance_records: [] }));
+    expect(batch.completedSessions).toBeNull();
+    expect(batch.totalSessions).toBe(45);
+  });
+
+  it('reports session progress as unavailable when total_sessions is not snapshotted', () => {
+    const batch = mapBatchRow(fixtureRow({
+      total_sessions: null,
+      attendance_records: [{ attendance_date: '2026-02-01', present: true }],
+    }));
+    expect(batch.completedSessions).toBeNull();
+  });
+
+  it('keeps the blocked fact that status normalization folds into pending', () => {
+    expect(mapBatchRow(fixtureRow({ status: 'blocked' })).blocked).toBe(true);
+    expect(mapBatchRow(fixtureRow({ current_stage: 'blocked' })).blocked).toBe(true);
+    expect(mapBatchRow(fixtureRow()).blocked).toBe(false);
+  });
+
+  it('maps the program catalog, treating is_required as the critical measure', () => {
+    const batch = mapBatchRow(fixtureRow({
+      scholarship_programs: {
+        code: 'TWSP',
+        program_document_requirements: [
+          { id: 'r1', program_id: 'program-1', document_key: 'ntp', document_name: 'Notice to Proceed', description: null, required_for_stage: 'ntp', audience: 'all', is_required: true, sort_order: 1, created_at: '', updated_at: '' },
+          { id: 'r2', program_id: 'program-1', document_key: 'photos', document_name: 'Photos', description: null, required_for_stage: null, audience: 'all', is_required: false, sort_order: 2, created_at: '', updated_at: '' },
+        ],
+      } as unknown as BatchRowWithProgram['scholarship_programs'],
+    }));
+    expect(batch.documentRequirements).toEqual([
+      expect.objectContaining({ key: 'ntp', label: 'Notice to Proceed', stage: 'ntp', critical: true }),
+      expect.objectContaining({ key: 'photos', critical: false, stage: '' }),
+    ]);
+  });
+
+  it('never claims an NTP lag it has no dates for', () => {
+    expect(mapBatchRow(fixtureRow()).ntpLag).toBeNull();
   });
 });

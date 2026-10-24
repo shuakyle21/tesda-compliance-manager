@@ -18,6 +18,8 @@ import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicato
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
+import { sessionProgress, describeSessionProgress } from '@/modules/batches/domain/progress';
+import { formatDate } from '@/shared/dates';
 import type { Batch, LifecycleStage, UrgencyTier } from '@/shared/types';
 
 type BatchPropRow = { label: string; icon: IconName; value: ReactNode };
@@ -39,21 +41,21 @@ function buildBatchProps(batch: Batch, isTwsp: boolean, billingReady: boolean): 
     ) },
     { label: 'Training Days', icon: 'calendar', value: <TrainingDayPills schedule={batch.trainingDaySchedule} program={batch.program} /> },
     { label: 'Program', icon: 'folders', value: <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program} · {batch.ncLevel}</StatusBadge> },
-    { label: 'Status', icon: 'info-circle', value: billingReady ? <BillingReadyBadge /> : <StatusBadge variant="ongoing" iconName="check">Training Ongoing</StatusBadge> },
+    { label: 'Status', icon: 'info-circle', value: billingReady ? <BillingReadyBadge /> : <BatchStatusBadge batch={batch} /> },
     { label: 'BSRS', icon: 'shield-check', value: (
       <StatusBadge variant={batch.bsrs ? 'approved' : 'not-approved'} iconName={batch.bsrs ? 'shield-check' : 'shield-off'}>
-        {batch.bsrs ? 'APPROVED' : 'NOT APPROVED'}
+        {batch.bsrs ? 'VERIFIED' : 'NOT VERIFIED'}
       </StatusBadge>
     ) },
     { label: 'NTP → Start', icon: 'calendar', value: (
       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: batch.ntpLag === 0 ? 'var(--color-green-dk)' : 'var(--color-text-primary)' }}>
-        {batch.ntpLag === 0 ? 'Same-day' : `${batch.ntpLag} days`}
+        {batch.ntpLag === null ? 'Not recorded' : batch.ntpLag === 0 ? 'Same-day' : `${batch.ntpLag} days`}
       </span>
     ) },
-    { label: 'TIP', icon: 'check', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.tipDate}</span> },
-    { label: 'AOU', icon: 'file-invoice', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.aouDate}</span> },
+    { label: 'TIP', icon: 'check', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.tipDate || 'Not recorded'}</span> },
+    { label: 'AOU', icon: 'file-invoice', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.aouDate || 'Not recorded'}</span> },
     { label: 'Report dates', icon: 'file-text', value: (
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {batch.ntpDate} · Report {batch.reportDate}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {batch.ntpDate || 'not recorded'} · Report {batch.reportDate || 'not recorded'}</span>
     ) },
   ];
 }
@@ -80,14 +82,14 @@ function BatchModalHero({ batch, isTwsp, billingReady }: { batch: Batch; isTwsp:
 function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
   return (
     <div className="nm-section">
-      <div className="nm-section-title" style={{ color: 'var(--color-purple)' }}>
-        <Icon name="briefcase" size={13} style={{ color: 'var(--color-purple)' }} />Entrepreneurship
+      <div className="nm-section-title" style={{ color: 'var(--color-entre)' }}>
+        <Icon name="briefcase" size={13} style={{ color: 'var(--color-entre)' }} />Entrepreneurship
       </div>
       <div className="nm-entre-grid">
-        <div className="nm-entre-card" style={{ background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)' }}>
-          <div className="nm-entre-cap" style={{ color: 'var(--color-purple)' }}>Schedule</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-purple-dk)' }}>{entre.date || 'TBD'}</div>
-          <div style={{ fontSize: 11, color: 'var(--color-purple)', marginTop: 3, opacity: 0.85 }}>Immediately after training</div>
+        <div className="nm-entre-card" style={{ background: 'var(--color-entre-lt)', borderColor: 'var(--color-entre)' }}>
+          <div className="nm-entre-cap" style={{ color: 'var(--color-entre)' }}>Schedule</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-entre-dk)' }}>{entre.date || 'TBD'}</div>
+          <div style={{ fontSize: 11, color: 'var(--color-entre)', marginTop: 3, opacity: 0.85 }}>Immediately after training</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Duration</div>
@@ -101,7 +103,7 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
           {entre.status !== 'done' && entre.status !== 'active' && (
             <span style={{
               display: 'inline-flex', alignItems: 'center', height: 20, padding: '0 8px',
-              borderRadius: 'var(--radius-md)', background: 'var(--color-purple-lt)', color: 'var(--color-purple-dk)',
+              borderRadius: 'var(--radius-md)', background: 'var(--color-entre-lt)', color: 'var(--color-entre-dk)',
               fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, letterSpacing: '0.04em',
             }}>PENDING</span>
           )}
@@ -134,6 +136,14 @@ function BatchScholarsGrid({ batch }: { batch: Batch }) {
   );
 }
 
+/** The batch's recorded status in words — not "Training Ongoing" for every batch. */
+function BatchStatusBadge({ batch }: { batch: Batch }) {
+  if (batch.blocked) return <StatusBadge variant="cancelled" iconName="alert-triangle">Blocked</StatusBadge>;
+  if (batch.status === 'completed') return <StatusBadge variant="completed" iconName="check">Completed</StatusBadge>;
+  if (batch.status === 'pending') return <StatusBadge variant="upcoming">Not started</StatusBadge>;
+  return <StatusBadge variant="ongoing" iconName="check">Training ongoing</StatusBadge>;
+}
+
 export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => void }) {
   const [closing, setClosing] = useState(false);
 
@@ -158,7 +168,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
   const billingReady = isBillingReady(batch);
   const billTone = deriveBillTone(tier);
   const entre = (batch.lifecycle || []).find((s) => s.key === 'entre');
-  const daysLeft = Math.max(0, batch.totalDays - batch.currentDay);
+  const sessions = sessionProgress(batch);
   const props = buildBatchProps(batch, isTwsp, billingReady);
 
   return (
@@ -193,17 +203,17 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <div className="nm-section-title"><Icon name="chart-dots" size={13} />Training Progress</div>
             <div className="nm-progress-grid">
               <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 32, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>{batch.progressPct}%</div>
-                <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 5 }}>Day {batch.currentDay} of {batch.totalDays} training days</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 32, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>{sessions ? `${sessions.pct}%` : '—'}</div>
+                <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 5 }}>{describeSessionProgress(batch)}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                  <span>{batch.trainingStart}</span><span>→</span><span>{batch.trainingEnd}</span>
+                  <span>{formatDate(batch.trainingStart) ?? 'Not set'}</span><span>→</span><span>{formatDate(batch.trainingEnd) ?? 'Not set'}</span>
                 </div>
-                <ProgressBar percent={batch.progressPct} />
+                {sessions && <ProgressBar percent={sessions.pct} />}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                  <span>{daysLeft} training days remaining</span>
-                  <span>{batch.scholars}/{batch.approvedSeats} enrolled</span>
+                  <span>{sessions ? `${sessions.total - Math.min(sessions.held, sessions.total)} sessions remaining` : 'Attendance not recorded yet'}</span>
+                  <span>{batch.approvedSeats ? `${batch.scholars}/${batch.approvedSeats} enrolled` : `${batch.scholars} enrolled`}</span>
                 </div>
               </div>
             </div>
@@ -221,11 +231,13 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <div className="nm-billing" style={{ background: billTone.bg, borderColor: billTone.bd }}>
               <Icon name={billTone.icon} size={22} style={{ color: billTone.fg, flexShrink: 0 }} />
               <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 600, lineHeight: 1, color: billTone.fg }}>{batch.daysToBilling}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: billTone.fg, opacity: 0.8, marginTop: 3 }}>days until billing deadline</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 600, lineHeight: 1, color: billTone.fg }}>{Number.isFinite(batch.daysToBilling) ? Math.abs(batch.daysToBilling) : '—'}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: billTone.fg, marginTop: 3 }}>
+                  {!Number.isFinite(batch.daysToBilling) ? 'no billing deadline recorded' : batch.daysToBilling < 0 ? 'days overdue' : 'days until billing deadline'}
+                </div>
               </div>
               <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 500, color: billTone.fg }}>{batch.billingDeadline}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 500, color: billTone.fg }}>{formatDate(batch.billingDeadline) ?? 'Not recorded'}</div>
                 <div style={{ fontSize: 11, color: billTone.fg, opacity: 0.7, marginTop: 2 }}>Submit billing statement</div>
               </div>
             </div>

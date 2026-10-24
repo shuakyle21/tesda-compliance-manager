@@ -10,7 +10,7 @@
  */
 
 import { isBillingReady } from '@/modules/billing/domain/readiness';
-import { urgencyTier } from '@/modules/batches/domain/urgency';
+import { hasOpenBillingObligation, urgencyTier } from '@/modules/batches/domain/urgency';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
@@ -34,13 +34,16 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
   if (isBillingReady(b)) {
     rows.push({ tone: 'green', category: 'billing-ready', text: `${b.id} reached the billing progress threshold.` });
   }
-  if (b.bsrs) rows.push({ tone: 'green', category: 'bsrs-approved', text: `${b.id} BSRS approved — eligible for billing.` });
+  if (b.bsrs) rows.push({ tone: 'green', category: 'bsrs-approved', text: `${b.id} BSRS report marked verified in TVI-CAMS.` });
   // Same "billing stage already done" guard BatchTimeline uses to hide
   // completed cohorts — without it, a finished batch's now-negative
   // daysToBilling reads as a critical alert instead of disappearing.
-  const billDone = b.lifecycle.find((s) => s.key === 'bill')?.status === 'done';
-  if (!billDone && urgencyTier(b.daysToBilling) === 'critical') {
-    rows.push({ tone: 'red', category: 'billing-critical', text: `${b.id} billing window opens in ${b.daysToBilling} days.` });
+  const billingUrgency = urgencyTier(b.daysToBilling);
+  if (hasOpenBillingObligation(b) && (billingUrgency === 'critical' || billingUrgency === 'overdue')) {
+    const timing = billingUrgency === 'overdue'
+      ? `is ${Math.abs(b.daysToBilling)} days overdue.`
+      : `is due in ${b.daysToBilling} days.`;
+    rows.push({ tone: 'red', category: 'billing-critical', text: `${b.id} billing ${timing}` });
   }
   // Only flag missing critical docs once this batch actually tracks at least
   // one critical requirement — an untracked key (ADR-004) means "not synced
@@ -56,7 +59,7 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
       text: `${b.id} missing ${docCompliance.missing} critical document${docCompliance.missing > 1 ? 's' : ''}.`,
     });
   }
-  if (b.ntpLag > 7) rows.push({ tone: 'red', category: 'ntp-lag', text: `${b.id} NTP-to-start lag exceeded 7 days.` });
+  if (b.ntpLag !== null && b.ntpLag > 7) rows.push({ tone: 'red', category: 'ntp-lag', text: `${b.id} NTP-to-start lag exceeded 7 days.` });
   return rows;
 }
 

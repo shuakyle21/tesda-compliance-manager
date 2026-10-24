@@ -11,7 +11,8 @@ import { Icon, type IconName } from './Icon';
 type Tier = 'critical' | 'warning' | 'on-track' | 'overdue' | 'unknown';
 
 function tierOf(days: number | null | undefined): Tier {
-  if (days == null) return 'unknown';
+  // `Infinity` is the mapper's "no deadline recorded" sentinel — never a countdown.
+  if (days == null || !Number.isFinite(days)) return 'unknown';
   if (days < 0) return 'overdue';
   if (days <= 6) return 'critical';
   if (days <= 21) return 'warning';
@@ -70,7 +71,8 @@ export function UrgencyIndicator({ days, variant = 'inline' }: { days: number; v
   const s = TIER_STYLES[tierOf(days)];
 
   let label: string;
-  if (days < 0) label = `${Math.abs(days)}D OVERDUE`;
+  if (!Number.isFinite(days)) label = 'NOT RECORDED';
+  else if (days < 0) label = `${Math.abs(days)}D OVERDUE`;
   else if (days === 0) label = 'TODAY';
   else label = `${days} DAYS`;
 

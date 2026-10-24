@@ -27,6 +27,7 @@ import type {
 import type {
   Batch,
   DocRecord,
+  DocumentRequirement,
   LifecycleStage,
   LifecycleStageKey,
   LifecycleStatus,
@@ -40,6 +41,7 @@ type RequirementRow = Database['public']['Tables']['program_document_requirement
 type BatchRowWithProgram = BatchRow & {
   scholarship_programs: { code: string; program_document_requirements: RequirementRow[] | null } | null;
   documents: DocumentRow[] | null;
+  attendance_records: { attendance_date: string; present: boolean }[] | null;
 };
 
 /**
@@ -88,6 +90,36 @@ function mapDocumentsMap(
   for (const req of requirementRows ?? []) map[req.document_key] = MISSING_DOC;
   for (const row of documentRows ?? []) map[row.document_key] = mapDocumentRow(row);
   return map;
+}
+
+const DOCUMENT_ICONS: Partial<Record<string, string>> = {
+  aou: 'send', ntp: 'file-invoice', tip_report: 'presentation', training_schedule: 'calendar',
+  attendance: 'file-text', lamr: 'file-text', assessment: 'file-check', billing_report: 'receipt',
+};
+
+function mapRequirementRows(rows: RequirementRow[] | null | undefined): DocumentRequirement[] {
+  return (rows ?? []).map((row) => ({
+    key: row.document_key,
+    label: row.document_name,
+    stage: row.required_for_stage ?? '',
+    critical: row.is_required,
+    icon: DOCUMENT_ICONS[row.document_key] ?? 'file',
+  }));
+}
+
+/**
+ * Distinct attended dates are the completed sessions; no stored counter can
+ * drift from attendance. Progress is **unavailable** (null) unless both halves
+ * exist: a snapshotted `total_sessions`, and at least one attendance row.
+ * PostgREST returns `[]` (never null) for an empty embed, so "no rows" has to
+ * be read as "attendance not recorded here", not as a real 0 sessions held.
+ */
+function completedSessions(
+  rows: BatchRowWithProgram['attendance_records'],
+  totalSessions: number | null | undefined,
+): number | null {
+  if (!totalSessions || !rows || rows.length === 0) return null;
+  return new Set(rows.filter((row) => row.present).map((row) => row.attendance_date)).size;
 }
 
 // ---------------------------------------------------------------------------
@@ -161,7 +193,7 @@ function deriveLifecycle(currentStage: DbLifecycleStage): LifecycleStage[] {
 }
 
 /**
- * Calculates whole days from today to `dateIso` (placeholder for a real billing deadline).
+ * Calculates whole days from today to `dateIso`.
  * A missing date returns Infinity — the established "no known deadline" sentinel
  * that sorts last and never triggers urgency tiers. An *unparseable* date is
  * treated the same way: without the guard, `new Date('garbage').getTime()` is
@@ -172,24 +204,6 @@ function daysUntil(dateIso: string | null): number {
   if (!dateIso) return Number.POSITIVE_INFINITY;
   const ms = new Date(dateIso).getTime() - Date.now();
   return Number.isFinite(ms) ? Math.ceil(ms / 86_400_000) : Number.POSITIVE_INFINITY;
-}
-
-/**
- * Converts ISO date to the UI's display convention. `Batch` stores dates as pre-formatted
- * display strings (see lib/data/seed.ts: "Jun 18, 2026"; training start drops
- * the year: "Apr 21"). Passing raw ISO through would render "2026-06-18" in the
- * cards and silently defeat deriveDashboardMetrics' `, YYYY`-trimming regex.
- * Null/unparseable → '' (the UI's established empty convention).
- */
-function toDisplayDate(dateIso: string | null, withYear = true): string {
-  if (!dateIso) return '';
-  const d = new Date(dateIso);
-  if (!Number.isFinite(d.getTime())) return '';
-  return d.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    ...(withYear ? { year: 'numeric' as const } : {}),
-  });
 }
 
 /** Same `?? ''` default repeated across most of mapBatchRow's string fields below. */
@@ -220,15 +234,17 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     tenantId: row.tenant_id,
     name: batchDisplayName(row.batch_code, row.batch_section),
     qualification: row.qualification_title, // closes the TES-60 gap (AC1)
+    programId: row.program_id,
     program: orEmpty(row.scholarship_programs?.code),
     ncLevel: orEmpty(row.nc_level),
     trainer: orEmpty(row.trainer_name),
     trainerId: orEmpty(row.trainer_profile_id),
     scholars: orZero(row.learner_count),
     progressPct: orZero(row.progress_percent),
-    trainingStart: toDisplayDate(row.start_date, false),
-    trainingEnd: toDisplayDate(row.end_date),
+    trainingStart: row.start_date ?? '',
+    trainingEnd: row.end_date ?? '',
     status: normalizeStatus(row.status),
+    blocked: row.status === 'blocked' || row.current_stage === 'blocked',
     bsrs: row.billing_report_status === 'verified',
 
     // Source-row freshness — drives the dashboard stale-data signal (TES-8 AC6, #65).
@@ -237,16 +253,18 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     // Derived from current_stage:
     lifecycle: deriveLifecycle(row.current_stage),
 
-    // TODO(contract): no billing-deadline column exists yet — using end_date as a
-    // stand-in. Add `billing_deadline` to the batches contract (TES-30).
-    billingDeadline: toDisplayDate(row.end_date),
-    daysToBilling: daysUntil(row.end_date),
+    // `?? null`, not a bare read: until migration 20261024110000 is applied the
+    // column is absent and `select('*')` yields `undefined`, which would slip
+    // past every `!== null` "no deadline recorded" check downstream.
+    billingDeadline: row.billing_deadline ?? null,
+    daysToBilling: daysUntil(row.billing_deadline ?? null),
 
     // Closed (TES-30): joined + backfilled from the embedded selects below.
     documents: mapDocumentsMap(
       row.documents,
       row.scholarship_programs?.program_document_requirements,
     ),
+    documentRequirements: mapRequirementRows(row.scholarship_programs?.program_document_requirements),
 
     // TODO(contract): fields the UI type requires but the contract does not yet
     // provide. Defaulted so the shape is valid; replace as the contract grows.
@@ -254,9 +272,14 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     trainingDaySchedule: [],
     notes: '',
     duration: 0,
-    currentDay: 0,
-    totalDays: 0,
-    ntpLag: 0,
+    completedSessions: completedSessions(row.attendance_records, row.total_sessions),
+    totalSessions: row.total_sessions ?? null,
+    // Compatibility aliases for surfaces not yet migrated (analytics, billing
+    // packet math). Never rendered as a "Day X of Y" claim — UI reads the
+    // nullable fields above and shows an unavailable state instead.
+    currentDay: completedSessions(row.attendance_records, row.total_sessions) ?? 0,
+    totalDays: row.total_sessions ?? 0,
+    ntpLag: null,
     tipDate: '',
     remark: orEmpty(row.official_system_reference),
   };
@@ -270,7 +293,15 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
  * `modules/tenancy`'s fact and that module's `data/` is private to it.
  */
 export type BatchesSnapshot =
-  | { status: 'ok'; batches: Batch[]; dataAsOf: string | null }
+  | {
+      status: 'ok';
+      batches: Batch[];
+      /** Newest `updated_at` across the rows — when a batch was last *edited*. */
+      dataAsOf: string | null;
+      /** When this snapshot was read. Every request is a live read, so this is
+       *  the honest "data as of" stamp; `dataAsOf` is edit recency, not staleness. */
+      fetchedAt: string;
+    }
   | { status: 'no-tenant-access' }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
@@ -294,20 +325,27 @@ function latestUpdatedAt(batches: Batch[]): string | null {
  * its own round-trip — both `app/(dashboard)/layout.tsx` and every route's
  * `page.tsx` call this independently for the same request.
  */
-export const getBatchesSnapshot = cache(async (): Promise<BatchesSnapshot> => {
+export const getBatchesSnapshot = cache(async (tenantId?: string): Promise<BatchesSnapshot> => {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
   try {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('batches')
-      .select('*, scholarship_programs(code, program_document_requirements(*)), documents(*)')
+      .select('*, scholarship_programs(code, program_document_requirements(*)), documents(*), attendance_records(attendance_date, present)')
       .order('end_date', { ascending: true });
+    // Scope *selection*, not authorization: RLS already limits rows to the
+    // caller's schools (RULES.md §1); this picks the one school the URL is
+    // about, from a scope validated against the caller's own memberships
+    // (`modules/tenancy/domain/scope.ts`). Omitted = every school RLS allows,
+    // which only the admin overview and trainer routes ask for.
+    if (tenantId) query = query.eq('tenant_id', tenantId);
+    const { data, error } = await query;
 
     if (error) return { status: 'sync-failed', error: error.message };
 
     const batches = (data ?? []).map((row) => mapBatchRow(row as unknown as BatchRowWithProgram));
-    return { status: 'ok', batches, dataAsOf: latestUpdatedAt(batches) };
+    return { status: 'ok', batches, dataAsOf: latestUpdatedAt(batches), fetchedAt: new Date().toISOString() };
   } catch (err) {
     // Network / client-construction failures land here, not in `error` above.
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };

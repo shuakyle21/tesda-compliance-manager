@@ -86,7 +86,10 @@
      ============================================================ */
   --color-text-primary:   #18180F;
   --color-text-secondary: #5A5950;
-  --color-text-muted:     #97968E;
+  /* Darkened from #97968E (2.97:1 on white — failed WCAG AA for the 11–12px
+     labels it carries). #6B6A64 is the same warm grey at 5.43:1 on white and
+     4.60:1 on surface-alt, still a step lighter than secondary (7.05:1). */
+  --color-text-muted:     #6B6A64;
   --color-text-disabled:  #C4C2BC;
   --color-text-inverse:   #F5F4F0;
 
@@ -134,6 +137,14 @@
   --color-purple:         #534AB7;
   --color-purple-lt:      #EEEDFE;
   --color-purple-dk:      #3C3489;
+
+  /* Plum — the ENTRE (entrepreneurship) lifecycle stage, exclusively. Its own
+     family so purple stays reserved for NC levels. Base 7.0:1 on white;
+     dk on lt 9.7:1. */
+  --color-entre:          #8E3B6E;
+  --color-entre-lt:       #F7E8F1;
+  --color-entre-dk:       #5E2449;
+  --color-entre-border:   #E3B9D2;
 
   /* ============================================================
      TYPOGRAPHY

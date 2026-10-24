@@ -290,6 +290,8 @@ export interface Database {
           learner_count: number;
           start_date: string | null;
           end_date: string | null;
+          billing_deadline: string | null;
+          total_sessions: number | null;
           current_stage: LifecycleStage;
           status: BatchStatus;
           progress_percent: number;
@@ -313,6 +315,8 @@ export interface Database {
           learner_count?: number;
           start_date?: string | null;
           end_date?: string | null;
+          billing_deadline?: string | null;
+          total_sessions?: number | null;
           current_stage?: LifecycleStage;
           status?: BatchStatus;
           progress_percent?: number;

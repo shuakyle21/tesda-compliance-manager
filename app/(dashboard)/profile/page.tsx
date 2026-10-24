@@ -32,7 +32,7 @@ const ROLE_COLOR: Record<UserRole, string> = {
 const ROLE_BLURB: Record<UserRole, string> = {
   owner: 'Platform owner. Super-admin access across all tenants and system configuration.',
   admin: 'School proprietor. Full control of one school — members, documents, lifecycle and billing.',
-  coordinator: 'Registrar. Cross-school read/write access across the schools you are enrolled in.',
+  coordinator: 'Read/write access to batches, documents, and billing across the schools you are a member of.',
   trainer: 'Trainer. Manages attendance and documents for an assigned class only.',
   viewer: 'Auditor. View-only access for compliance review across schools.',
 };
@@ -52,7 +52,7 @@ const ROLE_CAPS: Record<UserRole, string[]> = {
     'Update lifecycle & dates',
     'Attach & verify documents',
     'Import / export CSV',
-    'Cross-school (registrar) access',
+    'Access across all of your schools',
   ],
   trainer: [
     'View own class',
@@ -66,9 +66,11 @@ const ROLE_CAPS: Record<UserRole, string[]> = {
 
 type ClerkProfileUser = Awaited<ReturnType<typeof getCurrentUser>>;
 
-function deriveRole(clerkUser: NonNullable<ClerkProfileUser>): UserRole {
-  const rawRole = (clerkUser.publicMetadata?.role as string | undefined)?.toLowerCase() ?? 'viewer';
-  return (rawRole as UserRole) in ROLE_BLURB ? (rawRole as UserRole) : 'viewer';
+// The role shown is `profiles.role` — the role RLS enforces — never Clerk
+// metadata, which is identity only and used to disagree with it (audit I5).
+// No profile row yet → least-privileged viewer.
+function deriveRole(dbRole: UserRole | null): UserRole {
+  return dbRole && dbRole in ROLE_BLURB ? dbRole : 'viewer';
 }
 
 function deriveIdentity(clerkUser: NonNullable<ClerkProfileUser>) {
@@ -99,8 +101,8 @@ function deriveHasGoogle(clerkUser: NonNullable<ClerkProfileUser>): boolean {
 }
 
 /** Pure Clerk-user → display-value translation, kept out of the JSX. */
-function deriveProfileView(clerkUser: NonNullable<ClerkProfileUser>) {
-  const role = deriveRole(clerkUser);
+function deriveProfileView(clerkUser: NonNullable<ClerkProfileUser>, dbRole: UserRole | null) {
+  const role = deriveRole(dbRole);
   return {
     role,
     roleColor: ROLE_COLOR[role],
@@ -177,7 +179,7 @@ function SchoolAccessCard({
       {tenants.length > 1 && (
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 10, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-teal-dk)' }}>
           <Icon name="shield-check" size={11} />
-          Registrar access across {tenants.length} schools
+          Access across {tenants.length} schools
         </div>
       )}
     </PCard>
@@ -225,6 +227,14 @@ export default async function ProfilePage() {
   const clerkUser = await getCurrentUser();
   if (!clerkUser) redirect('/sign-in');
 
+  // Live school memberships and role for this user. Anything other than `ok`
+  // (no profile row yet, query failure, or no Supabase env) leaves the list
+  // empty, which SchoolAccessCard renders as an honest "not on record" state —
+  // never a substituted catalog.
+  const profileSnapshot = await getProfileSnapshot(clerkUser.id);
+  const tenants: Tenant[] = profileSnapshot.status === 'ok' ? profileSnapshot.profile.tenants : [];
+  const activeTenantId = profileSnapshot.status === 'ok' ? profileSnapshot.profile.defaultTenantId : null;
+
   const {
     role,
     roleColor,
@@ -237,15 +247,7 @@ export default async function ProfilePage() {
     memberSince,
     lastActiveTime,
     hasGoogle,
-  } = deriveProfileView(clerkUser);
-
-  // Live school memberships for this user. Anything other than `ok` (no
-  // profile row yet, query failure, or no Supabase env) leaves the list empty,
-  // which SchoolAccessCard renders as an honest "not on record" state — never
-  // a substituted catalog.
-  const profileSnapshot = await getProfileSnapshot(clerkUser.id);
-  const tenants: Tenant[] = profileSnapshot.status === 'ok' ? profileSnapshot.profile.tenants : [];
-  const activeTenantId = profileSnapshot.status === 'ok' ? profileSnapshot.profile.defaultTenantId : null;
+  } = deriveProfileView(clerkUser, profileSnapshot.status === 'ok' ? profileSnapshot.profile.role : null);
 
   return (
     <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 16 }}>

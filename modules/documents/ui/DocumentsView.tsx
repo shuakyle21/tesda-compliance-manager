@@ -177,10 +177,10 @@ export function DocumentsView({
       [file.batchId + ':' + file.docKey]: { status: 'verified', verifiedBy: CURRENT_USER, verifiedDate: today, updated: today, source: file.source || 'Uploaded file' },
     }));
     setPreview((fp) => (fp ? { ...fp, status: 'verified', verifiedBy: CURRENT_USER, verifiedDate: today, updated: today } : fp));
-    setToast({ title: 'Document verified', message: `${file.name} accepted by ${CURRENT_USER}. Registrar notified.` });
+    setToast({ title: 'Document verified', message: `${file.name} accepted by ${CURRENT_USER}.` });
   };
   const handleRequestChanges = (file: PreviewFile) => {
-    setToast({ title: 'Changes requested', message: `${file.name} returned to the uploader. Registrar notified to re-submit.` });
+    setToast({ title: 'Changes requested', message: `${file.name} returned to the uploader to re-submit.` });
     setPreview(null);
   };
 

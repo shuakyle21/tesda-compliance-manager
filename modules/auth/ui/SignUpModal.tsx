@@ -14,7 +14,7 @@
  *   done   → "Go to sign in" closes the modal back to the sign-in card.
  *
  * The done step deliberately does NOT activate the new session: per the
- * product flow, a registrar still has to assign the account's school and role,
+ * product flow, an administrator still has to assign the account's school and role,
  * so the copy sends the user back to sign in ("You can sign in now").
  *
  * Google OAuth goes through signUp.authenticateWithRedirect and returns via
@@ -374,7 +374,7 @@ function SignUpDoneStep({ onClose }: { onClose: () => void }) {
       </span>
       <h1 className={styles.doneTitle}>Account created</h1>
       <p className={styles.sub}>
-        Your registrar will assign your school and role. You can sign in now.
+        An administrator will assign your school and role. You can sign in now.
       </p>
       <button type="button" className={styles.primary} onClick={onClose}>
         Go to sign in

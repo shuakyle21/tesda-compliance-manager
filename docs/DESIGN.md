@@ -5,6 +5,8 @@
 >
 > **Key deviations from spec** are marked with `⚠ DEVIATION` and reflect decisions made during implementation. When spec and deviation conflict, the deviation wins — `colors_and_type.css` and `ui_kits/admin/` are the live ground truth.
 
+> **2026-10-24 amendments** are collected in [§18](#18-amendments-2026-10-24) and win over anything earlier in this file they contradict.
+
 ---
 
 ## Table of Contents
@@ -26,6 +28,7 @@
 15. [Design Tokens (Code)](#15-design-tokens-code)
 16. [Figma File Structure](#16-figma-file-structure)
 17. [File Index](#17-file-index)
+18. [Amendments 2026-10-24](#18-amendments-2026-10-24)
 
 ---
 
@@ -167,7 +170,7 @@ Do **not** use monospace for: trainer names, qualification titles, remarks or de
 |---|---|---|
 | `color-text-primary` | `#18180F` | Headlines, card titles, primary labels |
 | `color-text-secondary` | `#5A5950` | Body text, descriptions, form labels |
-| `color-text-muted` | `#97968E` | Placeholders, metadata, timestamps |
+| `color-text-muted` | `#6B6A64` | Placeholders, metadata, timestamps. ⚠ DEVIATION (2026-10-24): was `#97968E`, which is 2.97:1 on white and failed AA — see §18 |
 | `color-text-disabled` | `#C4C2BC` | Disabled inputs, inactive navigation |
 | `color-text-inverse` | `#F5F4F0` | Text on dark backgrounds |
 
@@ -1126,3 +1129,44 @@ Status / Purple / DEFAULT · Light · Dark
 ---
 
 *Training Compliance System Design System · TESDA Farm School Scholarship Operations · 3 batches · 47 scholars · 2026 cycle.*
+
+---
+
+## 18. Amendments 2026-10-24
+
+From the dashboard design-system audit (`docs/DASHBOARD_DESIGN_AUDIT_2026-10-24.md`)
+and the dashboard improvement plan. Each item closes a gap the audit established;
+none is an aesthetic preference. These mirror the (gitignored) design-system skill
+references so the whole team and `tvicams-reviewer` see the same rules.
+
+### 18.1 Tokens
+
+| Change | Value | Why |
+|---|---|---|
+| `--color-text-muted` darkened | `#6B6A64` (was `#97968E`) | Old value was 2.97:1 on white, failing AA for the 11–12px labels it carries. New: 5.43:1 on white, 4.60:1 on surface-alt, still lighter than secondary (7.05:1). |
+| New plum family for **ENTRE** | `--color-entre` `#8E3B6E` · `-lt` `#F7E8F1` · `-dk` `#5E2449` · `-border` `#E3B9D2` | ENTRE borrowed purple, which is reserved for NC levels. Base is 7.0:1 on white. |
+| Semantic **text** uses `-dk` shades | e.g. `--color-amber-dk` | Base amber is 4.1:1 on white and fails AA at 11px. |
+| Role tags are neutral | `--color-text-secondary`, 10px | Role is identity, not status; teal/purple/amber are reserved. |
+
+### 18.2 Components
+
+- **Metric card:** label · value · **one verified status line**. Warning/critical keep the no-left-border deviation, tint in `-dk` shades, **and** prefix the status line with a status glyph, so severity is never color alone (RULES.md rule 23). A metric with no source shows `—` and names what is missing, never a zero. There is one KPI row (`modules/batches/ui/KpiSummary.tsx`), not a per-route copy.
+- **Lifecycle pipeline:** **7 steps** (AOU → NTP → TIP → Training → ENTRE → Assessment → Billing), matching the approved prototype. It is a list (`role="list"`, `aria-current="step"`), ENTRE uses plum, and labels never drop below 10px.
+- **Urgency indicator:** every countdown goes through it or through `urgencyTier`'s **`overdue`** tier. "No deadline recorded" is its own state, never `Infinity` and never a countdown from another date.
+- **Left-border accents:** no component uses a 3px left-border accent to signal importance, severity or category. This is now a written rule, not an inference. The only exemption is the selected table row.
+
+### 18.3 Data panels and empty states
+
+A data panel resolves its state in this order: **access restricted → unable to load data → not configured → no documents uploaded → sync pending → data**.
+- "Sync pending" appears only with a real sync signal and is never inferred.
+- A real zero is data and renders as the chart.
+- A panel whose source does not exist yet is omitted, not drawn empty with zero legends. Today that applies to the trend, which waits on stored progress snapshots, and to EGACE until its source exists.
+
+### 18.4 Dashboard
+
+- The **Needs-attention queue** is the signature element.
+  - It lists overdue or blocked work (red, "Urgent") and work coming due or needing a record (amber, "Due").
+  - Each item names its severity in words and links to its batch.
+  - Readiness (green) is never a task.
+- **Dates always carry the year** (`shared/dates.ts`). A past deadline printed without a year reads as upcoming.
+- **"Data as of"** is the snapshot's fetch time. Edit recency is not staleness.

@@ -2,7 +2,7 @@
  * SCREEN ROUTE — Add a user (FR-01/FR-02).
  *
  * The screen the sign-up flow already promises: `modules/auth/ui/SignUpModal`
- * tells a new user "your registrar will assign your school and role", and
+ * tells a new user "an administrator will assign your school and role", and
  * until now nothing performed that assignment. A self sign-up lands as a
  * `viewer` with no tenant membership (`modules/auth/data/provisioning.ts`),
  * which under RLS means no data at all.

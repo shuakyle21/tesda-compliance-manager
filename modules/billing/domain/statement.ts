@@ -16,6 +16,7 @@ import type { Batch, ScholarRow } from '@/shared/types';
 import type { BillingTrackId } from './tracks';
 import { isCfsp, trackById } from './tracks';
 import { pesosInWords } from './amountInWords';
+import { formatDate } from '@/shared/dates';
 import {
   ACCIDENT_INSURANCE,
   ENTREPRENEURSHIP_FEE,
@@ -107,7 +108,7 @@ function rqmCode(batch: Batch): string {
  */
 function trainingPeriod(batch: Batch): string {
   const hrs = nominalHoursFor(batch.qualification);
-  return `${batch.trainingStart} – ${batch.trainingEnd} (${hrs} hrs)`;
+  return `${formatDate(batch.trainingStart) ?? '—'} – ${formatDate(batch.trainingEnd) ?? '—'} (${hrs} hrs)`;
 }
 
 /**

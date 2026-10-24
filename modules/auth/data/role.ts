@@ -1,16 +1,13 @@
 /**
  * Role resolution for dashboard-tree routes (FR-01).
  *
- * Extracted so the billing route does not become a third copy of the resolver
- * that `app/(dashboard)/dashboard/page.tsx` grew inline. The dashboard still
- * carries its own copy; migrating it here is a follow-up, not part of this
- * change.
+ * One resolver for every dashboard-tree route; the dashboard's former inline
+ * Clerk-metadata copy is gone. `profiles.role` is the only role authority.
  *
  * This is a *usability* gate. The security boundary is Postgres RLS plus the
  * server-side redirect in the route — never this function's return value alone.
  */
 
-import { getCurrentUser } from '@/modules/auth/data/auth';
 import type { UserRole } from '@/shared/types';
 
 export type OfficeRole = Extract<UserRole, 'admin' | 'coordinator' | 'viewer'>;
@@ -46,15 +43,17 @@ function asResolvedRole(role: string | null): ResolvedRole {
 }
 
 /**
- * Resolves the acting role from trusted sources only:
- *   1. `dbRole` — the real role from the caller's `profiles` row (via
- *      `modules/tenancy/data`'s `getProfileSnapshot`). Passed in rather than
- *      fetched here because a module's `data/` is private to it; the caller
- *      (an `app/` route) fetches both and passes the result down.
- *   2. Clerk `publicMetadata.role` — pre-dates the real resolver, kept as a
- *      last-resort fallback for a signed-in user with no `profiles` row yet.
- * Returns `null` when neither answers — callers must fall back to the
- * least-privileged variant (viewer), not to a write-enabled one.
+ * Resolves the acting role from the one trusted source: `dbRole`, the caller's
+ * `profiles.role` (via `modules/tenancy/data`'s `getProfileSnapshot`) — the
+ * same column RLS reads, so the UI and the database can no longer disagree
+ * about who someone is. Passed in rather than fetched here because a module's
+ * `data/` is private to it; the caller (an `app/` route) fetches and passes it.
+ *
+ * Clerk is identity only. This used to fall back to Clerk
+ * `publicMetadata.role`, and the dashboard read that while the sidebar read
+ * the DB — one admin was shown as ADMIN and VIEWER on the same screen (audit
+ * I5). A signed-in user with no `profiles` row now has no role: `null`, and
+ * callers fall back to the least-privileged variant (viewer).
  *
  * This is what redirect/authorization decisions must call — never
  * `resolveRouteRole`, whose `?role=` override lets any caller claim any role
@@ -62,14 +61,7 @@ function asResolvedRole(role: string | null): ResolvedRole {
  * `?role=admin`.
  */
 export async function resolveTrustedRole(dbRole?: UserRole | null): Promise<ResolvedRole> {
-  const fromDb = asResolvedRole(dbRole ?? null);
-  if (fromDb) return fromDb;
-
-  const user = await getCurrentUser().catch(() => null);
-  const metadataRole =
-    typeof user?.publicMetadata?.role === 'string' ? user.publicMetadata.role.toLowerCase() : null;
-
-  return asResolvedRole(metadataRole);
+  return asResolvedRole(dbRole ?? null);
 }
 
 /**
@@ -107,8 +99,7 @@ export function toOfficeRole(role: ResolvedRole | string | null): OfficeRole {
  *   1. `?role=` preview override — a dev/demo affordance, stays available
  *      even once real identity exists. Lets an already-authorized caller
  *      preview another role's UI; it is not a security signal.
- *   2/3. Falls through to `resolveTrustedRole` (`dbRole`, then Clerk
- *      `publicMetadata.role`).
+ *   2. Falls through to `resolveTrustedRole` (`profiles.role`).
  *
  * Do not use this return value to gate a redirect or any write — call
  * `resolveTrustedRole` for that instead.

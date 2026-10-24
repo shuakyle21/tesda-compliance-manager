@@ -108,7 +108,7 @@ export type ActivitySnapshot =
  * through the feed; combined with `limit`, one extra row is fetched to derive
  * `hasMore` without a separate count query.
  */
-export async function getActivitySnapshot(limit?: number, offset = 0): Promise<ActivitySnapshot> {
+export async function getActivitySnapshot(limit?: number, offset = 0, tenantId?: string): Promise<ActivitySnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
 
   try {
@@ -117,6 +117,10 @@ export async function getActivitySnapshot(limit?: number, offset = 0): Promise<A
       .from('activity_log')
       .select('*, profiles(full_name, role)')
       .order('created_at', { ascending: false });
+    // Scope *selection*, not authorization: RLS already limits rows to the
+    // caller's schools; this picks the one school the URL is about
+    // (`modules/tenancy/domain/scope.ts`). Omitted = every school RLS allows.
+    if (tenantId) query = query.eq('tenant_id', tenantId);
     if (limit !== undefined) query = query.range(offset, offset + limit);
 
     const { data, error } = await query;
