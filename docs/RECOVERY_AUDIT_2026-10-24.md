@@ -219,9 +219,79 @@ It lists four names: `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `E2E_CLERK_USE
 Your working `.env.local` needs ten. Missing from the example: **every Supabase variable** (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`), `CLERK_WEBHOOK_SIGNING_SECRET`, and the client-readable `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` — the example's unprefixed `CLERK_PUBLISHABLE_KEY` is a name the browser cannot read. Anyone setting up a fresh clone, including a future you on a new machine, gets a half-configured app with no obvious cause. A deployment blocker in waiting.
 
 ### G8. Dead database dependencies [verified]
-`drizzle-orm`, `drizzle-kit` and `postgres` are in `package.json`; `DATABASE_URL` is in `.env.local`. Grep across `app/ modules/ shared/ lib/ proxy.ts` for `drizzle`, `from 'postgres'` and `DATABASE_URL` returns **zero hits**, and there is no `drizzle.config.*`. [inferred] Leftovers from the Cloud SQL plan that was drafted and never started. Harmless but misleading — they imply a second database path that does not exist. Worth removing, or recording why they stay.
+`drizzle-orm`, `drizzle-kit` and `postgres` are in `package.json`; `DATABASE_URL` is in `.env.local`. Grep across `app/ modules/ shared/ lib/ proxy.ts` for `drizzle`, `from 'postgres'` and `DATABASE_URL` returns **zero hits**, and there is no `drizzle.config.*`. [inferred] Leftovers from the Cloud SQL plan that was drafted and never started. Harmless but misleading — they imply a second database path that does not exist. Worth removing, or recording why they stay. `next-swagger-doc` belongs in the same category — see §G9.3.
 
-### G9. Lower-severity items
+### G9. 34 open Dependabot alerts — but only two reach code this app runs [verified]
+
+Surfaced by GitHub on push, not by anything in the audit above: **34 open alerts on the
+default branch — 2 critical, 17 high, 14 moderate, 1 low**, all against `pnpm-lock.yaml`.
+By Dependabot's own scope split that is **20 runtime** (1 critical, 12 high, 6 medium, 1 low)
+and **14 development** (1 critical, 5 high, 8 medium).
+
+The raw count overstates the risk, and the breakdown matters more than the total.
+**Dependabot grades the package, not this app's exposure** — it cannot see which import
+paths exist here. Four groups, worst first:
+
+**1. `next` — the only alert against a direct runtime dependency.** Installed **16.3.4**.
+
+| Severity | Advisory | What it is | Patched | Reachable here? |
+| --- | --- | --- | --- | --- |
+| **critical** | `GHSA-vcvr-r3jv-pc5j` | Remote code execution in `next/og` `ImageResponse` | 16.3.6 | **No** [verified] |
+| medium | `GHSA-3w37-wq28-93x7` | Pending `use cache` fill can leak Draft Mode content into regular responses | 16.3.8 | **No** [verified] |
+
+Neither is reachable as the app is written: grep across `app/ modules/ shared/ lib/` finds no
+`next/og`, no `ImageResponse`, no `opengraph-image`, no `use cache` and no `draftMode`.
+
+That is a reason to rank it calmly, **not** a reason to leave it. The fix is the cheapest
+item in this whole document: `package.json` already specifies `next: "^16.3.4"`, so the
+patched 16.3.6 and 16.3.8 are **inside the existing range** and `pnpm update next` clears
+both with no manifest edit and no breaking-change risk. [inferred — not run here]
+A later feature adding an OG image would silently make the critical live.
+
+**2. `swagger-ui-react` roots most of the runtime noise.** `pnpm why` traces **14 of the 20
+runtime alerts** to this one dependency:
+
+- `axios` — 10 alerts (via `swagger-client` → `@swagger-api/apidom-reference` → `axios 1.19.0`)
+- `follow-redirects` — 2
+- `dompurify` — 1, `sprintf-js` — 1
+
+Its entire use in this codebase is **one file**: `app/api-docs/SwaggerUIViewer.tsx`, loaded
+`dynamic(..., { ssr: false })`, behind `requireAuthenticatedUser()`. An internal,
+auth-gated, client-only developer page — not a product feature any TVI coordinator touches.
+
+So the highest-leverage security action here is not a version bump but a **scope decision**:
+dropping `swagger-ui-react` retires roughly 14 runtime alerts at once. Note `sprintf-js`
+`CVE-2026-97058` reports **no patched version at all**, so removal is the only route that
+closes it.
+
+**3. `next-swagger-doc` appears to be dead weight.** [verified] It is imported nowhere —
+`app/api/openapi.json/route.ts` serves the **static** `docs/openapi/openapi.json` via
+`import spec from "@/docs/openapi/openapi.json"`. Same category as the unused database
+packages in §G8, and it contributes `js-yaml` / `brace-expansion` alerts for nothing.
+
+**4. The 14 development-scope alerts do not ship.** They come from tooling —
+`@modelcontextprotocol/sdk` and `hono` (OpenWiki), `vite` / `esbuild` (Vitest),
+`compression` and the critical `proxy-addr` (`serve`, used only by `pnpm preview`),
+`fast-uri`, `ip-address`. Real for anyone running those commands locally; not part of the
+deployed app. Routine `pnpm update` territory, not an incident.
+
+**Why the audit missed this.** §G8 examined dependencies for *dead weight* and never once
+checked them for *known CVEs*. For a tool holding school compliance records that was a real
+blind spot, and it only came to light because `git push` printed a warning. Worth a standing
+check rather than an accident: Dependabot alerts are visible to `gh api
+/repos/{owner}/{repo}/dependabot/alerts`, which a CI job could read on a schedule.
+
+**Suggested order,** fitting into §H rather than displacing it: `pnpm update next` alongside
+§H task 3 (it is one command and the only runtime critical); the `swagger-ui-react` /
+`next-swagger-doc` scope decision as its own small PR, since removing a page is a product
+call; dev-scope updates whenever the lockfile is next touched.
+
+**Not verified here:** nothing was bumped, installed or re-scanned. Reachability above is
+from grep and `pnpm why`, which prove no *static* import path exists — they do not rule out
+a dynamic or transitive call, and they say nothing about whether a patched version builds
+cleanly.
+
+### G10. Lower-severity items
 - `NEXT_PUBLIC_DEMO_PASSWORD` is read in a client component (`app/sign-in/.../sign-in-page.tsx`), so a demo credential ships in the browser bundle. Intentional per ADR-005, but worth a conscious look. [verified]
 - Service-role key confined to `lib/supabase/service.ts`, server-only. Correct. [verified]
 - `/api/debug/auth-check` returns 404 in production. Correctly gated. [verified]
@@ -246,6 +316,8 @@ Your working `.env.local` needs ten. Missing from the example: **every Supabase 
 | **3** | **Add a CI job running `tsc`, `vitest`, `lint`, `build` on every PR** | Without it, 1 and 2 recur. The single highest-leverage change here | 1, 2 green first | **S** — one workflow file |
 | **4** | **Resume Supabase, then re-verify the migration table** | Gates every live claim, and settles #243 (G4) | dashboard access | **S**, then **M** |
 | **5** | **Build `modules/attendance/domain/eligibility.ts`** (after re-cutting ADR-007 as a *new* additive migration) | Where you were actually heading. Pure domain logic, unit-testable, unblocks billing tranches | 4, #243 | **M** |
+
+**Alongside task 3:** `pnpm update next`. It is one command inside the existing `^16.3.4` range, and it clears the only runtime-critical dependency alert (§G9).
 
 **Then:** the role resolver (#32/#136) and an RLS test suite (#52) are the two biggest remaining risks. Both deserve their own focused sessions.
 
@@ -296,3 +368,4 @@ Then do task 3 while the lesson is fresh.
 - **Runtime behaviour of any screen** — no live database and no dev server run, so nothing was exercised in a browser.
 - **Deployment** — no host or Vercel deployment was inspected; I do not know whether anything is deployed anywhere.
 - **`get_advisors`** returned an empty list, which against a paused project means nothing.
+- **Dependency fixes (§G9)** — nothing was bumped, installed or re-scanned. The reachability findings come from grep and `pnpm why`, which prove no *static* import path exists; they do not rule out dynamic or transitive calls, and they say nothing about whether a patched version builds cleanly.
