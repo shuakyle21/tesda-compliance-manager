@@ -21,6 +21,8 @@
  */
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { parseScopedPath, scopedPath } from '@/modules/tenancy/domain/scope';
 import { Icon } from '@/shared/ui/Icon';
 import { useNavDrawer } from './NavDrawerProvider';
 
@@ -33,6 +35,10 @@ interface TopbarProps {
 }
 
 export function Topbar({ isTrainerRoute = false }: TopbarProps) {
+  // The activity log is per school; stay in the school the URL is on (the
+  // legacy unscoped path still works and forwards to the default school).
+  const scoped = parseScopedPath(usePathname());
+  const activityHref = scoped ? scopedPath(scoped.code, 'activity-log') : '/activity-log';
   const { collapsed, toggleCollapsed } = useNavDrawer();
 
   return (
@@ -43,7 +49,7 @@ export function Topbar({ isTrainerRoute = false }: TopbarProps) {
         </button>
       )}
       {!isTrainerRoute && (
-        <Link href="/activity-log" className="topbar-bell icon-btn" aria-label="Notifications" title="Notifications" style={{ marginLeft: 'auto', position: 'relative' }}>
+        <Link href={activityHref} className="topbar-bell icon-btn" aria-label="Notifications" title="Notifications" style={{ marginLeft: 'auto', position: 'relative' }}>
           <Icon name="bell" size={17} />
         </Link>
       )}

@@ -1,50 +1,60 @@
 /**
- * Dashboard metric derivation — the 5/6-card KPI summary, computed from a batch
- * set (never hardcoded, so the numbers cannot drift from the records).
+ * Dashboard metric derivation — the one canonical KPI summary, computed from a
+ * batch set (never hardcoded, so the numbers cannot drift from the records).
+ * Both the dashboard KPI grid and the shell's metrics row read this; neither
+ * re-derives a number of its own.
  *
- * Moved out of `shared/mocks/index.ts` (TES-94) for two reasons: it was called
- * `getMockMetrics` while the dashboard already fed it **live** batches, and its
- * document-compliance half had to consult `modules/documents/domain/compliance`
- * — an import `shared/` is not allowed to make. Same precedent as TES-68 moving
- * `urgencyTier` and `isBillingReady` out of `shared/`.
+ * One population: every count, roster and average describes the **active**
+ * (`ongoing`) batches. Mixing "active batches" with "all-status scholars" put
+ * a completed cohort's roster beside an active-batch count (audit B1).
+ *
+ * Only verified signals: session progress comes from attendance (ADR-001 B2),
+ * never the hand-typed `progress_percent`; a deadline counts down only when one
+ * was recorded. Anything without a source is `null` — "not yet tracked".
  */
 
-import { criticalRequirements, summarizeDocCompliance } from '@/modules/documents/domain/compliance';
-import type { Batch, DashboardMetrics, DocumentRequirement } from '@/shared/types';
+import { summarizeOwnCatalogCompliance } from '@/modules/documents/domain/compliance';
+import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from './urgency';
+import type { Batch, DashboardMetrics } from '@/shared/types';
 
-/**
- * Derives the 5-card dashboard metrics from a batch set and requirement catalog.
- * All numbers are computed from the inputs (never hardcoded), so they cannot
- * drift from the underlying records. Document compliance routes through the
- * compliance domain module to apply the ADR-004 untracked-exclusion rule.
- */
-export function deriveDashboardMetrics(
-  batches: readonly Batch[],
-  requirements: readonly DocumentRequirement[],
-): DashboardMetrics {
-  const totalBatches = batches.length;
-  const totalScholars = batches.reduce((s, b) => s + b.scholars, 0);
-  const avgProgress = totalBatches
-    ? Math.round(batches.reduce((s, b) => s + b.progressPct, 0) / totalBatches)
-    : 0;
-  const activeBatches = batches.filter((b) => b.status === 'ongoing').length;
+function isActive(batch: Batch): boolean {
+  return batch.status === 'ongoing';
+}
 
-  const earliest = totalBatches
-    ? batches.slice().sort((a, b) => a.daysToBilling - b.daysToBilling)[0]
-    : null;
+/** Mean session completion over the batches that have attendance, or null when none do. */
+function sessionProgress(batches: readonly Batch[]): { pct: number | null; tracked: number } {
+  const tracked = batches.filter((b) => b.completedSessions !== null && b.totalSessions);
+  if (tracked.length === 0) return { pct: null, tracked: 0 };
+  const sum = tracked.reduce((s, b) => s + Math.min(1, b.completedSessions! / b.totalSessions!), 0);
+  return { pct: Math.round((sum / tracked.length) * 100), tracked: tracked.length };
+}
 
-  // Critical-document compliance (ADR-004): untracked requirement keys are
-  // excluded from the percentage rather than counted as verified, and
-  // `docCompliancePct` is null — "unknown" — when nothing is tracked at all.
-  const docs = summarizeDocCompliance(batches, criticalRequirements(requirements));
+export function deriveDashboardMetrics(batches: readonly Batch[]): DashboardMetrics {
+  const active = batches.filter(isActive);
+  const open = batches.filter(hasOpenBillingObligation);
+  const dated = open
+    .filter(hasRecordedBillingDeadline)
+    .sort((a, b) => a.daysToBilling - b.daysToBilling);
+  const next = dated[0] ?? null;
+  const progress = sessionProgress(active);
+
+  // Critical-document compliance (ADR-004), each batch against its own
+  // program's catalog: untracked keys are excluded, and the percentage is
+  // null — "unknown" — when nothing is tracked at all.
+  const docs = summarizeOwnCatalogCompliance(active);
 
   return {
-    totalBatches,
-    totalScholars,
-    avgProgress,
-    earliestBillingDeadline: earliest ? earliest.billingDeadline.replace(/, \d+$/, '') : '—',
-    daysToEarliestBilling: earliest ? earliest.daysToBilling : 0,
-    activeBatches,
+    totalBatches: batches.length,
+    activeBatches: active.length,
+    activeScholars: active.reduce((s, b) => s + b.scholars, 0),
+    sessionProgressPct: progress.pct,
+    sessionTrackedBatches: progress.tracked,
+    nextBilling: next && next.billingDeadline
+      ? { batchId: next.id, deadline: next.billingDeadline, daysToBilling: next.daysToBilling }
+      : null,
+    openBillingObligations: open.length,
+    billingDeadlinesMissing: open.length - dated.length,
+    overdueBilling: dated.filter((b) => urgencyTier(b.daysToBilling) === 'overdue').length,
     docCompliancePct: docs.onFilePct,
     docMissing: docs.missing,
     docPending: docs.pending,

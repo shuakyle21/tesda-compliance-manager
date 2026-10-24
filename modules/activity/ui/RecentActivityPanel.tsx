@@ -42,7 +42,7 @@ function ActivityFeed({ events }: { events: readonly ActivityEvent[] }) {
   );
 }
 
-export function RecentActivityPanel({ events }: { events: readonly ActivityEvent[] }) {
+export function RecentActivityPanel({ events, viewAllHref }: { events: readonly ActivityEvent[]; viewAllHref: string }) {
   return (
     <section className="dash-panel" aria-labelledby="recent-activity-heading">
       <div className="dash-panel-head">
@@ -50,7 +50,7 @@ export function RecentActivityPanel({ events }: { events: readonly ActivityEvent
           <Icon name="timeline" size={13} />
           Recent Activity
         </div>
-        <Link href="/activity-log" className="dash-link">View all</Link>
+        <Link href={viewAllHref} className="dash-link">View all</Link>
       </div>
       <div className="dash-panel-body">
         <ActivityFeed events={events} />

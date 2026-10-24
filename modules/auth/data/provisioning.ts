@@ -5,7 +5,7 @@
  * yet for `user.created`/`user.deleted`), so callers must be limited to the
  * Clerk webhook route handler. A user who signs themselves up gets the
  * least-privileged role and no tenant membership: this repo's sign-up flow
- * already tells users "your registrar will assign your school and role" (see
+ * already tells users "an administrator will assign your school and role" (see
  * `modules/auth/ui/SignUpModal.tsx`), so provisioning creates only the row an
  * admin later assigns — self sign-up must never grant tenant access.
  *

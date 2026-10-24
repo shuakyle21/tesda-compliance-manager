@@ -25,7 +25,7 @@ export function NoTenantAccessState({ subject = 'this workspace' }: NoTenantAcce
     <EmptyState
       iconName="users"
       heading="No school assigned yet"
-      sub={`Your account isn't attached to a school, so ${subject} can't be shown. An admin or registrar assigns your school and role — once they do, this page fills in on its own.`}
+      sub={`Your account isn't attached to a school, so ${subject} can't be shown. An administrator assigns your school and role — once they do, this page fills in on its own.`}
     />
   );
 }

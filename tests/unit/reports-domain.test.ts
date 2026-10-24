@@ -20,14 +20,14 @@ import type { Batch, ScholarRow } from '@/shared/types';
 
 function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
   return {
-    id: 'BAT-1', tenantId: 'tenant-1', name: 'BAT-1',
+    id: 'BAT-1', tenantId: 'tenant-1', programId: 'program-1', name: 'BAT-1',
     qualification: 'Agricultural Crops Production NC II', program: 'TWSP', ncLevel: 'NC II',
     trainer: 'Jane Dela Cruz', trainerId: 'trainer-1', scholars: 25,
     trainingDays: '', trainingDaySchedule: [], notes: '',
     trainingStart: 'Jan 1', trainingEnd: 'Jun 1, 2026',
-    duration: 0, currentDay: 0, totalDays: 0, progressPct: 80, ntpLag: 0, tipDate: '',
+    duration: 0, currentDay: 0, totalDays: 0, completedSessions: null, totalSessions: null, progressPct: 80, ntpLag: 0, tipDate: '',
     billingDeadline: 'Jun 1, 2026', daysToBilling: 10, bsrs: false,
-    remark: '', status: 'ongoing', lifecycle: [], documents: {},
+    remark: '', status: 'ongoing', lifecycle: [], documents: {}, documentRequirements: [], blocked: false,
     ...overrides,
   };
 }

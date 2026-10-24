@@ -2,6 +2,7 @@
 
 import { Icon } from '@/shared/ui/Icon';
 import type { Batch, EgaceStage, Tenant } from '@/shared/types';
+import { formatDate } from '@/shared/dates';
 
 interface EgaceOutcomesTableProps {
   rows: Batch[];
@@ -84,8 +85,8 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
                   </div>
                 </td>
                 <td className="egc-td egc-trainer">{b.trainer}</td>
-                <td className="egc-td egc-mono">{b.trainingStart.replace(/,\s*\d{4}$/, '')}</td>
-                <td className="egc-td egc-mono">{b.trainingEnd.replace(/,\s*\d{4}$/, '')}</td>
+                <td className="egc-td egc-mono">{formatDate(b.trainingStart) ?? '—'}</td>
+                <td className="egc-td egc-mono">{formatDate(b.trainingEnd) ?? '—'}</td>
                 {stages.map((s) => {
                   const v = egaceVal(b, s.key);
                   return (

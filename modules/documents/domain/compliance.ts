@@ -132,6 +132,31 @@ export function summarizeBatchDocCompliance(
   return summarizeDocCompliance([batch], requirements);
 }
 
+/**
+ * Summarize every batch against **its own** program's critical catalog
+ * (`batch.documentRequirements`), then total. A single flat catalog would
+ * count Program A's requirement as missing on a Program B batch. With no
+ * catalog on any batch, everything is `0` and both percentages are `null` —
+ * "not yet tracked", never a fabricated 0% or 100%.
+ */
+export function summarizeOwnCatalogCompliance(batches: readonly Batch[]): DocComplianceSummary {
+  const totals = { tracked: 0, untracked: 0, verified: 0, submitted: 0, pending: 0, missing: 0 };
+  for (const batch of batches) {
+    const part = summarizeBatchDocCompliance(batch, criticalRequirements(batch.documentRequirements));
+    totals.tracked += part.tracked;
+    totals.untracked += part.untracked;
+    totals.verified += part.verified;
+    totals.submitted += part.submitted;
+    totals.pending += part.pending;
+    totals.missing += part.missing;
+  }
+  return {
+    ...totals,
+    onFilePct: pct(totals.verified + totals.submitted, totals.tracked),
+    verifiedPct: pct(totals.verified, totals.tracked),
+  };
+}
+
 /** The critical subset of a requirement catalog — the compliance-bearing docs. */
 export function criticalRequirements(
   requirements: readonly DocumentRequirement[],

@@ -18,6 +18,8 @@ import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
+import { sessionProgress, describeSessionProgress } from '@/modules/batches/domain/progress';
+import { formatDate } from '@/shared/dates';
 import type { Batch, UrgencyTier } from '@/shared/types';
 
 function cardChrome(billingReady: boolean, clickable: boolean) {
@@ -85,21 +87,24 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
           </Field>
           <Field label="Scholars" style={{ marginTop: 10 }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-primary)' }}>{batch.scholars}</span>
-            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginLeft: 6 }}>enrolled · {batch.trainingDays}</span>
+            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginLeft: 6 }}>enrolled{batch.trainingDays ? ` · ${batch.trainingDays}` : ''}</span>
           </Field>
           <Field label="TIP" style={{ marginTop: 10 }}>
-            <StatusBadge variant="completed" iconName="check">{batch.tipDate}</StatusBadge>
+            {/* From the lifecycle, not a hardcoded "done" badge over an empty date. */}
+            {batch.lifecycle.find((s) => s.key === 'tip')?.status === 'done'
+              ? <StatusBadge variant="completed" iconName="check">{batch.tipDate || 'Done'}</StatusBadge>
+              : <StatusBadge variant="upcoming">Pending</StatusBadge>}
           </Field>
         </Col>
 
         <Col borderLeft>
           <Field label="Training window">
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-primary)' }}>
-              {batch.trainingStart} → {batch.trainingEnd}
+              {formatDate(batch.trainingStart) ?? 'Not set'} → {formatDate(batch.trainingEnd) ?? 'Not set'}
             </span>
           </Field>
-          <Field label={`Day ${batch.currentDay} of ${batch.totalDays}`} style={{ marginTop: 10 }}>
-            <ProgressBar percent={batch.progressPct} />
+          <Field label={describeSessionProgress(batch)} style={{ marginTop: 10 }}>
+            <SessionBar batch={batch} />
           </Field>
         </Col>
 
@@ -141,31 +146,40 @@ function CardHeaderBadges({ batch, billingReady }: { batch: Batch; billingReady:
 }
 
 function BillingCol({ batch, tier }: { batch: Batch; tier: UrgencyTier }) {
+  // ntpLag is null until NTP and start dates are mapped — never a green "Same-day".
   const ntpSameDay = batch.ntpLag === 0;
   return (
     <Col borderLeft>
       <Field label="NTP → Start lag">
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: ntpSameDay ? 'var(--color-green-dk)' : 'var(--color-text-primary)' }}>
-          {ntpSameDay ? 'Same-day' : `${batch.ntpLag} days`}
+          {batch.ntpLag === null ? 'Not recorded' : ntpSameDay ? 'Same-day' : `${batch.ntpLag} days`}
         </span>
       </Field>
       <Field label="Billing deadline" style={{ marginTop: 10 }}>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500,
-          color: tier === 'critical' ? 'var(--color-red-dk)'
+          color: tier === 'critical' || tier === 'overdue' ? 'var(--color-red-dk)'
             : tier === 'warning' ? 'var(--color-amber-dk)'
             : 'var(--color-text-primary)',
         }}>
-          {batch.billingDeadline}
+          {formatDate(batch.billingDeadline) ?? 'Not recorded'}
         </span>
       </Field>
       <Field label="BSRS" style={{ marginTop: 10 }}>
         <StatusBadge variant={batch.bsrs ? 'approved' : 'not-approved'} iconName={batch.bsrs ? 'shield-check' : 'shield-off'}>
-          {batch.bsrs ? 'APPROVED' : 'NOT APPROVED'}
+          {batch.bsrs ? 'VERIFIED' : 'NOT VERIFIED'}
         </StatusBadge>
       </Field>
     </Col>
   );
+}
+
+/** Session bar when attendance is recorded; otherwise the unavailable state in words. */
+function SessionBar({ batch }: { batch: Batch }) {
+  const progress = sessionProgress(batch);
+  return progress
+    ? <ProgressBar percent={progress.pct} />
+    : <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>Attendance not recorded yet</span>;
 }
 
 function Col({ children, borderLeft }: { children: ReactNode; borderLeft?: boolean }) {

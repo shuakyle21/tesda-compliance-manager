@@ -6,6 +6,7 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
   return {
     id: 'BAT-1',
     tenantId: 'tenant-1',
+    programId: 'program-1',
     name: 'BAT-1',
     qualification: 'Agricultural Crops Production NC II',
     program: 'TWSP',
@@ -21,6 +22,8 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
     duration: 0,
     currentDay: 0,
     totalDays: 0,
+    completedSessions: null,
+    totalSessions: null,
     progressPct: 80,
     ntpLag: 0,
     tipDate: '',
@@ -31,6 +34,8 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
     status: 'ongoing',
     lifecycle: [],
     documents: {},
+    documentRequirements: [],
+    blocked: false,
     ...overrides,
   };
 }

@@ -30,6 +30,7 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
   return {
     id: 'BAT-1',
     tenantId: 'tenant-1',
+    programId: 'program-1',
     name: 'BAT-1',
     qualification: 'Agricultural Crops Production NC II',
     program: 'TWSP',
@@ -45,6 +46,8 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
     duration: 0,
     currentDay: 0,
     totalDays: 0,
+    completedSessions: null,
+    totalSessions: null,
     progressPct: 80,
     ntpLag: 0,
     tipDate: '',
@@ -55,6 +58,8 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
     status: 'ongoing',
     lifecycle: [],
     documents: {},
+    documentRequirements: REQS,
+    blocked: false,
     ...overrides,
   };
 }
@@ -156,7 +161,7 @@ describe('summarizeDocCompliance across batches', () => {
 
 describe('deriveDashboardMetrics — document fields', () => {
   it('reports unknown compliance when no batch tracks a critical document', () => {
-    const metrics = deriveDashboardMetrics([fixtureBatch()], REQS);
+    const metrics = deriveDashboardMetrics([fixtureBatch()]);
     expect(metrics.docCompliancePct).toBeNull();
     expect(metrics.docTracked).toBe(0);
     expect(metrics.docUntracked).toBe(3);
@@ -167,7 +172,7 @@ describe('deriveDashboardMetrics — document fields', () => {
     const batch = fixtureBatch({
       documents: { aou: doc('verified'), ntp: doc('verified'), attendance: doc('verified'), optional_extra: doc('missing') },
     });
-    const metrics = deriveDashboardMetrics([batch], REQS);
+    const metrics = deriveDashboardMetrics([batch]);
 
     expect(metrics.docCompliancePct).toBe(100);
     expect(metrics.docMissing).toBe(0);

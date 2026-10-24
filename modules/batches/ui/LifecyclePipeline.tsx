@@ -2,8 +2,13 @@
  * UI COMPONENT — LifecyclePipeline (ported from components/LifecyclePipeline.jsx)
  *
  * Fixed-stage process: AOU → NTP → TIP → Training → ENTRE → Assessment → Billing.
- * The ENTRE (Entrepreneurship) stage gets a distinct purple treatment + briefcase
- * glyph so it reads as its own phase between training and assessment.
+ * The ENTRE (Entrepreneurship) stage gets its own plum treatment (`--color-entre*`)
+ * + briefcase glyph so it reads as its own phase between training and
+ * assessment. Purple stays reserved for NC levels.
+ *
+ * Accessibility per the component spec: the pipeline is a list, each step a
+ * list item whose label states its status in words, and the active step
+ * carries `aria-current="step"` — status never rests on circle color alone.
  */
 
 import { Icon } from '@/shared/ui/Icon';
@@ -12,13 +17,15 @@ import type { LifecycleStage } from '@/shared/types';
 export function LifecyclePipeline({ steps }: { steps: LifecycleStage[] }) {
   const dense = steps.length >= 7;
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${steps.length}, 1fr)`, paddingTop: 6 }}>
+    <ol role="list" aria-label="Lifecycle stages" style={{ display: 'grid', gridTemplateColumns: `repeat(${steps.length}, 1fr)`, paddingTop: 6, margin: 0, paddingLeft: 0, listStyle: 'none' }}>
       {steps.map((s, i) => (
         <Step key={s.key} step={s} index={i} isLast={i === steps.length - 1} dense={dense} />
       ))}
-    </div>
+    </ol>
   );
 }
+
+const STATUS_WORD = { done: 'done', active: 'in progress', pending: 'pending', overdue: 'overdue' } as const;
 
 interface StepFlags {
   isDone: boolean;
@@ -41,11 +48,11 @@ function deriveCircleStyle({ isDone, isActive, isOverdue, isEntre, entrePending 
   if (isOverdue) return { background: 'var(--color-red)', borderColor: 'var(--color-red)', color: 'white' };
   if (isActive) {
     return isEntre
-      ? { background: 'var(--color-purple)', borderColor: 'var(--color-purple)', color: 'white' }
+      ? { background: 'var(--color-entre)', borderColor: 'var(--color-entre)', color: 'var(--color-surface)' }
       : { background: 'var(--color-blue)', borderColor: 'var(--color-blue)', color: 'white' };
   }
   if (isDone) return { background: 'var(--color-green)', borderColor: 'var(--color-green)', color: 'white' };
-  if (entrePending) return { background: 'var(--color-purple-lt)', borderColor: 'var(--color-purple)', color: 'var(--color-purple-dk)' };
+  if (entrePending) return { background: 'var(--color-entre-lt)', borderColor: 'var(--color-entre)', color: 'var(--color-entre-dk)' };
   return { background: 'var(--color-surface)', borderColor: 'var(--color-border-strong)', color: 'var(--color-text-muted)' };
 }
 
@@ -65,16 +72,21 @@ function Step({ step, index, isLast, dense }: { step: LifecycleStage; index: num
   const circleStyle = deriveCircleStyle(flags);
 
   const lineColor = isDone ? 'var(--color-green)' : 'var(--color-border)';
-  const labelSize = dense ? 9 : 10;
-  const dateSize = dense ? 9 : 10;
+  // 10px is the type-scale floor (`text-2xs`); dense mode no longer drops below it.
+  const labelSize = 10;
+  const dateSize = dense ? 10 : 11;
 
   const entreTint = isEntre && !isDone;
-  const labelColor = entreTint ? 'var(--color-purple)'
+  const labelColor = entreTint ? 'var(--color-entre-dk)'
     : (step.status === 'pending' ? 'var(--color-text-muted)' : 'var(--color-text-primary)');
-  const dateColor = entreTint ? 'var(--color-purple-dk)' : 'var(--color-text-muted)';
+  const dateColor = entreTint ? 'var(--color-entre-dk)' : 'var(--color-text-muted)';
 
   return (
-    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 6 }}>
+    <li
+      aria-current={isActive ? 'step' : undefined}
+      aria-label={`${step.label}: ${STATUS_WORD[step.status as keyof typeof STATUS_WORD] ?? step.status}${step.date ? `, ${step.date}` : ''}`}
+      style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 6 }}
+    >
       {!isLast && (
         <div style={{ position: 'absolute', top: 17, left: '50%', right: '-50%', height: 1, background: lineColor, zIndex: 1 }} />
       )}
@@ -94,7 +106,7 @@ function Step({ step, index, isLast, dense }: { step: LifecycleStage; index: num
       <div style={{ marginTop: 2, fontFamily: 'var(--font-mono)', fontSize: dateSize, color: dateColor, fontWeight: 500, textAlign: 'center' }}>
         {step.date || (step.status === 'pending' ? 'Pending' : '')}
       </div>
-    </div>
+    </li>
   );
 }
 

@@ -2,23 +2,18 @@ import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import { requireAuthenticatedUser } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
-import { deriveTenantAccess, getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
+import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { isPlatformAdmin as resolveIsPlatformAdmin } from '@/modules/tenancy/data/platform';
 import { NavDrawerProvider } from '@/modules/shell/ui/NavDrawerProvider';
 import { Sidebar } from '@/modules/shell/ui/Sidebar';
 import { MobileHeader } from '@/modules/shell/ui/MobileHeader';
 import { Topbar } from '@/modules/shell/ui/Topbar';
-import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
-import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
-import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
-import { withTenantAccess } from '@/modules/tenancy/domain/access';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const clerkUserId = await requireAuthenticatedUser();
   const headerList = await headers();
   const pathname = headerList.get('x-pathname') ?? '';
   const isTrainerRoute = pathname.startsWith('/trainer');
-  const isDashboardRoute = pathname === '/dashboard';
 
   // Real role, for nav that must not be shown to the wrong person (the
   // admin-only "Add user" row). Trusted sources only — `resolveTrustedRole`,
@@ -44,24 +39,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   // from `denied`, because there the two need different screens.
   const isPlatformAdmin = await resolveIsPlatformAdmin();
 
-  // Derived from the snapshot already read above, not via `resolveTenantAccess`:
-  // that helper exists to look up the profile for callers who do not hold one,
-  // and its "no signed-in user → unknown" branch is unreachable here because
-  // `requireAuthenticatedUser` has already redirected. Sibling routes that lack
-  // a snapshot still call it. Please do not restore the indirection.
-  const batchesSnapshot = withTenantAccess(
-    await getBatchesSnapshot(),
-    deriveTenantAccess(profileSnapshot),
-  );
-  // A metrics strip reading 0 batches / 0 scholars is a claim about a school.
-  // For someone attached to no school it is a claim about nothing, so it is
-  // suppressed alongside the sync-failed case rather than rendered as zeros.
-  const metrics =
-    isDashboardRoute ||
-    batchesSnapshot.status === 'sync-failed' ||
-    batchesSnapshot.status === 'no-tenant-access'
-      ? null
-      : deriveDashboardMetrics(selectBatchesForDisplay(batchesSnapshot), []);
+  // The KPI row is not rendered here: a root layout does not re-render on
+  // client-side navigation, so a row placed here kept the previous school's
+  // numbers after a school switch. It is owned by the segment it describes —
+  // `t/[tenantCode]/(sections)/layout.tsx` and `trainer/layout.tsx`.
 
   return (
     <NavDrawerProvider>
@@ -79,7 +60,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <MobileHeader />
           <main className="main-content">
             <Topbar isTrainerRoute={isTrainerRoute} />
-            {metrics && <MetricsRow metrics={metrics} hideBilling={isTrainerRoute} />}
             {children}
           </main>
         </div>
@@ -87,3 +67,4 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     </NavDrawerProvider>
   );
 }
+

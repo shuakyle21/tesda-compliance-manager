@@ -119,24 +119,22 @@ function privateComponent(name: string): PrivateComponent {
   return element!.type as PrivateComponent;
 }
 
-// Mirrors Sidebar's useState call order exactly: orgOpen, tenant, activeOp.
+// Mirrors Sidebar's useState call order exactly: orgOpen, activeOp. The active
+// school is no longer state — it is derived from the URL (see the
+// "active school" tests below).
 function arrangeSidebarState({
   orgOpen = false,
-  tenant = null,
   activeOp = null,
 }: {
   orgOpen?: boolean;
-  tenant?: Tenant | null;
   activeOp?: 'import' | 'settings' | null;
 } = {}) {
   const setOrgOpen = vi.fn();
-  const setTenant = vi.fn();
   const setActiveOp = vi.fn();
   hooks.useState
     .mockReturnValueOnce([orgOpen, setOrgOpen])
-    .mockReturnValueOnce([tenant, setTenant])
     .mockReturnValueOnce([activeOp, setActiveOp]);
-  return { setOrgOpen, setTenant, setActiveOp };
+  return { setOrgOpen, setActiveOp };
 }
 
 function fakeDocument() {
@@ -502,46 +500,59 @@ describe('Sidebar operations list', () => {
   });
 });
 
-describe('Sidebar tenant seeding', () => {
-  // Sidebar seeds its `tenant` state lazily via useState's initializer, which
-  // this file mocks — so the only way to exercise the seeding logic itself is
-  // to capture that initializer (the second useState call: orgOpen, tenant,
-  // activeOp) and invoke it directly, the same way Escape-handling tests
-  // above capture and invoke the useEffect callback.
-  function captureTenantSeed(): Tenant | null {
-    return (hooks.useState.mock.calls[1][0] as () => Tenant | null)();
+describe('Sidebar active school', () => {
+  // The active school comes from the URL (`/t/<code>/…`), so the switcher,
+  // the nav and the data on screen always agree. Off a scoped page it falls
+  // back to the default membership, then the first one.
+  const OTHER: Tenant = { ...TENANT_FIXTURE, id: 'tnt_other', code: 'OTH', name: 'Other Farm School' };
+
+  function activeSchool(props: Partial<SidebarProps>): Tenant | null {
+    arrangeSidebarState();
+    const switcher = namedElement(Sidebar({ ...NO_IDENTITY, ...props }), 'SchoolSwitcher');
+    return switcher!.props.tenant as Tenant | null;
   }
 
-  it('seeds the membership flagged as default when one exists among several', () => {
-    const other: Tenant = { ...TENANT_FIXTURE, id: 'tnt_other', name: 'Other Farm School' };
-    arrangeSidebarState();
+  it('uses the school named in the URL over the default membership', () => {
+    hooks.usePathname.mockReturnValue('/t/oth/documents');
+    expect(activeSchool({ tenants: [TENANT_FIXTURE, OTHER], defaultTenantId: TENANT_FIXTURE.id })).toBe(OTHER);
+  });
 
-    Sidebar({ ...NO_IDENTITY, tenants: [other, TENANT_FIXTURE], defaultTenantId: TENANT_FIXTURE.id });
-
-    expect(captureTenantSeed()).toBe(TENANT_FIXTURE);
+  it('seeds the membership flagged as default off a scoped page', () => {
+    hooks.usePathname.mockReturnValue('/profile');
+    expect(activeSchool({ tenants: [OTHER, TENANT_FIXTURE], defaultTenantId: TENANT_FIXTURE.id })).toBe(TENANT_FIXTURE);
   });
 
   it('falls back to the first tenant when no membership is flagged as default', () => {
-    arrangeSidebarState();
+    expect(activeSchool({ tenants: [TENANT_FIXTURE], defaultTenantId: null })).toBe(TENANT_FIXTURE);
+  });
 
-    Sidebar({ ...NO_IDENTITY, tenants: [TENANT_FIXTURE], defaultTenantId: null });
-
-    expect(captureTenantSeed()).toBe(TENANT_FIXTURE);
+  it('falls back to the default when the URL names a school the caller does not belong to', () => {
+    hooks.usePathname.mockReturnValue('/t/not-mine/dashboard');
+    expect(activeSchool({ tenants: [OTHER, TENANT_FIXTURE], defaultTenantId: TENANT_FIXTURE.id })).toBe(TENANT_FIXTURE);
   });
 
   it('resolves to null when the profile has no memberships at all', () => {
-    arrangeSidebarState();
-
-    Sidebar({ ...NO_IDENTITY });
-
-    expect(captureTenantSeed()).toBeNull();
+    expect(activeSchool({})).toBeNull();
   });
 
-  it('falls back to the first tenant when the flagged default id matches none of them', () => {
+  it('points every workspace row into the active school', () => {
+    hooks.usePathname.mockReturnValue('/t/oth/billing');
     arrangeSidebarState();
+    const tree = Sidebar({ ...NO_IDENTITY, tenants: [TENANT_FIXTURE, OTHER], defaultTenantId: TENANT_FIXTURE.id });
+    const hrefs = elementsIn(tree)
+      .filter((el) => typeof el.type === 'function' && el.type.name === 'NavRow')
+      .map((el) => (el.props.item as { href?: string }).href)
+      .filter((href): href is string => href?.startsWith('/t/') ?? false);
+    expect(hrefs).toContain('/t/oth/dashboard');
+    expect(hrefs).toContain('/t/oth/billing');
+    expect(hrefs.every((href) => href.startsWith('/t/oth/'))).toBe(true);
+  });
 
-    Sidebar({ ...NO_IDENTITY, tenants: [TENANT_FIXTURE], defaultTenantId: 'tnt_does_not_exist' });
-
-    expect(captureTenantSeed()).toBe(TENANT_FIXTURE);
+  it('switches school by linking to the same section in the chosen school', () => {
+    hooks.usePathname.mockReturnValue('/t/oth/documents');
+    arrangeSidebarState();
+    const switcher = namedElement(Sidebar({ ...NO_IDENTITY, tenants: [TENANT_FIXTURE, OTHER], defaultTenantId: null }), 'SchoolSwitcher');
+    const hrefFor = switcher!.props.hrefFor as (t: Tenant) => string;
+    expect(hrefFor(TENANT_FIXTURE)).toBe('/t/fix-001/documents');
   });
 });

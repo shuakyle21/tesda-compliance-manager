@@ -15,9 +15,15 @@ import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
+import { pluralize } from '@/shared/text';
 import type { Batch } from '@/shared/types';
 
-export function CardsView({ batches }: { batches: Batch[] }) {
+/**
+ * `loadedAt` is the snapshot's real fetch time, formatted on the server (so
+ * the client never re-formats it in another timezone). It replaced a
+ * hardcoded "loaded at 14:02" (audit A19).
+ */
+export function CardsView({ batches, loadedAt }: { batches: Batch[]; loadedAt: string | null }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
   const [open, setOpen] = useState<Batch | null>(null);
@@ -28,7 +34,7 @@ export function CardsView({ batches }: { batches: Batch[] }) {
     <div>
       <div className="page-head">
         <h1>Batch Cards</h1>
-        <span className="subline">{batches.length} active {batches.length === 1 ? 'batch' : 'batches'}</span>
+        <span className="subline">{batches.length} {pluralize(batches.length)} · {batches.filter((b) => b.status === 'ongoing').length} active</span>
       </div>
 
       <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} />
@@ -38,7 +44,7 @@ export function CardsView({ batches }: { batches: Batch[] }) {
       ) : (
         <div className="batch-stack">
           <InfoCallout variant="info">
-            {filtered.length} batch records loaded at 14:02. Sorted by earliest billing deadline first.
+            {filtered.length} batch {pluralize(filtered.length, 'record', 'records')}{loadedAt ? ` loaded ${loadedAt}` : ''}. Sorted by earliest billing deadline first.
           </InfoCallout>
           {filtered.map((b) => (
             <BatchCard key={b.id} batch={b} onClick={() => setOpen(b)} />

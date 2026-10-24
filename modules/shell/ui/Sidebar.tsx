@@ -20,23 +20,49 @@ import { Toast, type ToastData } from '@/shared/ui/Toast';
 import type { Tenant, UserRole } from '@/shared/types';
 import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
+import { parseScopedPath, scopedPath, type ScopedSection } from '@/modules/tenancy/domain/scope';
 import { useNavDrawer } from './NavDrawerProvider';
 
 type NavItem = { label: string; icon: IconName; href?: string; op?: 'import' | 'settings' };
 
-const WORKSPACE: NavItem[] = [
-  { label: 'Dashboard', icon: 'layout-dashboard', href: '/dashboard' },
-  { label: 'Batch Cards', icon: 'folders', href: '/batch-cards' },
-  { label: 'Table View', icon: 'file-text', href: '/table-view' },
-  { label: 'Documents', icon: 'file-check', href: '/documents' },
+/**
+ * Office screens are per school: each row links into the active school's
+ * scope (`/t/<code>/<section>`, the locked "tenant context in the URL path"
+ * fact). The section, not a fixed href, is what each row names.
+ */
+const WORKSPACE: { label: string; icon: IconName; section: ScopedSection }[] = [
+  { label: 'Dashboard', icon: 'layout-dashboard', section: 'dashboard' },
+  { label: 'Batch Cards', icon: 'folders', section: 'batch-cards' },
+  { label: 'Table View', icon: 'file-text', section: 'table-view' },
+  { label: 'Documents', icon: 'file-check', section: 'documents' },
   // Billing sits between Documents and Analytics per the Figma nav rail
   // (840:5128). The route itself redirects trainers — nav order is cosmetic,
   // the role gate is server-side.
-  { label: 'Billing', icon: 'receipt', href: '/billing' },
-  { label: 'Analytics', icon: 'chart-bar', href: '/analytics' },
-  { label: 'Report', icon: 'file-invoice', href: '/report' },
-  { label: 'Activity Log', icon: 'timeline', href: '/activity-log' },
+  { label: 'Billing', icon: 'receipt', section: 'billing' },
+  { label: 'Analytics', icon: 'chart-bar', section: 'analytics' },
+  { label: 'Report', icon: 'file-invoice', section: 'report' },
+  { label: 'Activity Log', icon: 'timeline', section: 'activity-log' },
 ];
+
+/** Admins' cross-school management view; unscoped by design. */
+const OVERVIEW: NavItem = { label: 'All schools', icon: 'building', href: '/overview' };
+
+/**
+ * The school (and section) the URL is on. Off a scoped page (profile,
+ * overview) it falls back to the default membership, then the first one.
+ */
+function resolveActiveSchool(pathname: string, tenants: Tenant[], defaultTenantId: string | null): { tenant: Tenant | null; currentSection: ScopedSection } {
+  const scoped = parseScopedPath(pathname);
+  const fromUrl = scoped ? tenants.find((t) => t.code.toLowerCase() === scoped.code.toLowerCase()) : undefined;
+  const tenant = fromUrl ?? tenants.find((t) => t.id === defaultTenantId) ?? tenants[0] ?? null;
+  const currentSection = WORKSPACE.find((w) => w.section === scoped?.section)?.section ?? 'dashboard';
+  return { tenant, currentSection };
+}
+
+/** A row's href inside the active school, or the legacy unscoped path (which redirects) with none. */
+function sectionHref(tenant: Tenant | null, section: ScopedSection): string {
+  return tenant ? scopedPath(tenant.code, section) : `/${section}`;
+}
 
 // Shown in place of a school name/meta while no tenant is resolved. Deliberately
 // states the absence instead of naming a plausible-looking school.
@@ -171,14 +197,14 @@ export function Sidebar({
   const { open, closeDrawer, collapsed, toggleCollapsed } = useNavDrawer();
   const operations = resolveOperations(isTrainerRoute, isAdmin, isPlatformAdmin);
 
-  // School selector. Seeded from the caller's default membership when one
-  // exists, falling back to the first tenant in the list, then to null when
-  // the profile belongs to none.
+  // The active school comes from the URL (`/t/<code>/…`), so the switcher, the
+  // nav, and the data on screen always agree. Off a scoped page (profile,
+  // overview) it falls back to the default membership, then the first one.
+  // It used to be client state the data never read — switching changed only
+  // the label (audit I1).
   const [orgOpen, setOrgOpen] = useState(false);
   const closeOrg = useCallback(() => setOrgOpen(false), []);
-  const [tenant, setTenant] = useState<Tenant | null>(
-    () => tenants.find((t) => t.id === defaultTenantId) ?? tenants[0] ?? null,
-  );
+  const { tenant, currentSection } = resolveActiveSchool(pathname, tenants, defaultTenantId);
 
   // Operations overlays (Import CSV / Settings); their completion toast lives in <SidebarOverlays>.
   const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
@@ -224,15 +250,22 @@ export function Sidebar({
           open={orgOpen}
           onToggle={() => setOrgOpen((o) => !o)}
           onClose={closeOrg}
-          onSelect={setTenant}
+          hrefFor={(t) => scopedPath(t.code, currentSection)}
+          onNavigate={closeDrawer}
         />
 
         {/* Navigation */}
         <nav className="sb-nav">
           <div className="sb-group-label">Workspace</div>
-          {WORKSPACE.map((item) => (
-            <NavRow key={item.label} item={item} active={item.href === pathname} onNavigate={closeDrawer} />
-          ))}
+          {isAdmin && !isTrainerRoute && (
+            <NavRow item={OVERVIEW} active={pathname === OVERVIEW.href} onNavigate={closeDrawer} />
+          )}
+          {WORKSPACE.map((item) => {
+            const href = sectionHref(tenant, item.section);
+            return (
+              <NavRow key={item.label} item={{ label: item.label, icon: item.icon, href }} active={href === pathname} onNavigate={closeDrawer} />
+            );
+          })}
 
           <div className="sb-group-label">Operations</div>
           {operations.map((item) => (
@@ -276,22 +309,24 @@ export function Sidebar({
 }
 
 /**
- * School selector. Controlled: `open`/`tenant` stay in <Sidebar> because its
- * Esc handler must close this dropdown *before* the drawer, and the Settings
- * modal reads the selected tenant. Click-outside dismissal is owned here.
+ * School selector. Each school is a **link** to the same section inside that
+ * school's scope — choosing one changes the URL, and with it every query on
+ * the page. `open` stays in <Sidebar> because its Esc handler must close this
+ * dropdown *before* the drawer. Click-outside dismissal is owned here.
  *
  * `tenants` comes from the caller's real membership list. When it has 0 or 1
  * entries, `canSwitch` is false: the control renders locked and
  * non-interactive, and a null `tenant` shows the "School not set" placeholder
  * rather than a name.
  */
-function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, onSelect }: {
+function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, hrefFor, onNavigate }: {
   tenant: Tenant | null;
   tenants: Tenant[];
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
-  onSelect: (t: Tenant) => void;
+  hrefFor: (t: Tenant) => string;
+  onNavigate: () => void;
 }) {
   const orgRef = useRef<HTMLDivElement>(null);
   const canSwitch = tenants.length > 1;
@@ -319,7 +354,7 @@ function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, onSelect }: 
           <span className="sb-org-name">{tenant?.name ?? NO_TENANT_NAME}</span>
           <span className="sb-org-meta">
             {canSwitch
-              ? `${tenants.length} schools · registrar`
+              ? `${tenants.length} schools`
               : (tenant?.region || NO_TENANT_META)}
           </span>
         </span>
@@ -328,15 +363,16 @@ function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, onSelect }: 
 
       {open && canSwitch && (
         <div className="dropdown sb-org-dd">
-          <div className="dd-section">Registrar · your schools</div>
+          <div className="dd-section">Your schools</div>
           {tenants.map((t, i) => (
-            <button
-              type="button"
+            <Link
               key={t.id}
+              href={hrefFor(t)}
               className={`dd-item${t.id === tenant?.id ? ' active' : ''}`}
-              onClick={() => { onSelect(t); onClose(); }}
+              aria-current={t.id === tenant?.id ? 'true' : undefined}
+              onClick={() => { onClose(); onNavigate(); }}
             >
-              <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 22, height: 22, fontSize: 9 }}>
+              <span className={`org-mark${i > 0 ? ' alt' : ''}`} style={{ width: 22, height: 22, fontSize: 10 }}>
                 {t.code.slice(0, 3)}
               </span>
               <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
@@ -346,7 +382,7 @@ function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, onSelect }: 
                 </span>
               </span>
               {t.id === tenant?.id && <Icon name="check" size={14} style={{ color: 'var(--color-blue-dk)' }} />}
-            </button>
+            </Link>
           ))}
         </div>
       )}

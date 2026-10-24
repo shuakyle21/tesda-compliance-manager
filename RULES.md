@@ -71,6 +71,9 @@ reviewing, or merging code.
 22. **IBM Plex fonts; semantic color tokens only** (`app/globals.css`, `app/design-system.css`) —
     never raw hex in components. **[review]**
 23. **Status is conveyed by text + icon, never color alone.** WCAG 2.2 AA target. **[review]**
+    No 3px left-border accent as a status/severity/category signal (selected table row excepted);
+    dates always print the year; a metric with no source renders "—" + what is missing, never 0.
+    Token and component amendments: `docs/DESIGN.md` §18. **[review]**
 24. **Every data screen implements all six states:** loading, empty, no-results, error/sync-failed,
     permission-denied, stale-data. Screens with relative dates show an exact "Data as of"
     timestamp. **[review]**

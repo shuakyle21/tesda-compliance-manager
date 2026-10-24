@@ -10,8 +10,8 @@ describe('urgencyTier', () => {
     expect(urgencyTier(0)).toBe('critical');
   });
 
-  it('returns critical for an overdue deadline (negative days)', () => {
-    expect(urgencyTier(-3)).toBe('critical');
+  it('returns overdue for a past deadline', () => {
+    expect(urgencyTier(-3)).toBe('overdue');
   });
 
   it('returns warning just past the critical boundary (7 days)', () => {

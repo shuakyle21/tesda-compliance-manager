@@ -19,31 +19,34 @@ import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
 import { criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
+import { sessionProgress } from '@/modules/batches/domain/progress';
+import { pluralize } from '@/shared/text';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export function TableView({
   batches,
-  documentRequirements,
+  initialBatchId = null,
 }: {
   batches: Batch[];
-  // Injected by the route rather than read from a module-level catalog: the
-  // real requirement catalog is per scholarship program, so only the caller
-  // can resolve it. An empty catalog renders "—" (ADR-004 "unknown"), never a
-  // fabricated compliance figure.
-  documentRequirements: DocumentRequirement[];
+  /**
+   * `?batch=<code>` deep link: opens that batch's detail on arrival, so the
+   * dashboard's Needs-attention items land on the batch they name.
+   */
+  initialBatchId?: string | null;
 }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
-  const [open, setOpen] = useState<Batch | null>(null);
+  const [open, setOpen] = useState<Batch | null>(
+    () => (initialBatchId ? batches.find((b) => b.id.toLowerCase() === initialBatchId.toLowerCase()) ?? null : null),
+  );
 
   const filtered = useMemo(() => filterBatches(batches, query, program), [batches, query, program]);
-  const crit = useMemo(() => criticalRequirements(documentRequirements), [documentRequirements]);
 
   return (
     <div>
       <div className="page-head">
         <h1>Table View</h1>
-        <span className="subline">{batches.length} active {batches.length === 1 ? 'batch' : 'batches'}</span>
+        <span className="subline">{batches.length} {pluralize(batches.length)} · {batches.filter((b) => b.status === 'ongoing').length} active</span>
       </div>
 
       <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} />
@@ -76,7 +79,7 @@ export function TableView({
               </thead>
               <tbody>
                 {filtered.map((b, i) => (
-                  <TableRow key={b.id} batch={b} critical={crit} odd={i % 2 === 0} onClick={() => setOpen(b)} />
+                  <TableRow key={b.id} batch={b} critical={criticalRequirements(b.documentRequirements)} odd={i % 2 === 0} onClick={() => setOpen(b)} />
                 ))}
               </tbody>
             </table>
@@ -175,7 +178,7 @@ function TableRow({
         </div>
       </td>
       <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', textAlign: 'right' }}>{batch.scholars}</td>
-      <td style={cellStyle}><ProgressBar percent={batch.progressPct} variant="mini" /></td>
+      <td style={cellStyle}><SessionCell batch={batch} /></td>
       <td style={cellStyle}>
         {isBillingReady(batch) ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
       </td>
@@ -198,3 +201,11 @@ function TableRow({
 }
 
 export default TableView;
+
+/** Attendance-derived progress; the unavailable state in words, never the hand-typed percent. */
+function SessionCell({ batch }: { batch: Batch }) {
+  const progress = sessionProgress(batch);
+  return progress
+    ? <ProgressBar percent={progress.pct} variant="mini" />
+    : <span style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>Not recorded</span>;
+}

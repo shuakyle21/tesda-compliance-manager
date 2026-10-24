@@ -28,7 +28,7 @@ export interface LifecycleStage {
 // Urgency drives the 3px left-border color on batch cards. Derived from
 // daysToBilling (see urgencyTier()).
 // ---------------------------------------------------------------------------
-export type UrgencyTier = 'critical' | 'warning' | 'on-track' | 'muted';
+export type UrgencyTier = 'overdue' | 'critical' | 'warning' | 'on-track' | 'muted';
 
 // ---------------------------------------------------------------------------
 // Documents — each batch embeds a record keyed by document requirement key.
@@ -166,6 +166,8 @@ export interface ScheduleAdjustment {
 export interface Batch {
   id: string;
   tenantId: string;
+  /** Database identifier of the program requirement catalog for this batch. */
+  programId: string;
   name: string;
   qualification: string;
   program: string; // generic ScholarshipProgram code (e.g. 'TWSP' | 'CFSP')
@@ -179,23 +181,34 @@ export interface Batch {
   trainingStart: string;
   trainingEnd: string;
   duration: number;
+  /** Attendance-derived session progress. Null means the source is unavailable. */
+  completedSessions: number | null;
+  totalSessions: number | null;
+  /** @deprecated Use `completedSessions`; retained while detail views migrate. */
   currentDay: number;
+  /** @deprecated Use `totalSessions`; retained while detail views migrate. */
   totalDays: number;
   progressPct: number;
-  ntpLag: number;
+  /** NTP-to-start lag in days; null until NTP and start dates are mapped. */
+  ntpLag: number | null;
   tipDate: string;
-  billingDeadline: string;
+  /** Canonical ISO billing deadline. Null means no deadline has been recorded. */
+  billingDeadline: string | null;
   daysToBilling: number;
   bsrs: boolean;
   remark: string;
   status: 'ongoing' | 'completed' | 'pending';
+  /** Recorded as blocked (DB `status` or `current_stage`). `status` folds blocked into 'pending', so this keeps the fact. */
+  blocked: boolean;
   lifecycle: LifecycleStage[];
   documents: Record<string, DocRecord>;
+  /** Requirement catalog for this batch's program. `is_required` maps to critical. */
+  documentRequirements: DocumentRequirement[];
 
   /** ISO `updated_at` of the source row; drives dashboard data-freshness (TES-8 AC6, #65). */
   updatedAt?: string;
 
-  // Enrichment-derived (optional at the source, always present after load)
+  // Enrichment-derived (optional when the source data or mapper is not connected)
   entreStart?: string;
   entreEnd?: string;
   approvedSeats?: number;
@@ -259,13 +272,27 @@ export interface EgaceStage {
 // ---------------------------------------------------------------------------
 // Dashboard metrics — the 5-card summary row.
 // ---------------------------------------------------------------------------
+/**
+ * The one canonical KPI summary (`modules/batches/domain/metrics.ts`). Counts,
+ * roster and averages all describe the same population — active batches.
+ * `null` always means "no source yet", never zero.
+ */
 export interface DashboardMetrics {
   totalBatches: number;
-  totalScholars: number;
-  avgProgress: number;
-  earliestBillingDeadline: string;
-  daysToEarliestBilling: number;
   activeBatches: number;
+  /** Learners enrolled across active batches only. */
+  activeScholars: number;
+  /** Mean attendance-derived session completion; null when no active batch has attendance. */
+  sessionProgressPct: number | null;
+  /** How many active batches the progress figure is drawn from. */
+  sessionTrackedBatches: number;
+  /** Nearest recorded deadline among open billing obligations; null when none recorded. */
+  nextBilling: { batchId: string; deadline: string; daysToBilling: number } | null;
+  /** Batches that still owe billing work, with or without a recorded deadline. */
+  openBillingObligations: number;
+  /** Open obligations whose deadline has not been recorded. */
+  billingDeadlinesMissing: number;
+  overdueBilling: number;
   /**
    * Critical-document compliance, or `null` when **nothing is tracked** —
    * unknown, not 0% and not 100% (ADR-004 / TES-94). Callers render "—" for
