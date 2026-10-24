@@ -242,11 +242,43 @@ paths exist here. Four groups, worst first:
 Neither is reachable as the app is written: grep across `app/ modules/ shared/ lib/` finds no
 `next/og`, no `ImageResponse`, no `opengraph-image`, no `use cache` and no `draftMode`.
 
-That is a reason to rank it calmly, **not** a reason to leave it. The fix is the cheapest
-item in this whole document: `package.json` already specifies `next: "^16.3.4"`, so the
-patched 16.3.6 and 16.3.8 are **inside the existing range** and `pnpm update next` clears
-both with no manifest edit and no breaking-change risk. [inferred — not run here]
-A later feature adding an OG image would silently make the critical live.
+That is a reason to rank it calmly, **not** a reason to leave it — a later feature adding an
+OG image would silently make the critical live.
+
+> **Correction, 2026-10-24.** This paragraph first claimed the fix was a patch-level move
+> "inside the existing range" with "no manifest edit and no breaking-change risk", labelled
+> `[inferred — not run here]`. Running it falsified two of those three claims. The label was
+> honest; the content was still wrong, which is the failure mode this document's labels exist
+> to surface rather than excuse. Replaced with what the run showed:
+
+`pnpm update next` resolves to **16.4.3**, the newest release satisfying `^16.3.4` — a
+**minor** bump, not the patch the 16.3.6/16.3.8 advisory numbers suggest. It also **rewrites
+the manifest** spec to `^16.4.3`, because `pnpm update` syncs the range to what it installed
+rather than leaving it alone the way `pnpm install` does. The lockfile moves 501 lines and
+gains 15 packages (`rolldown`, `sharp`, `postcss@8.5.31`, `nanoid`, `picomatch`,
+`source-map-js@1.2.2`). So it is still cheap, but it is a dependency change worth reviewing,
+not a one-line edit. [verified — PR #280]
+
+It is also **safe on the evidence, and repairs nothing.** Measured against a baseline taken
+on `origin/main` before the bump — necessary because `main` already fails, so an after-only
+reading cannot tell a regression from existing breakage: [verified]
+
+| Check | Before (16.3.4) | After (16.4.3) |
+| --- | --- | --- |
+| `tsc --noEmit` | 9 errors | 9 errors, same line:column |
+| `pnpm test` | 267/269, 2 sidebar failures | identical |
+| `pnpm build` | fails at type check | fails at type check |
+| `pnpm lint` | 1 warning, 0 errors | identical |
+
+No regression and no repair, correctly — none of those failures were Next's. That baseline
+also independently confirms §B's split of **9 errors on `main` versus 5 on #278's branch**.
+What it does **not** show is any runtime behaviour: the build never reaches route generation
+because the typecheck gate stops it, and §G3's paused project leaves no data to exercise a
+page against. §H task 1 is what would let a Next upgrade reach a successful build at all.
+
+One alert this does **not** clear, against the expectation above: `source-map-js`
+`CVE-2026-93749` (high). Version 1.2.2 enters the tree, but Next 16.4.3 still bundles
+`postcss@8.5.23 → source-map-js@1.2.1`, so the vulnerable copy remains. [verified]
 
 **2. `swagger-ui-react` roots most of the runtime noise.** `pnpm why` traces **14 of the 20
 runtime alerts** to this one dependency:
@@ -281,8 +313,8 @@ blind spot, and it only came to light because `git push` printed a warning. Wort
 check rather than an accident: Dependabot alerts are visible to `gh api
 /repos/{owner}/{repo}/dependabot/alerts`, which a CI job could read on a schedule.
 
-**Suggested order,** fitting into §H rather than displacing it: `pnpm update next` alongside
-§H task 3 (it is one command and the only runtime critical); the `swagger-ui-react` /
+**Suggested order,** fitting into §H rather than displacing it: `pnpm update next` **— done,
+PR #280** (it was the only runtime critical); the `swagger-ui-react` /
 `next-swagger-doc` scope decision as its own small PR, since removing a page is a product
 call; dev-scope updates whenever the lockfile is next touched.
 
@@ -317,7 +349,7 @@ cleanly.
 | **4** | **Resume Supabase, then re-verify the migration table** | Gates every live claim, and settles #243 (G4) | dashboard access | **S**, then **M** |
 | **5** | **Build `modules/attendance/domain/eligibility.ts`** (after re-cutting ADR-007 as a *new* additive migration) | Where you were actually heading. Pure domain logic, unit-testable, unblocks billing tranches | 4, #243 | **M** |
 
-**Alongside task 3:** `pnpm update next`. It is one command inside the existing `^16.3.4` range, and it clears the only runtime-critical dependency alert (§G9).
+**Already done, out of band:** `pnpm update next` (16.3.4 → 16.4.3, **PR #280**) clears the only runtime-critical dependency alert. Verified as no regression across tsc/test/build/lint against a baseline on `main`, which is a weaker claim than "working" — task 1 is still what lets a Next upgrade reach a successful build. See §G9.
 
 **Then:** the role resolver (#32/#136) and an RLS test suite (#52) are the two biggest remaining risks. Both deserve their own focused sessions.
 
