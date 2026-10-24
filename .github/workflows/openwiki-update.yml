@@ -68,7 +68,7 @@ jobs:
           # Node's fetch gives up on any response slower than 300s and the call is
           # retried from scratch (up to 4 x 300s per call).
           OPENWIKI_OPENAI_COMPATIBLE_STREAMING: "true"
-          OPENWIKI_MODEL_ID: "auto"
+          OPENWIKI_MODEL_ID: "flash"
           # Required for the LangSmith connector's code-mode pull to authenticate.
           # For extra workspaces, add OPENWIKI_LANGSMITH_API_KEY_2, _3, ... as repo
           # secrets and env entries here.
