@@ -435,6 +435,17 @@ describe('Sidebar user card', () => {
     expect(textIn(elementWithClassName(tree, 'user-avatar'))).toBe('KC');
   });
 
+  it('treats a whitespace-only name as no name, matching the avatar', () => {
+    arrangeSidebarState();
+    const tree = Sidebar({ ...NO_IDENTITY, fullName: '   ', role: null });
+
+    // initialsOf() already collapses whitespace to NO_NAME_MARK, so the name
+    // beside it must not render an empty string — `?? NO_NAME_LABEL` would,
+    // because '   ' is neither null nor undefined.
+    expect(textIn(elementWithClassName(tree, 'user-avatar'))).toBe('—');
+    expect(textIn(elementWithClassName(tree, 'sb-user-name'))).toBe('Name not set');
+  });
+
   it('shows an honest placeholder and omits the role tag when no identity is resolved', () => {
     arrangeSidebarState();
     const tree = Sidebar({ ...NO_IDENTITY });
