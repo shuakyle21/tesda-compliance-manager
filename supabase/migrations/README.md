@@ -59,16 +59,38 @@ enum, 7 tables, 17 columns, 9 indexes, 6 triggers, 15 policies, 2 seed rows).
 | `20260906120000_ensure_invitation_membership_atomic` | ✅ | ✅ |
 | `20260910120000_add_adr001_billing_domain` | ✅ | ✅ |
 
-### Added since that check
+## State as of 2026-10-24
+
+Re-verified first-hand this time, not inherited: `list_migrations` returned all
+eight versions below, and `list_tables` confirmed the ADR-007 columns by name.
+The seven rows above were checked the same way and still agree.
 
 | File | Recorded | Objects present |
 | --- | --- | --- |
-| `20261024063000_adr007_attendance_dropout_rule` | ❌ not yet pushed | ❌ |
+| `20261024071359_adr007_attendance_dropout_rule` | ✅ | ✅ |
 
 ADR-007's schema change. Additive on purpose: it alters the columns
 `20260910120000` introduced rather than editing that file, which is recorded and
-so would never re-run. Correct whichever way that file's applied state lands,
-since migrations run in filename order.
+so would never re-run — confirmed, since `max_absences` was present live before
+this ran.
+
+**Its filename was renamed after applying.** `apply_migration` assigns its own
+version string, and it recorded `20261024071359` while the file had been written
+as `20261024063000`. Left alone, that is #230 all over again: the recorded
+version matches no filename, so `db push` re-runs the file against a database
+that already has its objects. The file is named for the version that was
+actually recorded. If you apply a migration through the MCP tool rather than
+`db push`, check the version it recorded and rename to match.
+
+Verified live after applying:
+
+| Assertion | Result |
+| --- | --- |
+| `program_billing_rules.max_absence_percent` numeric, default 20.00, not null | ✅ |
+| `tenant_settings.max_absence_percent` numeric, nullable, no default | ✅ |
+| `attendance_records.excused` boolean, default false, not null | ✅ |
+| no `max_absences` on either table | ✅ |
+| all three column comments present | ✅ |
 
 `20260906114735_…` was renamed from `20260906130000_…` by this PR so its
 filename matches the version actually recorded. All ten of its policies plus

@@ -39,7 +39,7 @@ earlier session rather than re-verified. Supabase keys applied migrations on the
 version string, so editing a recorded file changes the repository and never the
 database — the repo would have claimed `max_absence_percent` while the live
 column stayed `max_absences`. The change therefore ships as a new additive
-migration, `20261024063000_adr007_attendance_dropout_rule.sql`, which is correct
+migration, `20261024071359_adr007_attendance_dropout_rule.sql`, which is correct
 whichever way the applied/unapplied question lands, since migrations run in
 filename order. RULES.md rule 3.
 
