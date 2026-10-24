@@ -59,6 +59,17 @@ enum, 7 tables, 17 columns, 9 indexes, 6 triggers, 15 policies, 2 seed rows).
 | `20260906120000_ensure_invitation_membership_atomic` | ✅ | ✅ |
 | `20260910120000_add_adr001_billing_domain` | ✅ | ✅ |
 
+### Added since that check
+
+| File | Recorded | Objects present |
+| --- | --- | --- |
+| `20261024063000_adr007_attendance_dropout_rule` | ❌ not yet pushed | ❌ |
+
+ADR-007's schema change. Additive on purpose: it alters the columns
+`20260910120000` introduced rather than editing that file, which is recorded and
+so would never re-run. Correct whichever way that file's applied state lands,
+since migrations run in filename order.
+
 `20260906114735_…` was renamed from `20260906130000_…` by this PR so its
 filename matches the version actually recorded. All ten of its policies plus
 `app_private.is_platform_admin()` were verified present first.

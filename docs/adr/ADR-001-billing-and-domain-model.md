@@ -41,9 +41,18 @@ PRD, TRD, and Implementation Plan can cite them without restating them.
 
 ## 2. Eligibility
 
+> **Superseded by [[ADR-007-attendance-based-dropout-rule]] (2026-09-15).** The
+> fixed ≥5-absence rule below is retired. A scholar is now dropped from the
+> program when absences exceed **20% of the batch's `total_sessions`**, or on
+> **3 consecutive unexcused absences** (ADR-007 Elig-2/Elig-3). The storage
+> changed with it: `max_absences` no longer exists, and the threshold lives in
+> `program_billing_rules.max_absence_percent`. ADR-007 also moves the outcome
+> from a *payment* exclusion to an *enrollment* one. Do not implement the rule
+> as stated below.
+
 | ID | Decision |
 | --- | --- |
-| **Elig** | A scholar is **ineligible for allowance if absences ≥ 5** (single rule, stored as `max_absences = 4` in program rules; tenant override allowed). No attendance-percentage rule is used for eligibility — only the absence count. |
+| **Elig** | **RETIRED — superseded by [[ADR-007-attendance-based-dropout-rule]] Elig-2.** As originally decided: a scholar is ineligible for allowance if absences ≥ 5 (single rule, stored as `max_absences = 4` in program rules; tenant override allowed), with no attendance-percentage rule. |
 | — | Eligibility is evaluated **per scholar**; the per-scholar absence count also drives the TSF absence deduction (§4). |
 
 ## 3. Cost Schedule (`scholarship_cost_schedule`)
@@ -184,7 +193,7 @@ Three tiers:
 | Tier | Settings |
 | --- | --- |
 | **System** | (none required for MVP) |
-| **Program / qualification** | Cost-schedule rates (BB1), `max_absences` cap. |
+| **Program / qualification** | Cost-schedule rates (BB1), `max_absence_percent` cap (ADR-007 Elig-2; was `max_absences`). |
 | **Tenant** | Signatories (Prepared by / Approved by — name + title), letterhead/header image, TESDA PO addressee (name + office/region), partial-billing enabled + threshold overrides (COALESCE over program defaults). |
 
 Billing generation pulls **signatories/header/addressee from tenant settings**,
@@ -235,6 +244,7 @@ left for a follow-up pass against the updated docs.
 ## Related
 
 - [[ADR-003-billing-packet-queue]] — amends §4 with the packet-queue projection
+- [[ADR-007-attendance-based-dropout-rule]] — supersedes §2 Elig with the 20% / 3-consecutive-unexcused dropout rule
 - [[MASTER_PRD_SRS]] — FR-09 revised per this ADR
 - [[MVP_PRD]] — non-goals revised per §12
 - [[TRD]] — §4.3a / §16 implement these decisions
