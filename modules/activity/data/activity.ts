@@ -124,7 +124,7 @@ export async function getActivitySnapshot(limit?: number, offset = 0): Promise<A
     if (error) return { status: 'sync-failed', error: error.message };
     const rows = data ?? [];
     const hasMore = limit !== undefined && rows.length > limit;
-    const events = rows.slice(0, limit).map((row) => mapActivityLogRow(row as ActivityLogRowWithProfile));
+    const events = rows.slice(0, limit).map((row) => mapActivityLogRow(row as unknown as ActivityLogRowWithProfile));
     return { status: 'ok', events, hasMore };
   } catch (err) {
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };

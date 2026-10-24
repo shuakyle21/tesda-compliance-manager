@@ -158,7 +158,7 @@ export async function findUserByEmail(email: string): Promise<UserLookupSnapshot
       .limit(1);
 
     if (error) return { status: 'sync-failed', error: error.message };
-    const row = data?.[0] as ProfileLookupRow | undefined;
+    const row = data?.[0] as unknown as ProfileLookupRow | undefined;
     if (!row) return { status: 'not-registered' };
 
     // Belt and braces over the escaping above. Any pattern character that slips

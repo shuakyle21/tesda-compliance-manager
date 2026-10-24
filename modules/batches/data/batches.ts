@@ -306,7 +306,7 @@ export const getBatchesSnapshot = cache(async (): Promise<BatchesSnapshot> => {
 
     if (error) return { status: 'sync-failed', error: error.message };
 
-    const batches = (data ?? []).map((row) => mapBatchRow(row as BatchRowWithProgram));
+    const batches = (data ?? []).map((row) => mapBatchRow(row as unknown as BatchRowWithProgram));
     return { status: 'ok', batches, dataAsOf: latestUpdatedAt(batches) };
   } catch (err) {
     // Network / client-construction failures land here, not in `error` above.
