@@ -131,9 +131,6 @@ sources:
   - id: openwiki-source-4029f22d57710f525e978978
     resource: repo://tests/unit/evidence-path.test.ts
 generated: { by: "openwiki/0.5.0", at: "2026-10-20T01:21:35.552Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-10-20T01:21:35.552Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
