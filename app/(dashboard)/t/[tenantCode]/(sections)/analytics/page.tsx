@@ -15,7 +15,7 @@ import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { Icon } from '@/shared/ui/Icon';
 import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { requireScope } from '../../../../tenant-scope';
-import type { Batch, DocumentRequirement } from '@/shared/types';
+import type { Batch } from '@/shared/types';
 
 export default async function AnalyticsPage({ params }: { params: Promise<{ tenantCode: string }> }) {
   // One school, validated against the caller's memberships by the segment layout.
@@ -31,14 +31,6 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ tena
   const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccessOf(profile));
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
 
-  // No live per-program document-requirement catalog exists yet: the real
-  // contract (`getDocumentRequirementsSnapshot`) is scoped per scholarship
-  // program and needs a program id that `Batch` doesn't carry
-  // (TES-34-adjacent gap). An empty catalog leaves the document-compliance
-  // chart in its "cannot be scored" state per ADR-004, never at a fabricated
-  // percentage.
-  const documentRequirements: DocumentRequirement[] = [];
-
   return (
     <div>
       <Header />
@@ -53,7 +45,7 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ tena
       {snapshot.status === 'no-tenant-access' && <NoTenantAccessState subject="analytics" />}
       {snapshot.status !== 'no-tenant-access' &&
         !(snapshot.status === 'sync-failed' && batches.length === 0) && (
-          <AnalyticsView batches={batches} documentRequirements={documentRequirements} />
+          <AnalyticsView batches={batches} />
         )}
     </div>
   );

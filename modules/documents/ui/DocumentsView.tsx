@@ -86,10 +86,10 @@ export function DocumentsView({
   syncFailed,
 }: {
   batches: Batch[];
-  // Injected by the route rather than read from a module-level catalog: the
-  // real requirement catalog is per scholarship program, so only the caller
-  // can resolve it. An empty catalog renders the "requirements unavailable"
-  // state (ADR-004 "unknown"), never a fabricated compliance figure.
+  // The matrix columns: every requirement any shown batch's program asks for
+  // (`requirementCatalogOf`). Display only — completeness is scored per batch
+  // against its own catalog. An empty list renders the "requirements
+  // unavailable" state (ADR-004 "unknown"), never a fabricated figure.
   documentRequirements: DocumentRequirement[];
   syncFailed: boolean;
 }) {
@@ -106,8 +106,13 @@ export function DocumentsView({
    * requirement at all (ADR-004 — untracked is neither verified nor missing;
    * the matrix renders it as its own muted "Not tracked" pill). An override
    * can only refine a record that exists.
+   *
+   * The columns span every shown program, and the mapper keeps any document
+   * row a batch has, so a requirement outside this batch's own catalog is
+   * untracked even if an old record for it exists.
    */
   const docOf = (b: Batch, key: string): DocRecord | null => {
+    if (!b.documentRequirements.some((r) => r.key === key)) return null;
     const base = docRecordFor(b, key);
     if (!base) return null;
     const ov = overrides[b.id + ':' + key];
@@ -116,8 +121,10 @@ export function DocumentsView({
 
   const completeness = useMemo(() => batches.map((b) => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
-    // batch tracks none of them, so the card reads "—" rather than 0%.
-    const crit = criticalRequirements(documentRequirements);
+    // batch tracks none of them, so the card reads "—" rather than 0%. Scored
+    // against this batch's own program catalog: the matrix columns are a
+    // union across programs and would count another program's documents.
+    const crit = criticalRequirements(b.documentRequirements);
     const records = crit.map((r) => docOf(b, r.key));
     const tracked = records.filter((d): d is DocRecord => d !== null);
     const ok = tracked.filter((d) => d.status === 'verified').length;

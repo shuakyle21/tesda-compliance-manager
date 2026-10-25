@@ -50,8 +50,8 @@ interface BillingQueueViewProps {
    */
   cards?: BillingCard[];
   role: BillingRole;
-  /** Exact timestamp for the mandated "Data as of" stamp. */
-  dataAsOf: string;
+  /** Exact timestamp for the mandated "Data as of" stamp; null when unavailable. */
+  dataAsOf: string | null;
   /** Supabase configured but the query failed — surfaces the sync-failed banner. */
   syncFailed?: boolean;
   /** Source data is older than the freshness window. */
@@ -140,7 +140,7 @@ function BillingQueueHeader({
   hasCards,
   onGenerate,
 }: {
-  dataAsOf: string;
+  dataAsOf: string | null;
   stale: boolean;
   canWrite: boolean;
   summary: PacketSummary;
@@ -151,7 +151,7 @@ function BillingQueueHeader({
     <div className="page-head">
       <h1>Billing</h1>
       <span className="subline">
-        Packet readiness · Data as of {dataAsOf}
+        Packet readiness · Data as of {dataAsOf ?? 'not available'}
         {stale ? ' · STALE' : ''}
       </span>
       {canWrite && (

@@ -14,7 +14,9 @@ import {
   isDocTracked,
   summarizeBatchDocCompliance,
   summarizeDocCompliance,
+  requirementCatalogOf,
 } from '@/modules/documents/domain/compliance';
+import { alertCategoryCounts } from '@/modules/batches/domain/alerts';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
 import type { Batch, DocRecord, DocStatus, DocumentRequirement } from '@/shared/types';
 
@@ -177,5 +179,30 @@ describe('deriveDashboardMetrics — document fields', () => {
     expect(metrics.docCompliancePct).toBe(100);
     expect(metrics.docMissing).toBe(0);
     expect(metrics.docUntracked).toBe(0);
+  });
+});
+
+describe('requirementCatalogOf', () => {
+  it('unions every batch catalog once per key, in first-seen order', () => {
+    const a = fixtureBatch({ id: 'A', documentRequirements: [req('aou'), req('ntp')] });
+    const b = fixtureBatch({ id: 'B', documentRequirements: [req('ntp'), req('tip')] });
+    expect(requirementCatalogOf([a, b]).map((r) => r.key)).toEqual(['aou', 'ntp', 'tip']);
+  });
+
+  it('is empty when no batch carries a catalog', () => {
+    expect(requirementCatalogOf([fixtureBatch({ documentRequirements: [] })])).toEqual([]);
+  });
+});
+
+describe('alertCategoryCounts — per-batch catalogs', () => {
+  it("flags missing critical documents from each batch's own catalog", () => {
+    const a = fixtureBatch({ id: 'A', documentRequirements: [req('aou')], documents: { aou: doc('missing') } });
+    const b = fixtureBatch({ id: 'B', documentRequirements: [req('ntp')], documents: { ntp: doc('verified') } });
+    expect(alertCategoryCounts([a, b])['doc-missing']).toBe(1);
+  });
+
+  it('raises no document alert for a batch with no catalog', () => {
+    const none = fixtureBatch({ documentRequirements: [], documents: {} });
+    expect(alertCategoryCounts([none])['doc-missing']).toBe(0);
   });
 });

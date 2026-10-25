@@ -19,8 +19,12 @@ reviewing, or merging code.
 
 1. **RLS is the security boundary; UI hiding is usability only.** Every authorization decision
    is made by Postgres RLS (`app_private.*` helpers). **[rls]**
-2. **Never manually filter by tenant in JS.** RLS scopes rows. A JS-side tenant filter is a bug
-   even when it returns the right answer — it signals the query was written assuming no RLS. **[review]**
+2. **Never authorize by tenant in JS.** RLS decides which rows a caller may see. A JS-side tenant
+   check used as access control is a bug even when it returns the right answer — it signals the
+   query was written assuming no RLS. **Allowed:** a `tenant_id = scope.tenantId` filter taken
+   from a validated `TenantScope` (`modules/tenancy/domain/scope.ts`). It only *selects* which of
+   the caller's schools a screen shows, on top of RLS; it never grants access RLS would deny.
+   **[review]**
 3. **The service-role key must never reach client code.** Server-side clients use the anon key
    plus the Clerk session token, supplied through the `accessToken` callback (never a
    hand-set `Authorization` header, and never a JWT template — those were deprecated

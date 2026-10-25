@@ -4,7 +4,8 @@
  * SCREEN — Batch Cards (ported from App.jsx CardsView)
  *
  * The primary dashboard view: a vertical stack of full-width BatchCards sorted
- * by urgency. Owns the search/program filter state and the BatchModal that opens
+ * by earliest billing deadline (`filterBatches`); batches with no deadline keep
+ * the snapshot's training-end-date order at the end. Owns the search/program filter state and the BatchModal that opens
  * on card click. Client Component (interactive).
  */
 
@@ -44,7 +45,7 @@ export function CardsView({ batches, loadedAt }: { batches: Batch[]; loadedAt: s
       ) : (
         <div className="batch-stack">
           <InfoCallout variant="info">
-            {filtered.length} batch {pluralize(filtered.length, 'record', 'records')}{loadedAt ? ` loaded ${loadedAt}` : ''}. Sorted by earliest billing deadline first.
+            {filtered.length} batch {pluralize(filtered.length, 'record', 'records')}{loadedAt ? ` loaded ${loadedAt}` : ''}. Sorted by earliest billing deadline first; batches with no deadline recorded come last, by training end date.
           </InfoCallout>
           {filtered.map((b) => (
             <BatchCard key={b.id} batch={b} onClick={() => setOpen(b)} />

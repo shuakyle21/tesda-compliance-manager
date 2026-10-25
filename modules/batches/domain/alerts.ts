@@ -63,12 +63,12 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
   return rows;
 }
 
-/** Alert counts per category across all batches, for chart/summary views. */
-export function alertCategoryCounts(
-  batches: Batch[],
-  documentRequirements: DocumentRequirement[],
-): Record<AlertCategory, number> {
-  const criticalDocs = criticalRequirements(documentRequirements);
+/**
+ * Alert counts per category across all batches, for chart/summary views. Each
+ * batch is checked against its own program's critical documents, so one
+ * program's requirement never counts as missing on another program's batch.
+ */
+export function alertCategoryCounts(batches: Batch[]): Record<AlertCategory, number> {
   const counts: Record<AlertCategory, number> = {
     'billing-ready': 0,
     'bsrs-approved': 0,
@@ -77,7 +77,7 @@ export function alertCategoryCounts(
     'ntp-lag': 0,
   };
   for (const b of batches) {
-    for (const row of batchAlerts(b, criticalDocs)) counts[row.category]++;
+    for (const row of batchAlerts(b, criticalRequirements(b.documentRequirements))) counts[row.category]++;
   }
   return counts;
 }
