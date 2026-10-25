@@ -25,25 +25,11 @@ import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
 import { scopedPath } from '@/modules/tenancy/domain/scope';
+import { formatDateTime } from '@/shared/dates';
 import { requireScope } from '../../../../tenant-scope';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
-
-const DATA_AS_OF_FALLBACK = '29 May 2026, 09:12';
-
-function formatAsOf(value: string | null): string {
-  if (!value) return DATA_AS_OF_FALLBACK;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return DATA_AS_OF_FALLBACK;
-  return date.toLocaleString('en-PH', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 export default async function BillingPage({ params: routeParams, searchParams }: { params: Promise<{ tenantCode: string }>; searchParams: SearchParams }) {
   // One school, validated against the caller's memberships by the segment layout.
@@ -150,11 +136,10 @@ export default async function BillingPage({ params: routeParams, searchParams }:
   // `buildStatement` derives the actual document from — same batches, two views.
   const cards = buildBillingCards(visible, documentRequirements);
 
-  const latestUpdate = visible
-    .map((b) => b.updatedAt)
-    .filter((v): v is string => Boolean(v))
-    .sort()
-    .at(-1) ?? null;
+  // "Data as of" is when this snapshot was read, the same stamp the dashboard
+  // shows. Null (rendered as "not available") when there is no ok snapshot,
+  // never a stand-in time.
+  const dataAsOf = snapshot.status === 'ok' ? formatDateTime(snapshot.fetchedAt) : null;
 
   if (packets.length === 0) {
     return (
@@ -180,7 +165,7 @@ export default async function BillingPage({ params: routeParams, searchParams }:
       packets={packets}
       cards={cards}
       role={billingRole}
-      dataAsOf={formatAsOf(latestUpdate)}
+      dataAsOf={dataAsOf}
       syncFailed={syncFailed}
       stale={stale}
     />
