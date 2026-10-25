@@ -20,16 +20,10 @@ import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress, describeSessionProgress } from '@/modules/batches/domain/progress';
 import { formatDate } from '@/shared/dates';
-import type { Batch, LifecycleStage, UrgencyTier } from '@/shared/types';
+import { deriveBillTone } from './billTone';
+import type { Batch, LifecycleStage } from '@/shared/types';
 
 type BatchPropRow = { label: string; icon: IconName; value: ReactNode };
-type BillTone = { bg: string; fg: string; bd: string; icon: IconName };
-
-function deriveBillTone(tier: UrgencyTier): BillTone {
-  if (tier === 'on-track') return { bg: 'var(--color-green-lt)', fg: 'var(--color-green-dk)', bd: 'var(--color-green)', icon: 'check' };
-  if (tier === 'warning') return { bg: 'var(--color-amber-lt)', fg: 'var(--color-amber-dk)', bd: 'var(--color-amber-border)', icon: 'clock' };
-  return { bg: 'var(--color-red-lt)', fg: 'var(--color-red-dk)', bd: 'var(--color-red-border)', icon: 'alert-triangle' };
-}
 
 function buildBatchProps(batch: Batch, isTwsp: boolean, billingReady: boolean): BatchPropRow[] {
   return [
