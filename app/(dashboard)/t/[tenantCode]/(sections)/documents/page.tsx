@@ -7,8 +7,9 @@ import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/d
 import { DocumentsView } from '@/modules/documents/ui/DocumentsView';
 import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
+import { requirementCatalogOf } from '@/modules/documents/domain/compliance';
 import { requireScope } from '../../../../tenant-scope';
-import type { Batch, DocumentRequirement } from '@/shared/types';
+import type { Batch } from '@/shared/types';
 
 export default async function DocumentsPage({ params }: { params: Promise<{ tenantCode: string }> }) {
   // One school, validated against the caller's memberships by the segment layout.
@@ -24,14 +25,12 @@ export default async function DocumentsPage({ params }: { params: Promise<{ tena
   const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccessOf(profile));
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
 
-  // No live per-program document-requirement catalog exists yet: the real
-  // contract (`getDocumentRequirementsSnapshot`) is scoped per scholarship
-  // program and needs a program id that `Batch` doesn't carry
-  // (TES-34-adjacent gap). An empty catalog collapses the matrix into its
-  // "requirements unavailable" state per ADR-004 — never a fabricated
-  // compliance percentage. (Each batch's own `documents` status map is live;
-  // only this flat row catalog is missing.)
-  const documentRequirements: DocumentRequirement[] = [];
+  // Each batch carries its own program's requirement catalog (mapped in
+  // `mapBatchRow`). The matrix columns are their union; a column outside a
+  // batch's program renders as "Not tracked", never "missing" (ADR-004). With
+  // no catalog on any batch the matrix shows its "requirements unavailable"
+  // state, never a fabricated compliance figure.
+  const documentRequirements = requirementCatalogOf(batches);
 
   // The compliance matrix has no honest shape for someone attached to no
   // school: an all-blank grid reads as "your batches are missing every

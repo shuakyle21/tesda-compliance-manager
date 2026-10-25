@@ -164,6 +164,25 @@ export function criticalRequirements(
   return requirements.filter((r) => r.critical);
 }
 
+/**
+ * Every requirement any of these batches' programs asks for, once each (keyed
+ * by `key`, first occurrence wins, in first-seen order).
+ *
+ * For **display only** — the columns of a matrix that spans several programs.
+ * Never score a batch against this union: a Program A requirement would count
+ * against a Program B batch. Score with each batch's own
+ * `batch.documentRequirements` instead (see `summarizeOwnCatalogCompliance`).
+ */
+export function requirementCatalogOf(batches: readonly Batch[]): DocumentRequirement[] {
+  const byKey = new Map<string, DocumentRequirement>();
+  for (const batch of batches) {
+    for (const req of batch.documentRequirements) {
+      if (!byKey.has(req.key)) byKey.set(req.key, req);
+    }
+  }
+  return [...byKey.values()];
+}
+
 // ---------------------------------------------------------------------------
 // Blocking strip (TES-40 / FR-06 AC-2) — "which documents are holding this
 // batch up, by name?"

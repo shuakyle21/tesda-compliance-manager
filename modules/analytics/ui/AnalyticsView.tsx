@@ -21,15 +21,9 @@ import { BarChart, BarList, DonutChart, Card, Title, Text, Grid, Col } from '@tr
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import { ALERT_CATEGORY_LABEL, alertCategoryCounts } from '@/modules/batches/domain/alerts';
-import type { Batch, DocumentRequirement } from '@/shared/types';
+import type { Batch } from '@/shared/types';
 
-export function AnalyticsView({
-  batches,
-  documentRequirements,
-}: {
-  batches: Batch[];
-  documentRequirements: DocumentRequirement[];
-}) {
+export function AnalyticsView({ batches }: { batches: Batch[] }) {
   if (!batches.length) {
     return <EmptyState heading="No data to chart" sub="Import a CSV to populate analytics." />;
   }
@@ -48,10 +42,11 @@ export function AnalyticsView({
 
   // ADR-004: a batch that tracks none of the critical requirements is left out
   // of the ranking entirely — plotting it as 0% would read as a compliance
-  // failure rather than an absence of data.
-  const criticalReqs = criticalRequirements(documentRequirements);
+  // failure rather than an absence of data. Each batch is scored against its
+  // own program's catalog, never a cross-program list.
+  const hasCriticalReqs = batches.some((b) => criticalRequirements(b.documentRequirements).length > 0);
   const docData = batches
-    .map((b) => ({ name: b.id, summary: summarizeBatchDocCompliance(b, criticalReqs) }))
+    .map((b) => ({ name: b.id, summary: summarizeBatchDocCompliance(b, criticalRequirements(b.documentRequirements)) }))
     .filter((d) => d.summary.verifiedPct !== null)
     .map((d) => ({ name: d.name, value: d.summary.verifiedPct as number }))
     .sort((a, b) => b.value - a.value);
@@ -62,7 +57,7 @@ export function AnalyticsView({
   // Live counts from the same alerts engine AlertsPanel uses (batches.ts,
   // computed on read) — no alerts_log table exists, so this can never drift
   // from what the dashboard's alerts panel is actually showing.
-  const alertCounts = alertCategoryCounts(batches, documentRequirements);
+  const alertCounts = alertCategoryCounts(batches);
   const alertsData = Object.entries(alertCounts)
     .filter(([, value]) => value > 0)
     .map(([category, value]) => ({ name: ALERT_CATEGORY_LABEL[category as keyof typeof ALERT_CATEGORY_LABEL], value }));
@@ -105,7 +100,7 @@ export function AnalyticsView({
             <BarList data={docData} valueFormatter={(v: number) => `${v}%`} color="emerald" className="mt-4" />
           ) : (
             <Text className="mt-4">
-              {criticalReqs.length === 0
+              {!hasCriticalReqs
                 ? 'No critical document requirements defined.'
                 // Untracked is unknown, not zero (ADR-004) — say so rather
                 // than leaving a titled card with an empty chart in it.
