@@ -106,8 +106,13 @@ export function DocumentsView({
    * requirement at all (ADR-004 — untracked is neither verified nor missing;
    * the matrix renders it as its own muted "Not tracked" pill). An override
    * can only refine a record that exists.
+   *
+   * The columns span every shown program, and the mapper keeps any document
+   * row a batch has, so a requirement outside this batch's own catalog is
+   * untracked even if an old record for it exists.
    */
   const docOf = (b: Batch, key: string): DocRecord | null => {
+    if (!b.documentRequirements.some((r) => r.key === key)) return null;
     const base = docRecordFor(b, key);
     if (!base) return null;
     const ov = overrides[b.id + ':' + key];
