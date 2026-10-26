@@ -1,11 +1,11 @@
 ---
 type: Reference
 title: Quickstart and Change Routing
-description: "First stop before changing TVI-CAMS: what the system is and where the official-systems boundary lies, the doc-reading order and full ADR precedence chain, the invariants that gate every change and their enforcement levels, the exact verification loop, the durable substrate facts a change must account for, and a task → page routing table over the fixed four-page set."
+description: "First stop before changing TVI-CAMS: what the system is and where the official-systems copy boundary lies, the doc-reading order and the full ADR precedence chain, the invariants that gate every change and their enforcement levels, the exact verification loop, and a task → page routing table over the fixed four-page set."
 tags: ["quickstart", "task-routing", "onboarding", "invariants", "verification", "tesda-compliance-manager", "nextjs", "supabase", "clerk", "rls", "migrations", "adr-precedence"]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-10-25T05:56:04.137Z
+    at: 2026-10-26T00:51:40.902Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example
@@ -65,6 +65,8 @@ sources:
     resource: repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql
   - id: openwiki-source-acb73c82b90d7c0325351e5f
     resource: repo://supabase/migrations/README.md
+  - id: openwiki-source-2020074c6fdeab02aae020b7
+    resource: repo://tests/unit/batches.test.ts
   - id: openwiki-source-4b1944144311805b722ef6ef
     resource: repo://tests/unit/dashboard-domain.test.ts
   - id: openwiki-source-892600aba8a4baaca4ccc7a9
@@ -73,50 +75,51 @@ sources:
     resource: repo://tests/unit/redirect-url.test.ts
   - id: openwiki-source-5840c4db50eac7206a874ca9
     resource: repo://tests/unit/sign-in-verification.test.ts
-  - id: openwiki-source-4a8c4e61ab290d00b22b6541
-    resource: repo://tests/unit/urgency.test.ts
+  - id: openwiki-source-763cabdcd60de0e5da8f9a60
+    resource: repo://tests/unit/supabase-server.test.ts
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-10-25T05:56:04.137Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-26T00:51:40.902Z" }
 ---
 
 # Quickstart and Change Routing
 
-This is the first page an agent or human opens before touching TVI-CAMS. It is a routing map, not a tutorial: orient on the system, find the page that answers your task, know the invariants no change may cross, and know how to verify work.
+This is the first page an agent or human opens before touching TVI-CAMS. It is a routing map, not a tutorial: orient on the system, find the page that answers your task, know the invariants no change may cross, and know how to verify work. Mechanism lives on the three architecture pages; this page only tells you which one owns your task and which rule locks it.
 
 ## What TVI-CAMS is
 
-TVI-CAMS (TESDA Compliance Manager) is an **internal multi-tenant compliance working layer** for TVI schools running TESDA scholarship batches (TWSP/CFSP). It tracks batch lifecycle, documents, attendance, and LAMR evidence, and generates the school's billing documents as populated `.docx` templates (ADR-001: TSF/Allowance, Training Cost, Entrepreneurship; Assessment Fee is out of scope).
+TVI-CAMS (TESDA Compliance Manager) is an **internal multi-tenant compliance working layer** for TVI schools running TESDA scholarship batches (TWSP/CFSP). It tracks batch lifecycle, documents, attendance, and LAMR evidence, and generates the school's billing documents as populated `.docx` templates — TSF/Allowance, Training Cost, Entrepreneurship; Assessment Fee is out of scope (ADR-001).
 
-**The official-systems boundary.** This tool never holds official standing. TESDA's **SIS, T2MIS, and BSRS remain authoritative** for official records, approved qualification maps, schedules, ULI records, attendance submissions, billing documents, and required reports; Supabase stores internal working copies, evidence, status tracking, and references to official records. UI copy must never imply official TESDA approval or submission (RULES rule 27) — a packet marked `submitted` or `settled` is a person's bookkeeping note, not an official fact (ADR-003 P3).
+**The official-systems boundary.** This tool never holds official standing. TESDA's **SIS, T2MIS, and BSRS remain authoritative** for official records, approved qualification maps, schedules, ULI records, attendance submissions, billing documents, and required reports; the database stores internal working copies, evidence, status tracking, and references to official records. UI copy must never imply official TESDA approval or submission (RULES rule 27) — and a packet marked `submitted` or `settled` is a person's bookkeeping note, not an official fact (ADR-003 P3). The practical consequence: never "fix" a discrepancy by editing the app to match a screen, and never write copy like "submitted to TESDA" for an action that only flips a column here.
 
-Orientation facts:
+Facts you need before reading code, none of which this page explains further:
 
-- **Tenants:** three initial schools — AKB, J3ED, NEN — strictly scoped by Supabase RLS. New schools are provisioned through `/schools/new`.
-- **Roles:** Admin, Coordinator, Trainer, Viewer — lowercase `profile_role` values; capitalized labels are display copy only (`CONTEXT.md`, RULES "Locked domain facts"). Role authority is `profiles.role`; Clerk is identity only.
-- **Platform admin / school registry (ADR-006):** a *separate axis* from `profile_role`, never a fifth role value. `/schools/new` runs a `security invoker` `create_school` RPC that lands a tenant **plus its registered programs in one transaction**. Its reach is the registry only — `tenants`, `qualifications`, `tenant_qualifications`, unassigned `profiles`, seating a tenant's first member — and holding `admin` at a school grants nothing on `/schools/new`.
-- **Programs:** TWSP and CFSP, stored as configurable records, not hard-coded UI branches.
-- **Stack:** Next.js 16 App Router, React 19, TypeScript strict, Tailwind v4, Supabase (Postgres + Storage), Clerk, pnpm as the only package manager. One app talks directly to Supabase; there is no separate backend. **Node 22+ is required** (`engines` in `package.json`).
+- **Tenants:** three initial schools — AKB, J3ED, NEN — scoped by Supabase RLS; new schools are provisioned through `/schools/new`. Tenant context lives in the URL path segment, `/t/<tenantCode>` ([overview, scoped routing](/openwiki/architecture/overview.md#scoped-routing--ttenantcode)).
+- **Roles:** `admin`, `coordinator`, `trainer`, `viewer` — lowercase `profile_role` values that are the authority; capitalized labels are display copy (`CONTEXT.md`). Clerk is identity only.
+- **Platform admin (ADR-006):** a separate axis from `profile_role`, never a fifth role value, resolved through a `security definer` RPC; its reach is the school registry only.
+- **Stack:** Next.js 16 App Router, React 19, TypeScript strict, Tailwind v4, Supabase (Postgres + Storage), Clerk, pnpm as the only package manager. One app talks directly to Supabase; there is no separate backend.
 
 ## Run it locally
 
 ```bash
 pnpm install
-pnpm dev          # Next.js dev server on :3000
+pnpm dev          # Next.js dev server (next dev --webpack) on :3000
 ```
 
-`.env.example` documents the Clerk test keys (`pk_test_*` / `sk_test_*`) the e2e suite uses. The Supabase pair is `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (read by [`lib/supabase/server.ts`](/lib/supabase/server.ts)); `SUPABASE_SERVICE_ROLE_KEY` is read only by [`lib/supabase/service.ts`](/lib/supabase/service.ts) and must never reach client code (RULES rule 3). With the Supabase pair unset, `isSupabaseConfigured()` is false and data functions return `unconfigured` snapshots — never fabricated data (RULES rule 19).
+`.env.example` documents the Clerk test keys (`pk_test_*` / `sk_test_*`) the e2e suite needs. The Supabase pair is `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`, read by [`lib/supabase/server.ts`](/lib/supabase/server.ts); `SUPABASE_SERVICE_ROLE_KEY` is read only by [`lib/supabase/service.ts`](/lib/supabase/service.ts), for the Clerk webhook, and must never reach client code (rule 3). With the Supabase pair unset, `isSupabaseConfigured()` is false and data functions return `unconfigured` snapshots instead of fabricated data (rule 19) — a half-configured local run fails honestly rather than lying.
+
+**Node 22+ is required** (`engines` in [`package.json`](/package.json)). See the verification loop for why.
 
 ## Read the docs in this order
 
 1. [`README.md`](/README.md) — what this is, features, roles, layout, commands.
 2. [`CONTEXT.md`](/CONTEXT.md) — domain model and ubiquitous language (Batch, RQM, NTP, ULI, tranche, readiness gate, "untracked"…).
 3. [`CLAUDE.md`](/CLAUDE.md) — architecture guidance and the *why* behind the invariants.
-4. [`RULES.md`](/RULES.md) — the *what*: the non-negotiable checklist, each rule tagged with its enforcement level (hook / deny / lint / types / rls / review). **Read it before any code change.** Where `CLAUDE.md` and `RULES.md` appear to disagree, **RULES.md wins** and the drift gets fixed (rule 34 still claims no test runner exists; `tests/unit/` holds 25 spec files).
+4. [`RULES.md`](/RULES.md) — the *what*: the non-negotiable checklist, each rule tagged with its enforcement level. **Read it before any code change.** Where `CLAUDE.md` and `RULES.md` appear to disagree, **RULES.md wins** and the drift gets fixed. Rule 34 is one such stale line: it still says there is no test runner and `pnpm test` is a placeholder, while [`package.json`](/package.json) defines `pnpm test` as `vitest run` and `tests/unit/` holds 26 Vitest specs.
 
 ### ADR precedence
 
-`RULES.md` rule 30 is the chain, and it resolves in one direction. Never quote superseded PRD wording as current:
+RULES rule 30 is the chain, and it resolves in one direction: `docs/adr/` wins over anything in `docs/MASTER_PRD_SRS.md` and `docs/TRD.md`. Never quote superseded PRD wording as current.
 
 | ADR | Effect on the chain | Status |
 | --- | --- | --- |
@@ -131,76 +134,83 @@ ADR-002 and ADR-005 remain accepted and load-bearing for scope (the prototype po
 
 ## The fixed four-page wiki
 
-Four pages, this one plus three architecture pages. No fifth page, and no `design-system.md` — UI, token, state and copy questions route to [`RULES.md`](/RULES.md) §4–§5.
+Four pages: this one plus three architecture pages. No fifth page. UI, token, state, and copy questions route to [`RULES.md`](/RULES.md) §4–§5 — rules 21–26 (icons, fonts, tokens, status-by-text-and-icon, the six mandated data-screen states, primitive reuse, Server-Component default) and rule 27 (copy framing); [`CLAUDE.md`](/CLAUDE.md) carries the *why*.
 
 | Page | Answers |
 | --- | --- |
-| [Architecture Overview](/openwiki/architecture/overview.md) | The map: stack, the Clerk → proxy → `requireAuthenticatedUser()` → RLS request path, scoped `/t/<school>` routing, the lint-enforced import model, the module catalog, ADR precedence. |
-| [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | Schema shape, enums, the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) and repo-vs-database drift, `app_private.*` helpers and the [per-table policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map), the [ADR-006 boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), the `database.types.ts` regeneration contract, rule-36 guardrails. |
-| [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) | Where code goes, [import direction](/openwiki/architecture/module-boundaries-and-data-pattern.md#import-direction-is-lint-enforced), the private `data/` surface, [fetch → map → derive](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-data-contract-fetch--map--derive), the [snapshot union](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-four-state-snapshot-contract), [enum bridges](/openwiki/architecture/module-boundaries-and-data-pattern.md#enum-bridges-total-maps-in-the-mapper-never-in-components), the documents-module gate-vs-measurement split. |
+| [Architecture Overview](/openwiki/architecture/overview.md) | The map: stack, the Clerk → proxy → `requireAuthenticatedUser()` → RLS request path, [scoped `/t/<school>` routing](/openwiki/architecture/overview.md#scoped-routing--ttenantcode), role authority vs. presentation role, the lint-enforced [import model](/openwiki/architecture/overview.md#the-four-layer-import-model), the module catalog, build/run/test. |
+| [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) | Schema shape, enums, the [migration history](/openwiki/architecture/data-model-and-rls.md#migration-history), the `app_private.*` helper chain and [per-table policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map), the [ADR-006 boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006), the [regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract), rule-36 guardrails. |
+| [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) | Where code goes, [import direction](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-never-edges), the private `data/` surface, [fetch → map → derive](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-reference-implementation), the [snapshot union](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-snapshot-union-ok--sync-failed--unconfigured-plus-no-tenant-access) and its [guard ordering](/openwiki/architecture/module-boundaries-and-data-pattern.md#guard-ordering), [enum bridges](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-enum-bridge-and-the-total-map-rule). |
 
 ## Invariants that gate every change
 
-1. **RLS is the security boundary; UI hiding is usability only** (rule 1, **[rls]**). Every authorization decision is Postgres RLS via `app_private.*`. **A JS-side tenant filter is a bug even when it returns the right answer** — it signals a query written assuming no RLS (rule 2). Tenant-scope selection in `modules/tenancy` rides *on top of* RLS, never instead of it.
-2. **Import direction is `app → modules → shared → lib/supabase`, lint-enforced** (rule 7; `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs)). Raw `database.types.ts` rows are data-layer only (rule 10), `shared/` never imports upward (rule 9), and another module's `data/` is private (rule 8).
-3. **Never execute statements against the live Supabase project without explicit permission** (rule 36, **[deny]**): `execute_sql` — *including read-only `select`s* — `apply_migration`, branch create/merge/reset, and edge-function deploys, by any route (MCP, CLI, `psql`). One hosted project, no staging. Answer schema questions from the migrations and `lib/supabase/database.types.ts` first; the read-only introspection tools (`list_migrations`, `list_tables`) are for what those cannot answer.
-4. **`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are do-not-edit handoff** (rule 28, **[hook]**): ported verbatim, `globalIgnores`d, edit-blocked by `.claude/hooks/protect-static-dirs.sh`.
-5. **After any migration: regenerate `lib/supabase/database.types.ts`, then update affected mappers and domain types** (rule 20); new migrations are additive and `20260528160300_create_tenant_scoped_schema.sql` is canonical.
-6. **ADR precedence closes doors.** ADR-006's platform-admin reach is closed: granting `app_private.is_platform_admin()` any compliance table, or letting the operator seat itself into a tenant, needs its own ADR. ADR-004 makes `modules/documents/domain/compliance.ts` the single home of untracked-document semantics; no surface re-decides it.
-7. **Locked domain facts code must not contradict** (RULES, bottom): progress is `sessions_held / total_sessions`; the ADR-007 dropout rule; one RQM code = one batch; ULI is the permanent learner key; tenant context lives in the URL path segment; alerts are computed on read — no cron, no email.
+Each row names its enforcement level and the rule number to cite in review. **[hook]** and **[deny]** cannot be talked past; **[lint]** and **[types]** fail a gate you must run below; **[rls]** is not application code at all.
+
+| # | Invariant | Lock |
+| --- | --- | --- |
+| 1 | **RLS is the security boundary; UI hiding is usability only.** Every authorization decision is Postgres RLS via `app_private.*`. A JS-side tenant check used *as* access control is a bug even when it returns the right answer — it signals the query was written assuming no RLS. A `tenant_id = scope.tenantId` filter off a validated `TenantScope` is allowed because it only *selects* among rows RLS already allows. | rule 1, rule 2, **[rls]** / **[review]** |
+| 2 | **The service-role key never reaches client code**, and the server client authenticates by Clerk `accessToken` callback (never a hand-set `Authorization` header, never a JWT template). A missing token throws rather than querying as `anon`. | rule 3, **[review]** |
+| 3 | **Reviewers are read-only and live in the repo** (`.claude/agents/`, a `tools:` list without Edit/Write) — a reviewer that edits what it reviews has no independence. | rule 37, **[review]** |
+| 4 | **Import direction is `app → modules → shared → lib/supabase`**; another module's `data/` is private; raw `database.types.ts` rows are data-layer only. | rule 7, rule 8, rule 10, **[lint]** |
+| 5 | **The enum bridge is a total map in the mapper**, so a new DB variant fails compilation until its UI treatment is chosen. | rule 18, **[types]** |
+| 6 | **Discriminated snapshots are never faked.** Neither `unconfigured` nor `sync-failed` substitutes mock data, and the guard clause must check "empty" *before* `sync-failed` or a failure yielding zero rows silently swallows the banner. | rule 19, **[review]** |
+| 7 | **Never execute statements against the live Supabase project without explicit permission** — `execute_sql` *including read-only `select`s*, `apply_migration`, branch create/merge/reset, edge deploys, by any route (MCP, CLI, `psql`). One hosted project, no staging. | rule 36, **[deny]** |
+| 8 | **After any migration, regenerate `lib/supabase/database.types.ts`**, then update affected mappers and domain types; new migrations are additive. | rule 20, **[review]** |
+| 9 | **ADR precedence closes doors.** Granting `app_private.is_platform_admin()` any compliance table, or letting it seat itself into a tenant, needs its own ADR; no surface re-decides untracked-document semantics. | rule 30, **[review]** |
+| 10 | **Locked domain facts code must not contradict**: progress is `sessions_held / total_sessions`; the ADR-007 dropout rule; one RQM code = one batch; ULI is the permanent learner key; tenant context in the URL path; alerts computed on read (no cron, no email); packet lifecycle `draft → ready → generated → submitted → settled`. | `RULES.md` §"Locked domain facts", **[review]** |
+| 11 | **`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are do-not-edit handoff** — ported verbatim, `globalIgnores`d, edit-blocked. | rule 28, **[hook]** |
+
+Viewer is read-only and server-denied on writes (rule 4), and trainer-facing DTOs omit billing deadline, billing preparation, NTP lag, BSRS, and financial fields server-side (rule 5) — both are trimming rules that a client-side `hidden` class silently breaks.
 
 ## Verification loop
 
-Run these in order, commands exactly as invoked:
+Run all four, in order, commands exactly as invoked, and see green before calling work done:
 
 ```bash
-pnpm lint               # ESLint flat config; enforces the import boundaries above
-pnpm test               # Vitest over tests/unit/ (Node 22+ required)
-pnpm exec tsc --noEmit  # strict typecheck — there is no dedicated script
-pnpm test:e2e           # Playwright e2e (e2e/), Clerk test keys only per .env.example
+pnpm exec tsc --noEmit  # strict typecheck — rule 18 compiles against it; there is no script for this
+pnpm lint               # ESLint flat config — rules 7, 8, 9, 10 are import/no-restricted-paths zones in eslint.config.mjs
+pnpm test               # Vitest over tests/unit/ — rule 19, rule 34, the guard-ordering and domain rules
+pnpm test:e2e           # Playwright — rule 1: proves the layout gate, not proxy.ts, redirects
 ```
 
-- `pnpm test` runs `vitest run` over `tests/unit/**/*.test.ts` ([`vitest.config.mts`](/vitest.config.mts)); **25 spec files** at this head. Mappers and `domain/` layers are asserted with **fixed as-of dates** so time-dependent rules stay deterministic — `urgency.test.ts`, `dashboard-domain.test.ts`, `learner-import.test.ts`, `evidence-path.test.ts`, `doc-blockers.test.ts` and the rest.
-- **Node 22+ is required:** Vitest 4's rolldown calls `util.styleText` with an array argument and throws `ERR_INVALID_ARG_VALUE` on Node 21 or older — a bundler stack trace at startup, not a test failure.
-- `pnpm test:e2e` boots the app via `pnpm dev` (the `webServer` in [`playwright.config.ts`](/playwright.config.ts)); `e2e/global.setup.ts` obtains a Clerk testing token and [`e2e/auth.spec.ts`](/e2e/auth.spec.ts) asserts that an unauthenticated `/dashboard` visit redirects to `/sign-in` — proof the layout gate, not `proxy.ts`, is the gate. **Clerk test keys only**, never production keys.
-- No CI workflow runs this loop; green is a local, self-imposed gate.
+- `pnpm test` runs `vitest run` (include `tests/unit/**/*.test.ts`, [`vitest.config.mts`](/vitest.config.mts)) across 26 spec files. Time-dependent behavior is pinned by fixing the clock rather than trusting the runner's: [`batches.test.ts`](/tests/unit/batches.test.ts) wraps its `daysToBilling` block in `vi.setSystemTime('2026-06-01T00:00:00.000Z')`, and `dashboard-domain.test.ts` is as-of by construction because `daysToBilling` is already precomputed on its fixtures. Keep that shape — a spec that reads the real clock goes red on an unrelated day.
+- **Node 22+ is required for `pnpm test`:** Vitest 4's rolldown calls `util.styleText` with an array argument and throws `ERR_INVALID_ARG_VALUE` at startup on Node 21 or older. The failure is a bundler stack trace before any test loads, not a test failure — do not read it as one.
+- `pnpm test:e2e` boots the app through the `webServer` (`pnpm dev`) in [`playwright.config.ts`](/playwright.config.ts); `e2e/global.setup.ts` fetches a Clerk testing token and [`e2e/auth.spec.ts`](/e2e/auth.spec.ts) asserts an unauthenticated `/dashboard` visit redirects to `/sign-in`. **Clerk test keys only** per `.env.example`, never production keys.
+- No CI workflow runs this loop — `.github/workflows/` holds Qodana and OpenWiki, neither of which lints, typechecks, or tests. Green is a local, self-imposed gate. Real-Supabase RLS/tenant-isolation tests are still outstanding and must run against the hosted project with no mocks (rule 35).
 
 ## Durable substrate facts a change must account for
 
-Read from checked-in records, not from the live project (rule 36). The dated per-version catalog lives in [`supabase/migrations/README.md`](/supabase/migrations/README.md) and the [migration ledger](/openwiki/architecture/data-model-and-rls.md#migration-history) — consult those, do not assume.
+Read these from checked-in records, never from the live project (rule 36). Two checked-in facts already bite:
 
-1. **Migrations: nine `.sql` files.** `20260528160300` is canonical; the rest are additive. `20261024071359` (ADR-007) is applied and verified live; `20261024110000` (ADR-008) is checked in and **not applied**. `20260910120000` (ADR-001) and `20260906120000` are now repair-recorded, and the `ensure_profile_tenant_membership` gap is closed — the ledgers' older prose about it is history.
-2. **Version ≠ filename, and the directory is not the deployed schema.** Supabase keys applied migrations on the version string: a renamed file looks unapplied, and hand-run SQL records nothing. ADR-007's file was renamed to the version Supabase actually recorded. Confirm a migration by object name (`pg_proc`, `pg_policies`), never by comparing policy *sets* — a set reads as a superset regardless. `list_tables` row counts are `reltuples` estimates.
-3. **One policy is not reproducible from the repo.** `public.tenants` carries "Tenants selectable by Clerk user", defined by no checked-in migration, omitting the `is_active` check its reviewed counterpart enforces — so the checked-in policy map describes intent, not every policy enforcing it.
-4. **The type layer is out of step in both directions.** `database.types.ts` predates the billing domain and ADR-007 (no billing tables, no `excused`, and `program_billing_rules` still describes the retired `max_absences`) while carrying `billing_deadline` **by hand** ahead of its migration. Regenerate only against a database that already has what the file describes.
-5. **Nothing reads the ADR-007 or ADR-008 columns yet.** `max_absence_percent` and `excused` have no code caller (`modules/attendance/domain/eligibility.ts` is unbuilt), so the rule is schema and docs only; `modules/batches/data/batches.ts` reads `row.billing_deadline ?? null`, so until `20261024110000` applies every batch reports "not recorded". Someone must still enter deadlines — there is no edit path for the column.
-6. **Seeds never run automatically.** `20260831120000` lives in [`supabase/seeds/`](/supabase/seeds/README.md); `[db.seed]` points at a placeholder, and its rows are already in the hosted project.
-7. **Evidence storage I/O is unverified** until issue #122 (unset Clerk-Supabase/Third-Party Auth toggles make every call fail as an indistinguishable RLS denial), and `storage.objects` has **no DELETE policy** for the bucket — which is why `modules/documents/data/evidence.ts` exposes no delete.
-8. **The blocker-gate family has no screen.** `blockingDocuments` / `blockerCount` / `blockingDocumentNames` implement ADR-004 D4 and are tested in `tests/unit/doc-blockers.test.ts`, but nothing in `app/` imports them — a ready public domain surface.
+1. **The type layer and the schema are out of step in both directions.** `lib/supabase/database.types.ts` carries `billing_deadline` **by hand** ahead of its migration, while holding no `excused`, no `max_absence_percent` (nor even the retired `max_absences`), and no billing tables. Regeneration is only safe against a database that already has everything the file describes.
+2. **Nothing reads the ADR-007 or ADR-008 columns yet.** `max_absence_percent` and `excused` have no code caller — `modules/attendance/` holds a README only, and `modules/attendance/domain/eligibility.ts` is planned, not built. [`modules/batches/data/batches.ts`](/modules/batches/data/batches.ts) reads `row.billing_deadline ?? null`, so every batch reports "not recorded" until `20261024110000` applies, and no edit path exists to enter a deadline. The ADR-007 rule is currently schema and docs.
+
+Broader state — migration ledger by date, the one policy no migration defines, storage I/O unverified under issue #122, the unimported blocker-gate family — belongs to the [data model page](/openwiki/architecture/data-model-and-rls.md#migration-history); consult it rather than assuming.
 
 ## Task → page routing
 
-| Task family | Start here |
-| --- | --- |
-| Before any code change (all families) | [`RULES.md`](/RULES.md) — the checklist, every rule tagged with its enforcement level |
-| Schema, RLS policies, migrations, enums, triggers, the `compliance-evidence` bucket | [data-model-and-rls](/openwiki/architecture/data-model-and-rls.md) — [migration history](/openwiki/architecture/data-model-and-rls.md#migration-history), [per-table policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map), [storage policies](/openwiki/architecture/data-model-and-rls.md#storage-policies) |
-<!-- openwiki: broken internal link [</app/(dashboard] file "</app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-| Provisioning a school; platform admin; registry; qualifications/COPR | [data-model-and-rls, School registry and platform admin (ADR-006)](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006); write path [`app/(dashboard)/schools/new/page.tsx`](</app/(dashboard)/schools/new/page.tsx>), [`modules/tenancy/domain/schoolDraft.ts`](/modules/tenancy/domain/schoolDraft.ts), [`modules/tenancy/data/schools.ts`](/modules/tenancy/data/schools.ts) |
-<!-- openwiki: broken internal link [</app/(dashboard] file "</app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-| Adding or inviting a user; profile provisioning; `/users/new` | [data-model-and-rls, Profile provisioning and user administration](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration) + [`app/(dashboard)/users/new/actions.ts`](</app/(dashboard)/users/new/actions.ts>), [`modules/auth/data/provisioning.ts`](/modules/auth/data/provisioning.ts) |
-<!-- openwiki: broken internal link [/openwiki/architecture/overview.md#the-auth-chain-in-one-breath] heading anchor "the-auth-chain-in-one-breath" does not exist in "/openwiki/architecture/overview.md". Fix the href or restore the target, then delete this comment. -->
-| Sign-in, post-sign-in redirect handling, MFA, error shaping | [overview, the auth chain](/openwiki/architecture/overview.md#the-auth-chain-in-one-breath) + `modules/auth` (`sanitizeRedirectUrl` in [`domain/redirectUrl.ts`](/modules/auth/domain/redirectUrl.ts)) |
-| Adding a migration or regenerating `database.types.ts` | [data-model-and-rls, the regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract) + the [`supabase/migrations/README.md`](/supabase/migrations/README.md) ledger in the same PR |
-| Where code goes; import boundaries; adding a module | [module-boundaries-and-data-pattern, layer model](/openwiki/architecture/module-boundaries-and-data-pattern.md#layer-model) and [import direction](/openwiki/architecture/module-boundaries-and-data-pattern.md#import-direction-is-lint-enforced) |
-| New entity data layer; snapshot/error states; enum bridges; `no-tenant-access` fold | [module-boundaries-and-data-pattern, the data contract](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-data-contract-fetch--map--derive), [snapshot union](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-four-state-snapshot-contract), [enum bridges](/openwiki/architecture/module-boundaries-and-data-pattern.md#enum-bridges-total-maps-in-the-mapper-never-in-components) |
-| Document-compliance semantics (untracked, gate vs. measurement, evidence paths) | [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md) + [ADR-004](/docs/adr/ADR-004-untracked-document-semantics.md) |
-| Billing and packet work (ADR-001 engine, ADR-003 queue, ADR-008 deadline) | Read the ADR first (rule 30): [ADR-001](/docs/adr/ADR-001-billing-and-domain-model.md), then [ADR-003](/docs/adr/ADR-003-billing-packet-queue.md), then [ADR-008](/docs/adr/ADR-008-recorded-batch-billing-deadline.md) — ADR-008 **amends P5**, so stale P5 wording is not current |
-| Dashboard urgency engine; alerts and attention ordering | [overview](/openwiki/architecture/overview.md) → the domain rules in [module-boundaries-and-data-pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md); urgency is computed on read, defined in `modules/batches/domain/`, covered by `tests/unit/urgency.test.ts` and `dashboard-domain.test.ts` |
-| Dropout / eligibility questions | [ADR-007](/docs/adr/ADR-007-attendance-based-dropout-rule.md) — the ≥5-absence rule is retired even where older prose still cites it |
-| UI rules, tokens, states, copy, icons | [`RULES.md`](/RULES.md) §4 (rules 21–26) and §5 (rule 27); [`CLAUDE.md`](/CLAUDE.md) gives the why — no wiki page owns this, by design |
-| Domain vocabulary; locked domain facts | [`CONTEXT.md`](/CONTEXT.md) + [RULES.md, Locked domain facts](/RULES.md) |
-| Verifying a change | The [verification loop](#verification-loop) above |
-| Touching the live database at all | Rule 36 — explicit permission first; [data-model-and-rls, operations](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10) |
+Every row names the owning page, the raw rule that locks the change, and the ADR when one governs. Before any of them, read `RULES.md`.
+
+| Task family | Route | Lock |
+| --- | --- | --- |
+| Orient: stack, auth chain, scoped routing, roles, module catalog | [overview](/openwiki/architecture/overview.md), [the auth chain](/openwiki/architecture/overview.md#the-auth-chain) | rules 1, 2 |
+| Sign-in, post-sign-in redirect handling, MFA, error shaping | [overview, the auth chain](/openwiki/architecture/overview.md#the-auth-chain) + `modules/auth` (`sanitizeRedirectUrl` in [`modules/auth/domain/redirectUrl.ts`](/modules/auth/domain/redirectUrl.ts), covered by `tests/unit/redirect-url.test.ts`) | rule 3 |
+| Where code goes, adding a module, import boundaries | [module-boundaries, layer model](/openwiki/architecture/module-boundaries-and-data-pattern.md#layer-model) | rules 7, 8, 9, 10, 11, 12 |
+| New entity data layer, snapshot states, enum bridges, `no-tenant-access` fold | [module-boundaries, the reference implementation](/openwiki/architecture/module-boundaries-and-data-pattern.md#the-reference-implementation) and [guard ordering](/openwiki/architecture/module-boundaries-and-data-pattern.md#guard-ordering) | rules 17, 18, 19 |
+| Document compliance (untracked, gate vs. measurement, evidence paths) | [module-boundaries](/openwiki/architecture/module-boundaries-and-data-pattern.md) + [ADR-004](/docs/adr/ADR-004-untracked-document-semantics.md) | rule 19, ADR-004 |
+| Schema, migrations, enums, triggers, the evidence bucket | [data-model-and-rls](/openwiki/architecture/data-model-and-rls.md) | rules 20, 36 |
+| Adding a migration or regenerating `database.types.ts` | [data-model-and-rls, the regeneration contract](/openwiki/architecture/data-model-and-rls.md#the-database-types-regeneration-contract) + [`supabase/migrations/README.md`](/supabase/migrations/README.md) in the same PR | rules 20, 36 |
+| RLS policies, `app_private.*` helpers, tenant isolation | [data-model-and-rls, the RLS decision machinery](/openwiki/architecture/data-model-and-rls.md#the-rls-decision-machinery) and [policy map](/openwiki/architecture/data-model-and-rls.md#per-table-policy-map) | rules 1, 2, 4 |
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+| Provisioning a school; platform admin; registry; COPR | [data-model-and-rls, ADR-006 boundary](/openwiki/architecture/data-model-and-rls.md#school-registry-and-platform-admin-adr-006); path [`schools/new/actions.ts`](/app/(dashboard)/schools/new/actions.ts) → [`modules/tenancy/data/schools.ts`](/modules/tenancy/data/schools.ts) | rules 30, 36, ADR-006 |
+| Adding a user; profile provisioning | [data-model-and-rls, profile provisioning](/openwiki/architecture/data-model-and-rls.md#profile-provisioning-and-user-administration) | rule 3 (service-role-only path) |
+| Billing and packet work | [ADR-001](/docs/adr/ADR-001-billing-and-domain-model.md) → [ADR-003](/docs/adr/ADR-003-billing-packet-queue.md) → [ADR-008](/docs/adr/ADR-008-recorded-batch-billing-deadline.md); stale P5 wording is not current | rule 30 |
+| Dropout / eligibility | [ADR-007](/docs/adr/ADR-007-attendance-based-dropout-rule.md) — the ≥5-absence rule is retired even where older prose still cites it | rule 30 |
+| Dashboard urgency, alerts, attention ordering | [overview](/openwiki/architecture/overview.md); rules are live in `modules/batches/domain/` (`urgency.ts`, `attention.ts`), covered by `dashboard-domain.test.ts` | rule 14 (pure `domain/`) |
+| UI rules, tokens, states, copy, icons | [`RULES.md`](/RULES.md) §4–§5; [`CLAUDE.md`](/CLAUDE.md) carries the why | rules 21–27 |
+| Domain vocabulary, locked facts | [`CONTEXT.md`](/CONTEXT.md) + `RULES.md` §"Locked domain facts" | — |
+| Touching the live database at all | [data-model-and-rls, operations](/openwiki/architecture/data-model-and-rls.md#operations-and-agent-constraints-rules-10) | rule 36, **[deny]** |
+| Verifying a change | the [verification loop](#verification-loop) above | — |
 
 ## Related pages
 

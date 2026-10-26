@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:03b8d4e33c42890a9e06d20948634c988f2d31813c8aafd97828070d5e31457b",
+  "pageVersion": "sha256:19c1cca1d78de36f4ddae285d005582baa70e75bfd3e78a8cec783b2b96f1bb1",
   "claims": [
     {
       "id": "claim_989cf53fa86c46e3a2f936984aa0acee",
@@ -34,7 +34,7 @@
         },
         {
           "resource": "repo://RULES.md#L18-L23",
-          "version": "repo-lines-v1:sha256:8fd929308b40667cb04ddad747fd564b0082e7fe08d4d3cbd1e4c17b60d74942:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTBjNmE1MTIyMzc1OTJhZDJlYjIxYTkyZjY0OTIwNDEwMTIxNjEzMWZjZTA0YzRkYWEwMDg3NWQ1YmRiMGU1YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWFmYzE1MTRjMmNkNzY2MjQ5MDY4ZjgwNDJlZDY4OTk2OGM0MzBjNjE5OTJhZmZkNzA0Y2E5YTkxYzVmNmI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDk2MGEyZTI0MTNmZGRlYTg0NDJlYmU2MjIyMzY3ZDU0YThiM2UwMWQ5OTY1YmJhMjY4MzgwNGNmNmQ1MjJkMyJ9"
+          "version": "repo-lines-v1:sha256:7c59217f5b544a8330dbf5d1c885e438f81b623fa8acd96de3c26b3258a94830:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwYzZhNTEyMjM3NTkyYWQyZWIyMWE5MmY2NDkyMDQxMDEyMTYxMzFmY2UwNGM0ZGFhMDA4NzVkNWJkYjBlNWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczZjk4Y2Y2N2Q3OTA1Y2IzOTExMGY2MDllYWQzMDE4OWViZDBjYTUxMDJlY2RiYWFlNTI2ZDI3MjIzYjY2YzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5NjBhMmUyNDEzZmRkZWE4NDQyZWJlNjIyMjM2N2Q1NGE4YjNlMDFkOTk2NWJiYTI2ODM4MDRjZjZkNTIyZDMifQ"
         }
       ]
     },
@@ -92,23 +92,27 @@
     },
     {
       "id": "claim_9970a007496b4376b33382e28a3f6b58",
-      "statement": "After any migration the agent must regenerate lib/supabase/database.types.ts and then update the affected mappers and domain types (RULES §3.20); new migrations are additive with 20260528160300 canonical, and the ledger is updated in the same PR with a row moved to applied only after the migration has actually run — supabase/migrations/README.md is the current ledger, docs/DATA_MODEL.md the older one.",
+      "statement": "After any migration (RULES §3 rule 20) the agent must regenerate lib/supabase/database.types.ts and then update the affected mappers and domain types; new migrations are additive with 20260528160300 canonical. The directory is not the ledger: supabase/migrations/README.md is updated in the same PR and a row moves to applied only once the migration has actually run, whereas docs/DATA_MODEL.md stops at seven versions and is history.",
       "evidence": [
         {
           "resource": "repo://CLAUDE.md#L95-L98",
           "version": "repo-lines-v1:sha256:319dc897ccac7cf2855585a59df2cc4155d2d287278f6d17dcf13067321156b9:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzRlMTQ5ODA2ZWYxYTA2NjAyOTFmYTU2N2ZlZjk0MmM1NWIxZTZlNDA2OTUyYzk3YThmZDVkNzI0NDAwNTE1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQ1NGQ4MzcyZWMyMDE2OWY1YTRkNjljNDc1ZDgxMTFiY2QxMWFhNWYxZTdjNzI1NTFiNjM5ZGY3ZGZmYTI4NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzY3YjJiZWUwZjg2MDNhNTcxZDQ1MjA2MjJkZWMwMzM5NWU4MzQ4NDU5ZmIwOGVhMDM0ZDYyZjE4YmEzOTJiZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjIwMmRkZWY5MmU1MjllNjU1N2EyNDQwODdkMDJlZTExZTQyNDY4MWRkNjMzM2M3YmJhODIxMWUwMmNkMzljYyJ9"
         },
         {
-          "resource": "repo://RULES.md#L64-L66",
+          "resource": "repo://RULES.md#L68-L70",
           "version": "repo-lines-v1:sha256:e0c9b14cc5e8439ad84c0a2b31ba31e5878b14774a8bbc2836b169250b353626:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGQ3MWFiMmY0NzIwMDIwNmY5ZGQ5M2JiZDM4ODhmY2UzMDM1ZThlOTQxYWU5ZGI5ZmY3NzRhZmJlNDYyYjA0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzY2QyODFmNDhmMmVhYzc2NzJmZDcxMDcxNTJhMjE2NmM4MTJkOTMzMjFmZDQ5NjE2ZjY5ZWZkMTFkNTBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJkZGZhYWIxMTk1NzMwZmVlMjE5MTBlZjQ3NzUzZjdkNmI0ZjBkOTUxZWUxN2FjMDMxN2U0NjE3YWJkMTE3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMxMjNhMjViYzk1YWM3OTZhZjg5ZTlmNDBkYTU1MDllZDhkYzY5ZGJlN2Y3NWJkYTg2YTRhYTJmNWVjMzY3MCJ9"
         },
         {
-          "resource": "repo://docs/DATA_MODEL.md#L48-L50",
-          "version": "repo-lines-v1:sha256:63a669f69d0ffaf5922d05e81860543756ba65cd16a52f07a83da02d70601132:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTEzZWFmMzE5NmJkZTg3YzQ1YTdjOWI1ZTdjNjViMjg5ZWIzMzE1MWMwZGRkZjQ0ZTUxNjk4NDg0MjE2MDE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1MzUwYWRkZDkzYjk3M2ZkOTJiZDRhOGZmMWM3NGM4ZWYxMGI3NTI3ZWY5ZGE1ZDNhNTYwZDJkNjIyZDU2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODVhYzg2YjUzMzhjMzI1NmZkMDMwZmFlYTI4ZDBmZDE4MmVjMDUzNDI5ZTY4YjRhZmY5Y2YwNjBmMzQ1ZmYzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGQ4ZTMzZjBiMWIxYjY3NjcxNDZmNmViOTE4NDAxN2E5ZDNkMTg3MDU5NWZkOGI3YWY0NmE1NTVmMGE0YzM1MyJ9"
+          "resource": "repo://docs/DATA_MODEL.md#L7-L46",
+          "version": "repo-lines-v1:sha256:ab3c74bd2e29b7de79205b20cfee1fd7133d4c2a49119c92e0280ceb28140c18:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkZDFmYTBlZjJjODg2Yzc5NWQ0MWU2YzNmYzRkODc2MjY1YTdkMjQzMzUxZTRlYmE1ZmM1Y2ZiYzk4ZGMyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0YTkzNGI5ZTk4YjljOWY1YWFmOGI3MjZiZTRiNzFkNmJhYzllOTQ1YTk2MDVjZDE0MDg3MmRhMjlhNTA1ZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiYTkwMGU1M2FjOTVjYWUxODQ4ODVkYzIwNjUwNTUzYTcyMjMzZTQ0NjQ0ODU3MjdlMjRiMGUxMGExNTYzMGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2M2Q4ODVkZWJiNDQ2YTQzMGZhOTVjYTg2Zjk3N2JlZmFiMGQyMDYwZDFlM2I5NzM0ZWVkMDM2MjVjNmZjYzcifQ"
         },
         {
           "resource": "repo://supabase/migrations/README.md#L1-L6",
           "version": "repo-lines-v1:sha256:142c2a1ef266fac6874738cf1618caf9051bd8d29860562f73e59d0f0dcbb7a9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE2OTFjYmQxODliNTJkNmUyMjJlMDVhN2QxYTQzMjRhYmRhNjljMzA3OWE5Y2ZlOTBiM2E0ODJlMDBiZTRlZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzEyZTc2YjYxZGRjYTc5MjI1MjMzYWJjNDNjODJiY2MwMzE2OGYwZDBlMDhiMDMyYjdkYWRiZWQ5MWViMjg4NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWEzMDEzMzMwMWQwZTZkMTMyMzFlN2JlOTEzYzNiYTAzZmI5YWJlY2U0ZjQ5MjM2MWRlZjk4NzA3ODFiNzkyZCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L44-L66",
+          "version": "repo-lines-v1:sha256:7a4468c1f3c8c22eea7a3170fbee4c82f3da26030529e74e302539d895f4ec56:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0MWMzMGQ4N2MzY2Q3MmQzNjZjZTIzN2FiNmEyNTg5NjY4ZjhmZTZiM2I3OTA4OTQ3NTUxNzcyZTI3N2FmM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZjQ2ZTMyNWJmNWE2YTY3NDE3MWQwZTMyYTQ0YmJiZTgxMzIzMTg1ZmIwMTVjMGZhOTc1NDA5YmVkOGE2NzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxNDUyNDgxY2MzMjYyZTI5MzJmMzMyZTA5ZDg5MWEzZTIyMzFkOWU1YjJiNmI4ZmE4YzI3NjRmYjM4MjE3ZDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3ZTk1NThkZjJkODNhMzMyODIwOTM3N2UyOTNlODQ1MDk4N2JjYjc4Y2U0ZWQ0Nzc0ZDg0NGIxNDIzZjA1OTEifQ"
         }
       ]
     },
@@ -198,19 +202,23 @@
     },
     {
       "id": "claim_fe2d2c65dc8f4cf286265f83a2ce73b4",
-      "statement": "The Vitest unit suite (`pnpm test` → `vitest run`; include pattern `tests/unit/**/*.test.ts` in `vitest.config.mts`) spans 25 spec files at this head, with time-dependent mappers and `domain/` layers asserted against fixed as-of dates so they stay deterministic — for example `urgency.test.ts`, `dashboard-domain.test.ts`, `learner-import.test.ts` and `evidence-path.test.ts`.",
+      "statement": "`pnpm test` is `vitest run` (include `tests/unit/**/*.test.ts` in vitest.config.mts) and `tests/unit/` holds 26 spec files at this head, so rule 34's \"no test runner yet / placeholder\" prose no longer describes the repo. Time-dependent behavior is pinned with vi.setSystemTime rather than the runner clock (batches.test.ts fixes 2026-06-01 for its daysToBilling block); dashboard-domain.test.ts needs no clock because daysToBilling is precomputed on its fixtures.",
       "evidence": [
+        {
+          "resource": "repo://RULES.md#L123-L128",
+          "version": "repo-lines-v1:sha256:ff97fb81f9fb75b40667585bafda54811b8c8ec0b009b5d002b85d7cdbc468da:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGQyYWE4ODYxZDUwMzdiOTIwZGU5MjMzZTE1NzE0MDNlN2FiMjZlNmUyODFlOTNiYjIyMGZjOTkwYmVkYmExOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWI0NGI2NTgzNzEyM2NlNTY0N2Y0M2QxZTAzY2ViZmIzMGRlOWUxOWIwMTMwMjk4OTViOWU2Y2E1ZjBiNjAwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q1MDk4ODI2YjUwMjhkNjNhZTVlMTA5ZTVhMzNhZjg0NmZkZDNkNTg5ZTA1ZWIxZTE3YjYwZTJhZTE3ZGZjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgxNWEzOGU4ZDUwZDZkMjg0ZDk2NDFhYjgxZGNiY2FlYTAzYTFlMDE1N2RmN2QwOTRjNjMzNGNjNDAyZTNiMyJ9"
+        },
         {
           "resource": "repo://package.json#L16-L16",
           "version": "repo-lines-v1:sha256:241fc249efa71b0e7a97f7f4eb8b89494a59cb3f87d71be6aad63aa3ba5e3d3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQxZmMyNDllZmE3MWIwZTdhOTdmN2Y0ZWI4Yjg5NDk0YTU5Y2IzZjg3ZDcxYmU2YWFkNjNhYTNiYTVlM2QzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQxZmMyNDllZmE3MWIwZTdhOTdmN2Y0ZWI4Yjg5NDk0YTU5Y2IzZjg3ZDcxYmU2YWFkNjNhYTNiYTVlM2QzYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjUxNjg3NWVmZTIzYmMzZDQzZjE5MjcwNDg2OGVkYjU1Njc0MGEwNWJkMTYwMmFlODQ3MDBlNWJmNWVlNzVjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJiNDdjYTJjZmUxMzYyYmFiNDM0ZjY3NzY5NDA3ZjU2OWU1MDZhOGI2NDcwYTMyMzc0MDEyNzNjZWM5NmE4OCJ9"
         },
         {
-          "resource": "repo://tests/unit/dashboard-domain.test.ts",
-          "version": "repo-file-v1:sha256:b3f95f7526c05a302a890ed1409daf79319b89a6f891ed7983ed6898fa9e0939"
+          "resource": "repo://tests/unit/batches.test.ts#L139-L153",
+          "version": "repo-lines-v1:sha256:c03c8d9ef7921b9b1e7739d2e8e6b953e2b7dec36282486ac8b09952a85e6f2c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzZTc4MGFlOWVmMDQxNGQ3MzQ0YzI1YTQwMjlhYzlhMDQxMzkzNWUwYjViYzJmYjUwMDJjMTUxYWIwMDVmNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3NmEzZDY4Y2E4MGEzMzJiODRlNWFhOWI4ZGFkMjk1MTI5NTgxN2M0MjBlZWZhYWQyYWVlOWYwODI1YjNmM2QifQ"
         },
         {
-          "resource": "repo://tests/unit/urgency.test.ts",
-          "version": "repo-file-v1:sha256:9ff64c7ed71009fa2c146d6bbead999e90c31cd6033aa7d4d890f300725f4ecb"
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L9-L10",
+          "version": "repo-lines-v1:sha256:fe0d1cb708e4b3c9c554e1c6d57dc61ead4f261b4c116dc50570306d206971e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjM3ZDAyOTM2NzUzZWVlZjMwZDVhNzE1YjY3NjRhNTM3ZWYzNGFiYjJiNWJmZjY5NjZlYjQ5MmYzMTgyZWE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZjZDFmY2U2ZTJlNjg3MWNiZDExMGNiOWQwZTVmODUzNWM0MzFlNTc2N2RkMzkzYjYyNmY3ZGU3MzQ2MTZmMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjc4ZmFlZmQzZmUyZjEzOTBhMDlkODE3NTRhOWU0MTE3N2M4MDRiNWZiNGNlZmYyZDJhNWY0MWVjOThlZTU1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzU1Mjg4MzE5NzZmN2M1NjFhZWFhZGVkNmJjNGYyMTk0ODhhMjI3OTVhYzQzZWMzN2NhNmU3MWVmZjU3NmY2YyJ9"
         },
         {
           "resource": "repo://vitest.config.mts#L11-L14",
@@ -297,24 +305,6 @@
       ]
     },
     {
-      "id": "claim_98567669068f4c8ab0cf419e57884dca",
-      "statement": "`RULES.md` rule 34 is a known stale rule: it states there is no test runner and that `pnpm test` is a placeholder, while `package.json` defines `pnpm test` as `vitest run` and `tests/unit/` holds 25 Vitest spec files whose include pattern is `tests/unit/**/*.test.ts` in `vitest.config.mts`.",
-      "evidence": [
-        {
-          "resource": "repo://RULES.md#L119-L124",
-          "version": "repo-lines-v1:sha256:ff97fb81f9fb75b40667585bafda54811b8c8ec0b009b5d002b85d7cdbc468da:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGQyYWE4ODYxZDUwMzdiOTIwZGU5MjMzZTE1NzE0MDNlN2FiMjZlNmUyODFlOTNiYjIyMGZjOTkwYmVkYmExOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWI0NGI2NTgzNzEyM2NlNTY0N2Y0M2QxZTAzY2ViZmIzMGRlOWUxOWIwMTMwMjk4OTViOWU2Y2E1ZjBiNjAwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q1MDk4ODI2YjUwMjhkNjNhZTVlMTA5ZTVhMzNhZjg0NmZkZDNkNTg5ZTA1ZWIxZTE3YjYwZTJhZTE3ZGZjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgxNWEzOGU4ZDUwZDZkMjg0ZDk2NDFhYjgxZGNiY2FlYTAzYTFlMDE1N2RmN2QwOTRjNjMzNGNjNDAyZTNiMyJ9"
-        },
-        {
-          "resource": "repo://package.json#L16-L16",
-          "version": "repo-lines-v1:sha256:241fc249efa71b0e7a97f7f4eb8b89494a59cb3f87d71be6aad63aa3ba5e3d3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQxZmMyNDllZmE3MWIwZTdhOTdmN2Y0ZWI4Yjg5NDk0YTU5Y2IzZjg3ZDcxYmU2YWFkNjNhYTNiYTVlM2QzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQxZmMyNDllZmE3MWIwZTdhOTdmN2Y0ZWI4Yjg5NDk0YTU5Y2IzZjg3ZDcxYmU2YWFkNjNhYTNiYTVlM2QzYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjUxNjg3NWVmZTIzYmMzZDQzZjE5MjcwNDg2OGVkYjU1Njc0MGEwNWJkMTYwMmFlODQ3MDBlNWJmNWVlNzVjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJiNDdjYTJjZmUxMzYyYmFiNDM0ZjY3NzY5NDA3ZjU2OWU1MDZhOGI2NDcwYTMyMzc0MDEyNzNjZWM5NmE4OCJ9"
-        },
-        {
-          "resource": "repo://vitest.config.mts#L11-L14",
-          "version": "repo-lines-v1:sha256:d7505e5b3ea407a5bf4ac105b0d8dee1f0c7f69b39dcc93c42c9b923053f2604:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTkzNmRmN2E1YTNhYWYxODBjZmZkMWQ2NWM2NDZlZjZhZWEzNTJjYzI3Nzc0Njg2MTk5Y2Q4ZmIzZTg5OWM3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDk0NTI3Zjc2M2I2MjJhY2MxMDFhNDlkMTRmNzYzZTVhODkxNjVlODg5YjY0NjZhMjlkYjQwMzQ3ODg1NDNkNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
-        }
-      ]
-    },
-    {
       "id": "claim_f3f5456462804a4480a6e8990b48d161",
       "statement": "RULES.md rule 30 fixes the ADR precedence chain one way: ADR-001 supersedes conflicting billing-is-preparation-only PRD/TRD wording, ADR-003 amends ADR-001 §4 (derived packet due_date, P5), ADR-007 supersedes ADR-001's Elig row (20% of total_sessions or 3 consecutive unexcused absences replaces the retired ≥5-absence count), ADR-008 amends ADR-003<|place_holder_mm_span_0442|>P5 for the batch-level deadline only, and ADR-006 supersedes FR-02's \"Super Admin is not implemented\" while closing platform-admin reach to the school registry — extending it to any compliance table, or letting the operator seat itself into a tenant, needs its own ADR. ADR-002 and ADR-005 stay accepted and load-bearing for scope.",
       "evidence": [
@@ -379,10 +369,28 @@
           "version": "repo-lines-v1:sha256:3e6cb5fb299eb33ed59dd30447fbc8dd1848a365c9270578d7da561e8aa1f800:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyY2VjYjE0NGE0NmY1ZGNmMTJhNjE2OWZjZWVkNzY5NWU4Mjk0YjA5MGRlNzZmMzY2MWNkZDAyNDkzMDAxNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiOTBiMTRkZWQyNDI0N2VhN2NlZmY0ZDk2MWNhMTVlYjA2YzU5ZjhiNzY2MmUwNmQ3NzM1ZWU4NmUwNDJlYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_6b31b24d814942859b6f406faaa15223",
+      "statement": "The checks that actually bite inside the shared server client are governed by RULES rule 3: lib/supabase/server.ts builds the anon-key client with Clerk's `accessToken` callback (no template, no hand-set Authorization header), and the callback throws the exported NO_CLERK_TOKEN_MESSAGE when Clerk issues no token so the failure surfaces as `sync-failed` instead of an indistinguishable empty `anon` read. tests/unit/supabase-server.test.ts pins both the callback shape and the throw, and is the pattern to copy for other server-boundary code.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L28-L31",
+          "version": "repo-lines-v1:sha256:71f90cb3feb2c8df6b0f35a6a15fc9e46fc69b6bc22ca4a455d2f41cef988eec:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU0MTc1MDIzNjkyOWExY2FiNDRlOTFlNzAyZmNhNjQyOGYxYTVmODZlNjY3YWJkODhkZjU1MWQ1Zjk4Y2Y1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ1NDZlN2U3MzEzNTk0MTU5NGM4NDU0NjAzNzVjZjQ3MWI3MDRjZjY4ZDQzNWQyNTU3N2FhNWU5NTk3YzZkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTNlZDJkMjliYjAwOTRlMDFmZGU1MjEyY2ViZmNlYzgwMTA5YjU5NWIzNTJlNWNiODQzMzBmNTFlOGQ4YzMzYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjc3MDUzMzBjNDIwMzVkZGQ1YzU0Y2IzMTJmMDg1OTNhZjdjZDc0ZDI0ZjA5ZmQ5MDQ3NTcxZjQ4NDEzMDdiYSJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/server.ts#L40-L67",
+          "version": "repo-lines-v1:sha256:c9e325b42f3a054130bbc0c885d3c3a6391a73227e99f395d5b72fa7b49af726:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkZjAzNThkY2Q5ZjgyMjNkNWVjMWYxNGUzY2MxMDIzODNmODI0OTMzNWNjMmYzZDhjYjU3NWEyZWFiZGY5NWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRhNjA4NDBmZDRmOTMwYjk3ZDI1ZjE4YmE1NmVlYmEyZjNlZDVkZDQwZjM4NDliNmEyZDU0MGZmMmQ0MzI3YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/supabase-server.test.ts#L55-L124",
+          "version": "repo-lines-v1:sha256:ed42e0f0d8fbeef0015285986c7e7d51ce1d3bc65b7d965ae29a771ab22adc8b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MjdjMzExZTFhNTQ4OGI0ZDE2ZGVjMjYwY2Y1OGY1Njg5NDk5ZTExYzA3OGMwMzkyZWNkZDEzZTdhZTVhZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-10-25T05:56:04.137Z"
+    "at": "2026-10-26T00:51:40.902Z"
   }
 }

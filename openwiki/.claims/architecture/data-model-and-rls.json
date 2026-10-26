@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:351bfcf528ea872c7a4ad213a6da1460832c813d1a81a00dff6c60d5599a404f",
+  "pageVersion": "sha256:6ea45446c9bb3a83c11afbcc18f1ecd2cb7c5bfa9f8057e466992020213048cd",
   "claims": [
     {
       "id": "claim_2451e47bfaa74c17ab764a2de4103019",
@@ -886,7 +886,7 @@
       "evidence": [
         {
           "resource": "repo://RULES.md#L20-L31",
-          "version": "repo-lines-v1:sha256:7a14cd81a8a8016ab02c89f0f63fd777d7ed62fc25adeaa8dae2cd58a0105772:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxYWIzZTQxNTdiNzA1ZWU5Y2FiYzRhYzI2N2UzYzkyZmUxNjY3ZWU4NjA4NDk4OTVjMjk4M2RkOTVhMGI0ZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhZDhlYjZjZGVlYzE5NDRjZDlkMjRmMmZkNDYyNGRlM2IzNmU0ZTcxNGQ1ZTA3NmY3ZmQ5ZDdkODY1N2RlOGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2ZWIwYTEwMGE4MDQxNjEzMTk1MTRlZDMxZjY4YjMyOWFiNmY5ZTlkODM2YTRlMzQwODkwZDU5MzRmYzYzOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkZmFkOTlkMjg3ZDk1MDMwNjBjNTczMWNkYzVjMWNiYTM5MTI4NTQzZGM3MmFkZGFmZTMwZjhjYjRmZWZmODMifQ"
+          "version": "repo-lines-v1:sha256:06dc609d1f76f09805bfba2e0dd2c2ec6dada6afa9036f59f80031d342a5893a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxYWIzZTQxNTdiNzA1ZWU5Y2FiYzRhYzI2N2UzYzkyZmUxNjY3ZWU4NjA4NDk4OTVjMjk4M2RkOTVhMGI0ZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhZDhlYjZjZGVlYzE5NDRjZDlkMjRmMmZkNDYyNGRlM2IzNmU0ZTcxNGQ1ZTA3NmY3ZmQ5ZDdkODY1N2RlOGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2ZWIwYTEwMGE4MDQxNjEzMTk1MTRlZDMxZjY4YjMyOWFiNmY5ZTlkODM2YTRlMzQwODkwZDU5MzRmYzYzOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkZmFkOTlkMjg3ZDk1MDMwNjBjNTczMWNkYzVjMWNiYTM5MTI4NTQzZGM3MmFkZGFmZTMwZjhjYjRmZWZmODMifQ"
         },
         {
           "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L520-L547",
@@ -997,10 +997,142 @@
           "version": "repo-lines-v1:sha256:ae65a8c298fcc6f99167d55e88741ecba7367ee41c28a7c10ea7c002f959223f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzc3OWNkNGIwMmNjODllN2E3M2VkZGMzZDdhYjNiMjRhMzY0ODJkYWNjZjlmNmY4MTMzMDc0NDlmYjRmMTU1NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2U5YTRjNTUzOWVkMGIwNjhhOWU4OWUzODcwNzFmOTk1OWE2YjJiZmQzNTU4OTMyNjFkODc1YmI2MDBiY2YwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2U4MDRjNDE2ZmVjYjdlYmYzYzJmNjA2OWQ2NDRmZDE5MmFmYzI2Njc2OWYxNDRmYzEyMGNiMjU1OGE0ODVjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_fd96ab7735004c1fbd3d5edfba7d5b67",
+      "statement": "RULES §10 rule 36 forbids running anything against the one hosted project without explicit permission or an agreed plan — `execute_sql` denied as a tool, read-only `select`s included, because the tool is denied rather than the statement kind; `apply_migration`, branch operations, `db push`/`db reset`/`migration up`, and `psql` are denied likewise, and `.claude/settings.json` carries the deny list one-for-one (rule 36 is `[deny]`-level). The rule's counterpart is the reading strategy: schema questions are answered from the checked-in migrations and `lib/supabase/database.types.ts` first, and only the read-only introspection tools (`list_tables`, `list_migrations`, `get_advisors`, `search_docs`) are available for what those cannot answer.",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore",
+          "version": "repo-file-v1:sha256:7a6adfa22cc592735cf20ce87200906a91b3e48fbbc2ce71c9a2013ef10a84d9"
+        },
+        {
+          "resource": "repo://RULES.md#L130-L144",
+          "version": "repo-lines-v1:sha256:8c060b6a3df1a97f187e1ea14d7e66989c9cd936b58fc2ba6f91888632a75a0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5ZjRkMTQzNGM1MTU0OGYzZDMwNWE2ZWU5NjQ1M2MxODlmYTNlMjMwYTU4YThhNjgyYjBkMzVmYTU4YWNlNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1YzM4OGQxNTljZmFmYzFlNDE3OTcwMjBlMzY3NzIzNTNiZWQ0MmUwZjhkNGQwMGE1Y2EwNGNkMGEwNmU0MTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxYzcwODczM2NmNDM0MGZiYmZhMTI2YzRhNjJjYThlYzIxNmEwNWI5NTAzMjEzZTZjY2M5N2RiZTNiNGQ0NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlNjY0MjcyYjVlZDljZjA0OWRjN2QzN2JjZTJlZTBjZWQ0MzQ2YjgzZTMwZjc3ZTNhN2RjZjQyNzYwMmQxNzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_100766bd096447c58569556c99999098",
+      "statement": "RULES rule 1 makes RLS the security boundary and UI hiding usability only, and rule 2 draws the JS line precisely: a `tenant_id = scope.tenantId` filter from a validated `TenantScope` (`modules/tenancy/domain/scope.ts`) is allowed because it only selects which of the caller's schools a screen shows on top of RLS, while a JS tenant check used as access control is a bug even when it returns the right answer. `tests/unit/tenant-scope.test.ts` pins the selection half — a scope is built only for a school the profile is a member of — and pins `resolveTrustedRole` to `profiles.role` as the only role authority, never Clerk metadata.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L18-L27",
+          "version": "repo-lines-v1:sha256:7c59217f5b544a8330dbf5d1c885e438f81b623fa8acd96de3c26b3258a94830:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwYzZhNTEyMjM3NTkyYWQyZWIyMWE5MmY2NDkyMDQxMDEyMTYxMzFmY2UwNGM0ZGFhMDA4NzVkNWJkYjBlNWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczZjk4Y2Y2N2Q3OTA1Y2IzOTExMGY2MDllYWQzMDE4OWViZDBjYTUxMDJlY2RiYWFlNTI2ZDI3MjIzYjY2YzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5NjBhMmUyNDEzZmRkZWE4NDQyZWJlNjIyMjM2N2Q1NGE4YjNlMDFkOTk2NWJiYTI2ODM4MDRjZjZkNTIyZDMifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L24-L52",
+          "version": "repo-lines-v1:sha256:06f614f7a913f8e66a48021fd7ddf5cc1a8f12bc3f5cd7455ffe849169f2a1f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyY2E2NDQwYTQ0ODE0NTdmY2QyMjM0YWE5M2ZhN2RlY2VhMjFmMWE3NWQyM2U4MDM0NWRiMzgzNDE2YmYyZWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlMDBkYThlMWYzY2Q2OGU1NTA1NmUwMTk1YTU4NzdhNzMxNzI5ZWMyOTFkMjJkODExMjIzNmRiMWE2NDBlNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a546bb7f6ce54d9ba9b971f004c11b6b",
+      "statement": "Rule 4 — viewer is read-only and must be server-denied on writes — is satisfied structurally: nearly every write policy bottoms out in `can_manage_tenant()`, which excludes `viewer` by role, so a viewer's INSERT/UPDATE/DELETE fails at the database instead of merely being hidden. The one exception is the `activity_log` INSERT policy (`can_access_tenant`, no role predicate), the single place the database does not itself enforce the read-only rule.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L32-L32",
+          "version": "repo-lines-v1:sha256:b366e8460f159adae09f960ca6fe134f3566e6032405b7cafd7eea6edebeefb3:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjM2NmU4NDYwZjE1OWFkYWUwOWY5NjBjYTZmZTEzNGYzNTY2ZTYwMzI0MDViN2NhZmQ3ZWVhNmVkZWJlZWZiMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjM2NmU4NDYwZjE1OWFkYWUwOWY5NjBjYTZmZTEzNGYzNTY2ZTYwMzI0MDViN2NhZmQ3ZWVhNmVkZWJlZWZiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTFkMjMxODlmN2MxYTIwMTk3ODMwOThmNzEwYzgwZmM2MzVmNjllMzlkNzlhZmY2ZjYyNTMzMmY0MGZkY2JhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmVjOWU4YmNhZWZhOWFlZGY4NzRiY2IxNTM2MzUxZjMzNzNhMTAyZjU1ZWYwNWM4MWY5MDQwMzQwY2I1NjUxNiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql",
+          "version": "repo-file-v1:sha256:ac47eea2061988a695bdf7e4e09fbce960c19f14158cf711679f8520294fa12d"
+        }
+      ]
+    },
+    {
+      "id": "claim_1143b604dba0438d96e25b04a9b2b9bb",
+      "statement": "Rule 5 (trainer-facing DTOs omit billing deadline, billing preparation, NTP lag, BSRS, and financial fields server-side) is a second gate on top of RLS, not a substitute for it: the `documents` policies already withhold non-`trainer`/`all` audience rows from a trainer's embedded select, so the mapper in `modules/batches/data/batches.ts` never sees them and stays role-unaware. `billing_records` SELECT therefore uses an explicit role allowlist rather than `can_read_batch`, which would have admitted the assigned trainer to their own batch's amounts.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L33-L34",
+          "version": "repo-lines-v1:sha256:b410f2f7331c127bb63863465587a226debb36a2311de7cc24afe6fb99ad40f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDMyNjI3Mzk2MzhkZTlhZTBiZGZkMjk3MDBjMzEzZWZkMWFjZjg4YjZkODM4ZWQ4MWJkNjE5NzZkNTc0ZTIxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWUwMzU3Yzc1ODNiYTU5Y2IwMDQ3YWUzODE3MjdjOThlNDE0NmUwZGZhYmI1NzMxZDUyOGY3MGVmYjBlZWIyMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDYyMjkyZmQ3MzIzMDYzNGEyY2Q1N2RjZTgwMmE2ZWI4ZjY0ZGE4YzM1Y2YxYzg3OTJiODBjYzJjZDE0ZGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDliZjg2YmJhYzlkNTIyMmQyYjllNjk2ODNhZDY3Zjc3NzY0YzY2YWQxYzhmMzUzYzcyMTZmNDQzY2ZmNGE0NCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L47-L60",
+          "version": "repo-lines-v1:sha256:3233991563b9e50d8511d213fc98e644dbd5eb635b0d8f3e70d38e6a9e4f4bfb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDRkNjBhZTkwMWNhMmI4Zjc3ODk4MTdiZjFlZDAxZDA5NTFiOGVjYzdlYTAyNmFmZTVjNzIwMGFhODU2YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YWVkMWI2ZDY3MGFhODFlNDdmOWU4YTEyYTk4MWQ3NjI3ZTk3OGQxZmY2OWVmZTM1YjcxZGVlOTZjOGI0OTAifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L520-L541",
+          "version": "repo-lines-v1:sha256:976227c0f2a2e2691f8b7109a85b53c79c76e3d691f87ce237e2179f99743122:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NDA0ZGI5NGFiYWU5Y2NkMzhiYTA0NzE3ODI0ODZjZjAzZWYwMTgxYTEwMmE2OGM5YWMwMWJiOGE2YmZjNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkOTE5YWZlMmYxODY0MzViZGFmMTE4MDEwNGMwZDhlYTg0MzA0YTJhNzA4YzE3YjMxNGE5YjA4ZmEzZmUzYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlNjZkNTI1M2QxYjk1N2MxNGIyNzZmNmQ0YTRkOGU0YWYwM2E0MzFlMGFmYWFlNzM0Y2M1ODA0NTNlMDA3MzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c47dd4aa45e457ba9efb6f717c175b6",
+      "statement": "ADR-007's dropout rule landed as schema with no consumer and no automatic write: `attendance_records.excused` defaults to `false` because an unexcused default understates dropout risk, `tenant_settings.max_absence_percent` is nullable with null meaning 'inherit the program rule' so the two thresholds cannot disagree, and the percentage rule is unevaluable on a batch with null `total_sessions`. The streak counts recorded rows ordered by `attendance_date` (no session calendar exists, so a missing date is unmarked, not absent), trainers correct by `present`/`excused` UPDATE rather than DELETE, and a registrar still flips `learners.is_active` by hand.",
+      "evidence": [
+        {
+          "resource": "repo://CONTEXT.md",
+          "version": "repo-file-v1:sha256:571e0f4b34c1ee16808a9927b92178dd579437a03347a260319c17f510efc4b4"
+        },
+        {
+          "resource": "repo://RULES.md#L162-L174",
+          "version": "repo-lines-v1:sha256:61823a350e1ffdcb33d2321a274e648b205f189626caaf7debbbeabcb4f37268:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NWRlN2MyMWNlOTc0M2Y2Y2VkY2IyNGU4NmU2Y2FhZDA5MTlmZTg0ZTUwM2VjZTBlOWY0MzU3OGEzOTZlZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwN2I3ZThiYzZhYzYyODc3YWVlZDJhNTJmMzBjM2YwYjI4ZDk5MWI2YzI0MWJmNWM3Zjg2NDIyYWE0NTRhY2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L31-L94",
+          "version": "repo-lines-v1:sha256:7220047816cb970daaa07bea3f17cf6be8e1b352859c89f049929c78a8db75e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNzM2ZDIwN2I2YmE0NWJjYjljMzMyYjc2YTg4YTM3ODU4MjM5YzM0ZGYxZmM4MzIyNWI4NDkwMDdmNmU4ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2OTI5YmJlYTc3MTZkMzA0NjM2NGE0N2ZkMzczNDFmMzM1ZWMyOTUyYjYxNDNhYWU1ODEyMmMyZWFkNDFhNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxM2Q0MzMyYzE3NzVjMjIwM2JkYTk0NmM5YWFmOWJjMWMzMDIxODYzNzQ2NTM3ZmI1OWMzNDNjNzY1NTEzOTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_56a6ed2ffe154a14a7e4f44c9060df1a",
+      "statement": "ADR-004 document semantics sit on top of the audience-gated `documents` policies: an untracked key (one the batch's own catalog never claimed) is excluded from every compliance percentage, renders `null`/'—' when nothing is tracked, and blocks at a gate through `isDocOnFile`; `modules/documents/domain/compliance.ts` is the single home of the rule and `modules/batches/domain/alerts.ts` fires `doc-missing` only once a critical requirement is actually tracked.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-004-untracked-document-semantics.md#L36-L39",
+          "version": "repo-lines-v1:sha256:109a71da80d25ae9f819d1bdea19e6235407fe9c48e4ad9a6b170025e8b66d65:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmUwMjQ2OTZmYjNmNTFjOGFjMjUzOWNlNTAzMGE0NzM4OTY4MTczZjg0ZTFjMTJhZGQ4ODFjMmZjNTliNWQyNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUwZjMyM2RmZTJjNzUxMDc2M2Y3MjRmMzVlYmY2YjQ5MTVlMWNjOTA2NWUyYzkyYzY0N2EyMjAxNjMwZTdlZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzI1ZTNkZjg5NmE5MjZjMzhlYTljZTRkYTNlY2FkNDA3YjMwZDg5ZDIxZjc3N2Y1ZWMzZDI3ZjczZTk1OTJmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2U4YzMyZDk2NDdmN2MyMjk4NzI0ZjA4ODc2NTk2OTI2NGJkYTUwZDY4N2M3ZWQ4ZDJkYzNlZDJlMTIwNzcxZSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/domain/alerts.ts#L48-L61",
+          "version": "repo-lines-v1:sha256:f758812e3082d120f6f1f3da3922e5bfcc8bf46f0e7612b1bd2fcb3220efa1df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiMGIyYmQwOWFlNDFiNjA3MDYzMjFkMjgxMDMyZDA5ODA5M2VjZmMyNGVmZTE4OGIwMWRjYTE0N2U4OGE2ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2YjU1NzBlMjJkOWI0N2FlMjdmNDBjZGQ5MzdiMTI0OTFmMTlmZGNhZTk2YTY0YjhiZjQwZTA5MGY3Y2QwYzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkZjdmNzRlODFhYzEzMWI5NjM5ZDVkNjc1ZjRlNTQwMzM0MzI3ZGRmODRlYzdjYTFjZjE4NWZmMmFlY2I5OWIifQ"
+        },
+        {
+          "resource": "repo://modules/documents/domain/compliance.ts#L27-L82",
+          "version": "repo-lines-v1:sha256:1a293774c74b81960eda480551b0b1f1a4ba749a7fab1b25078bb3ad573097e0:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmZDA4ZTAxOGY5ZDdiZjU3ZWIwMTZjMzE5ZDZlZGQ0YjM3NDRjNTAwMGVjNDQ3Y2E5OThiMmRmNmI0NWMxNDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkYThmYzk3MzA2NTgyZGUzMjFjNjRkMmIxYWEyNGE1MzAyNmQ5NzI5Y2M2YWVmNDY0ZGI4NjdlOWZlZGI3NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1YjI5Y2IzOGUwNGM0MDIyZmNiN2YyYzYxMDYxMWIwM2YwZTFlNGU2YjQ3YWY0MTE2MmJiOTE2MmI1NTU3YjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3db3ec338ad840a69a28cce53ed5ac93",
+      "statement": "`database.types.ts` has not been regenerated since the ADR-006 row: it omits all seven billing tables, `billing_type`, `excused`, `max_absence_percent`, and the widened `can_trainer_write_batch`, and `program_billing_rules` carries no absence-threshold column at all rather than a stale `max_absences`. `batches.billing_deadline` is the one hand-carried exception. The governing contract is RULES §3 rule 20 — regenerate after any migration, then update mappers and domain types — and migration 1 stays canonical under an additive-only rule.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L68-L70",
+          "version": "repo-lines-v1:sha256:e0c9b14cc5e8439ad84c0a2b31ba31e5878b14774a8bbc2836b169250b353626:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGQ3MWFiMmY0NzIwMDIwNmY5ZGQ5M2JiZDM4ODhmY2UzMDM1ZThlOTQxYWU5ZGI5ZmY3NzRhZmJlNDYyYjA0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzY2QyODFmNDhmMmVhYzc2NzJmZDcxMDcxNTJhMjE2NmM4MTJkOTMzMjFmZDQ5NjE2ZjY5ZWZkMTFkNTBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJkZGZhYWIxMTk1NzMwZmVlMjE5MTBlZjQ3NzUzZjdkNmI0ZjBkOTUxZWUxN2FjMDMxN2U0NjE3YWJkMTE3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMxMjNhMjViYzk1YWM3OTZhZjg5ZTlmNDBkYTU1MDllZDhkYzY5ZGJlN2Y3NWJkYTg2YTRhYTJmNWVjMzY3MCJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L255-L332",
+          "version": "repo-lines-v1:sha256:1dc25441a974b938f8e408aebdec3bb3717faadc3dc1fe4be3023eee974fae13:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmYTQyZTg4NDY4ZTVkNTMxY2NiMzcyODBhZWEzYjIzMzNkZmVhZjZhNDI4YzkwM2YxMzZjMjMzMzc5YTZiOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMzNkYzczMWU3ZDA3YjFmMGMwNWNmZWJkN2UxOTIyMDIzZTYwNzdiYzBhZTdiYTMwMTQ4ZjUwODMzYTI1YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2MmRjNDUyNjJjNmE1NTdmMmE3OTYzZDQwYmMzOTViMjE0MzM5YjZkNWZhYjc0ODdkM2I0NWRiMzdhZTI2ZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5OWRjOTRiMmE3YTMzNzg1ZTVhMWY0ZGFjOWUxMzBlZjNjOWY1MGNiNTQzYThlM2I0Yjg5MTI0MDRjMzRiZTMifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L1-L6",
+          "version": "repo-lines-v1:sha256:142c2a1ef266fac6874738cf1618caf9051bd8d29860562f73e59d0f0dcbb7a9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE2OTFjYmQxODliNTJkNmUyMjJlMDVhN2QxYTQzMjRhYmRhNjljMzA3OWE5Y2ZlOTBiM2E0ODJlMDBiZTRlZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzEyZTc2YjYxZGRjYTc5MjI1MjMzYWJjNDNjODJiY2MwMzE2OGYwZDBlMDhiMDMyYjdkYWRiZWQ5MWViMjg4NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWEzMDEzMzMwMWQwZTZkMTMyMzFlN2JlOTEzYzNiYTAzZmI5YWJlY2U0ZjQ5MjM2MWRlZjk4NzA3ODFiNzkyZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_507d1932662540498096e25a566223ff",
+      "statement": "The provisional ADR-008 file is not deployed schema: `billing_deadline` should change nothing on screen until `20261024110000` applies. The mapper reads `row.billing_deadline ?? null` rather than a bare read, because before the migration `select('*')` yields `undefined` and would slip past every `!== null` 'no deadline recorded' check; `daysUntil(null)` returns the `Infinity` sentinel, `urgencyTier` maps it to `muted`, and `hasRecordedBillingDeadline` gates the countdown. No screen writes the column, so deadlines would need hand entry once it lands.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L256-L260",
+          "version": "repo-lines-v1:sha256:62c1f1f4823f9b693ca7401e58bbc7bc4bac18e1f6b9ef4ecdb957d08ce9455f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY0YjM4NmEyMGUwY2VhZWUwZGNjNmQ2Yzc2NTAzMTZkM2I1ODQ0NDFiYjRjMzIxN2YxOTgyNmEzMjliZjI3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIyNmIyMTJjNTRmNjBhNTMwYTkwMGIxODA3ZDhhZDM3MjEwNWRlZjczNzUwNjlhZDc0ODFlYzdkOGY2NjRlZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTgyNzRhZDIxMTA0MzdkODYzNjU0MjYxNzIyZWZmMjlmNWQwYjQxM2I3ZjdkODAyOTg0MWUzM2NmZjg3ZjJlYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODY2N2I1ZjI5ZGNiYmI1YmM3ODQ4MmQ3MmZiMmJmZjg2MDVmYWNlMjU3MmQ4N2I0ZTVmYzRhODQwNzI1YjQxZCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/domain/urgency.ts#L9-L35",
+          "version": "repo-lines-v1:sha256:0b71cb1a2f40819dd6d72000974b7f8f3d4285f7272f79f20cbb7be4be326e74:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxMDQxMjBhNDVmOGI0OGY2ODQ5MGY3YmRjYTY5NDliMzM4ZjI4OWFmMjNmNjg2ODdmM2M2OGRkMjRjNTU0YjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiNzgzNzExYmI5YWM4ZjNmMTQxNmI4Yzk1NzMyMDc5YTFkN2JlOGQyZjFmZDhiZGQ4YWIxMmVlMzMzNTgxNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql#L1-L18",
+          "version": "repo-lines-v1:sha256:d8fa70735a2b6fa407011721454b80cc1f7317ad6aa807ebf6d9524e3f8bda22:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlOTJjY2QzNDE0M2YyYTZiYzA5Y2QyZWE1MGI5M2JiY2U1YTQyMGVmNzk0YTM4MDRhMzA1MzIzZmMxMTE3MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmNjllM2RlZmUwODU3OGY5ZDI5OTk0ZDNkNmMzZjc0OGZkYzYyOTBlYjIzMjk5NDljNGFmZWIwZGNiNzNlMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-10-25T05:56:04.137Z"
+    "at": "2026-10-26T00:51:40.902Z"
   }
 }
