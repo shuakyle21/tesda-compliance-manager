@@ -5,29 +5,29 @@
       "pageVersion": "sha256:6ea45446c9bb3a83c11afbcc18f1ecd2cb7c5bfa9f8057e466992020213048cd",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "97a86ab2-53b1-4880-b2a8-309c424a288f",
-      "gitHead": "3d8af475a801e0d1220c4f63ab3ff4f76e7449af",
-      "sourceFingerprint": "sha256:59f858a9b1c41e120dedfeaecc55591dc69f9b05f38f7d585f5c2d99a558469a"
+      "gitHead": "93f8013ad4f70e2cc7c24d0ca09257d9fdc226fb",
+      "sourceFingerprint": "sha256:d713c8f6e3944bb5428fca4bf4c6a39a2769af8c6ea22c2ebe5a8c2d74193554"
     },
     "/openwiki/architecture/module-boundaries-and-data-pattern.md": {
       "pageVersion": "sha256:b614a90a2cab3435a17501e1e166d4ba270e2fae9f55f3cb4a3e0e582942ba48",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "97a86ab2-53b1-4880-b2a8-309c424a288f",
-      "gitHead": "3d8af475a801e0d1220c4f63ab3ff4f76e7449af",
-      "sourceFingerprint": "sha256:59f858a9b1c41e120dedfeaecc55591dc69f9b05f38f7d585f5c2d99a558469a"
+      "gitHead": "93f8013ad4f70e2cc7c24d0ca09257d9fdc226fb",
+      "sourceFingerprint": "sha256:d713c8f6e3944bb5428fca4bf4c6a39a2769af8c6ea22c2ebe5a8c2d74193554"
     },
     "/openwiki/architecture/overview.md": {
       "pageVersion": "sha256:17467d3a79cb82aec8952fd7c2b4e780c53fbb8c297b846d6f4d38f624b50648",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "97a86ab2-53b1-4880-b2a8-309c424a288f",
-      "gitHead": "3d8af475a801e0d1220c4f63ab3ff4f76e7449af",
-      "sourceFingerprint": "sha256:59f858a9b1c41e120dedfeaecc55591dc69f9b05f38f7d585f5c2d99a558469a"
+      "gitHead": "93f8013ad4f70e2cc7c24d0ca09257d9fdc226fb",
+      "sourceFingerprint": "sha256:d713c8f6e3944bb5428fca4bf4c6a39a2769af8c6ea22c2ebe5a8c2d74193554"
     },
     "/openwiki/quickstart.md": {
       "pageVersion": "sha256:19c1cca1d78de36f4ddae285d005582baa70e75bfd3e78a8cec783b2b96f1bb1",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "97a86ab2-53b1-4880-b2a8-309c424a288f",
-      "gitHead": "3d8af475a801e0d1220c4f63ab3ff4f76e7449af",
-      "sourceFingerprint": "sha256:59f858a9b1c41e120dedfeaecc55591dc69f9b05f38f7d585f5c2d99a558469a"
+      "gitHead": "93f8013ad4f70e2cc7c24d0ca09257d9fdc226fb",
+      "sourceFingerprint": "sha256:d713c8f6e3944bb5428fca4bf4c6a39a2769af8c6ea22c2ebe5a8c2d74193554"
     }
   }
 }
