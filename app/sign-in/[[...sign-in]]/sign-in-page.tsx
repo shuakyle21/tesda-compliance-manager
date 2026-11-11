@@ -448,7 +448,7 @@ function SignInView({
             id="email"
             type="email"
             className={styles.input}
-            placeholder="you@school.ph"
+            placeholder="name@example.com"
             autoComplete="email"
             required
             value={email}
@@ -687,7 +687,7 @@ function ForgotView({
               id="reset-email"
               type="email"
               className={styles.input}
-              placeholder="you@school.ph"
+              placeholder="name@example.com"
               autoComplete="email"
               required
               value={email}

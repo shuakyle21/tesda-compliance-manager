@@ -10,15 +10,15 @@
  * through the matrix and the preview via local override state. Client Component.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
-import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
+import { DOC_TIER_ON_TRACK, DOC_TIER_WARNING, criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
 import { displayBatchId } from '@/modules/batches/domain/rqm';
+import { formatDate } from '@/shared/dates';
 import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -29,9 +29,6 @@ const STATUS_LABEL: Record<string, string> = {
 // `.doc-status.na` treatment — deliberately not "Missing", which asserts a
 // document is absent when in fact nothing was ever required or recorded here.
 const UNTRACKED_LABEL = 'Not tracked';
-
-// Single demo identity — an admin (proprietor) who can verify documents.
-const CURRENT_USER = 'Pia Buenaventura';
 
 /** Cell icon per doc status; 'missing' and 'na' both read as file-off. */
 const CELL_STATUS_ICON: Record<string, IconName> = {
@@ -46,10 +43,10 @@ function cellIcon(doc: DocRecord | null, status: string): IconName {
   return doc ? CELL_STATUS_ICON[status] : 'info-circle';
 }
 
-function cellTitle(doc: DocRecord | null, status: string, isWriter: boolean): string {
+function cellTitle(doc: DocRecord | null, status: string): string {
   if (!doc) return 'This batch does not track this document. Its programme requirement catalog has no entry for it.';
-  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${doc.updated} · ${doc.source}`;
-  return isWriter ? 'Click to attach' : 'Document not yet provided';
+  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${formatDate(doc.updated) ?? '—'} · ${doc.source ?? '—'}`;
+  return 'Document not yet provided';
 }
 
 type CompletenessTier = 'untracked' | 'on-track' | 'warning' | 'critical';
@@ -85,6 +82,8 @@ export function DocumentsView({
   batches,
   documentRequirements,
   syncFailed,
+  canVerify,
+  verifierName,
 }: {
   batches: Batch[];
   // The matrix columns: every requirement any shown batch's program asks for
@@ -93,32 +92,24 @@ export function DocumentsView({
   // unavailable" state (ADR-004 "unknown"), never a fabricated figure.
   documentRequirements: DocumentRequirement[];
   syncFailed: boolean;
+  // From the trusted role (`profiles.role`), never the `?role=` preview override.
+  canVerify: boolean;
+  // The signed-in user's display name; null when the profile has none.
+  verifierName: string | null;
 }) {
-  // Verification overrides keyed `${batchId}:${docKey}`.
-  const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
-  const [toast, setToast] = useState<ToastData | null>(null);
-
-  const isWriter = true; // admin/coordinator
-  const canVerify = true; // admin
 
   /**
    * The record for a cell, or `null` when this batch does not track the
    * requirement at all (ADR-004 — untracked is neither verified nor missing;
-   * the matrix renders it as its own muted "Not tracked" pill). An override
-   * can only refine a record that exists.
+   * the matrix renders it as its own muted "Not tracked" pill).
    *
    * The columns span every shown program, and the mapper keeps any document
    * row a batch has, so a requirement outside this batch's own catalog is
    * untracked even if an old record for it exists.
    */
-  const docOf = useCallback((b: Batch, key: string): DocRecord | null => {
-    if (!b.documentRequirements.some((r) => r.key === key)) return null;
-    const base = docRecordFor(b, key);
-    if (!base) return null;
-    const ov = overrides[b.id + ':' + key];
-    return ov ? { ...base, ...ov } : base;
-  }, [overrides]);
+  const docOf = (b: Batch, key: string): DocRecord | null =>
+    b.documentRequirements.some((r) => r.key === key) ? docRecordFor(b, key) : null;
 
   const completeness = useMemo(() => batches.map((b) => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
@@ -132,9 +123,9 @@ export function DocumentsView({
     const pct = tracked.length ? Math.round((ok / tracked.length) * 100) : null;
     const missing = tracked.filter((d) => d.status === 'missing').length;
     const untracked = crit.length - tracked.length;
-    const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
+    const tier: CompletenessTier = pct === null ? 'untracked' : pct >= DOC_TIER_ON_TRACK ? 'on-track' : pct >= DOC_TIER_WARNING ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, tier };
-  }), [batches, docOf]);
+  }), [batches]);
 
   if (!batches.length) {
     return (
@@ -167,29 +158,14 @@ export function DocumentsView({
   const buildPreview = (b: Batch, req: DocumentRequirement, doc: DocRecord): PreviewFile => ({
     name: req.label, batchId: b.id, batchLabel: displayBatchId(b), batchName: b.name, program: b.program,
     tenantId: b.tenantId, docKey: req.key, url: doc.url, status: doc.status,
-    updated: doc.updated, source: doc.source, critical: req.critical,
-    verifiedBy: doc.verifiedBy || null, verifiedDate: doc.verifiedDate || null,
+    updated: formatDate(doc.updated), source: doc.source, critical: req.critical,
+    verifiedBy: doc.verifiedBy || null, verifiedDate: formatDate(doc.verifiedDate),
   });
 
   const onCellClick = (b: Batch, req: DocumentRequirement) => {
     const doc = docOf(b, req.key);
-    if (!doc) return; // untracked — nothing to preview and nothing to attach against
-    if (doc.status === 'verified' || doc.status === 'submitted') setPreview(buildPreview(b, req, doc));
-    else if (isWriter) setToast({ title: 'Attach document', message: `Open uploader ⇢ ${displayBatchId(b)} · ${req.label}` });
-  };
-
-  const handleVerify = (file: PreviewFile) => {
-    const today = 'May 31';
-    setOverrides((prev) => ({
-      ...prev,
-      [file.batchId + ':' + file.docKey]: { status: 'verified', verifiedBy: CURRENT_USER, verifiedDate: today, updated: today, source: file.source || 'Uploaded file' },
-    }));
-    setPreview((fp) => (fp ? { ...fp, status: 'verified', verifiedBy: CURRENT_USER, verifiedDate: today, updated: today } : fp));
-    setToast({ title: 'Document verified', message: `${file.name} accepted by ${CURRENT_USER}.` });
-  };
-  const handleRequestChanges = (file: PreviewFile) => {
-    setToast({ title: 'Changes requested', message: `${file.name} returned to the uploader to re-submit.` });
-    setPreview(null);
+    // Only a recorded document has anything to preview; attaching one is not available yet.
+    if (doc && (doc.status === 'verified' || doc.status === 'submitted')) setPreview(buildPreview(b, req, doc));
   };
 
   const colCount = batches.length;
@@ -199,6 +175,9 @@ export function DocumentsView({
     <div>
       <Header />
       <SyncFailedCallout syncFailed={syncFailed} />
+      <InfoCallout variant="info">
+        Uploading documents isn&apos;t available yet.
+      </InfoCallout>
 
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${colCount}, 1fr)`, gap: 12, margin: '16px 0' }}>
         {batches.map((b, i) => {
@@ -272,14 +251,14 @@ export function DocumentsView({
                     type="button"
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
-                    disabled={!doc}
-                    title={cellTitle(doc, s, isWriter)}
+                    disabled={!doc || (s !== 'verified' && s !== 'submitted')}
+                    title={cellTitle(doc, s)}
                   >
                     <Icon name={cellIcon(doc, s)} size={11} />
                     {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
                   {doc?.updated && (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{doc.updated}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{formatDate(doc.updated) ?? '—'}</span>
                   )}
                 </div>
               );
@@ -292,13 +271,11 @@ export function DocumentsView({
         <FilePreviewModal
           file={preview}
           canVerify={canVerify}
-          adminName={CURRENT_USER}
-          onVerify={handleVerify}
-          onRequestChanges={handleRequestChanges}
+          adminName={verifierName}
+          verifyUnavailable="Verification can't be saved yet."
           onClose={() => setPreview(null)}
         />
       )}
-      {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }

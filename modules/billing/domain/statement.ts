@@ -21,9 +21,11 @@ import {
   ACCIDENT_INSURANCE,
   ENTREPRENEURSHIP_FEE,
   NEW_NORMAL_ASSISTANCE,
+  RATE_UNAVAILABLE,
   TSF_DAY_RATE,
   nominalHoursFor,
   trainingCostFor,
+  pesoLabel,
   tsfDaysFor,
 } from './rates';
 
@@ -59,7 +61,8 @@ export interface BillingStatement {
   rows: { cells: string[] }[];
   summary: StatementSummaryLine[];
   totalLabel: string;
-  grandTotal: number;
+  /** `null` when no component of the document has a rate (shown as "—"). */
+  grandTotal: number | null;
   grandTotalLabel: string;
   grandWords: string;
 }
@@ -93,13 +96,14 @@ function scholarName(s: ScholarRow): string {
  */
 function trainingPeriod(batch: Batch): string {
   const hrs = nominalHoursFor(batch.qualification);
-  return `${formatDate(batch.trainingStart) ?? '—'} – ${formatDate(batch.trainingEnd) ?? '—'} (${hrs} hrs)`;
+  return `${formatDate(batch.trainingStart) ?? '—'} – ${formatDate(batch.trainingEnd) ?? '—'} (${hrs ?? '—'} hrs)`;
 }
 
 /**
  * Returns the full program banner for the statement cover (CFSP or TWSP).
  */
 function programBanner(program: string): string {
+  if (!program.trim()) return '—';
   return isCfsp(program)
     ? 'Coconut Farmers Scholarship Program (CFSP)'
     : 'Training for Work Scholarship Program (TWSP)';
@@ -146,7 +150,7 @@ export function buildStatement(
     trainerName: batch.trainer || '—',
     rqm: batch.rqmCode,
     period: trainingPeriod(batch),
-    scholarsLabel: `${roster.length} pax`,
+    scholarsLabel: batch.scholars_list ? `${roster.length} pax` : '—',
   };
 
   if (trackId === 'training_cost') return buildTrainingCost(batch, roster, header);
@@ -169,7 +173,7 @@ function finalize(
   columns: StatementColumn[],
   rows: { cells: string[] }[],
   summary: StatementSummaryLine[],
-  grandTotal: number,
+  grandTotal: number | null,
 ): BillingStatement {
   return {
     ...header,
@@ -179,8 +183,8 @@ function finalize(
     summary,
     totalLabel: 'Total amount due',
     grandTotal,
-    grandTotalLabel: formatPeso(grandTotal),
-    grandWords: pesosInWords(grandTotal),
+    grandTotalLabel: grandTotal === null ? '—' : formatPeso(grandTotal),
+    grandWords: grandTotal === null ? '—' : pesosInWords(grandTotal),
   };
 }
 
@@ -197,14 +201,20 @@ function buildTrainingCost(batch: Batch, roster: ScholarRow[], header: Header): 
     { key: 'cost', label: 'Training Cost', align: 'right', mono: true },
     { key: 'total', label: 'Total Cost', align: 'right', mono: true },
   ];
+  const cost = unit === null ? '—' : formatPeso(unit);
   const rows = roster.map((s, i) => ({
-    cells: [String(i + 1), scholarName(s), s.sex || '—', formatPeso(unit), formatPeso(unit)],
+    cells: [String(i + 1), scholarName(s), s.sex || '—', cost, cost],
   }));
+  if (unit === null) {
+    // Unmapped qualification: no rate, so no amount — never a guessed default.
+    const summary = [{ label: RATE_UNAVAILABLE, amount: '—' }];
+    return finalize(header, `${RATE_UNAVAILABLE} · ${header.scholarsLabel}`, columns, rows, summary, null);
+  }
   const grandTotal = unit * roster.length;
   const summary: StatementSummaryLine[] = [
     { label: `${roster.length} scholars × ${formatPeso(unit)}`, amount: formatPeso(grandTotal) },
   ];
-  return finalize(header, `${formatPeso(unit)} per scholar · ${roster.length} pax`, columns, rows, summary, grandTotal);
+  return finalize(header, `${formatPeso(unit)} per scholar · ${header.scholarsLabel}`, columns, rows, summary, grandTotal);
 }
 
 /**
@@ -214,14 +224,16 @@ function buildTrainingCost(batch: Batch, roster: ScholarRow[], header: Header): 
 function buildTsfAllowance(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
   const cfsp = isCfsp(batch.program);
   const days = tsfDaysFor(batch.qualification);
-  const tsf = days * TSF_DAY_RATE;
-  const perScholar = tsf + (cfsp ? NEW_NORMAL_ASSISTANCE + ACCIDENT_INSURANCE : 0);
+  const tsf = days === null ? null : days * TSF_DAY_RATE;
+  const perScholar = (tsf ?? 0) + (cfsp ? NEW_NORMAL_ASSISTANCE + ACCIDENT_INSURANCE : 0);
+  // Without a TSF rate, only CFSP's fixed components can be summed; TWSP has nothing to total.
+  const hasAmount = tsf !== null || cfsp;
 
   const columns: StatementColumn[] = [
     { key: 'no', label: 'No.', align: 'left', mono: true },
     { key: 'name', label: 'Name', align: 'left' },
     { key: 'sex', label: 'Sex', align: 'center' },
-    { key: 'tsf', label: `TSF (${days}×₱160)`, align: 'right', mono: true },
+    { key: 'tsf', label: `TSF (${days ?? '—'}×${pesoLabel(TSF_DAY_RATE)})`, align: 'right', mono: true },
     ...(cfsp
       ? [
           { key: 'nn', label: 'New Normal', align: 'right' as const, mono: true },
@@ -236,24 +248,28 @@ function buildTsfAllowance(batch: Batch, roster: ScholarRow[], header: Header): 
       String(i + 1),
       scholarName(s),
       s.sex || '—',
-      formatPeso(tsf),
+      tsf === null ? '—' : formatPeso(tsf),
       ...(cfsp ? [formatPeso(NEW_NORMAL_ASSISTANCE), formatPeso(ACCIDENT_INSURANCE)] : []),
-      formatPeso(perScholar),
+      hasAmount ? formatPeso(perScholar) : '—',
     ],
   }));
 
   const n = roster.length;
-  const grandTotal = perScholar * n;
+  const grandTotal = hasAmount ? perScholar * n : null;
   const summary: StatementSummaryLine[] = [
-    { label: `TSF — ${days} days × ₱160 × ${n}`, amount: formatPeso(tsf * n) },
+    tsf === null
+      ? { label: `TSF — ${RATE_UNAVAILABLE}`, amount: '—' }
+      : { label: `TSF — ${days} days × ${pesoLabel(TSF_DAY_RATE)} × ${n}`, amount: formatPeso(tsf * n) },
     ...(cfsp
       ? [
-          { label: `New Normal Assistance — ₱1,000 × ${n}`, amount: formatPeso(NEW_NORMAL_ASSISTANCE * n) },
-          { label: `Accident Insurance — ₱100.80 × ${n}`, amount: formatPeso(ACCIDENT_INSURANCE * n) },
+          { label: `New Normal Assistance — ${pesoLabel(NEW_NORMAL_ASSISTANCE)} × ${n}`, amount: formatPeso(NEW_NORMAL_ASSISTANCE * n) },
+          { label: `Accident Insurance — ${pesoLabel(ACCIDENT_INSURANCE)} × ${n}`, amount: formatPeso(ACCIDENT_INSURANCE * n) },
         ]
       : []),
+    ...(tsf === null && cfsp ? [{ label: 'Total excludes TSF (no rate for this qualification)', amount: '—' }] : []),
   ];
-  return finalize(header, `${formatPeso(perScholar)} per scholar · ${n} pax`, columns, rows, summary, grandTotal);
+  const subtitle = hasAmount ? `${formatPeso(perScholar)} per scholar` : RATE_UNAVAILABLE;
+  return finalize(header, `${subtitle} · ${header.scholarsLabel}`, columns, rows, summary, grandTotal);
 }
 
 /**
@@ -279,7 +295,7 @@ function buildEntrepreneurship(batch: Batch, roster: ScholarRow[], header: Heade
   }));
   const grandTotal = ENTREPRENEURSHIP_FEE * roster.length;
   const summary: StatementSummaryLine[] = [
-    { label: `₱800 × ${roster.length} scholars`, amount: formatPeso(grandTotal) },
+    { label: `${pesoLabel(ENTREPRENEURSHIP_FEE)} × ${roster.length} scholars`, amount: formatPeso(grandTotal) },
   ];
-  return finalize(header, `₱800 per scholar · ${roster.length} pax`, columns, rows, summary, grandTotal);
+  return finalize(header, `${pesoLabel(ENTREPRENEURSHIP_FEE)} per scholar · ${header.scholarsLabel}`, columns, rows, summary, grandTotal);
 }

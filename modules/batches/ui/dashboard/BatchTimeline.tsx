@@ -42,14 +42,16 @@ import type { Batch, LifecycleStatus } from '@/shared/types';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const dayMs = 86_400_000;
 
-function parseDate(value: string | undefined | null, fallbackYear = 2026): Date | null {
+/** A date with no year in it needs `fallbackYear`; without one it is unreadable (null), never a guessed year. */
+function parseDate(value: string | undefined | null, fallbackYear?: number): Date | null {
   if (!value) return null;
   const clean = value.replace(/^by\s+/i, '').trim();
   const m = clean.match(/([A-Za-z]{3,})\s+(\d{1,2})(?:,\s*(\d{4}))?/);
   if (!m) return null;
   const mon = MONTHS.indexOf(m[1].slice(0, 3));
   if (mon < 0) return null;
-  return new Date(m[3] ? Number(m[3]) : fallbackYear, mon, Number(m[2]));
+  const year = m[3] ? Number(m[3]) : fallbackYear;
+  return year === undefined ? null : new Date(year, mon, Number(m[2]));
 }
 
 type Phase = {
@@ -107,7 +109,7 @@ function buildPrepPhase(aou: Date | null, ntp: Date | null): Phase | null {
 
 function buildTrainPhase(ts: Date | null, te: Date | null, b: Batch): Phase | null {
   if (!ts || !te) return null;
-  return { key: 'train', label: 'Training', s: ts, e: te, fillVar: '--color-amber-lt', strokeVar: '--color-amber-border', fgVar: '--color-amber-dk', pct: b.progressPct, detail: `Day ${b.currentDay}/${b.totalDays}` };
+  return { key: 'train', label: 'Training', s: ts, e: te, fillVar: '--color-amber-lt', strokeVar: '--color-amber-border', fgVar: '--color-amber-dk', pct: b.progressPct, detail: Number.isFinite(b.currentDay) && Number.isFinite(b.totalDays) && b.totalDays > 0 ? `Day ${b.currentDay}/${b.totalDays}` : 'Not recorded' };
 }
 
 function buildEntrePhase(es: Date | null, ee: Date | null): Phase | null {
@@ -117,24 +119,24 @@ function buildEntrePhase(es: Date | null, ee: Date | null): Phase | null {
 
 function buildBillPhase(billStart: Date | null, bill: Date | null, b: Batch): Phase | null {
   if (!billStart || !bill || bill.getTime() <= billStart.getTime()) return null;
-  return { key: 'bill', label: 'Billing window', s: billStart, e: bill, fillVar: '--color-green-lt', strokeVar: '--color-green-border', fgVar: '--color-green-dk', detail: b.daysToBilling != null ? `${b.daysToBilling} days remaining` : undefined };
+  return { key: 'bill', label: 'Billing window', s: billStart, e: bill, fillVar: '--color-green-lt', strokeVar: '--color-green-border', fgVar: '--color-green-dk', detail: Number.isFinite(b.daysToBilling) ? `${b.daysToBilling} days remaining` : 'Not recorded' };
 }
 
-export function ganttData(batches: Batch[]): GanttRow[] {
+export function ganttData(batches: Batch[], fallbackYear?: number): GanttRow[] {
   // Completed cohorts (billing stage already done) are hidden from the active
   // timeline — matches the claude-design source's "completed cohorts are
   // hidden" footnote (TES-93).
   return batches
     .filter((b) => lifecycleStatus(b, 'bill') !== 'done')
     .map((b): GanttRow => {
-      const aou = parseDate(b.aouDate);
-      const ntp = parseDate(b.ntpDate);
-      const tip = parseDate(b.tipDate);
-      const ts = parseDate(b.trainingStart);
-      const te = parseDate(b.trainingEnd);
-      const es = parseDate(b.entreStart);
-      const ee = parseDate(b.entreEnd);
-      const bill = parseDate(b.billingDeadline);
+      const aou = parseDate(b.aouDate, fallbackYear);
+      const ntp = parseDate(b.ntpDate, fallbackYear);
+      const tip = parseDate(b.tipDate, fallbackYear);
+      const ts = parseDate(b.trainingStart, fallbackYear);
+      const te = parseDate(b.trainingEnd, fallbackYear);
+      const es = parseDate(b.entreStart, fallbackYear);
+      const ee = parseDate(b.entreEnd, fallbackYear);
+      const bill = parseDate(b.billingDeadline, fallbackYear);
 
       const phases: Phase[] = [
         buildPrepPhase(aou, ntp),
@@ -205,8 +207,9 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
   // below doesn't re-run on every render over an equal-but-new Date instance.
   const anchor = batches[0];
   const anchorBill = parseDate(anchor?.billingDeadline);
-  const todayMs = anchorBill ? anchorBill.getTime() - (anchor?.daysToBilling ?? 0) * dayMs : new Date(2026, 5, 19).getTime();
-  const today = useMemo(() => new Date(todayMs), [todayMs]);
+  // No anchor deadline (or no countdown) means no honest "today" — the marker is left off.
+  const todayMs = anchorBill && Number.isFinite(anchor?.daysToBilling) ? anchorBill.getTime() - anchor.daysToBilling * dayMs : null;
+  const today = useMemo(() => (todayMs === null ? null : new Date(todayMs)), [todayMs]);
 
   const rows = useMemo(() => ganttData(batches), [batches]);
 
@@ -258,7 +261,7 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
       svg.append('text').attr('x', 15).attr('y', AX - 26).attr('fill', cssVar(host, '--color-text-muted'))
         .style('font-family', 'var(--font-sans)').style('font-size', '9px').style('font-weight', '600').style('letter-spacing', '0.08em').text('BATCH');
 
-      if (today >= x.domain()[0] && today <= x.domain()[1]) {
+      if (today && today >= x.domain()[0] && today <= x.domain()[1]) {
         svg.append('line').attr('x1', x(today)).attr('x2', x(today)).attr('y1', AX - 18).attr('y2', h - 6)
           .attr('stroke', cssVar(host, '--color-red')).attr('stroke-width', 1).attr('stroke-dasharray', '3 3');
         const flag = svg.append('g').attr('transform', `translate(${x(today)},${AX - 4})`);

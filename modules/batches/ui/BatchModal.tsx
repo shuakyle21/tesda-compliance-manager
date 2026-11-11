@@ -93,12 +93,12 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
       <div className="nm-entre-grid">
         <div className="nm-entre-card" style={{ background: 'var(--color-entre-lt)', borderColor: 'var(--color-entre)' }}>
           <div className="nm-entre-cap" style={{ color: 'var(--color-entre)' }}>Schedule</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-entre-dk)' }}>{entre.date || 'TBD'}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-entre-dk)' }}>{entre.date || 'Not set'}</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Duration</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>3</div>
-          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>training days</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>—</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>Not set</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Status</div>
@@ -117,6 +117,18 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
   );
 }
 
+// Shown only when the batch carries a real updated timestamp.
+function LastUpdated({ iso }: { iso?: string }) {
+  const date = formatDate(iso);
+  if (!date) return null;
+  return (
+    <>
+      <span>Last updated {date}</span>
+      <span style={{ color: 'var(--color-border-strong)' }}>·</span>
+    </>
+  );
+}
+
 function BatchScholarsGrid({ batch }: { batch: Batch }) {
   const dropoutColor = (batch.dropouts ?? 0) > 0 ? 'var(--color-red-dk)' : 'var(--color-text-muted)';
   const stats = [
@@ -131,7 +143,7 @@ function BatchScholarsGrid({ batch }: { batch: Batch }) {
       <div className="nm-scholars-grid">
         {stats.map((s) => (
           <div key={s.label} className="nm-scholar-card">
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: s.color }}>{s.value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: s.color }}>{s.value ?? '—'}</div>
             <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 5 }}>{s.label}</div>
           </div>
         ))}
@@ -261,8 +273,7 @@ export function BatchModal({ batch, onClose, rqmEdit }: { batch: Batch; onClose:
           </div>
 
           <div className="nm-footer">
-            <span>Last updated Jun 1, 2026</span>
-            <span style={{ color: 'var(--color-border-strong)' }}>·</span>
+            <LastUpdated iso={batch.updatedAt} />
             <BatchIdLabel batch={batch} />
             <button className="btn ghost" style={{ marginLeft: 'auto', height: 28, fontSize: 12, gap: 4 }} onClick={close}>
               <Icon name="x" size={12} />Close

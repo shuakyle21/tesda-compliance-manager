@@ -8,6 +8,7 @@ import { DocumentsView } from '@/modules/documents/ui/DocumentsView';
 import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { requirementCatalogOf } from '@/modules/documents/domain/compliance';
+import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { requireScope } from '../../../../tenant-scope';
 import type { Batch } from '@/shared/types';
 
@@ -39,11 +40,16 @@ export default async function DocumentsPage({ params }: { params: Promise<{ tena
     return <NoTenantAccessState subject="the document matrix" />;
   }
 
+  // Trusted role only (`profiles.role`); the PRD lets Admin or Coordinator verify documents.
+  const role = await resolveTrustedRole(profile.role);
+
   return (
     <DocumentsView
       batches={batches}
       documentRequirements={documentRequirements}
       syncFailed={snapshot.status === 'sync-failed'}
+      canVerify={role === 'admin' || role === 'coordinator'}
+      verifierName={profile.fullName}
     />
   );
 }

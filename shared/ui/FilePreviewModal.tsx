@@ -29,6 +29,8 @@ export interface PreviewFile {
   critical?: boolean;
   verifiedBy?: string | null;
   verifiedDate?: string | null;
+  /** The stored file's real name, when one is known. */
+  fileName?: string | null;
 }
 
 const FP_STATUS_META: Record<string, { label: string; variant: BadgeVariant; icon: IconName }> = {
@@ -43,6 +45,7 @@ function fpInitials(name: string) {
   return (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 }
 
+// Vendor-neutral wording for the storage backend's own label.
 const FP_SOURCE_LABELS: Record<string, string> = { Supabase: 'Uploaded file', Storage: 'Uploaded file' };
 
 function fpSourceLabel(file: PreviewFile, hasFile: boolean) {
@@ -59,10 +62,12 @@ interface FilePreviewModalProps {
   onVerify?: (f: PreviewFile) => void;
   onRequestChanges?: (f: PreviewFile) => void;
   onNotifyAdmin?: (f: PreviewFile) => void;
+  /** When set, verification cannot be saved: the Verify control is disabled and this text is shown. */
+  verifyUnavailable?: string;
   onClose: () => void;
 }
 
-export function FilePreviewModal({ file, canVerify, adminName, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FilePreviewModalProps) {
+export function FilePreviewModal({ file, canVerify, adminName, verifyUnavailable, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FilePreviewModalProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -71,7 +76,8 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
 
   const meta = FP_STATUS_META[file.status] || FP_STATUS_META.na;
   const hasFile = !!file.url && file.status !== 'missing';
-  const fileName = (file.name || 'Document').replace(/\s+/g, '_') + '.pdf';
+  // The real file name when known; otherwise the document's label, with no invented extension.
+  const fileName = file.fileName || file.name || 'Document';
   const sourceLabel = fpSourceLabel(file, hasFile);
 
   return (
@@ -140,6 +146,7 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
             file={file}
             hasFile={hasFile}
             canVerify={canVerify}
+            verifyUnavailable={verifyUnavailable}
             onVerify={onVerify}
             onRequestChanges={onRequestChanges}
             onNotifyAdmin={onNotifyAdmin}
@@ -183,19 +190,26 @@ interface FPFooterActionsProps {
   file: PreviewFile;
   hasFile: boolean;
   canVerify?: boolean;
+  verifyUnavailable?: string;
   onVerify?: (f: PreviewFile) => void;
   onRequestChanges?: (f: PreviewFile) => void;
   onNotifyAdmin?: (f: PreviewFile) => void;
   onClose: () => void;
 }
 
-function FPFooterActions({ file, hasFile, canVerify, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FPFooterActionsProps) {
+function FPFooterActions({ file, hasFile, canVerify, verifyUnavailable, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FPFooterActionsProps) {
   return (
     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
       {hasFile && (
         <button className="btn ghost" title="Download"><Icon name="download" size={14} />Download</button>
       )}
-      {file.status === 'submitted' && canVerify && (
+      {file.status === 'submitted' && canVerify && verifyUnavailable && (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-text-muted)' }}>
+          <button className="btn" disabled title={verifyUnavailable}><Icon name="check" size={14} />Verify document</button>
+          <Icon name="info-circle" size={12} />{verifyUnavailable}
+        </span>
+      )}
+      {file.status === 'submitted' && canVerify && !verifyUnavailable && (
         <>
           <button className="btn secondary" onClick={() => onRequestChanges && onRequestChanges(file)}>
             <Icon name="refresh" size={14} />Request changes
@@ -205,12 +219,12 @@ function FPFooterActions({ file, hasFile, canVerify, onVerify, onRequestChanges,
           </button>
         </>
       )}
-      {file.status === 'submitted' && !canVerify && (
+      {file.status === 'submitted' && !canVerify && onNotifyAdmin && (
         <button className="btn secondary" onClick={() => onNotifyAdmin && onNotifyAdmin(file)}>
           <Icon name="bell" size={14} />Notify admin
         </button>
       )}
-      {file.status !== 'submitted' && (
+      {(file.status !== 'submitted' || (!canVerify && !onNotifyAdmin)) && (
         <button className="btn primary" onClick={onClose}>Close</button>
       )}
     </div>

@@ -196,7 +196,7 @@ function SignUpFormStep({
             {...fieldProps('email')}
             id="su-email"
             type="email"
-            placeholder="you@school.ph"
+            placeholder="name@example.com"
             autoComplete="email"
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
@@ -308,8 +308,12 @@ function SignUpVerifyStep({
     <>
       <h1 className={styles.title}>Verify your email</h1>
       <p className={styles.sub}>
-        Enter the 6-digit code sent to{' '}
-        <span className={styles.emailEcho}>{email.trim() || 'you@school.ph'}</span>
+        {email.trim() ? (
+          <>
+            Enter the 6-digit code sent to{' '}
+            <span className={styles.emailEcho}>{email.trim()}</span>
+          </>
+        ) : 'Enter the 6-digit code sent to your email.'}
       </p>
 
       {error && <p className={styles.error} role="alert">{error}</p>}

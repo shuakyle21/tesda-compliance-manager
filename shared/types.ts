@@ -2,7 +2,7 @@
  * STEP 1 — Data Layer: TypeScript Interfaces
  *
  * These types are the contract between the ported mock data (lib/data/seed.ts),
- * the UI components, and (eventually) the Supabase/Laravel schema. They mirror
+ * the UI components, and (eventually) the Supabase schema. They mirror
  * the shapes defined in the design handoff's `data/seed.js`.
  *
  * DOCS: https://nextjs.org/docs/app/building-your-application/configuring/typescript

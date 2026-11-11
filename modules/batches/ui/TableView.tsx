@@ -19,7 +19,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { filterBatches } from './filter';
-import { criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
+import { DOC_TIER_ON_TRACK, criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress } from '@/modules/batches/domain/progress';
 import type { Batch, DocumentRequirement } from '@/shared/types';
@@ -112,7 +112,7 @@ function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
 function docCellColor(docs: DocComplianceSummary): string {
   if (docs.tracked === 0) return 'var(--color-text-muted)';
   if (docs.missing > 0) return 'var(--color-red-dk)';
-  return (docs.verifiedPct ?? 0) >= 90 ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
+  return (docs.verifiedPct ?? 0) >= DOC_TIER_ON_TRACK ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
 }
 
 function docCellIcon(docs: DocComplianceSummary): IconName {

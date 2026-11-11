@@ -85,13 +85,13 @@ function deriveIdentity(clerkUser: NonNullable<ClerkProfileUser>) {
 function deriveActivityLabels(clerkUser: NonNullable<ClerkProfileUser>) {
   const memberSince = clerkUser.createdAt
     ? new Date(clerkUser.createdAt).toLocaleDateString('en-PH', { month: 'long', year: 'numeric' })
-    : 'January 2026';
+    : '—';
 
   const lastActiveTime = clerkUser.lastSignInAt
-    ? new Date(clerkUser.lastSignInAt).toLocaleTimeString('en-PH', {
-        hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila',
+    ? new Date(clerkUser.lastSignInAt).toLocaleString('en-PH', {
+        dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Manila',
       }) + ' PHT'
-    : '14:02 PHT';
+    : '—';
 
   return { memberSince, lastActiveTime };
 }
@@ -111,6 +111,9 @@ function deriveProfileView(clerkUser: NonNullable<ClerkProfileUser>, dbRole: Use
     ...deriveIdentity(clerkUser),
     ...deriveActivityLabels(clerkUser),
     hasGoogle: deriveHasGoogle(clerkUser),
+    passwordEnabled: clerkUser.passwordEnabled,
+    twoFactorEnabled: clerkUser.twoFactorEnabled,
+    totpEnabled: clerkUser.totpEnabled,
   };
 }
 
@@ -197,26 +200,6 @@ function ConnectedAccountsCard({ hasGoogle, email }: { hasGoogle: boolean; email
         statusTone={hasGoogle ? 'green' : 'amber'}
         last
       />
-
-      <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--color-border-faint)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <Icon name="timeline" size={13} style={{ color: 'var(--color-text-secondary)' }} />
-          <span style={{
-            fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
-            letterSpacing: '0.05em', textTransform: 'uppercase',
-            color: 'var(--color-text-muted)',
-          }}>
-            Active sessions
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--color-text-secondary)' }}>
-          <span style={{ width: 7, height: 7, borderRadius: 9999, background: 'var(--color-green)', flexShrink: 0 }} aria-hidden="true" />
-          <span style={{ flex: 1 }}>This device · Chrome on macOS</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-            Quezon City · now
-          </span>
-        </div>
-      </div>
     </PCard>
   );
 }
@@ -247,6 +230,9 @@ export default async function ProfilePage() {
     memberSince,
     lastActiveTime,
     hasGoogle,
+    passwordEnabled,
+    twoFactorEnabled,
+    totpEnabled,
   } = deriveProfileView(clerkUser, profileSnapshot.status === 'ok' ? profileSnapshot.profile.role : null);
 
   return (
@@ -329,7 +315,7 @@ export default async function ProfilePage() {
           </PRow>
           <PRow label="Member since">{memberSince}</PRow>
           <PRow label="Last active" last>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5 }}>Today · {lastActiveTime}</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5 }}>{lastActiveTime}</span>
           </PRow>
         </PCard>
 
@@ -341,27 +327,19 @@ export default async function ProfilePage() {
           <SecRow
             icon="settings"
             title="Password"
-            desc="Last changed 12 weeks ago"
-            status="Set"
-            statusTone="green"
+            desc={passwordEnabled ? 'Password sign-in enabled' : 'No password set'}
+            status={passwordEnabled ? 'Set' : 'Off'}
+            statusTone={passwordEnabled ? 'green' : 'amber'}
             action={<button type="button" className="btn ghost sm" disabled aria-disabled="true" style={{ marginLeft: 8 }}>Change</button>}
           />
           <SecRow
             icon="shield-check"
             title="Two-step verification"
-            desc="Authenticator app · TOTP"
-            status="On"
-            statusTone="green"
-            action={<button type="button" className="btn ghost sm" disabled aria-disabled="true" style={{ marginLeft: 8 }}>Manage</button>}
-          />
-          <SecRow
-            icon="user"
-            title="Passkeys"
-            desc="No passkeys registered"
-            status="Off"
-            statusTone="amber"
-            action={<button type="button" className="btn ghost sm" disabled aria-disabled="true" style={{ marginLeft: 8 }}>Add</button>}
+            desc={totpEnabled ? 'Authenticator app' : 'No authenticator app set up'}
+            status={twoFactorEnabled ? 'On' : 'Off'}
+            statusTone={twoFactorEnabled ? 'green' : 'amber'}
             last
+            action={<button type="button" className="btn ghost sm" disabled aria-disabled="true" style={{ marginLeft: 8 }}>Manage</button>}
           />
         </PCard>
 

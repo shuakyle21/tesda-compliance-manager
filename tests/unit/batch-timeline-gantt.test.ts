@@ -45,9 +45,11 @@ function lifecycleWith(key: string, status: LifecycleStage['status']): Lifecycle
   return [{ key: key as LifecycleStage['key'], label: key, status, date: '' }];
 }
 
+const YEAR = 2026;
+
 describe('ganttData', () => {
   it('omits the prep phase when aou/ntp dates are missing', () => {
-    const [row] = ganttData([fixtureBatch({ aouDate: undefined, ntpDate: undefined })]);
+    const [row] = ganttData([fixtureBatch({ aouDate: undefined, ntpDate: undefined })], YEAR);
     expect(row.phases.find((p) => p.key === 'prep')).toBeUndefined();
     expect(row.phases.find((p) => p.key === 'train')).toBeDefined();
   });
@@ -61,7 +63,7 @@ describe('ganttData', () => {
         entreEnd: 'May 20, 2026',
         billingDeadline: 'Jun 1, 2026',
       }),
-    ]);
+    ], YEAR);
     expect(row.phases.map((p) => p.key)).toEqual(['prep', 'train', 'entre', 'bill']);
   });
 
@@ -72,14 +74,14 @@ describe('ganttData', () => {
         entreEnd: 'May 20, 2026',
         billingDeadline: 'May 20, 2026', // same as entreEnd — not strictly after
       }),
-    ]);
+    ], YEAR);
     expect(row.phases.find((p) => p.key === 'bill')).toBeUndefined();
   });
 
   it('uses trainingEnd as the billing-window start when there is no entre phase', () => {
     const [row] = ganttData([
       fixtureBatch({ trainingEnd: 'May 1, 2026', billingDeadline: 'Jun 1, 2026' }),
-    ]);
+    ], YEAR);
     const bill = row.phases.find((p) => p.key === 'bill');
     expect(bill?.s).toEqual(new Date(2026, 4, 1));
   });
@@ -92,5 +94,21 @@ describe('ganttData', () => {
   it('keeps a batch whose billing stage is not done', () => {
     const rows = ganttData([fixtureBatch({ lifecycle: lifecycleWith('bill', 'active') })]);
     expect(rows).toHaveLength(1);
+  });
+
+  it('does not guess a year: a date with no year is unreadable without a fallback year', () => {
+    const [row] = ganttData([fixtureBatch({ trainingStart: 'Feb 1' })]);
+    expect(row.phases.find((p) => p.key === 'train')).toBeUndefined();
+  });
+
+  it('reads a yearless date with the year it is given', () => {
+    const [row] = ganttData([fixtureBatch({ trainingStart: 'Feb 1' })], YEAR);
+    expect(row.phases.find((p) => p.key === 'train')?.s).toEqual(new Date(2026, 1, 1));
+  });
+
+  it('says "Not recorded" for non-finite day counts instead of Infinity or 0/0', () => {
+    const [row] = ganttData([fixtureBatch({ totalDays: 0, currentDay: 0, daysToBilling: Infinity })], YEAR);
+    expect(row.phases.find((p) => p.key === 'train')?.detail).toBe('Not recorded');
+    expect(row.phases.find((p) => p.key === 'bill')?.detail).toBe('Not recorded');
   });
 });

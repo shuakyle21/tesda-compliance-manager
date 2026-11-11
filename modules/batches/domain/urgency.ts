@@ -3,7 +3,10 @@
  * Unit-tested with fixed as-of dates (`tests/unit/urgency.test.ts`).
  */
 
+import { URGENCY_CRITICAL_DAYS, URGENCY_WARNING_DAYS } from '@/shared/urgency';
 import type { Batch, UrgencyTier } from '@/shared/types';
+
+export { URGENCY_CRITICAL_DAYS, URGENCY_WARNING_DAYS };
 
 /**
  * Derive the urgency tier from days-to-billing. `Infinity` is the "no deadline
@@ -13,8 +16,8 @@ import type { Batch, UrgencyTier } from '@/shared/types';
 export function urgencyTier(daysToBilling: number): UrgencyTier {
   if (!Number.isFinite(daysToBilling)) return 'muted';
   if (daysToBilling < 0) return 'overdue';
-  if (daysToBilling <= 6) return 'critical';
-  if (daysToBilling <= 21) return 'warning';
+  if (daysToBilling <= URGENCY_CRITICAL_DAYS) return 'critical';
+  if (daysToBilling <= URGENCY_WARNING_DAYS) return 'warning';
   return 'on-track';
 }
 
