@@ -426,8 +426,8 @@ export function BillingQueueView({
   const handleSave = (label: string) => {
     setPreview(null);
     setToast({
-      title: 'Working copy saved',
-      message: `${label} recorded to the generation log (append-only). Nothing was submitted to TESDA.`,
+      title: 'Preview closed',
+      message: `${label} preview only — nothing was saved. Nothing was submitted to TESDA.`,
     });
   };
 

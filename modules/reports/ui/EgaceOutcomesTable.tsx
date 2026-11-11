@@ -1,5 +1,6 @@
 'use client';
 
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { Icon } from '@/shared/ui/Icon';
 import type { Batch, EgaceStage, Tenant } from '@/shared/types';
 import { formatDate } from '@/shared/dates';
@@ -81,7 +82,7 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
                 <td className="egc-td">
                   <div className="egc-qual">{b.qualification}</div>
                   <div className="egc-meta">
-                    {b.program} · {b.id}
+                    {b.program} · {displayBatchId(b)}
                     {b.status === 'completed' ? ' · completed' : ''}
                   </div>
                 </td>

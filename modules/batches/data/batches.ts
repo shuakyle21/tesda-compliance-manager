@@ -231,6 +231,7 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
   return {
     // Direct from the contract:
     id: row.batch_code, // human code (e.g. "BAT-2") for display continuity
+    rqmCode: row.rqm_code?.trim() || null,
     tenantId: row.tenant_id,
     name: batchDisplayName(row.batch_code, row.batch_section),
     qualification: row.qualification_title, // closes the TES-60 gap (AC1)

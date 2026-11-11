@@ -16,6 +16,7 @@ import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicato
 import { BatchModal } from '@/modules/batches/ui/BatchModal';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { filterBatches } from './filter';
 import { criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
@@ -163,7 +164,7 @@ function TableRow({
 
   return (
     <tr style={{ cursor: 'pointer' }} onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-      <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>{batch.id}</td>
+      <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}><BatchIdLabel batch={batch} /></td>
       <td style={cellStyle}>
         <div style={{ fontWeight: 500 }}>{batch.name.replace(/ · Batch \d+$/, '')}</div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.qualification}</div>

@@ -14,6 +14,8 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '@/shared/ui/Icon';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import type { BillingCard } from '@/modules/billing/data/billing';
 import { buildStatement, type StatementColumn } from '@/modules/billing/domain/statement';
 import type { BillingTrackId } from '@/modules/billing/domain/tracks';
@@ -57,7 +59,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
   return (
     <>
       <div className="scrim" style={{ zIndex: 100 }} onClick={onClose} />
-      <div className="modal" role="dialog" aria-modal="true" aria-label={`Billing statement for ${card.batch.id}`} style={{ zIndex: 110, width: 820 }}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label={`Billing statement for ${displayBatchId(card.batch)}`} style={{ zIndex: 110, width: 820 }}>
 
         {/* Header */}
         <div className="modal-head">
@@ -68,7 +70,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
             <div style={{ minWidth: 0 }}>
               <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Billing statement — {statement.trackLabel}</h3>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)', marginTop: 1 }}>
-                {statement.batchId} · internal working copy
+                <BatchIdLabel batch={card.batch} /> · internal working copy
               </div>
             </div>
           </div>
@@ -119,7 +121,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, padding: '12px 0', borderTop: '1px solid var(--color-border-faint)', borderBottom: '1px solid var(--color-border-faint)' }}>
             <MetaCell label="Qualification">{statement.qualification}</MetaCell>
             <MetaCell label="Name of trainer">{statement.trainerName}</MetaCell>
-            <MetaCell label="RQM code" mono>{statement.rqm}</MetaCell>
+            <MetaCell label="RQM code" mono={statement.rqm !== null}>{statement.rqm ?? 'Not recorded'}</MetaCell>
             <MetaCell label="Training duration" mono>{statement.period}</MetaCell>
             <MetaCell label="Scholars" mono>{statement.scholarsLabel}</MetaCell>
           </div>
@@ -175,7 +177,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
             ) : (
               <>
                 <button className="btn secondary" onClick={onClose}>Close</button>
-                <button className="btn primary" onClick={() => onSave?.(`${statement.trackLabel} · ${statement.batchId}`)}>
+                <button className="btn primary" onClick={() => onSave?.(`${statement.trackLabel} · ${displayBatchId(card.batch)}`)}>
                   <Icon name="download" size={14} />Save working copy
                 </button>
               </>
