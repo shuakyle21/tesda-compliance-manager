@@ -15,7 +15,7 @@
  * (tenant_id, batch_id, uli) as the backstop; it is partial (`where uli is
  * not null`), so it is still not an ON CONFLICT target for supabase-js upsert.
  *
- * TODO before a UI calls this: `sync-failed` carries the raw database message
+ * TODO before a UI calls this: `sync-failed` and `partial` carry the raw database message
  * (table, column and constraint names). Map it to user copy at the action
  * boundary (RULES.md rule 6).
  */
@@ -44,6 +44,10 @@ export interface SkippedRow {
 
 export type LearnerImportSnapshot =
   | { status: 'ok'; inserted: number; updated: number; skipped: SkippedRow[] }
+  /** Stopped part-way: `inserted` / `updated` rows ARE saved, the rest are not.
+   * The two tables are written in separate requests, so there is no rollback.
+   * Re-importing the same file is safe (rows match on ULI and details upsert). */
+  | { status: 'partial'; inserted: number; updated: number; skipped: SkippedRow[]; error: string }
   | { status: 'validation-failed'; errors: string[] }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
@@ -88,14 +92,20 @@ async function writeDetails(
   return error ? error.message : null;
 }
 
-/** Inserts the unmatched rows, then their details. Returns an error message, or `null` on success. */
+/** How many learner rows a write step saved before it finished or stopped. */
+interface WriteResult {
+  saved: number;
+  error: string | null;
+}
+
+/** Inserts the unmatched rows, then their details. */
 async function insertLearners(
   supabase: SupabaseServerClient,
   toInsert: ReconciledRow[],
   tenantId: string,
   batchId: string,
-): Promise<string | null> {
-  if (toInsert.length === 0) return null;
+): Promise<WriteResult> {
+  if (toInsert.length === 0) return { saved: 0, error: null };
   const inserts: LearnerInsert[] = toInsert.map(({ row }) => ({
     tenant_id: tenantId,
     batch_id: batchId,
@@ -108,23 +118,27 @@ async function insertLearners(
     assessment_result: row.assessmentResult,
   }));
   const { data, error } = await supabase.from('learners').insert(inserts).select('id, uli');
-  if (error) return error.message;
+  if (error) return { saved: 0, error: error.message };
 
+  // From here the learner rows are committed, so every exit reports them as saved.
+  const saved = toInsert.length;
   // ULIs are unique within the file (validateRows), so they key the new ids.
   const idByUli = new Map((data ?? []).map((l) => [l.uli, l.id]));
   for (const { row } of toInsert) {
     const id = idByUli.get(row.uli);
-    const detailsError = id ? await writeDetails(supabase, id, tenantId, row) : null;
-    if (detailsError) return detailsError;
+    if (!id) return { saved, error: `Row ${row.rowNumber}: the learner was saved but its details could not be linked.` };
+    const detailsError = await writeDetails(supabase, id, tenantId, row);
+    if (detailsError) return { saved, error: detailsError };
   }
-  return null;
+  return { saved, error: null };
 }
 
 /** Updates the ULI-matched rows one at a time (no bulk "update many rows with
  * different values" in supabase-js). Fine at CSV-import scale (single batch's
  * roster); revisit if this pipeline ever takes multi-thousand-row files.
- * Returns an error message, or `null` on success. */
-async function updateLearners(supabase: SupabaseServerClient, toUpdate: ReconciledRow[], tenantId: string): Promise<string | null> {
+ * `saved` counts rows whose learner AND details both went through. */
+async function updateLearners(supabase: SupabaseServerClient, toUpdate: ReconciledRow[], tenantId: string): Promise<WriteResult> {
+  let saved = 0;
   for (const { row, existingId } of toUpdate) {
     const update: LearnerUpdate = {
       learner_no: row.learnerNo,
@@ -135,11 +149,22 @@ async function updateLearners(supabase: SupabaseServerClient, toUpdate: Reconcil
       assessment_result: row.assessmentResult,
     };
     const { error } = await supabase.from('learners').update(update).eq('id', existingId as string);
-    if (error) return error.message;
+    if (error) return { saved, error: error.message };
     const detailsError = await writeDetails(supabase, existingId as string, tenantId, row);
-    if (detailsError) return detailsError;
+    if (detailsError) return { saved, error: detailsError };
+    saved += 1;
   }
-  return null;
+  return { saved, error: null };
+}
+
+/** Pure: `ok` when both steps finished, `sync-failed` when nothing was saved,
+ * otherwise `partial` with the real counts. */
+export function summariseWrites(inserted: WriteResult, updated: WriteResult, skipped: SkippedRow[]): LearnerImportSnapshot {
+  const error = inserted.error ?? updated.error;
+  const counts = { inserted: inserted.saved, updated: updated.saved, skipped };
+  if (!error) return { status: 'ok', ...counts };
+  if (inserted.saved + updated.saved === 0) return { status: 'sync-failed', error };
+  return { status: 'partial', ...counts, error };
 }
 
 /** Imports a learner CSV into a single batch. `batchId` scopes both the
@@ -183,13 +208,10 @@ export async function importLearnersCsv(batchId: string, csvText: string): Promi
     const toInsert = reconciled.filter((r) => r.existingId === null);
     const toUpdate = reconciled.filter((r) => r.existingId !== null);
 
-    const insertError = await insertLearners(supabase, toInsert, batchResult.tenantId, batchId);
-    if (insertError) return { status: 'sync-failed', error: insertError };
+    const inserted = await insertLearners(supabase, toInsert, batchResult.tenantId, batchId);
+    const updated = inserted.error ? { saved: 0, error: null } : await updateLearners(supabase, toUpdate, batchResult.tenantId);
 
-    const updateError = await updateLearners(supabase, toUpdate, batchResult.tenantId);
-    if (updateError) return { status: 'sync-failed', error: updateError };
-
-    return { status: 'ok', inserted: toInsert.length, updated: toUpdate.length, skipped: toSkipped(rowErrors) };
+    return summariseWrites(inserted, updated, toSkipped(rowErrors));
   } catch (err) {
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
   }

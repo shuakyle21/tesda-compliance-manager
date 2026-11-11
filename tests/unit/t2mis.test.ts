@@ -105,7 +105,7 @@ describe('T2MIS layout', () => {
     expect(cell(row, 'Age')).toBe('');
   });
 
-  it('leaves detail cells blank for a learner row with no details (trainer read, or not migrated)', () => {
+  it('leaves detail cells blank for a learner row with no details (none recorded, or a trainer read)', () => {
     const roster = mapTenantRoster([LEARNER_ROW], [], '2026-06-08');
     const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
     expect(cell(row, 'Last Name')).toBe('Reyes');
