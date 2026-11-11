@@ -38,7 +38,23 @@ describe('normalizeRqmCode', () => {
   });
 });
 
+describe('normalizeRqmCode, invisible and wide characters', () => {
+  it('folds U+2015 and U+FF0D to a hyphen', () => {
+    expect(normalizeRqmCode('RQM3\u20152026\uFF0DCFSP-0000-0001')).toBe(CODE);
+  });
+  it('strips zero-width characters', () => {
+    expect(normalizeRqmCode('RQM3\u200B-2026\u200C-CFSP\u200D-0000\uFEFF-0001')).toBe(CODE);
+  });
+});
+
 describe('checkRqmCode', () => {
+  it('rejects a six-part value', () => {
+    expect(checkRqmCode('RQM3-2026-CFSP-0000-0001-0002', CTX).ok).toBe(false);
+  });
+  it('does not warn when the provider numbers are numerically equal', () => {
+    expect(checkRqmCode('RQM3-2026-CFSP-01263-0001', { program: 'CFSP', providerCode: '1263' })).toMatchObject({ warnings: [] });
+    expect(checkRqmCode('RQM3-2026-CFSP-1263-0001', { program: 'CFSP', providerCode: '01263' })).toMatchObject({ warnings: [] });
+  });
   it('accepts a well-formed code and returns it normalized', () => {
     expect(checkRqmCode(' rqm3‐2026‐cfsp‐0000‐0001 ', CTX)).toEqual({ ok: true, code: CODE, warnings: [] });
   });
@@ -97,6 +113,28 @@ describe('findRqmCodes', () => {
   });
   it('does not return the four-part prefix of a five-part code separately', () => {
     expect(findRqmCodes('Request RQM3-2026-CFSP-12: RQM3-2026-CFSP-12-0001')).toEqual(['RQM3-2026-CFSP-12-0001']);
+  });
+});
+
+describe('findRqmCodes, hardening', () => {
+  it('does not return a truncated code glued to letters or digits', () => {
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0009ABC')).toEqual([]);
+    expect(findRqmCodes('xRQM3-2026-CFSP-0000-0009')).toEqual([]);
+  });
+  it('does not return either code of two glued together', () => {
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001RQM3-2026-CFSP-0000-0002')).toEqual([]);
+  });
+  it('does not return a six-part value', () => {
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001-0002')).toEqual([]);
+  });
+  it('finds a code split across a line break after a hyphen', () => {
+    expect(findRqmCodes('row RQM3-2026-CFSP-1263-\n0009 South Cotabato')).toEqual(['RQM3-2026-CFSP-1263-0009']);
+  });
+  it('finds a code with spaces around its hyphens, without joining neighbouring words', () => {
+    expect(findRqmCodes('Total - RQM3 - 2026 - CFSP - 0000 - 0001 end')).toEqual([CODE]);
+  });
+  it('folds U+2015, U+FF0D and zero-width characters', () => {
+    expect(findRqmCodes('RQM3\u20152026\uFF0DCFSP-0000\u200B-0001')).toEqual([CODE]);
   });
 });
 

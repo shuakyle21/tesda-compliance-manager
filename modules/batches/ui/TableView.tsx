@@ -39,9 +39,11 @@ export function TableView({
 }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
-  const [open, setOpen] = useState<Batch | null>(
-    () => (initialBatchId ? batches.find((b) => b.id.toLowerCase() === initialBatchId.toLowerCase()) ?? null : null),
+  const [openId, setOpenId] = useState<string | null>(
+    () => (initialBatchId ? batches.find((b) => b.id.toLowerCase() === initialBatchId.toLowerCase())?.id ?? null : null),
   );
+  // Looked up from the live list (not a stored copy) so a save shows up in the open modal.
+  const open = batches.find((b) => b.id === openId) ?? null;
 
   const filtered = useMemo(() => filterBatches(batches, query, program), [batches, query, program]);
 
@@ -82,7 +84,7 @@ export function TableView({
               </thead>
               <tbody>
                 {filtered.map((b, i) => (
-                  <TableRow key={b.id} batch={b} critical={criticalRequirements(b.documentRequirements)} odd={i % 2 === 0} onClick={() => setOpen(b)} />
+                  <TableRow key={b.id} batch={b} critical={criticalRequirements(b.documentRequirements)} odd={i % 2 === 0} onClick={() => setOpenId(b.id)} />
                 ))}
               </tbody>
             </table>
@@ -90,7 +92,7 @@ export function TableView({
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpen(null)} rqmEdit={rqmEdit} />}
+      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit} />}
     </div>
   );
 }

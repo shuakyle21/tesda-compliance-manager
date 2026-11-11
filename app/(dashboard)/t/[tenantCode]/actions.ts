@@ -99,6 +99,8 @@ export async function setBatchRqmCodeAction(
 
   // Which school, and is the caller a member? Resolved here, from the URL code.
   const resolved = await resolveRouteScope(tenantCode);
+  // `unknown` = the profile could not be read: a failure to check, not a refusal.
+  if (resolved.status === 'unknown') return SAVE_FAILED;
   if (resolved.status !== 'ok') return DENIED;
   const { scope, profile } = resolved;
 
@@ -110,7 +112,8 @@ export async function setBatchRqmCodeAction(
 
   const result = await setBatchRqmCode({ tenantId: scope.tenantId, batchCode, expectedPrevious, next: input.next });
   const failure = failureState(result);
-  if (failure || result.status !== 'saved') return failure ?? SAVE_FAILED;
+  if (failure) return failure;
+  if (result.status !== 'saved') return SAVE_FAILED; // unreachable; narrows `result` for the fields below
 
   // Re-saving the same value changes nothing, so it is not worth a log entry.
   const logged =

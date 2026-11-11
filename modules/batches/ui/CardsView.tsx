@@ -27,7 +27,9 @@ import type { Batch } from '@/shared/types';
 export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; loadedAt: string | null; rqmEdit?: RqmEdit }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
-  const [open, setOpen] = useState<Batch | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  // Looked up from the live list (not a stored copy) so a save shows up in the open modal.
+  const open = batches.find((b) => b.id === openId) ?? null;
 
   const filtered = useMemo(() => filterBatches(batches, query, program), [batches, query, program]);
 
@@ -48,12 +50,12 @@ export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; lo
             {filtered.length} batch {pluralize(filtered.length, 'record', 'records')}{loadedAt ? ` loaded ${loadedAt}` : ''}. Sorted by earliest billing deadline first; batches with no deadline recorded come last, by training end date.
           </InfoCallout>
           {filtered.map((b) => (
-            <BatchCard key={b.id} batch={b} onClick={() => setOpen(b)} />
+            <BatchCard key={b.id} batch={b} onClick={() => setOpenId(b.id)} />
           ))}
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpen(null)} rqmEdit={rqmEdit} />}
+      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit} />}
     </div>
   );
 }

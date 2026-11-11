@@ -8,7 +8,7 @@
  * the server and RLS refuses the write — see `app/(dashboard)/t/[tenantCode]/actions.ts`.
  */
 
-import { useActionState, useId, useRef, useState } from 'react';
+import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 import { normalizeRqmCode, type RqmFormState } from '@/modules/batches/domain/rqm';
 import type { Batch } from '@/shared/types';
@@ -18,11 +18,10 @@ type Mode = 'view' | 'edit' | 'confirm-replace' | 'confirm-remove';
 const IDLE: RqmFormState = { status: 'idle' };
 const SMALL = { height: 28, fontSize: 12 } as const;
 
-/** Where the editor goes when an action result arrives: close on success, step back on failure. */
+/** Where the editor goes when an action result arrives: close on success, back to the field on failure. */
 function modeAfter(state: RqmFormState, mode: Mode): Mode {
   if (state.status === 'saved') return 'view';
-  if (state.status === 'idle') return mode;
-  return mode === 'confirm-remove' ? 'view' : 'edit';
+  return state.status === 'idle' ? mode : 'edit';
 }
 
 function failureMessage(state: RqmFormState): string | null {
@@ -43,31 +42,41 @@ export function RqmCodeEditor({
   const [mode, setMode] = useState<Mode>('view');
   const [draft, setDraft] = useState('');
   const [seen, setSeen] = useState<RqmFormState>(IDLE);
+  // The last value known to be stored. The `batch` prop is a snapshot that only
+  // refreshes after revalidation, so every save result overrides it here.
+  const [current, setCurrent] = useState(batch.rqmCode);
+  // Shown only while the form that produced it is open; leaving edit mode clears it.
+  const [message, setMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const id = useId();
 
-  // The modal's `batch` prop is stale until the page refreshes, so once a save
-  // has succeeded the action's result is the truth.
-  const current = state.status === 'saved' ? state.code : batch.rqmCode;
   const next = normalizeRqmCode(draft);
-  const message = failureMessage(state);
 
+  // Derive state from a new action result during render (guarded by the
+  // comparison), the pattern React documents instead of an effect.
   if (state !== seen) {
     setSeen(state);
     setMode(modeAfter(state, mode));
+    setMessage(failureMessage(state));
+    if (state.status === 'saved') setCurrent(state.code);
+  }
+
+  function go(to: Mode) {
+    setMessage(null);
+    setMode(to);
   }
 
   function open() {
     setDraft(current ?? '');
-    setMode('edit');
+    go('edit');
   }
 
   // Replacing or removing a recorded code always passes through a confirm step.
   function save() {
     if (!current) formRef.current?.requestSubmit();
-    else if (!next) setMode('confirm-remove');
-    else if (next === current) setMode('view');
-    else setMode('confirm-replace');
+    else if (!next) go('confirm-remove');
+    else if (next === current) go('view');
+    else go('confirm-replace');
   }
 
   return (
@@ -91,9 +100,9 @@ export function RqmCodeEditor({
           <EditField id={id} draft={draft} onDraft={setDraft} onEnter={() => !pending && save()} pending={pending} invalid={message !== null} />
           <div style={ROW}>
             <PendingButton primary pending={pending} onClick={save}>Save</PendingButton>
-            <button type="button" className="btn ghost" style={SMALL} disabled={pending} onClick={() => setMode('view')}>Cancel</button>
+            <button type="button" className="btn ghost" style={SMALL} disabled={pending} onClick={() => go('view')}>Cancel</button>
             {current && (
-              <button type="button" className="btn" style={SMALL} disabled={pending} onClick={() => setMode('confirm-remove')}>Remove code</button>
+              <button type="button" className="btn" style={SMALL} disabled={pending} onClick={() => go('confirm-remove')}>Remove code</button>
             )}
           </div>
         </>
@@ -106,11 +115,11 @@ export function RqmCodeEditor({
           next={next}
           draft={draft}
           pending={pending}
-          onBack={() => setMode(mode === 'confirm-replace' ? 'edit' : 'view')}
+          onBack={() => go(mode === 'confirm-replace' ? 'edit' : 'view')}
         />
       )}
 
-      {message && (
+      {message && mode !== 'view' && (
         <p className="user-form-error" id={`${id}-error`} role="alert">
           <Icon name="alert-circle" size={14} />
           <span>{message}</span>
@@ -225,15 +234,21 @@ function ConfirmStep({
   pending: boolean;
   onBack: () => void;
 }) {
+  // Focus the question: the button that opened this step has just been removed.
+  // Not the submit button, so a repeated Enter or Space cannot confirm it.
+  const questionRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => questionRef.current?.focus(), []);
+
   return (
     <>
       <input type="hidden" name="rqmCode" value={replace ? draft : ''} />
-      <p style={{ fontSize: 13, margin: 0 }}>
+      <p ref={questionRef} tabIndex={-1} role="alert" style={{ fontSize: 13, margin: 0 }}>
         {replace ? `Replace ${current} with ${next}?` : `Remove ${current} from this batch?`}
       </p>
+      {/* Back comes first: it sits where "Save" was, so a double-click on Save lands harmlessly. */}
       <div style={ROW}>
-        <PendingButton primary pending={pending} submit>{replace ? 'Replace' : 'Remove'}</PendingButton>
         <button type="button" className="btn ghost" style={SMALL} disabled={pending} onClick={onBack}>Back</button>
+        <PendingButton primary pending={pending} submit>{replace ? 'Replace' : 'Remove'}</PendingButton>
       </div>
     </>
   );

@@ -21,17 +21,21 @@ export const RQM_CODE_MAX_LENGTH = 64;
 /** Four parts: the NTP's request number, not a batch code. */
 const RQM_REQUEST_NUMBER_PATTERN = /^RQM\d+-\d{4}-[A-Z]+-\d+$/;
 
-// U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash, U+2013 en dash,
-// U+2014 em dash, U+2212 minus. A real NTP prints codes with U+2010.
-const UNICODE_DASHES = /[‐-—−]/g;
+// U+2010 hyphen through U+2015 horizontal bar (incl. non-breaking hyphen, figure,
+// en and em dash), U+2212 minus, U+FF0D fullwidth hyphen-minus. A real NTP
+// prints codes with U+2010.
+const UNICODE_DASHES = /[‐-―−－]/g;
+// Soft hyphen and zero-width space / non-joiner / joiner / BOM.
+const INVISIBLES = /[­​-‍﻿]/g;
 
-/** Upper-cases, folds Unicode dashes to `-`, drops soft hyphens and all whitespace (incl. NBSP). */
+/** Upper-cases, drops invisible characters, folds Unicode dashes to `-`. Keeps whitespace. */
+function foldCode(input: string): string {
+  return input.toUpperCase().replace(INVISIBLES, '').replace(UNICODE_DASHES, '-');
+}
+
+/** Upper-cases, folds Unicode dashes to `-`, drops soft hyphens, zero-width characters and all whitespace (incl. NBSP). */
 export function normalizeRqmCode(input: string): string {
-  return input
-    .toUpperCase()
-    .replace(/­/g, '')
-    .replace(UNICODE_DASHES, '-')
-    .replace(/\s+/g, '');
+  return foldCode(input).replace(/\s+/g, '');
 }
 
 export type RqmCheck =
@@ -58,7 +62,9 @@ export function checkRqmCode(
     warnings.push(`The code's program (${program}) differs from this batch's program (${batchProgram}).`);
   }
   const providerCode = ctx.providerCode?.trim();
-  if (providerCode && provider !== providerCode) {
+  // Numerically equal values (01263 vs 1263) are the same provider.
+  const bare = (v: string) => v.toUpperCase().replace(/^0+(?=.)/, '');
+  if (providerCode && bare(provider) !== bare(providerCode)) {
     warnings.push(`The code's provider number (${provider}) differs from this school's TESDA provider code (${providerCode}).`);
   }
   return { ok: true, code, warnings };
@@ -66,14 +72,20 @@ export function checkRqmCode(
 
 /**
  * Normalized five-part codes anywhere in free text, de-duplicated, in order of
- * first appearance. Four-part request numbers are never returned. Folds dashes
- * but, unlike `normalizeRqmCode`, keeps whitespace so neighbouring words survive.
+ * first appearance. Four-part request numbers and six-part values are never
+ * returned, nor is a code glued to letters, digits or another code. Tolerates
+ * what `checkRqmCode` tolerates: whitespace around a hyphen, including a line
+ * break after it (PDF extraction). Only whitespace inside a candidate is
+ * allowed, so neighbouring words are never joined.
  */
 export function findRqmCodes(text: string): string[] {
-  const folded = text.toUpperCase().replace(/­/g, '').replace(UNICODE_DASHES, '-');
-  // Lookarounds: not glued to a longer token, and not the prefix of a six-part value.
-  const matches = folded.matchAll(/(?<![A-Z0-9-])RQM\d+-\d{4}-[A-Z]+-\d+-\d+(?!-?\d)/g);
-  return [...new Set([...matches].map((m) => m[0]))];
+  const H = String.raw`\s*-\s*`;
+  const pattern = new RegExp(
+    String.raw`(?<![A-Z0-9-])RQM\d+${H}\d{4}${H}[A-Z]+${H}\d+${H}\d+(?![A-Z0-9]|-\d)`,
+    'g',
+  );
+  const matches = foldCode(text).matchAll(pattern);
+  return [...new Set([...matches].map((m) => normalizeRqmCode(m[0])))];
 }
 
 /** What the set-RQM-code action hands back to `RqmCodeEditor`. Types only. */
