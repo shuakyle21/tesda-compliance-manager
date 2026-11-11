@@ -88,6 +88,44 @@ export function findRqmCodes(text: string): string[] {
   return [...new Set([...matches].map((m) => normalizeRqmCode(m[0])))];
 }
 
+/** Codes recorded on every batch other than `batchId`. */
+export function takenRqmCodes(batches: readonly Pick<Batch, 'id' | 'rqmCode'>[], batchId: string): string[] {
+  return batches.flatMap((b) => (b.id !== batchId && b.rqmCode ? [b.rqmCode] : []));
+}
+
+export type NtpReadResult =
+  | { ok: true; text: string }
+  | { ok: false; reason: 'unreadable' | 'no-text' | 'too-large' | 'not-pdf' };
+
+export type NtpOption = { code: string; mark: 'current' | 'taken' | null; disabled: boolean };
+
+export type NtpOutcome = { kind: 'options'; options: NtpOption[] } | { kind: 'message'; message: string };
+
+const NTP_FAILURE_MESSAGE = {
+  'no-text': 'This PDF has no readable text (it may be a scan). Type the code from the document.',
+  unreadable: "This PDF couldn't be read. Type the code from the document.",
+  'too-large': 'This file is too large to read.',
+  'not-pdf': 'Choose a PDF file.',
+} as const;
+
+/**
+ * What to show after reading an NTP PDF: a message, or the codes to choose from.
+ * A code on another batch is disabled; this batch's own current code is only marked.
+ */
+export function ntpReadOutcome(result: NtpReadResult, currentCode: string | null, takenCodes: readonly string[] = []): NtpOutcome {
+  if (!result.ok) return { kind: 'message', message: NTP_FAILURE_MESSAGE[result.reason] };
+  const codes = findRqmCodes(result.text);
+  if (codes.length === 0) return { kind: 'message', message: 'No RQM code was found in this PDF. Type the code from the document.' };
+  const taken = new Set(takenCodes);
+  return {
+    kind: 'options',
+    options: codes.map((code) => {
+      if (code === currentCode) return { code, mark: 'current', disabled: false };
+      return taken.has(code) ? { code, mark: 'taken', disabled: true } : { code, mark: null, disabled: false };
+    }),
+  };
+}
+
 /** What the set-RQM-code action hands back to `RqmCodeEditor`. Types only. */
 export type RqmFormState =
   | { status: 'idle' }

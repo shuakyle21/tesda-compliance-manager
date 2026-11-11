@@ -12,6 +12,7 @@
 import { useMemo, useState } from 'react';
 import { BatchCard } from '@/modules/batches/ui/BatchCard';
 import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
+import { takenRqmCodes } from '@/modules/batches/domain/rqm';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
@@ -55,7 +56,7 @@ export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; lo
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit} />}
+      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit && { ...rqmEdit, takenCodes: takenRqmCodes(batches, open.id) }} />}
     </div>
   );
 }

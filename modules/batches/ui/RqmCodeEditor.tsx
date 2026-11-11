@@ -10,7 +10,8 @@
 
 import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/shared/ui/Icon';
-import { normalizeRqmCode, type RqmFormState } from '@/modules/batches/domain/rqm';
+import { normalizeRqmCode, ntpReadOutcome, type NtpOutcome, type RqmFormState } from '@/modules/batches/domain/rqm';
+import { readPdfText } from '@/modules/batches/ui/ntpPdfText';
 import type { Batch } from '@/shared/types';
 
 type Mode = 'view' | 'edit' | 'confirm-replace' | 'confirm-remove';
@@ -33,9 +34,12 @@ export function RqmCodeEditor({
   batch,
   tenantCode,
   action,
+  takenCodes,
 }: {
   batch: Pick<Batch, 'id' | 'rqmCode' | 'program'>;
   tenantCode: string;
+  /** Codes already recorded on other batches of this school. */
+  takenCodes?: string[];
   action: (previous: RqmFormState, formData: FormData) => Promise<RqmFormState>;
 }) {
   const [state, formAction, pending] = useActionState(action, IDLE);
@@ -48,6 +52,7 @@ export function RqmCodeEditor({
   // Shown only while the form that produced it is open; leaving edit mode clears it.
   const [message, setMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const pdf = useNtpPdf(current, takenCodes, setDraft);
   const id = useId();
 
   const next = normalizeRqmCode(draft);
@@ -63,7 +68,13 @@ export function RqmCodeEditor({
 
   function go(to: Mode) {
     setMessage(null);
+    if (to === 'view') pdf.clear();
     setMode(to);
+  }
+
+  function typeDraft(value: string) {
+    setDraft(value);
+    pdf.markManual();
   }
 
   function open() {
@@ -84,7 +95,7 @@ export function RqmCodeEditor({
       <input type="hidden" name="tenantCode" value={tenantCode} />
       <input type="hidden" name="batchCode" value={batch.id} />
       <input type="hidden" name="expectedPrevious" value={current ?? ''} />
-      <input type="hidden" name="source" value="manual" />
+      <input type="hidden" name="source" value={pdf.source} />
 
       {mode === 'view' && (
         <div style={ROW}>
@@ -97,7 +108,12 @@ export function RqmCodeEditor({
 
       {mode === 'edit' && (
         <>
-          <EditField id={id} draft={draft} onDraft={setDraft} onEnter={() => !pending && save()} pending={pending} invalid={message !== null} />
+          <EditField id={id} draft={draft} onDraft={typeDraft} onEnter={() => !pending && save()} pending={pending} invalid={message !== null} />
+          <NtpReader
+            id={id}
+            pdf={pdf}
+            disabled={pending}
+          />
           <div style={ROW}>
             <PendingButton primary pending={pending} onClick={save}>Save</PendingButton>
             <button type="button" className="btn ghost" style={SMALL} disabled={pending} onClick={() => go('view')}>Cancel</button>
@@ -130,6 +146,109 @@ export function RqmCodeEditor({
     </form>
   );
 }
+
+/** State for the "Read from NTP PDF" flow. Nothing is chosen or saved until the user acts. */
+function useNtpPdf(current: string | null, takenCodes: string[] | undefined, setDraft: (code: string) => void) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [source, setSource] = useState<'manual' | 'ntp-pdf'>('manual');
+  const [reading, setReading] = useState(false);
+  const [outcome, setOutcome] = useState<NtpOutcome | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+
+  return {
+    fileRef,
+    source,
+    reading,
+    outcome,
+    picked,
+    markManual: () => setSource('manual'),
+    clear() {
+      setOutcome(null);
+      setPicked(null);
+      setSource('manual');
+      if (fileRef.current) fileRef.current.value = '';
+    },
+    async read(file: File | undefined) {
+      if (!file) return;
+      setReading(true);
+      setPicked(null);
+      setOutcome(ntpReadOutcome(await readPdfText(file), current, takenCodes));
+      setReading(false);
+    },
+    pick(code: string) {
+      setPicked(code);
+      setDraft(code);
+      setSource('ntp-pdf');
+    },
+  };
+}
+
+function NtpReader({ id, pdf, disabled }: { id: string; pdf: ReturnType<typeof useNtpPdf>; disabled: boolean }) {
+  const { fileRef, reading, outcome, picked } = pdf;
+  const onFile = pdf.read;
+  const onPick = pdf.pick;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={ROW}>
+        <input
+          ref={fileRef}
+          id={`${id}-pdf`}
+          type="file"
+          accept="application/pdf,.pdf"
+          tabIndex={-1}
+          style={HIDDEN}
+          disabled={disabled || reading}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = '';
+            onFile(file);
+          }}
+        />
+        <label htmlFor={`${id}-pdf`} style={HIDDEN}>Notice to Proceed PDF</label>
+        <PendingButton pending={reading} onClick={() => fileRef.current?.click()}>Read from NTP PDF</PendingButton>
+        <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Read on this device. The file is not uploaded.</span>
+      </div>
+      <span role="status" aria-live="polite" style={reading ? undefined : HIDDEN}>{reading ? 'Reading the PDF…' : ''}</span>
+      {outcome?.kind === 'message' && (
+        <p className="user-form-error" role="alert">
+          <Icon name="alert-circle" size={14} />
+          <span>{outcome.message}</span>
+        </p>
+      )}
+      {outcome?.kind === 'options' && (
+        <fieldset style={{ border: 0, margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <legend style={{ fontSize: 12, fontWeight: 600, padding: 0, marginBottom: 4 }}>RQM codes found in this PDF</legend>
+          {outcome.options.map((o) => (
+            <label key={o.code} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+              <input
+                type="radio"
+                name={`${id}-ntp`}
+                checked={picked === o.code}
+                disabled={o.disabled || disabled}
+                onChange={() => onPick(o.code)}
+              />
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{o.code}</span>
+              {o.mark && (
+                <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
+                  {o.mark === 'taken' ? 'already on another batch' : 'current'}
+                </span>
+              )}
+            </label>
+          ))}
+        </fieldset>
+      )}
+    </div>
+  );
+}
+
+const HIDDEN = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+} as const;
 
 const ROW = { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } as const;
 

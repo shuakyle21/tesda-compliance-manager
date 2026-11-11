@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { checkRqmCode, findRqmCodes, normalizeRqmCode } from '@/modules/batches/domain/rqm';
+import { checkRqmCode, findRqmCodes, normalizeRqmCode, ntpReadOutcome } from '@/modules/batches/domain/rqm';
 import { setBatchRqmCode } from '@/modules/batches/data/batches';
 
 const { selectMock, isMock, eqMock } = vi.hoisted(() => ({
@@ -170,5 +170,48 @@ describe('setBatchRqmCode', () => {
     const result = await setBatchRqmCode(args);
     expect(result).toEqual({ status: 'sync-failed' });
     expect(JSON.stringify(result)).not.toContain('raw detail');
+  });
+});
+
+describe('ntpReadOutcome', () => {
+  const A = 'RQM3-2026-CFSP-0000-0001';
+  const B = 'RQM3-2026-CFSP-0000-0002';
+  const C = 'RQM3-2026-CFSP-0000-0003';
+  const read = (text: string) => ({ ok: true as const, text });
+
+  it('says so when the text holds no five-part code', () => {
+    expect(ntpReadOutcome(read('Request RQM3-2026-CFSP-12 only'), null)).toEqual({
+      kind: 'message',
+      message: 'No RQM code was found in this PDF. Type the code from the document.',
+    });
+  });
+  it('offers one code', () => {
+    expect(ntpReadOutcome(read(`1 ${A} Course`), null)).toEqual({ kind: 'options', options: [{ code: A, mark: null, disabled: false }] });
+  });
+  it('keeps several codes in document order', () => {
+    const out = ntpReadOutcome(read(`${B} x ${A} y ${C}`), null);
+    expect(out.kind === 'options' && out.options.map((o) => o.code)).toEqual([B, A, C]);
+  });
+  it('marks and disables a code taken by another batch', () => {
+    const out = ntpReadOutcome(read(`${A} ${B}`), null, [B]);
+    expect(out).toEqual({
+      kind: 'options',
+      options: [{ code: A, mark: null, disabled: false }, { code: B, mark: 'taken', disabled: true }],
+    });
+  });
+  it("marks this batch's current code without disabling it", () => {
+    const out = ntpReadOutcome(read(`${A} ${B}`), A, [A, B]);
+    expect(out).toEqual({
+      kind: 'options',
+      options: [{ code: A, mark: 'current', disabled: false }, { code: B, mark: 'taken', disabled: true }],
+    });
+  });
+  it.each([
+    ['no-text', 'This PDF has no readable text (it may be a scan). Type the code from the document.'],
+    ['unreadable', "This PDF couldn't be read. Type the code from the document."],
+    ['too-large', 'This file is too large to read.'],
+    ['not-pdf', 'Choose a PDF file.'],
+  ] as const)('maps %s to its message', (reason, message) => {
+    expect(ntpReadOutcome({ ok: false, reason }, null)).toEqual({ kind: 'message', message });
   });
 });

@@ -30,6 +30,8 @@ import type { Batch, LifecycleStage } from '@/shared/types';
 export type RqmEdit = {
   tenantCode: string;
   action: (previous: RqmFormState, formData: FormData) => Promise<RqmFormState>;
+  /** RQM codes already recorded on the school's other batches. */
+  takenCodes?: string[];
 };
 
 type BatchPropRow = { label: string; icon: IconName; value: ReactNode };
@@ -141,7 +143,7 @@ function BatchScholarsGrid({ batch }: { batch: Batch }) {
 
 function withRqmRow(rows: BatchPropRow[], batch: Batch, rqmEdit?: RqmEdit): BatchPropRow[] {
   if (!rqmEdit) return rows;
-  const value = <RqmCodeEditor batch={batch} tenantCode={rqmEdit.tenantCode} action={rqmEdit.action} />;
+  const value = <RqmCodeEditor batch={batch} tenantCode={rqmEdit.tenantCode} action={rqmEdit.action} takenCodes={rqmEdit.takenCodes} />;
   return [{ label: 'RQM code', icon: 'file-invoice', value }, ...rows];
 }
 

@@ -14,6 +14,7 @@ import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
+import { takenRqmCodes } from '@/modules/batches/domain/rqm';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
@@ -92,7 +93,7 @@ export function TableView({
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit} />}
+      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit && { ...rqmEdit, takenCodes: takenRqmCodes(batches, open.id) }} />}
     </div>
   );
 }
