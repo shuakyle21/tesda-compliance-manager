@@ -82,6 +82,7 @@ export interface Tenant {
   streetAddress: string;
   providerType: string;
   providerClassification: string;
+  congressionalDistrict: string;
 }
 
 export type UserRole = 'owner' | 'admin' | 'coordinator' | 'trainer' | 'viewer';
@@ -122,6 +123,8 @@ export interface ScholarRow {
   lastName: string;
   firstName: string;
   middleInit: string;
+  /** Full middle name, as the T2MIS sheet wants it; `middleInit` is the display initial. */
+  middleName: string;
   extName: string;
   uli: string;
   sex: string;
@@ -146,6 +149,29 @@ export interface ScholarRow {
   employer: string;
   empClassification: string;
   salary: string;
+  // T2MIS terminal-report fields (migration 20261111120000). '' = not recorded.
+  // Dates on this type are ISO `YYYY-MM-DD`; the export formats them.
+  streetAddress: string;
+  barangay: string;
+  cityMunicipality: string;
+  district: string;
+  province: string;
+  voucherNumber: string;
+  employerAddress: string;
+}
+
+/**
+ * Facts about a batch that only the T2MIS export reads. They belong to the
+ * qualification as registered at this school (`tenant_qualifications`), reached
+ * through `batches.tenant_qualification_id`. '' = not recorded.
+ */
+export interface BatchT2misFacts {
+  sector: string;
+  registrationStatus: string;
+  cluster: string;
+  ctpr: string;
+  trainingCalendarCode: string;
+  deliveryMode: string;
 }
 
 export interface Competency {
@@ -221,6 +247,7 @@ export interface Batch {
   followUpReportDate?: string;
   followUpDue?: string | null;
   scholars_list?: ScholarRow[];
+  t2mis?: BatchT2misFacts;
   egace?: EgaceCounts;
   employmentFollowUp?: EmploymentFollowUp | null;
   competencies?: Competency[];

@@ -28,6 +28,7 @@ const TENANT: Tenant = {
   streetAddress: '',
   providerType: '',
   providerClassification: '',
+  congressionalDistrict: '',
   color: '',
   plan: '',
   activeBatches: 0,

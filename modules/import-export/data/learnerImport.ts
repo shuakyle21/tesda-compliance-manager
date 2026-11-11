@@ -84,6 +84,7 @@ async function insertLearners(
     middle_name: row.middleName,
     extension_name: row.extensionName,
     assessment_result: row.assessmentResult,
+    ...row.details,
   }));
   const { error } = await supabase.from('learners').insert(inserts);
   return error ? error.message : null;
@@ -102,6 +103,9 @@ async function updateLearners(supabase: SupabaseServerClient, toUpdate: Reconcil
       middle_name: row.middleName,
       extension_name: row.extensionName,
       assessment_result: row.assessmentResult,
+      // Only the cells the file actually filled: re-importing a names-only
+      // CSV must not blank details an earlier T2MIS import recorded.
+      ...row.details,
     };
     const { error } = await supabase.from('learners').update(update).eq('id', existingId as string);
     if (error) return error.message;

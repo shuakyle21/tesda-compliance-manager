@@ -21,7 +21,8 @@ import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase
 import type { Database } from '@/lib/supabase/database.types';
 import type { SchoolCommand } from '@/modules/tenancy/domain/schoolDraft';
 
-type QualificationRow = Database['public']['Tables']['qualifications']['Row'];
+// `cluster` (migration 20261111120000) is not selected by `listQualifications`.
+type QualificationRow = Omit<Database['public']['Tables']['qualifications']['Row'], 'cluster'>;
 
 const RLS_VIOLATION = '42501';
 const UNIQUE_VIOLATION = '23505';

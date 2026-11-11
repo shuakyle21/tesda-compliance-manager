@@ -15,6 +15,12 @@
  * `current_user_is_platform_admin`'s `Args` stays `Record<string, never>`
  * rather than the generator's `never`, matching this file's existing style.
  *
+ * The T2MIS columns (`tenants.congressional_district`, `qualifications.cluster`,
+ * `batches.training_calendar_code` / `.tenant_qualification_id`, and the 23
+ * learner demographic/employment columns) were written by hand from
+ * `supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql`,
+ * which is NOT YET APPLIED. Regenerate and re-check once it is.
+ *
  * NOTE FOR A FUTURE CLEANUP: this file is hand-maintained and stubs every
  * table's `Relationships` as `[]`. That stub is what makes supabase-js unable
  * to infer embedded joins, which is the root of the four long-standing TS2352
@@ -69,6 +75,7 @@ export interface Database {
           street_address: string | null;
           provider_type: string | null;
           provider_classification: string | null;
+          congressional_district: string | null;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -85,6 +92,7 @@ export interface Database {
           street_address?: string | null;
           provider_type?: string | null;
           provider_classification?: string | null;
+          congressional_district?: string | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -155,6 +163,7 @@ export interface Database {
           title: string;
           nc_level: string | null;
           sector: string | null;
+          cluster: string | null;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -165,6 +174,7 @@ export interface Database {
           title: string;
           nc_level?: string | null;
           sector?: string | null;
+          cluster?: string | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -292,6 +302,8 @@ export interface Database {
           end_date: string | null;
           billing_deadline: string | null;
           total_sessions: number | null;
+          training_calendar_code: string | null;
+          tenant_qualification_id: string | null;
           current_stage: LifecycleStage;
           status: BatchStatus;
           progress_percent: number;
@@ -317,6 +329,8 @@ export interface Database {
           end_date?: string | null;
           billing_deadline?: string | null;
           total_sessions?: number | null;
+          training_calendar_code?: string | null;
+          tenant_qualification_id?: string | null;
           current_stage?: LifecycleStage;
           status?: BatchStatus;
           progress_percent?: number;
@@ -341,6 +355,29 @@ export interface Database {
           first_name: string;
           middle_name: string | null;
           extension_name: string | null;
+          contact_number: string | null;
+          email: string | null;
+          street_address: string | null;
+          barangay: string | null;
+          city_municipality: string | null;
+          district: string | null;
+          province: string | null;
+          sex: string | null;
+          date_of_birth: string | null;
+          civil_status: string | null;
+          highest_grade_completed: string | null;
+          nationality: string | null;
+          client_classification: string | null;
+          training_status: string | null;
+          voucher_number: string | null;
+          date_assessed: string | null;
+          employment_status_before: string | null;
+          date_employed: string | null;
+          occupation: string | null;
+          employer_name: string | null;
+          employer_address: string | null;
+          employer_classification: string | null;
+          salary_range: string | null;
           assessment_result: AssessmentResult;
           is_active: boolean;
           created_at: string;
@@ -356,6 +393,29 @@ export interface Database {
           first_name: string;
           middle_name?: string | null;
           extension_name?: string | null;
+          contact_number?: string | null;
+          email?: string | null;
+          street_address?: string | null;
+          barangay?: string | null;
+          city_municipality?: string | null;
+          district?: string | null;
+          province?: string | null;
+          sex?: string | null;
+          date_of_birth?: string | null;
+          civil_status?: string | null;
+          highest_grade_completed?: string | null;
+          nationality?: string | null;
+          client_classification?: string | null;
+          training_status?: string | null;
+          voucher_number?: string | null;
+          date_assessed?: string | null;
+          employment_status_before?: string | null;
+          date_employed?: string | null;
+          occupation?: string | null;
+          employer_name?: string | null;
+          employer_address?: string | null;
+          employer_classification?: string | null;
+          salary_range?: string | null;
           assessment_result?: AssessmentResult;
           is_active?: boolean;
           created_at?: string;

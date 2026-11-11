@@ -34,7 +34,7 @@ function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
 
 function fixtureScholar(overrides: Partial<ScholarRow> = {}): ScholarRow {
   return {
-    seq: 1, lastName: 'Dela Cruz', firstName: 'Juan', middleInit: 'P', extName: '',
+    seq: 1, lastName: 'Dela Cruz', firstName: 'Juan', middleInit: 'P', middleName: 'Perez', extName: '',
     uli: 'ULI-0001', sex: 'M', dob: '1998-01-01', age: 28, civilStatus: 'Single',
     education: 'High School Graduate', nationality: 'Filipino', clientClass: 'Farmer',
     scholarshipType: 'TWSP', contact: '09170000000', email: 'juan@example.ph',
@@ -43,6 +43,8 @@ function fixtureScholar(overrides: Partial<ScholarRow> = {}): ScholarRow {
     empStatusBefore: ES.unemployed, employmentStatus: ES.wage,
     dateEmployed: 'Jul 1', occupation: 'Farm Technician', employer: 'Coop',
     empClassification: 'Regular', salary: '15000',
+    streetAddress: '', barangay: '', cityMunicipality: '', district: '', province: '',
+    voucherNumber: '', employerAddress: '',
     ...overrides,
   };
 }

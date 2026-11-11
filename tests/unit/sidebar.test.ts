@@ -49,6 +49,7 @@ const TENANT_FIXTURE: Tenant = {
   streetAddress: '',
   providerType: '',
   providerClassification: '',
+  congressionalDistrict: '',
   color: '',
   plan: '',
   activeBatches: 0,

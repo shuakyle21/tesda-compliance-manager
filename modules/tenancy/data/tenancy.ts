@@ -64,6 +64,7 @@ function mapTenantRow(row: TenantRow): Tenant {
     streetAddress: row.street_address ?? '',
     providerType: row.provider_type ?? '',
     providerClassification: row.provider_classification ?? '',
+    congressionalDistrict: row.congressional_district ?? '',
     // TODO(contract): no DB columns for these — UI-only decoration/rollups
     // the seed mock invents. Defaulted so the shape stays valid.
     color: '',

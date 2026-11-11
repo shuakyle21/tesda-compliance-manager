@@ -174,3 +174,18 @@ remain hardcoded there because they are facts about *the qualification at that s
 
 **Open.** Whether school admins should maintain their own program list (P7) — one additional
 policy if so.
+
+## Amendment — batch → qualification link (TES-49, 2026-11-11)
+
+Migration `20261111120000_add_t2mis_terminal_report_fields.sql` adds a nullable
+`batches.tenant_qualification_id` → `tenant_qualifications`. It closes the gap named under
+"Unblocked" above: the T2MIS export now reads industry sector, registration status, CTPR
+(`copr_number`), delivery mode and cluster through that link instead of hardcoding them, and
+writes a blank cell where a batch is not linked. `batches.qualification_title` is unchanged and
+remains the display title. Nothing sets the link yet — no screen writes it and existing batches
+are not backfilled, because matching free-text titles to registry rows would be a guess.
+
+The same migration adds the learner demographic, training and employment columns of the T2MIS
+terminal report to `learners` (tenant-scoped, existing RLS), not to the global
+`learner_identities`, which stays unused per ADR-001. The layout is
+`modules/import-export/domain/t2mis.ts`.
