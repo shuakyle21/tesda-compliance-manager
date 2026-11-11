@@ -93,13 +93,44 @@ export function takenRqmCodes(batches: readonly Pick<Batch, 'id' | 'rqmCode'>[],
   return batches.flatMap((b) => (b.id !== batchId && b.rqmCode ? [b.rqmCode] : []));
 }
 
+/** One pdf.js text item reduced to what joining needs (x, y = its transform origin). */
+export type PdfTextPiece = { str: string; x: number; y: number; width: number; height: number; hasEOL: boolean };
+
+/**
+ * Joins pdf.js text items by geometry, not with a fixed separator: pdf.js may
+ * split one word into several items (no gap), while table cells sit apart (gap).
+ * Gluing cells would break a code; spacing a split word would truncate it.
+ */
+export function joinPdfTextItems(items: readonly PdfTextPiece[]): string {
+  let out = '';
+  let prev: PdfTextPiece | null = null;
+  for (const it of items) {
+    if (!it.str) continue;
+    if (!it.str.trim()) {
+      if (out && !/\s$/.test(out)) out += ' ';
+      continue;
+    }
+    if (prev) {
+      const scale = Math.max(it.height, prev.height, 1);
+      if (prev.hasEOL || Math.abs(it.y - prev.y) > 0.5 * scale) out += '\n';
+      // 0.15: measured on a real NTP, touching pieces sit at ~0, word spaces at 0.27 and table cells at 2.67+ of the text height.
+      else if (it.x - (prev.x + prev.width) > 0.15 * scale && !/\s$/.test(out)) out += ' ';
+    }
+    out += it.str;
+    prev = it;
+  }
+  return out;
+}
+
 export type NtpReadResult =
-  | { ok: true; text: string }
+  | { ok: true; text: string; /** The PDF had more pages than were read. */ truncated?: boolean }
   | { ok: false; reason: 'unreadable' | 'no-text' | 'too-large' | 'not-pdf' };
 
 export type NtpOption = { code: string; mark: 'current' | 'taken' | null; disabled: boolean };
 
-export type NtpOutcome = { kind: 'options'; options: NtpOption[] } | { kind: 'message'; message: string };
+export type NtpOutcome = ({ kind: 'options'; options: NtpOption[] } | { kind: 'message'; message: string }) & {
+  truncated?: boolean;
+};
 
 const NTP_FAILURE_MESSAGE = {
   'no-text': 'This PDF has no readable text (it may be a scan). Type the code from the document.',
@@ -113,6 +144,11 @@ const NTP_FAILURE_MESSAGE = {
  * A code on another batch is disabled; this batch's own current code is only marked.
  */
 export function ntpReadOutcome(result: NtpReadResult, currentCode: string | null, takenCodes: readonly string[] = []): NtpOutcome {
+  const outcome = ntpOutcomeFor(result, currentCode, takenCodes);
+  return result.ok && result.truncated ? { ...outcome, truncated: true } : outcome;
+}
+
+function ntpOutcomeFor(result: NtpReadResult, currentCode: string | null, takenCodes: readonly string[]): NtpOutcome {
   if (!result.ok) return { kind: 'message', message: NTP_FAILURE_MESSAGE[result.reason] };
   const codes = findRqmCodes(result.text);
   if (codes.length === 0) return { kind: 'message', message: 'No RQM code was found in this PDF. Type the code from the document.' };

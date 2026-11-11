@@ -25,6 +25,11 @@ function modeAfter(state: RqmFormState, mode: Mode): Mode {
   return state.status === 'idle' ? mode : 'edit';
 }
 
+/** 'ntp-pdf' only for a code picked from the list and left untouched; empty or edited is 'manual'. */
+function submittedSource(submitted: string, picked: string | null): 'manual' | 'ntp-pdf' {
+  return submitted !== '' && submitted === picked ? 'ntp-pdf' : 'manual';
+}
+
 function failureMessage(state: RqmFormState): string | null {
   if (state.status === 'invalid' || state.status === 'error') return state.message;
   return state.status === 'denied' ? "You don't have permission to change this." : null;
@@ -42,7 +47,6 @@ export function RqmCodeEditor({
   takenCodes?: string[];
   action: (previous: RqmFormState, formData: FormData) => Promise<RqmFormState>;
 }) {
-  const [state, formAction, pending] = useActionState(action, IDLE);
   const [mode, setMode] = useState<Mode>('view');
   const [draft, setDraft] = useState('');
   const [seen, setSeen] = useState<RqmFormState>(IDLE);
@@ -53,9 +57,17 @@ export function RqmCodeEditor({
   const [message, setMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const pdf = useNtpPdf(current, takenCodes, setDraft);
+  const { clear: clearPdf } = pdf;
+  const [state, formAction, pending] = useActionState(async (previous: RqmFormState, formData: FormData) => {
+    const result = await action(previous, formData);
+    // The stored code changed: a stale code list and its "current" marker must not come back.
+    if (result.status === 'saved') clearPdf();
+    return result;
+  }, IDLE);
   const id = useId();
 
   const next = normalizeRqmCode(draft);
+  const source = submittedSource(mode === 'confirm-remove' ? '' : draft, pdf.picked);
 
   // Derive state from a new action result during render (guarded by the
   // comparison), the pattern React documents instead of an effect.
@@ -70,11 +82,6 @@ export function RqmCodeEditor({
     setMessage(null);
     if (to === 'view') pdf.clear();
     setMode(to);
-  }
-
-  function typeDraft(value: string) {
-    setDraft(value);
-    pdf.markManual();
   }
 
   function open() {
@@ -95,7 +102,7 @@ export function RqmCodeEditor({
       <input type="hidden" name="tenantCode" value={tenantCode} />
       <input type="hidden" name="batchCode" value={batch.id} />
       <input type="hidden" name="expectedPrevious" value={current ?? ''} />
-      <input type="hidden" name="source" value={pdf.source} />
+      <input type="hidden" name="source" value={source} />
 
       {mode === 'view' && (
         <div style={ROW}>
@@ -108,14 +115,15 @@ export function RqmCodeEditor({
 
       {mode === 'edit' && (
         <>
-          <EditField id={id} draft={draft} onDraft={typeDraft} onEnter={() => !pending && save()} pending={pending} invalid={message !== null} />
+          <EditField id={id} draft={draft} onDraft={setDraft} onEnter={() => !pending && !pdf.reading && save()} pending={pending} invalid={message !== null} />
           <NtpReader
             id={id}
             pdf={pdf}
             disabled={pending}
           />
           <div style={ROW}>
-            <PendingButton primary pending={pending} onClick={save}>Save</PendingButton>
+            {/* A read in flight may be about to change the field, so Save waits for it. */}
+            <PendingButton primary pending={pending} disabled={pdf.reading} onClick={save}>Save</PendingButton>
             <button type="button" className="btn ghost" style={SMALL} disabled={pending} onClick={() => go('view')}>Cancel</button>
             {current && (
               <button type="button" className="btn" style={SMALL} disabled={pending} onClick={() => go('confirm-remove')}>Remove code</button>
@@ -135,6 +143,14 @@ export function RqmCodeEditor({
         />
       )}
 
+      <Feedback id={id} mode={mode} message={message} state={state} />
+    </form>
+  );
+}
+
+function Feedback({ id, mode, message, state }: { id: string; mode: Mode; message: string | null; state: RqmFormState }) {
+  return (
+    <>
       {message && mode !== 'view' && (
         <p className="user-form-error" id={`${id}-error`} role="alert">
           <Icon name="alert-circle" size={14} />
@@ -143,42 +159,45 @@ export function RqmCodeEditor({
       )}
 
       {mode === 'view' && state.status === 'saved' && <SavedNote warnings={state.warnings} logFailed={state.logFailed} />}
-    </form>
+    </>
   );
 }
 
 /** State for the "Read from NTP PDF" flow. Nothing is chosen or saved until the user acts. */
 function useNtpPdf(current: string | null, takenCodes: string[] | undefined, setDraft: (code: string) => void) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [source, setSource] = useState<'manual' | 'ntp-pdf'>('manual');
   const [reading, setReading] = useState(false);
   const [outcome, setOutcome] = useState<NtpOutcome | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
+  // Latest-read-wins: clear, a newer read and unmount all bump it, so a slower read is ignored.
+  const latest = useRef(0);
+  useEffect(() => () => void latest.current++, []);
 
   return {
     fileRef,
-    source,
     reading,
     outcome,
     picked,
-    markManual: () => setSource('manual'),
     clear() {
+      latest.current++;
+      setReading(false);
       setOutcome(null);
       setPicked(null);
-      setSource('manual');
       if (fileRef.current) fileRef.current.value = '';
     },
     async read(file: File | undefined) {
       if (!file) return;
+      const mine = ++latest.current;
       setReading(true);
       setPicked(null);
-      setOutcome(ntpReadOutcome(await readPdfText(file), current, takenCodes));
+      const result = await readPdfText(file);
+      if (mine !== latest.current) return;
+      setOutcome(ntpReadOutcome(result, current, takenCodes));
       setReading(false);
     },
     pick(code: string) {
       setPicked(code);
       setDraft(code);
-      setSource('ntp-pdf');
     },
   };
 }
@@ -237,6 +256,7 @@ function NtpReader({ id, pdf, disabled }: { id: string; pdf: ReturnType<typeof u
           ))}
         </fieldset>
       )}
+      {outcome?.truncated && <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Only the first 50 pages were read.</span>}
     </div>
   );
 }
@@ -254,12 +274,14 @@ const ROW = { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } 
 
 function PendingButton({
   pending,
+  disabled,
   primary,
   submit,
   onClick,
   children,
 }: {
   pending: boolean;
+  disabled?: boolean;
   primary?: boolean;
   submit?: boolean;
   onClick?: () => void;
@@ -270,7 +292,7 @@ function PendingButton({
       type={submit ? 'submit' : 'button'}
       className={`btn${primary ? ' primary' : ''}${pending ? ' loading' : ''}`}
       style={SMALL}
-      disabled={pending}
+      disabled={pending || disabled}
       aria-busy={pending}
       onClick={onClick}
     >

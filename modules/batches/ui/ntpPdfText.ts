@@ -1,11 +1,12 @@
 // Browser-only: reads the text of an NTP PDF on the user's device. The file is never uploaded.
 import { EVIDENCE_MAX_BYTES } from '@/modules/documents/domain/evidencePath';
-import type { NtpReadResult } from '@/modules/batches/domain/rqm';
+import { joinPdfTextItems, type NtpReadResult, type PdfTextPiece } from '@/modules/batches/domain/rqm';
 
 const MAX_PAGES = 50;
 
 export async function readPdfText(file: File): Promise<NtpReadResult> {
-  const isPdf = file.type ? file.type.toLowerCase() === 'application/pdf' : /\.pdf$/i.test(file.name);
+  // Browsers often leave the type empty or generic; pdf.js rejects non-PDF bytes ('unreadable').
+  const isPdf = file.type.toLowerCase() === 'application/pdf' || /\.pdf$/i.test(file.name);
   if (!isPdf) return { ok: false, reason: 'not-pdf' };
   if (file.size > EVIDENCE_MAX_BYTES) return { ok: false, reason: 'too-large' };
 
@@ -20,10 +21,16 @@ export async function readPdfText(file: File): Promise<NtpReadResult> {
     const pages: string[] = [];
     for (let n = 1; n <= Math.min(pdf.numPages, MAX_PAGES); n++) {
       const content = await (await pdf.getPage(n)).getTextContent();
-      pages.push(content.items.map((item) => ('str' in item ? item.str : '')).join(' '));
+      const pieces: PdfTextPiece[] = [];
+      for (const item of content.items) {
+        if (!('str' in item)) continue; // marked-content items carry no text
+        pieces.push({ str: item.str, x: item.transform[4], y: item.transform[5], width: item.width, height: item.height, hasEOL: item.hasEOL });
+      }
+      pages.push(joinPdfTextItems(pieces));
     }
     const text = pages.join('\n');
-    return text.trim() ? { ok: true, text } : { ok: false, reason: 'no-text' };
+    if (!text.trim()) return { ok: false, reason: 'no-text' };
+    return pdf.numPages > MAX_PAGES ? { ok: true, text, truncated: true } : { ok: true, text };
   } catch {
     return { ok: false, reason: 'unreadable' };
   } finally {
