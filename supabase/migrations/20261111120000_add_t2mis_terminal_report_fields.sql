@@ -1,6 +1,9 @@
 -- T2MIS terminal-report fields (TES-49, export half of TES-15).
 --
--- NOT APPLIED -- RULES.md rule 36 requires explicit permission.
+-- APPLIED 2026-11-11 and recorded as version 20261111120000. It went in
+-- piecemeal through the SQL editor rather than in one run, so the live objects
+-- were verified against this file afterwards (columns, both foreign keys, both
+-- policies, the trigger, all three indexes).
 --
 -- The T2MIS "terminal" sheet has 48 columns; before this migration the schema
 -- stored about 14 of them. Everything here is additive (new nullable columns

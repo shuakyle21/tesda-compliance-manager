@@ -19,7 +19,9 @@
  * `batches.training_calendar_code` / `.tenant_qualification_id`, and the
  * `learner_details` table) were written by hand from
  * `supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql`,
- * which is NOT YET APPLIED. Regenerate and re-check once it is.
+ * which is now APPLIED (2026-11-11). Their Row and Insert shapes were checked
+ * field-by-field against `generate_typescript_types` on the live project and
+ * match.
  *
  * NOTE FOR A FUTURE CLEANUP: this file is hand-maintained and stubs every
  * table's `Relationships` as `[]`. That stub is what makes supabase-js unable
