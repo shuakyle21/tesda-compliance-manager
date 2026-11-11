@@ -14,6 +14,7 @@ import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
 import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
+import { RqmCodeEditor } from '@/modules/batches/ui/RqmCodeEditor';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
@@ -22,7 +23,14 @@ import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress, describeSessionProgress } from '@/modules/batches/domain/progress';
 import { formatDate } from '@/shared/dates';
 import { deriveBillTone } from './billTone';
+import type { RqmFormState } from '@/modules/batches/domain/rqm';
 import type { Batch, LifecycleStage } from '@/shared/types';
+
+/** Present only for callers whose trusted role may change the RQM code. */
+export type RqmEdit = {
+  tenantCode: string;
+  action: (previous: RqmFormState, formData: FormData) => Promise<RqmFormState>;
+};
 
 type BatchPropRow = { label: string; icon: IconName; value: ReactNode };
 
@@ -131,6 +139,12 @@ function BatchScholarsGrid({ batch }: { batch: Batch }) {
   );
 }
 
+function withRqmRow(rows: BatchPropRow[], batch: Batch, rqmEdit?: RqmEdit): BatchPropRow[] {
+  if (!rqmEdit) return rows;
+  const value = <RqmCodeEditor batch={batch} tenantCode={rqmEdit.tenantCode} action={rqmEdit.action} />;
+  return [{ label: 'RQM code', icon: 'file-invoice', value }, ...rows];
+}
+
 /** The batch's recorded status in words — not "Training Ongoing" for every batch. */
 function BatchStatusBadge({ batch }: { batch: Batch }) {
   if (batch.blocked) return <StatusBadge variant="cancelled" iconName="alert-triangle">Blocked</StatusBadge>;
@@ -139,7 +153,7 @@ function BatchStatusBadge({ batch }: { batch: Batch }) {
   return <StatusBadge variant="ongoing" iconName="check">Training ongoing</StatusBadge>;
 }
 
-export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => void }) {
+export function BatchModal({ batch, onClose, rqmEdit }: { batch: Batch; onClose: () => void; rqmEdit?: RqmEdit }) {
   const [closing, setClosing] = useState(false);
 
   const close = useCallback(() => {
@@ -164,7 +178,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
   const billTone = deriveBillTone(tier);
   const entre = (batch.lifecycle || []).find((s) => s.key === 'entre');
   const sessions = sessionProgress(batch);
-  const props = buildBatchProps(batch, isTwsp, billingReady);
+  const props = withRqmRow(buildBatchProps(batch, isTwsp, billingReady), batch, rqmEdit);
 
   return (
     <div className={`nm-backdrop${closing ? ' closing' : ''}`} onClick={close}>

@@ -11,7 +11,7 @@
 
 import { useMemo, useState } from 'react';
 import { BatchCard } from '@/modules/batches/ui/BatchCard';
-import { BatchModal } from '@/modules/batches/ui/BatchModal';
+import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
@@ -24,7 +24,7 @@ import type { Batch } from '@/shared/types';
  * the client never re-formats it in another timezone). It replaced a
  * hardcoded "loaded at 14:02" (audit A19).
  */
-export function CardsView({ batches, loadedAt }: { batches: Batch[]; loadedAt: string | null }) {
+export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; loadedAt: string | null; rqmEdit?: RqmEdit }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
   const [open, setOpen] = useState<Batch | null>(null);
@@ -53,7 +53,7 @@ export function CardsView({ batches, loadedAt }: { batches: Batch[]; loadedAt: s
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpen(null)} />}
+      {open && <BatchModal batch={open} onClose={() => setOpen(null)} rqmEdit={rqmEdit} />}
     </div>
   );
 }

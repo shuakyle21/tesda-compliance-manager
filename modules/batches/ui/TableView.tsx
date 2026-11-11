@@ -13,7 +13,7 @@ import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
-import { BatchModal } from '@/modules/batches/ui/BatchModal';
+import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
@@ -27,8 +27,10 @@ import type { Batch, DocumentRequirement } from '@/shared/types';
 export function TableView({
   batches,
   initialBatchId = null,
+  rqmEdit,
 }: {
   batches: Batch[];
+  rqmEdit?: RqmEdit;
   /**
    * `?batch=<code>` deep link: opens that batch's detail on arrival, so the
    * dashboard's Needs-attention items land on the batch they name.
@@ -88,7 +90,7 @@ export function TableView({
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpen(null)} />}
+      {open && <BatchModal batch={open} onClose={() => setOpen(null)} rqmEdit={rqmEdit} />}
     </div>
   );
 }
