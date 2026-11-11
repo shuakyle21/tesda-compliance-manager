@@ -95,7 +95,7 @@ export default async function ReportPage({ params }: { params: Promise<{ tenantC
   return (
     <>
       {syncFailed && <SyncFailedCallout retryHref={scopedPath(scope.code, 'report')} />}
-      <ReportView batches={batches} tenants={resolved.profile.tenants} asOf={snapshot.status === 'ok' ? formatDateTime(snapshot.fetchedAt) : null} />
+      <ReportView batches={batches} tenants={resolved.profile.tenants} rosterFailed={rosterSnapshot.status === 'sync-failed'} asOf={snapshot.status === 'ok' ? formatDateTime(snapshot.fetchedAt) : null} />
     </>
   );
 }

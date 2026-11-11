@@ -22,7 +22,7 @@ import { Icon } from '@/shared/ui/Icon';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { EGACE_STAGES, EMPLOYMENT_STATUSES } from '@/shared/vocab';
 import type { Batch, Tenant } from '@/shared/types';
-import { egaceVal, computeEgaceTotals, egaceRate, hasEgaceOutcomes } from '@/modules/reports/domain/egace';
+import { egaceVal, computeEgaceTotals, egaceRate, hasEgaceOutcomes, outcomeEnrolledBase } from '@/modules/reports/domain/egace';
 import {
   selectEmploymentCohorts,
   selectCertifiedScholars,
@@ -51,6 +51,8 @@ interface ReportViewProps {
   multiSchool?: boolean;
   /** When the batch data was loaded; null hides every "as of" line. */
   asOf: string | null;
+  /** The scholar roster failed to load, so an empty export is a failure, not "no records". */
+  rosterFailed?: boolean;
 }
 
 const ES = EMPLOYMENT_STATUSES;
@@ -78,7 +80,7 @@ function useReportViewData(batches: Batch[], tenants: Tenant[], multiSchool: boo
 
   const hasOutcomes = hasEgaceOutcomes(rows);
   const totals = computeEgaceTotals(rows, stages);
-  const rate = (v: number) => egaceRate(totals, v);
+  const rate = (v: number) => egaceRate({ ...totals, enrolled: outcomeEnrolledBase(rows) }, v);
 
   const empCohorts = selectEmploymentCohorts(rows);
   const empScholars = selectCertifiedScholars(empCohorts);
@@ -88,7 +90,7 @@ function useReportViewData(batches: Batch[], tenants: Tenant[], multiSchool: boo
   return { isMulti, schoolCount, tenantOf, rows, hasOutcomes, totals, rate, empCohorts, empScholars, empTotals, empRate };
 }
 
-export function ReportView({ batches, tenants = [], multiSchool, asOf }: ReportViewProps) {
+export function ReportView({ batches, tenants = [], multiSchool, asOf, rosterFailed = false }: ReportViewProps) {
   const [active, setActive] = useState<'egace' | 'employment'>('egace');
   const [toast, setToast] = useState<ToastData | null>(null);
 
@@ -117,7 +119,7 @@ export function ReportView({ batches, tenants = [], multiSchool, asOf }: ReportV
         schoolCount={schoolCount}
         rowCount={rows.length}
         asOf={asOf}
-        onExport={() => exportXlsx(rows, tenantOf, setToast)}
+        onExport={() => exportXlsx(rows, tenantOf, setToast, rosterFailed)}
       />
 
       {active === 'egace' ? (

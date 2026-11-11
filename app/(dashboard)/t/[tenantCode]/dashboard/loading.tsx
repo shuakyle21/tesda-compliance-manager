@@ -11,8 +11,9 @@ import { SkeletonBlock } from '@/shared/ui/Skeleton';
 
 export default function DashboardLoading() {
   return (
-    <div className="dashboard-view" aria-busy="true">
+    <>
       <span className="sr-only" role="status">Loading dashboard</span>
+      <div className="dashboard-view" aria-busy="true">
       <div className="page-head">
         <h1>Dashboard</h1>
       </div>
@@ -30,6 +31,7 @@ export default function DashboardLoading() {
         <SkeletonBlock h={220} />
         <SkeletonBlock h={220} />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

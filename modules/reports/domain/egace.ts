@@ -23,6 +23,14 @@ export function hasEgaceOutcomes(rows: Batch[]): boolean {
 }
 
 /**
+ * Enrolled count of only the batches that record outcomes: the fair denominator
+ * for outcome-stage rates, so batches without outcomes don't dilute them.
+ */
+export function outcomeEnrolledBase(rows: Batch[]): number {
+  return rows.reduce((n, b) => n + (b.egace?.enrolled ?? 0), 0);
+}
+
+/**
  * Sums each EGACE stage count (enrolled, graduate, assessed, certified, employed)
  * across every batch in the portfolio.
  */

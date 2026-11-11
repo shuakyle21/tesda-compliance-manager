@@ -52,5 +52,3 @@ export function ImportCsvModal({ onClose }: ImportCsvModalProps) {
     </>
   );
 }
-
-export default ImportCsvModal;

@@ -7,7 +7,7 @@
  * These are total functions over fixture batches and scholar rows.
  */
 import { describe, it, expect } from 'vitest';
-import { egaceVal, computeEgaceTotals, egaceRate, hasEgaceOutcomes } from '@/modules/reports/domain/egace';
+import { egaceVal, computeEgaceTotals, egaceRate, hasEgaceOutcomes, outcomeEnrolledBase } from '@/modules/reports/domain/egace';
 import {
   selectEmploymentCohorts,
   selectCertifiedScholars,
@@ -113,6 +113,20 @@ describe('computeEgaceTotals', () => {
     const egace = { ...FULL_EGACE };
     computeEgaceTotals([fixtureBatch({ egace })], EGACE_STAGES);
     expect(egace).toEqual(FULL_EGACE);
+  });
+});
+
+describe('mixed recorded / unrecorded batches', () => {
+  it('rates use only the enrolled count of batches that record outcomes', () => {
+    const rows = [
+      fixtureBatch({ id: 'BAT-A', egace: { enrolled: 20, graduate: 20, assessed: 0, certified: 0, employed: 0 } }),
+      fixtureBatch({ id: 'BAT-B', scholars: 25 }),
+    ];
+    const totals = computeEgaceTotals(rows, EGACE_STAGES);
+    expect(totals.enrolled).toBe(45);
+    expect(totals.graduate).toBe(20);
+    expect(outcomeEnrolledBase(rows)).toBe(20);
+    expect(egaceRate({ ...totals, enrolled: outcomeEnrolledBase(rows) }, totals.graduate)).toBe(100);
   });
 });
 

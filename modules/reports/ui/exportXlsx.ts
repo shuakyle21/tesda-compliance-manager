@@ -11,9 +11,13 @@ import { pluralize } from '@/shared/text';
 import { buildXlsx } from '@/modules/reports/domain/xlsx';
 
 /** Builds and downloads the T2MIS EGACE + employment .xlsx, then reports the result via `onResult`. */
-export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onResult: (toast: ToastData) => void): void {
+export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onResult: (toast: ToastData) => void, rosterFailed = false): void {
   const data = buildT2misRows(rows, tenantOf);
   if (data.length === 0) {
+    if (rosterFailed) {
+      onResult({ title: 'Export unavailable', message: "Scholar records couldn't be loaded. Try again." });
+      return;
+    }
     onResult({ title: 'Nothing to export', message: 'No scholar records are attached to these batches yet.' });
     return;
   }

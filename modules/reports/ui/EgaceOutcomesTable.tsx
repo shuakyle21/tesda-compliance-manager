@@ -89,7 +89,7 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
                 <td className="egc-td egc-mono">{formatDate(b.trainingStart) ?? '—'}</td>
                 <td className="egc-td egc-mono">{formatDate(b.trainingEnd) ?? '—'}</td>
                 {stages.map((s) => {
-                  if (s.key !== 'enrolled' && !hasOutcomes) {
+                  if (s.key !== 'enrolled' && !b.egace) {
                     return (
                       <td key={s.key} className="egc-td egc-num egc-val" style={{ color: 'var(--color-text-muted)' }}>
                         —<span className="sr-only"> Not recorded yet</span>
@@ -124,7 +124,7 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
         <Icon name="info-circle" size={12} />
         <span>
           {hasOutcomes
-            ? `Funnel fills as each cohort advances — columns stay blank (—) for batches still in training. Conversion vs enrolled: ${rate(totals.graduate)}% graduated · ${rate(totals.certified)}% certified · ${rate(totals.employed)}% employed.`
+            ? `Funnel fills as each cohort advances — columns stay blank (—) for batches still in training. Conversion vs enrolled: ${rate(totals.graduate)}% graduated · ${rate(totals.certified)}% certified · ${rate(totals.employed)}% employed.${rows.some((b) => !b.egace) ? ' Batches without recorded outcomes show a dash and are left out of the rates.' : ''}`
             : "Graduate, assessed, certified and employed counts aren't recorded in TVI-CAMS yet. Enrolled is each batch's enrolled scholar count."}
         </span>
       </div>
