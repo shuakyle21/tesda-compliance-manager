@@ -101,8 +101,8 @@ describe('findRqmCodes', () => {
     expect(findRqmCodes('Notice to Proceed for the following programs')).toEqual([]);
   });
   it('finds one code with U+2010 hyphens inside a table row', () => {
-    const row = '1 RQM3‐2026‐CFSP‐1263‐0009 South Cotabato Agricultural Crops Production NC II 17 416,343.60 15 April 2026';
-    expect(findRqmCodes(row)).toEqual(['RQM3-2026-CFSP-1263-0009']);
+    const row = '1 RQM3‐2026‐CFSP‐0000‐0001 Sample Province Sample Qualification NC II 10 100,000.00 01 January 2026';
+    expect(findRqmCodes(row)).toEqual(['RQM3-2026-CFSP-0000-0001']);
   });
   it('finds several, de-duplicated, in order of first appearance', () => {
     const text = 'b RQM3-2026-CFSP-0000-0002 a RQM3-2026-CFSP-0000-0001 again rqm3-2026-cfsp-0000-0002';
@@ -128,7 +128,7 @@ describe('findRqmCodes, hardening', () => {
     expect(findRqmCodes('RQM3-2026-CFSP-0000-0001-0002')).toEqual([]);
   });
   it('finds a code split across a line break after a hyphen', () => {
-    expect(findRqmCodes('row RQM3-2026-CFSP-1263-\n0009 South Cotabato')).toEqual(['RQM3-2026-CFSP-1263-0009']);
+    expect(findRqmCodes('row RQM3-2026-CFSP-0000-\n0001 Sample Province')).toEqual(['RQM3-2026-CFSP-0000-0001']);
   });
   it('finds a code with spaces around its hyphens, without joining neighbouring words', () => {
     expect(findRqmCodes('Total - RQM3 - 2026 - CFSP - 0000 - 0001 end')).toEqual([CODE]);
