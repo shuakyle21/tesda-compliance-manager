@@ -1,12 +1,9 @@
 /**
  * Shell Component: MetricsRow
  *
- * The KPI row the `(dashboard)` layout mounts above every route except
- * /dashboard (which renders its own, with the Needs-attention card). It is a
- * thin placement wrapper around `KpiSummary` — it used to be a second KPI
- * implementation with its own sub-copy ("On plan for Q2", "All training
- * ongoing") and its own variant rules, so the same tenant saw the same number
- * styled differently per route (audit B2/B3). There is now one row.
+ * Thin placement wrapper around `KpiSummary`, the one KPI row. Used by the
+ * trainer dashboard only; the school dashboard renders `KpiSummary` itself
+ * (with the Needs-attention card). No other screen shows a KPI row.
  */
 
 import { KpiSummary, type KpiLinks } from '@/modules/batches/ui/KpiSummary';
@@ -22,7 +19,7 @@ export function MetricsRow({
   /**
    * Trainer-facing routes must omit billing figures server-side, not via CSS
    * (CLAUDE.md role rules). The layout — not this component — decides when
-   * that applies; see `app/(dashboard)/layout.tsx`.
+   * that applies; see `app/(dashboard)/trainer/page.tsx`.
    */
   hideBilling?: boolean;
 }) {
