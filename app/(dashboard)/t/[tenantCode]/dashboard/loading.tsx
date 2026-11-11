@@ -7,34 +7,28 @@
  * nothing jumps when the data lands.
  */
 
-const shimmer: React.CSSProperties = {
-  background: 'color-mix(in srgb, var(--color-text-muted) 12%, var(--color-surface-alt))',
-  borderRadius: 'var(--radius-lg)',
-};
-
-function Block({ h }: { h: number }) {
-  return <div aria-hidden="true" style={{ ...shimmer, height: h }} />;
-}
+import { SkeletonBlock } from '@/shared/ui/Skeleton';
 
 export default function DashboardLoading() {
   return (
-    <div className="dashboard-view" aria-busy="true" aria-label="Loading dashboard">
+    <div className="dashboard-view" aria-busy="true">
+      <span className="sr-only" role="status">Loading dashboard</span>
       <div className="page-head">
         <h1>Dashboard</h1>
       </div>
 
       <section className="dash-kpi-grid" aria-hidden="true">
-        {Array.from({ length: 5 }).map((_, i) => <Block key={i} h={96} />)}
+        {Array.from({ length: 5 }).map((_, i) => <SkeletonBlock key={i} h={96} />)}
       </section>
 
       <div className="dash-ops-grid" aria-hidden="true">
-        <Block h={320} />
-        <Block h={320} />
+        <SkeletonBlock h={320} />
+        <SkeletonBlock h={320} />
       </div>
 
       <div className="dash-pair" aria-hidden="true">
-        <Block h={220} />
-        <Block h={220} />
+        <SkeletonBlock h={220} />
+        <SkeletonBlock h={220} />
       </div>
     </div>
   );

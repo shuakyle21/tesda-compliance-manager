@@ -557,15 +557,19 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
       return;
     }
     setBusy(true);
+    setError(null);
+    setCodeError(false);
     try {
       const res = await signUp.attemptEmailAddressVerification({ code: code.join('') });
       if (res.status === 'complete') {
         setStep('done');
         return;
       }
-      setCodeError(true);
-    } catch {
-      setCodeError(true);
+      setError('Could not verify the code. Please try again.');
+    } catch (err) {
+      setError(clerkError(err));
+      // Only a Clerk API error can mean a bad code; a network failure cannot.
+      setCodeError(Boolean((err as ClerkErrorShape)?.errors?.length));
     } finally {
       setBusy(false);
     }

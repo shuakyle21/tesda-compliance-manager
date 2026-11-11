@@ -7,7 +7,7 @@
  * These are total functions over fixture batches and scholar rows.
  */
 import { describe, it, expect } from 'vitest';
-import { egaceVal, computeEgaceTotals, egaceRate } from '@/modules/reports/domain/egace';
+import { egaceVal, computeEgaceTotals, egaceRate, hasEgaceOutcomes } from '@/modules/reports/domain/egace';
 import {
   selectEmploymentCohorts,
   selectCertifiedScholars,
@@ -64,6 +64,14 @@ describe('egaceVal', () => {
     expect(egaceVal(fixtureBatch(), 'certified')).toBe(0);
   });
 
+  it('enrolled falls back to the batch scholar count when egace is missing', () => {
+    expect(egaceVal(fixtureBatch({ scholars: 25 }), 'enrolled')).toBe(25);
+  });
+
+  it('a non-enrolled stage is still 0 when egace is missing', () => {
+    expect(egaceVal(fixtureBatch({ scholars: 25 }), 'graduate')).toBe(0);
+  });
+
   it('is 0 for a key the EGACE block does not track', () => {
     expect(egaceVal(fixtureBatch({ egace: FULL_EGACE }), 'not_a_stage')).toBe(0);
   });
@@ -95,15 +103,27 @@ describe('computeEgaceTotals', () => {
     });
   });
 
-  it('treats a batch with no EGACE block as zero rather than skipping it', () => {
+  it('counts a batch with no EGACE block as zero outcomes but its scholars as enrolled', () => {
+    // BAT-2 has scholars: 25 and no egace, so only enrolled gains (20 + 25).
     const rows = [fixtureBatch({ id: 'BAT-1', egace: FULL_EGACE }), fixtureBatch({ id: 'BAT-2' })];
-    expect(computeEgaceTotals(rows, EGACE_STAGES)).toEqual(FULL_EGACE);
+    expect(computeEgaceTotals(rows, EGACE_STAGES)).toEqual({ ...FULL_EGACE, enrolled: 45 });
   });
 
   it('does not mutate the batches it sums', () => {
     const egace = { ...FULL_EGACE };
     computeEgaceTotals([fixtureBatch({ egace })], EGACE_STAGES);
     expect(egace).toEqual(FULL_EGACE);
+  });
+});
+
+describe('hasEgaceOutcomes', () => {
+  it('is true when any batch has an egace block', () => {
+    expect(hasEgaceOutcomes([fixtureBatch(), fixtureBatch({ egace: FULL_EGACE })])).toBe(true);
+  });
+
+  it('is false when no batch has one', () => {
+    expect(hasEgaceOutcomes([fixtureBatch()])).toBe(false);
+    expect(hasEgaceOutcomes([])).toBe(false);
   });
 });
 
