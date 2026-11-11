@@ -44,6 +44,11 @@ const LEARNER_ROW = {
   id: 'l-1', tenant_id: 'tenant-1', batch_id: 'b-1', learner_no: null, uli: 'ABC-12-345-67890-001',
   last_name: 'Reyes', first_name: 'Ana', middle_name: 'Lim', extension_name: null,
   assessment_result: 'competent' as const, is_active: true, created_at: '', updated_at: '',
+  batches: { batch_code: 'BAT-1', start_date: '2026-04-21', end_date: '2026-06-08', scholarship_programs: { name: 'Coconut Farmers Scholarship Program (CFSP)' } },
+};
+
+const DETAILS_ROW = {
+  learner_id: 'l-1', tenant_id: 'tenant-1', created_at: '', updated_at: '',
   contact_number: '0917-000-0000', email: 'ana@example.ph', street_address: 'Purok 2', barangay: 'Rizal',
   city_municipality: 'Banga', district: 'II', province: 'South Cotabato', sex: 'Female',
   date_of_birth: '1990-06-09', civil_status: 'Single', highest_grade_completed: 'High School Graduate',
@@ -51,8 +56,9 @@ const LEARNER_ROW = {
   voucher_number: null, date_assessed: '2026-06-23', employment_status_before: 'Self-Employed',
   date_employed: '2026-08-17', occupation: 'Farmer', employer_name: 'Own farm', employer_address: 'Purok 2, Banga',
   employer_classification: 'Employer in Own Family-Operated Farm or Business', salary_range: '10,000 to 20,000',
-  batches: { batch_code: 'BAT-1', start_date: '2026-04-21', end_date: '2026-06-08', scholarship_programs: { name: 'Coconut Farmers Scholarship Program (CFSP)' } },
 };
+
+const WITH_DETAILS = { ...LEARNER_ROW, learner_details: DETAILS_ROW };
 
 const FACTS = [{
   batch_code: 'BAT-1', training_calendar_code: 'TCC-1',
@@ -63,7 +69,7 @@ const FACTS = [{
 }];
 
 function exportedRow(): string[] {
-  const roster = mapTenantRoster([LEARNER_ROW], FACTS, '2026-06-08');
+  const roster = mapTenantRoster([WITH_DETAILS], FACTS, '2026-06-08');
   const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
   return row;
 }
@@ -94,13 +100,22 @@ describe('T2MIS layout', () => {
   });
 
   it('leaves Age blank for a birth date after the as-of date', () => {
-    const roster = mapTenantRoster([{ ...LEARNER_ROW, date_of_birth: '2030-01-01' }], [], '2026-06-08');
+    const roster = mapTenantRoster([{ ...LEARNER_ROW, learner_details: { ...DETAILS_ROW, date_of_birth: '2030-01-01' } }], [], '2026-06-08');
     const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
     expect(cell(row, 'Age')).toBe('');
   });
 
-  it('leaves qualification cells blank when the batch has no qualification link', () => {
+  it('leaves detail cells blank for a learner row with no details (trainer read, or not migrated)', () => {
     const roster = mapTenantRoster([LEARNER_ROW], [], '2026-06-08');
+    const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
+    expect(cell(row, 'Last Name')).toBe('Reyes');
+    expect(cell(row, 'Contact Number')).toBe('');
+    expect(cell(row, 'Salary')).toBe('');
+    expect(cell(row, 'Age')).toBe('');
+  });
+
+  it('leaves qualification cells blank when the batch has no qualification link', () => {
+    const roster = mapTenantRoster([WITH_DETAILS], [], '2026-06-08');
     const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
     expect(cell(row, 'CTPR')).toBe('');
     expect(cell(row, 'Delivery Mode')).toBe('');
@@ -115,11 +130,9 @@ describe('T2MIS layout', () => {
     const { valid, errors } = validateRows(parsed.rows);
     expect(errors).toEqual([]);
 
-    const identity = ['batches', 'id', 'tenant_id', 'batch_id', 'learner_no', 'is_active', 'created_at', 'updated_at',
-      'uli', 'last_name', 'first_name', 'middle_name', 'extension_name', 'assessment_result'];
-    const details = Object.fromEntries(
-      Object.entries(LEARNER_ROW).filter(([key, value]) => !identity.includes(key) && value !== null),
-    );
+    const { learner_id: _id, tenant_id: _tenant, created_at: _c, updated_at: _u, ...columns } = DETAILS_ROW;
+    void [_id, _tenant, _c, _u];
+    const details = Object.fromEntries(Object.entries(columns).filter(([, value]) => value !== null));
     const { uli, last_name, first_name, middle_name, assessment_result } = LEARNER_ROW;
     expect(valid[0]).toMatchObject({ uli, lastName: last_name, firstName: first_name, middleName: middle_name, assessmentResult: assessment_result });
     expect(valid[0].details).toEqual(details);

@@ -22,14 +22,14 @@ export interface ParsedLearnerRow {
   middleName: string | null;
   extensionName: string | null;
   assessmentResult: ImportAssessmentResult;
-  /** Non-blank T2MIS cells, keyed by `learners` column. Dates are ISO. */
+  /** Non-blank T2MIS cells, keyed by `learner_details` column. Dates are ISO. */
   details: LearnerDetails;
   /** Cells that could not be read. Any entry rejects the row in {@link validateRows}. */
   problems: string[];
 }
 
 /**
- * T2MIS header (trimmed, lowercased) -> `learners` column. The sheet repeats
+ * T2MIS header (trimmed, lowercased) -> `learner_details` column. The sheet repeats
  * "Municipality City" and "Province" for the provider and the learner;
  * `rowsToRecords` keeps the later (learner) cell, which is the one wanted here.
  */

@@ -34,6 +34,7 @@ import {
 type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 type LearnerInsert = Database['public']['Tables']['learners']['Insert'];
 type LearnerUpdate = Database['public']['Tables']['learners']['Update'];
+type LearnerDetailsInsert = Database['public']['Tables']['learner_details']['Insert'];
 
 export interface SkippedRow {
   rowNumber: number;
@@ -69,7 +70,25 @@ async function fetchExistingLearners(supabase: SupabaseServerClient, batchId: st
   return { ok: true, rows: data ?? [] };
 }
 
-/** Inserts the unmatched rows. Returns an error message, or `null` on success. */
+/**
+ * Writes one learner's T2MIS details (`learner_details`, office-only). Skipped
+ * when the file filled none, so a names-only CSV never touches that table.
+ * One row per call: a single-object upsert updates only the columns it
+ * carries, so re-importing a sparser file does not blank earlier details.
+ */
+async function writeDetails(
+  supabase: SupabaseServerClient,
+  learnerId: string,
+  tenantId: string,
+  row: ReconciledRow['row'],
+): Promise<string | null> {
+  if (Object.keys(row.details).length === 0) return null;
+  const details: LearnerDetailsInsert = { learner_id: learnerId, tenant_id: tenantId, ...row.details };
+  const { error } = await supabase.from('learner_details').upsert(details, { onConflict: 'learner_id' });
+  return error ? error.message : null;
+}
+
+/** Inserts the unmatched rows, then their details. Returns an error message, or `null` on success. */
 async function insertLearners(
   supabase: SupabaseServerClient,
   toInsert: ReconciledRow[],
@@ -87,17 +106,25 @@ async function insertLearners(
     middle_name: row.middleName,
     extension_name: row.extensionName,
     assessment_result: row.assessmentResult,
-    ...row.details,
   }));
-  const { error } = await supabase.from('learners').insert(inserts);
-  return error ? error.message : null;
+  const { data, error } = await supabase.from('learners').insert(inserts).select('id, uli');
+  if (error) return error.message;
+
+  // ULIs are unique within the file (validateRows), so they key the new ids.
+  const idByUli = new Map((data ?? []).map((l) => [l.uli, l.id]));
+  for (const { row } of toInsert) {
+    const id = idByUli.get(row.uli);
+    const detailsError = id ? await writeDetails(supabase, id, tenantId, row) : null;
+    if (detailsError) return detailsError;
+  }
+  return null;
 }
 
 /** Updates the ULI-matched rows one at a time (no bulk "update many rows with
  * different values" in supabase-js). Fine at CSV-import scale (single batch's
  * roster); revisit if this pipeline ever takes multi-thousand-row files.
  * Returns an error message, or `null` on success. */
-async function updateLearners(supabase: SupabaseServerClient, toUpdate: ReconciledRow[]): Promise<string | null> {
+async function updateLearners(supabase: SupabaseServerClient, toUpdate: ReconciledRow[], tenantId: string): Promise<string | null> {
   for (const { row, existingId } of toUpdate) {
     const update: LearnerUpdate = {
       learner_no: row.learnerNo,
@@ -106,12 +133,11 @@ async function updateLearners(supabase: SupabaseServerClient, toUpdate: Reconcil
       middle_name: row.middleName,
       extension_name: row.extensionName,
       assessment_result: row.assessmentResult,
-      // Only the cells the file actually filled: re-importing a names-only
-      // CSV must not blank details an earlier T2MIS import recorded.
-      ...row.details,
     };
     const { error } = await supabase.from('learners').update(update).eq('id', existingId as string);
     if (error) return error.message;
+    const detailsError = await writeDetails(supabase, existingId as string, tenantId, row);
+    if (detailsError) return detailsError;
   }
   return null;
 }
@@ -160,7 +186,7 @@ export async function importLearnersCsv(batchId: string, csvText: string): Promi
     const insertError = await insertLearners(supabase, toInsert, batchResult.tenantId, batchId);
     if (insertError) return { status: 'sync-failed', error: insertError };
 
-    const updateError = await updateLearners(supabase, toUpdate);
+    const updateError = await updateLearners(supabase, toUpdate, batchResult.tenantId);
     if (updateError) return { status: 'sync-failed', error: updateError };
 
     return { status: 'ok', inserted: toInsert.length, updated: toUpdate.length, skipped: toSkipped(rowErrors) };

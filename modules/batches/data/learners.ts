@@ -10,9 +10,10 @@
  *   3. (no derive layer — nothing time-based to compute)
  *
  * The T2MIS roster fields (sex, dob, address, employment before training, ...)
- * are columns as of migration 20261111120000. Until that migration is applied
- * `select('*')` simply omits them, so every read below uses `?? ''` and the
- * report renders blank rather than failing. `employmentStatus` (the
+ * live in `learner_details` (migration 20261111120000), a one-to-one table
+ * trainers cannot read. Only the tenant roster fetch embeds it; a row without
+ * it — the per-batch fetch, a learner with no details yet, or the migration
+ * not applied — maps those fields to ''. `employmentStatus` (the
  * post-training outcome) is not a T2MIS terminal-report column and still has
  * no source.
  */
@@ -22,7 +23,11 @@ import type { Database, AssessmentResult as DbAssessmentResult } from '@/lib/sup
 import { ageOn } from '@/modules/import-export/domain/t2mis';
 import type { Batch, BatchT2misFacts, ScholarRow } from '@/shared/types';
 
-type LearnerRow = Database['public']['Tables']['learners']['Row'];
+type LearnerDetailsRow = Database['public']['Tables']['learner_details']['Row'];
+/** The embed arrives as an object for a one-to-one relationship; an array is tolerated. */
+type LearnerRow = Database['public']['Tables']['learners']['Row'] & {
+  learner_details?: LearnerDetailsRow | LearnerDetailsRow[] | null;
+};
 
 /** Total map: every DB assessment_result value has a UI string (`''` = not yet assessed). */
 const ASSESSMENT_RESULT_TO_UI: Record<DbAssessmentResult, string> = {
@@ -59,7 +64,9 @@ export interface LearnerBatchContext {
  * (billing statements).
  */
 export function mapLearnerRow(row: LearnerRow, seq: number, ctx?: LearnerBatchContext): ScholarRow {
-  const dob = orEmpty(row.date_of_birth);
+  const embedded = row.learner_details;
+  const details: Partial<LearnerDetailsRow> = (Array.isArray(embedded) ? embedded[0] : embedded) ?? {};
+  const dob = orEmpty(details.date_of_birth);
   return {
     seq,
     lastName: row.last_name,
@@ -70,30 +77,30 @@ export function mapLearnerRow(row: LearnerRow, seq: number, ctx?: LearnerBatchCo
     uli: orEmpty(row.uli),
     assessmentResult: ASSESSMENT_RESULT_TO_UI[row.assessment_result],
 
-    sex: orEmpty(row.sex),
+    sex: orEmpty(details.sex),
     dob,
     age: (ctx && ageOn(dob, ctx.asOf)) || 0,
-    civilStatus: orEmpty(row.civil_status),
-    education: orEmpty(row.highest_grade_completed),
-    nationality: orEmpty(row.nationality),
-    clientClass: orEmpty(row.client_classification),
-    contact: orEmpty(row.contact_number),
-    email: orEmpty(row.email),
-    streetAddress: orEmpty(row.street_address),
-    barangay: orEmpty(row.barangay),
-    cityMunicipality: orEmpty(row.city_municipality),
-    district: orEmpty(row.district),
-    province: orEmpty(row.province),
-    trainingStatus: orEmpty(row.training_status),
-    voucherNumber: orEmpty(row.voucher_number),
-    dateAssessed: orEmpty(row.date_assessed),
-    empStatusBefore: orEmpty(row.employment_status_before),
-    dateEmployed: orEmpty(row.date_employed),
-    occupation: orEmpty(row.occupation),
-    employer: orEmpty(row.employer_name),
-    employerAddress: orEmpty(row.employer_address),
-    empClassification: orEmpty(row.employer_classification),
-    salary: orEmpty(row.salary_range),
+    civilStatus: orEmpty(details.civil_status),
+    education: orEmpty(details.highest_grade_completed),
+    nationality: orEmpty(details.nationality),
+    clientClass: orEmpty(details.client_classification),
+    contact: orEmpty(details.contact_number),
+    email: orEmpty(details.email),
+    streetAddress: orEmpty(details.street_address),
+    barangay: orEmpty(details.barangay),
+    cityMunicipality: orEmpty(details.city_municipality),
+    district: orEmpty(details.district),
+    province: orEmpty(details.province),
+    trainingStatus: orEmpty(details.training_status),
+    voucherNumber: orEmpty(details.voucher_number),
+    dateAssessed: orEmpty(details.date_assessed),
+    empStatusBefore: orEmpty(details.employment_status_before),
+    dateEmployed: orEmpty(details.date_employed),
+    occupation: orEmpty(details.occupation),
+    employer: orEmpty(details.employer_name),
+    employerAddress: orEmpty(details.employer_address),
+    empClassification: orEmpty(details.employer_classification),
+    salary: orEmpty(details.salary_range),
 
     scholarshipType: orEmpty(ctx?.scholarshipType),
     dateStarted: orEmpty(ctx?.dateStarted),
@@ -178,8 +185,8 @@ export type TenantRosterSnapshot =
 
 const ROSTER_PAGE = 1000;
 
-/** Postgres undefined-column, and PostgREST's unknown relationship / unknown column. */
-const NOT_MIGRATED_CODES = new Set(['42703', 'PGRST200', 'PGRST204']);
+/** Postgres undefined column / table, and PostgREST's unknown relationship / column / table. */
+const NOT_MIGRATED_CODES = new Set(['42703', '42P01', 'PGRST200', 'PGRST204', 'PGRST205']);
 
 /** Today as ISO `YYYY-MM-DD` in the schools' timezone — a UTC date is a day behind until 08:00 there. */
 function todayInManila(): string {
@@ -223,12 +230,47 @@ export function attachRoster(batches: Batch[], roster: TenantRoster): Batch[] {
   return batches.map((b) => (roster[b.id] ? { ...b, scholars_list: roster[b.id].scholars, t2mis: roster[b.id].t2mis } : b));
 }
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+
+/** Every learner row for one school, all pages. */
+async function fetchRosterRows(
+  supabase: SupabaseServerClient,
+  tenantId: string,
+): Promise<{ rows: LearnerRowWithBatch[] } | { error: string }> {
+  // Paged: the API caps a response at 1000 rows and drops the rest without
+  // an error, which would silently shorten a large school's export.
+  // `learner_details` is embedded unless the first page says it does not
+  // exist yet (migration not applied) — then the roster is read without it.
+  const rows: LearnerRowWithBatch[] = [];
+  let embedDetails = true;
+  for (let from = 0; ; ) {
+    const { data, error } = await supabase
+      .from('learners')
+      .select(`*, ${embedDetails ? 'learner_details(*), ' : ''}batches(batch_code, start_date, end_date, scholarship_programs(name))`)
+      .eq('tenant_id', tenantId)
+      .order('last_name', { ascending: true })
+      .order('first_name', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, from + ROSTER_PAGE - 1);
+    if (error && embedDetails && NOT_MIGRATED_CODES.has(error.code)) {
+      embedDetails = false;
+      continue;
+    }
+    if (error) return { error: error.message };
+    rows.push(...((data ?? []) as unknown as LearnerRowWithBatch[]));
+    if ((data ?? []).length < ROSTER_PAGE) break;
+    from += ROSTER_PAGE;
+  }
+  return { rows };
+}
+
 /**
  * Every learner in one school, grouped by batch. `tenantId` is scope
  * selection on top of RLS (RULES.md rule 2), from a validated `TenantScope`.
  *
- * Carries contact, address and employment data: callers must be surfaces
- * trainers are server-denied from (the report route redirects them).
+ * Carries contact, address and employment data. RLS returns no
+ * `learner_details` to a trainer, and the one caller (the report route)
+ * redirects trainers before fetching.
  */
 export async function getTenantRosterSnapshot(tenantId: string): Promise<TenantRosterSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
@@ -236,22 +278,9 @@ export async function getTenantRosterSnapshot(tenantId: string): Promise<TenantR
   try {
     const supabase = await createSupabaseServerClient();
 
-    // Paged: the API caps a response at 1000 rows and drops the rest without
-    // an error, which would silently shorten a large school's export.
-    const rows: LearnerRowWithBatch[] = [];
-    for (let from = 0; ; from += ROSTER_PAGE) {
-      const { data, error } = await supabase
-        .from('learners')
-        .select('*, batches(batch_code, start_date, end_date, scholarship_programs(name))')
-        .eq('tenant_id', tenantId)
-        .order('last_name', { ascending: true })
-        .order('first_name', { ascending: true })
-        .order('id', { ascending: true })
-        .range(from, from + ROSTER_PAGE - 1);
-      if (error) return { status: 'sync-failed', error: error.message };
-      rows.push(...((data ?? []) as unknown as LearnerRowWithBatch[]));
-      if ((data ?? []).length < ROSTER_PAGE) break;
-    }
+    const page = await fetchRosterRows(supabase, tenantId);
+    if ('error' in page) return { status: 'sync-failed', error: page.error };
+    const { rows } = page;
 
     // Separate query on purpose: it names columns from migration
     // 20261111120000, so it errors until that is applied. Only that specific
