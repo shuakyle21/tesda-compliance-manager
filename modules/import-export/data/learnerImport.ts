@@ -9,12 +9,15 @@
  * to render at all — the caller's job on `unconfigured` here is to disable
  * the importer, not to pretend the import ran.
  *
- * Reconciliation is keyed on ULI (the permanent learner key per
- * docs/adr) rather than a DB upsert: the only unique constraint on
- * `learners` is (tenant_id, batch_id, learner_no) — there is no unique
- * index on `uli` for Postgres to target with ON CONFLICT. Matching by ULI is
- * therefore done in application code (`reconcileWithExisting`), then applied
- * as an explicit insert or update.
+ * Reconciliation is keyed on ULI (the permanent learner key per docs/adr)
+ * in application code (`reconcileWithExisting`), then applied as an explicit
+ * insert or update. Migration 20261111120000 adds a unique index on
+ * (tenant_id, batch_id, uli) as the backstop; it is partial (`where uli is
+ * not null`), so it is still not an ON CONFLICT target for supabase-js upsert.
+ *
+ * TODO before a UI calls this: `sync-failed` carries the raw database message
+ * (table, column and constraint names). Map it to user copy at the action
+ * boundary (RULES.md rule 6).
  */
 
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
@@ -84,6 +87,7 @@ async function insertLearners(
     middle_name: row.middleName,
     extension_name: row.extensionName,
     assessment_result: row.assessmentResult,
+    ...row.details,
   }));
   const { error } = await supabase.from('learners').insert(inserts);
   return error ? error.message : null;
@@ -102,6 +106,9 @@ async function updateLearners(supabase: SupabaseServerClient, toUpdate: Reconcil
       middle_name: row.middleName,
       extension_name: row.extensionName,
       assessment_result: row.assessmentResult,
+      // Only the cells the file actually filled: re-importing a names-only
+      // CSV must not blank details an earlier T2MIS import recorded.
+      ...row.details,
     };
     const { error } = await supabase.from('learners').update(update).eq('id', existingId as string);
     if (error) return error.message;
@@ -123,6 +130,13 @@ export async function importLearnersCsv(batchId: string, csvText: string): Promi
   }
   if (parsed.status === 'missing-columns') {
     return { status: 'validation-failed', errors: [`Missing required column(s): ${parsed.missing.join(', ')}`] };
+  }
+
+  if (parsed.status === 'multiple-batches') {
+    return {
+      status: 'validation-failed',
+      errors: [`This file covers more than one batch (${parsed.values.join('; ')}). Import one batch at a time.`],
+    };
   }
 
   const { valid, errors: rowErrors } = validateRows(parsed.rows);

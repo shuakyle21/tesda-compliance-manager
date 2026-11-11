@@ -21,6 +21,7 @@ import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { deriveTenantAccess } from '@/modules/tenancy/data/tenancy';
 import { withTenantAccess } from '@/modules/tenancy/domain/access';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
+import { attachRoster, getTenantRosterSnapshot } from '@/modules/batches/data/learners';
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
@@ -61,8 +62,14 @@ export default async function ReportPage({ params }: { params: Promise<{ tenantC
   // belong to no school" never masks a real fetch failure.
   const tenantAccess = profileSnapshot ? deriveTenantAccess(profileSnapshot) : 'unknown';
   const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccess);
-  const batches: Batch[] = selectBatchesForDisplay(snapshot);
-  const syncFailed = snapshot.status === 'sync-failed';
+  // Scholars are fetched here, not in the shared batches snapshot: the roster
+  // carries contact and employment data that no other screen should load.
+  const rosterSnapshot = await getTenantRosterSnapshot(scope.tenantId);
+  const batches: Batch[] = attachRoster(
+    selectBatchesForDisplay(snapshot),
+    rosterSnapshot.status === 'ok' ? rosterSnapshot.roster : {},
+  );
+  const syncFailed = snapshot.status === 'sync-failed' || rosterSnapshot.status === 'sync-failed';
 
   if (batches.length === 0) {
     return (
@@ -87,7 +94,7 @@ export default async function ReportPage({ params }: { params: Promise<{ tenantC
   return (
     <>
       {syncFailed && <SyncFailedCallout retryHref={scopedPath(scope.code, 'report')} />}
-      <ReportView batches={batches} />
+      <ReportView batches={batches} tenants={resolved.profile.tenants} />
     </>
   );
 }

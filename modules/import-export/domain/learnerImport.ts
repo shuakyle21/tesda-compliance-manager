@@ -1,12 +1,15 @@
 /**
  * Learner CSV import — pure validation and reconciliation rules, no I/O.
- * Scope note: `learners` (see the migration) only has learner_no, uli, names,
- * and assessment_result — it does not carry sex/DOB/employment/etc., so this
- * pipeline imports that narrower column set, not the full T2MIS/BSRS report
- * shape. Widening it is a schema change (new migration), not a parser change.
+ *
+ * Reads two shapes with one parser: the narrow roster CSV (names, ULI,
+ * assessment result) and the T2MIS terminal-report sheet saved as CSV. The
+ * T2MIS learner, training and employment columns land in `details`; its
+ * provider and qualification columns are ignored, because an import targets
+ * one batch the user already chose.
  */
 
 import { parseCsvRows, rowsToRecords } from './csv';
+import { parseT2misDate } from './t2mis';
 
 export type ImportAssessmentResult = 'competent' | 'not_yet_competent' | 'pending';
 
@@ -19,7 +22,49 @@ export interface ParsedLearnerRow {
   middleName: string | null;
   extensionName: string | null;
   assessmentResult: ImportAssessmentResult;
+  /** Non-blank T2MIS cells, keyed by `learners` column. Dates are ISO. */
+  details: LearnerDetails;
+  /** Cells that could not be read. Any entry rejects the row in {@link validateRows}. */
+  problems: string[];
 }
+
+/**
+ * T2MIS header (trimmed, lowercased) -> `learners` column. The sheet repeats
+ * "Municipality City" and "Province" for the provider and the learner;
+ * `rowsToRecords` keeps the later (learner) cell, which is the one wanted here.
+ */
+const DETAIL_COLUMNS = {
+  'contact number': 'contact_number',
+  'e mail address': 'email',
+  'street no and street address': 'street_address',
+  'barangay': 'barangay',
+  'municipality city': 'city_municipality',
+  'district': 'district',
+  'province': 'province',
+  'sex': 'sex',
+  'date of birth': 'date_of_birth',
+  'civil status': 'civil_status',
+  'highest grade completed': 'highest_grade_completed',
+  'nationality': 'nationality',
+  'classification of clients': 'client_classification',
+  'training status': 'training_status',
+  'voucher number': 'voucher_number',
+  'date assessed': 'date_assessed',
+  'employment status before the training': 'employment_status_before',
+  'date of employment': 'date_employed',
+  'occupation': 'occupation',
+  'name of employer': 'employer_name',
+  'address': 'employer_address',
+  'classification': 'employer_classification',
+  'salary': 'salary_range',
+} as const;
+
+type DetailHeader = keyof typeof DETAIL_COLUMNS;
+export type LearnerDetailColumn = (typeof DETAIL_COLUMNS)[DetailHeader];
+export type LearnerDetails = Partial<Record<LearnerDetailColumn, string>>;
+
+const DATE_COLUMNS: ReadonlySet<LearnerDetailColumn> = new Set(['date_of_birth', 'date_assessed', 'date_employed']);
+const SEX_ALIASES: Record<string, string> = { male: 'Male', m: 'Male', female: 'Female', f: 'Female' };
 
 export interface RowError {
   rowNumber: number;
@@ -44,6 +89,7 @@ const HEADER_ALIASES: Record<string, string> = {
   'ext.': 'extension name',
   'uli': 'uli',
   'assessment result': 'assessment result',
+  'assessment results': 'assessment result',
 };
 
 /** Soft check: ULIs in the wild are alphanumeric with dashes, ~10-20 chars.
@@ -63,6 +109,8 @@ const ASSESSMENT_RESULT_ALIASES: Record<string, ImportAssessmentResult> = {
 export type LearnerCsvParseResult =
   | { status: 'ok'; rows: ParsedLearnerRow[] }
   | { status: 'missing-columns'; missing: string[] }
+  /** The file spans more than one batch (e.g. a whole-school T2MIS export). */
+  | { status: 'multiple-batches'; values: string[] }
   | { status: 'empty' };
 
 /**
@@ -90,13 +138,39 @@ function readOptionalField(record: Record<string, string>, key: string): string 
 }
 
 /**
- * Reads the assessment result field from a record and normalizes it to the
- * internal enum (competent, not_yet_competent, pending). Unrecognized values
- * fall back to 'pending'.
+ * Reads the assessment result cell. A blank cell is 'pending'; a value that
+ * matches no known alias is a problem, not a silent 'pending' — importing
+ * "Competnt" as pending would quietly understate the batch's results.
  */
-function readAssessmentResult(record: Record<string, string>): ImportAssessmentResult {
-  const key = record['assessment result']?.trim().toLowerCase() ?? '';
-  return ASSESSMENT_RESULT_ALIASES[key] ?? 'pending';
+function readAssessmentResult(record: Record<string, string>, problems: string[]): ImportAssessmentResult {
+  const raw = record['assessment result']?.trim() ?? '';
+  const result = ASSESSMENT_RESULT_ALIASES[raw.toLowerCase()];
+  if (result) return result;
+  problems.push(`Assessment result "${raw}" is not recognised (use Competent, Not Yet Competent, or leave blank)`);
+  return 'pending';
+}
+
+/** Reads the T2MIS detail cells, normalising dates to ISO and sex to Male/Female. */
+function readDetails(record: Record<string, string>, problems: string[]): LearnerDetails {
+  const details: LearnerDetails = {};
+  for (const header of Object.keys(DETAIL_COLUMNS) as DetailHeader[]) {
+    const column = DETAIL_COLUMNS[header];
+    const cell = record[header]?.trim() ?? '';
+    if (!cell) continue;
+
+    if (DATE_COLUMNS.has(column)) {
+      const iso = parseT2misDate(cell);
+      if (iso === 'invalid') problems.push(`"${header}" value "${cell}" is not a date (use MM/DD/YYYY)`);
+      else if (iso) details[column] = iso;
+    } else if (column === 'sex') {
+      const sex = SEX_ALIASES[cell.toLowerCase()];
+      if (sex) details.sex = sex;
+      else problems.push(`Sex "${cell}" is not recognised (use Male or Female)`);
+    } else {
+      details[column] = cell;
+    }
+  }
+  return details;
 }
 
 /**
@@ -121,16 +195,28 @@ export function parseLearnerCsv(text: string): LearnerCsvParseResult {
     return normalized;
   });
 
-  const parsedRows: ParsedLearnerRow[] = records.map((record, i) => ({
-    rowNumber: i + 2, // +1 for 0-index, +1 for the header row
-    learnerNo: readOptionalField(record, 'learner no'),
-    uli: readField(record, 'uli'),
-    lastName: readField(record, 'last name'),
-    firstName: readField(record, 'first name'),
-    middleName: readOptionalField(record, 'middle name'),
-    extensionName: readOptionalField(record, 'extension name'),
-    assessmentResult: readAssessmentResult(record),
-  }));
+  // An import targets one batch. A whole-school T2MIS export carries every
+  // batch in one sheet; importing it would file all of them under the target.
+  for (const key of ['training calendar code', 'qualification program title']) {
+    const values = [...new Set(records.map((r) => r[key]).filter(Boolean))];
+    if (values.length > 1) return { status: 'multiple-batches', values };
+  }
+
+  const parsedRows: ParsedLearnerRow[] = records.map((record, i) => {
+    const problems: string[] = [];
+    return {
+      rowNumber: i + 2, // +1 for 0-index, +1 for the header row
+      learnerNo: readOptionalField(record, 'learner no'),
+      uli: readField(record, 'uli'),
+      lastName: readField(record, 'last name'),
+      firstName: readField(record, 'first name'),
+      middleName: readOptionalField(record, 'middle name'),
+      extensionName: readOptionalField(record, 'extension name'),
+      assessmentResult: readAssessmentResult(record, problems),
+      details: readDetails(record, problems),
+      problems,
+    };
+  });
 
   return { status: 'ok', rows: parsedRows };
 }
@@ -138,10 +224,8 @@ export function parseLearnerCsv(text: string): LearnerCsvParseResult {
 /**
  * Validates parsed learner rows, splitting them into valid rows (fit to write)
  * and errors (rejected with a reason). Checks for missing required fields
- * (name, ULI), invalid ULI format, and duplicate ULIs within the file.
- * A raw `assessment result` cell that didn't match a known alias silently
- * fell back to 'pending' during parse — this validator only enforces structural
- * rules, not value normalization.
+ * (name, ULI), invalid ULI format, unreadable cells (`problems`), and
+ * duplicate ULIs within the file.
  */
 export function validateRows(rows: ParsedLearnerRow[]): { valid: ParsedLearnerRow[]; errors: RowError[] } {
   const errors: RowError[] = [];
@@ -155,6 +239,10 @@ export function validateRows(rows: ParsedLearnerRow[]): { valid: ParsedLearnerRo
     }
     if (!ULI_PATTERN.test(row.uli)) {
       errors.push({ rowNumber: row.rowNumber, uli: row.uli || null, reason: 'ULI is missing or not a valid format' });
+      continue;
+    }
+    if (row.problems.length > 0) {
+      errors.push({ rowNumber: row.rowNumber, uli: row.uli, reason: row.problems.join('; ') });
       continue;
     }
     if (seenUli.has(row.uli)) {

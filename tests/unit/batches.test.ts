@@ -21,6 +21,8 @@ function fixtureRow(overrides: Partial<BatchRowWithProgram> = {}): BatchRowWithP
     end_date: '2026-06-18',
     billing_deadline: '2026-06-20',
     total_sessions: 45,
+    training_calendar_code: null,
+    tenant_qualification_id: null,
     current_stage: 'training',
     status: 'ongoing',
     progress_percent: 60,

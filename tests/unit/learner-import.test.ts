@@ -71,6 +71,8 @@ function row(overrides: Partial<ParsedLearnerRow> = {}): ParsedLearnerRow {
     middleName: null,
     extensionName: null,
     assessmentResult: 'pending',
+    details: {},
+    problems: [],
     ...overrides,
   };
 }
