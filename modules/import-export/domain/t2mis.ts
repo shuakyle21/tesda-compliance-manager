@@ -116,7 +116,8 @@ export const T2MIS_COLUMNS: T2misColumn[] = [
   { header: 'Province ', value: ({ scholar }) => scholar.province },
   { header: 'Sex', value: ({ scholar }) => scholar.sex },
   { header: 'Date of Birth', value: ({ scholar }) => isoToT2misDate(scholar.dob) },
-  { header: 'Age', value: ({ scholar }) => (scholar.dob ? String(scholar.age) : '') },
+  // `age` is 0 when it could not be computed (no birth date, or one in the future).
+  { header: 'Age', value: ({ scholar }) => (scholar.age > 0 ? String(scholar.age) : '') },
   { header: 'Civil Status', value: ({ scholar }) => scholar.civilStatus },
   { header: 'Highest Grade Completed', value: ({ scholar }) => scholar.education },
   { header: 'Nationality', value: ({ scholar }) => scholar.nationality },

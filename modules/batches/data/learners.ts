@@ -176,6 +176,16 @@ export type TenantRosterSnapshot =
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };
 
+const ROSTER_PAGE = 1000;
+
+/** Postgres undefined-column, and PostgREST's unknown relationship / unknown column. */
+const NOT_MIGRATED_CODES = new Set(['42703', 'PGRST200', 'PGRST204']);
+
+/** Today as ISO `YYYY-MM-DD` in the schools' timezone — a UTC date is a day behind until 08:00 there. */
+function todayInManila(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' }).format(new Date());
+}
+
 /** Pure: groups ordered learner rows by batch code and maps each. */
 export function mapTenantRoster(rows: LearnerRowWithBatch[], facts: BatchFactsRow[], asOf: string): TenantRoster {
   const roster: TenantRoster = {};
@@ -225,30 +235,40 @@ export async function getTenantRosterSnapshot(tenantId: string): Promise<TenantR
 
   try {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .from('learners')
-      .select('*, batches(batch_code, start_date, end_date, scholarship_programs(name))')
-      .eq('tenant_id', tenantId)
-      .order('last_name', { ascending: true })
-      .order('first_name', { ascending: true })
-      .order('id', { ascending: true });
-    if (error) return { status: 'sync-failed', error: error.message };
+
+    // Paged: the API caps a response at 1000 rows and drops the rest without
+    // an error, which would silently shorten a large school's export.
+    const rows: LearnerRowWithBatch[] = [];
+    for (let from = 0; ; from += ROSTER_PAGE) {
+      const { data, error } = await supabase
+        .from('learners')
+        .select('*, batches(batch_code, start_date, end_date, scholarship_programs(name))')
+        .eq('tenant_id', tenantId)
+        .order('last_name', { ascending: true })
+        .order('first_name', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, from + ROSTER_PAGE - 1);
+      if (error) return { status: 'sync-failed', error: error.message };
+      rows.push(...((data ?? []) as unknown as LearnerRowWithBatch[]));
+      if ((data ?? []).length < ROSTER_PAGE) break;
+    }
 
     // Separate query on purpose: it names columns from migration
-    // 20261111120000, so it errors until that is applied. A failure here
-    // leaves the qualification columns blank instead of failing the roster.
+    // 20261111120000, so it errors until that is applied. Only that specific
+    // "column/relationship does not exist" failure leaves the qualification
+    // cells blank; any other error fails the snapshot, because blank cells
+    // would be indistinguishable from "not recorded".
     const facts = await supabase
       .from('batches')
       .select('batch_code, training_calendar_code, tenant_qualifications(copr_number, registration_status, delivery_mode, qualifications(sector, cluster))')
       .eq('tenant_id', tenantId);
+    if (facts.error && !NOT_MIGRATED_CODES.has(facts.error.code)) {
+      return { status: 'sync-failed', error: facts.error.message };
+    }
 
     return {
       status: 'ok',
-      roster: mapTenantRoster(
-        (data ?? []) as unknown as LearnerRowWithBatch[],
-        (facts.error ? [] : facts.data ?? []) as unknown as BatchFactsRow[],
-        new Date().toISOString().slice(0, 10),
-      ),
+      roster: mapTenantRoster(rows, (facts.data ?? []) as unknown as BatchFactsRow[], todayInManila()),
     };
   } catch (err) {
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };

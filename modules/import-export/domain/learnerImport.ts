@@ -109,6 +109,8 @@ const ASSESSMENT_RESULT_ALIASES: Record<string, ImportAssessmentResult> = {
 export type LearnerCsvParseResult =
   | { status: 'ok'; rows: ParsedLearnerRow[] }
   | { status: 'missing-columns'; missing: string[] }
+  /** The file spans more than one batch (e.g. a whole-school T2MIS export). */
+  | { status: 'multiple-batches'; values: string[] }
   | { status: 'empty' };
 
 /**
@@ -192,6 +194,13 @@ export function parseLearnerCsv(text: string): LearnerCsvParseResult {
     }
     return normalized;
   });
+
+  // An import targets one batch. A whole-school T2MIS export carries every
+  // batch in one sheet; importing it would file all of them under the target.
+  for (const key of ['training calendar code', 'qualification program title']) {
+    const values = [...new Set(records.map((r) => r[key]).filter(Boolean))];
+    if (values.length > 1) return { status: 'multiple-batches', values };
+  }
 
   const parsedRows: ParsedLearnerRow[] = records.map((record, i) => {
     const problems: string[] = [];

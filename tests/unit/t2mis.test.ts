@@ -93,6 +93,12 @@ describe('T2MIS layout', () => {
     expect(cell(row, 'Salary')).toBe('10,000 to 20,000');
   });
 
+  it('leaves Age blank for a birth date after the as-of date', () => {
+    const roster = mapTenantRoster([{ ...LEARNER_ROW, date_of_birth: '2030-01-01' }], [], '2026-06-08');
+    const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
+    expect(cell(row, 'Age')).toBe('');
+  });
+
   it('leaves qualification cells blank when the batch has no qualification link', () => {
     const roster = mapTenantRoster([LEARNER_ROW], [], '2026-06-08');
     const [row] = buildT2misRows(attachRoster([BATCH], roster), () => TENANT);
@@ -129,6 +135,11 @@ describe('T2MIS import validation', () => {
     const { valid, errors } = validateRows(parsed.rows);
     expect(valid).toHaveLength(0);
     expect(errors[0].reason).toMatch(/Assessment result "Competnt"/);
+  });
+
+  it('refuses a file that spans more than one batch', () => {
+    const csv = 'Last Name,First Name,ULI,Qualification Program Title\nReyes,Ana,ABC12345678,Crops NC II\nCruz,Ben,DEF12345678,Bread NC II\n';
+    expect(parseLearnerCsv(csv)).toEqual({ status: 'multiple-batches', values: ['Crops NC II', 'Bread NC II'] });
   });
 
   it('names the field for a bad date or sex', () => {

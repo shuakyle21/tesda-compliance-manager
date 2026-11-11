@@ -182,7 +182,10 @@ Migration `20261111120000_add_t2mis_terminal_report_fields.sql` adds a nullable
 "Unblocked" above: the T2MIS export now reads industry sector, registration status, CTPR
 (`copr_number`), delivery mode and cluster through that link instead of hardcoding them, and
 writes a blank cell where a batch is not linked. `batches.qualification_title` is unchanged and
-remains the display title. Nothing sets the link yet — no screen writes it and existing batches
+remains the display title. The foreign key includes `tenant_id`, so a batch can only link to its
+own school's registry row, and it is `on delete restrict`: deleting a registry row never rewrites
+a `batches` row, which keeps P3's boundary (a platform admin has no write path into compliance
+tables) intact. Nothing sets the link yet — no screen writes it and existing batches
 are not backfilled, because matching free-text titles to registry rows would be a guess.
 
 The same migration adds the learner demographic, training and employment columns of the T2MIS

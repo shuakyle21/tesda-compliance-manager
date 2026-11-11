@@ -26,10 +26,24 @@ alter table public.qualifications
 -- delivery mode reachable from a batch. batches.qualification_title stays as
 -- the display title (ADR-006); this column is nullable and nothing reads it
 -- except the T2MIS export.
+--
+-- The foreign key is composite on purpose: it includes tenant_id, so a batch
+-- can only link to a registry row of its own school. `on delete restrict`
+-- (not `set null`) means deleting a registry row never rewrites a `batches`
+-- row -- a platform admin has no write path into compliance tables (ADR-006
+-- P3, RULES.md rule 30); a row still in use simply cannot be deleted.
+alter table public.tenant_qualifications
+  add constraint tenant_qualifications_id_tenant_key unique (id, tenant_id);
+
 alter table public.batches
   add column if not exists training_calendar_code text,
-  add column if not exists tenant_qualification_id uuid
-    references public.tenant_qualifications(id) on delete set null;
+  add column if not exists tenant_qualification_id uuid;
+
+alter table public.batches
+  add constraint batches_tenant_qualification_fkey
+    foreign key (tenant_qualification_id, tenant_id)
+    references public.tenant_qualifications (id, tenant_id)
+    on delete restrict;
 
 create index if not exists batches_tenant_qualification_id_idx
   on public.batches (tenant_qualification_id)
