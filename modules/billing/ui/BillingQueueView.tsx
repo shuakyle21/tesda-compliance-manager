@@ -182,29 +182,24 @@ function BillingSummaryTiles({ summary }: { summary: PacketSummary }) {
       <MetricCard
         label="Ready"
         value={formatPesoCompact(summary.ready)}
-        sub={`${summary.readyCount} ${summary.readyCount === 1 ? 'packet' : 'packets'} can be generated`}
         iconName="check"
       />
       <MetricCard
         label="Awaiting docs"
         value={formatPesoCompact(summary.pendingReview)}
-        sub={`${summary.pendingCount} blocked on documents`}
         iconName="clock"
         variant="warning"
       />
       <MetricCard
         label="Overdue"
         value={formatPesoCompact(summary.overdue)}
-        sub={`${summary.overdueCount} past the tranche deadline`}
         iconName="alert-triangle"
         variant="critical"
       />
-      {/* ADR-003 P6 — an observation total, not a reconciliation. The sub-label
-          says who asserted it so the figure is never read as authoritative. */}
+      {/* ADR-003 P6 — an observation total, not a reconciliation. */}
       <MetricCard
         label="Recorded as paid"
         value={formatPesoCompact(summary.settled)}
-        sub={`${summary.settledCount} marked settled by a coordinator`}
         iconName="receipt"
       />
     </div>
@@ -341,7 +336,6 @@ function BillingPacketDetailPanel({
       <EmptyState
         iconName="file-off"
         heading="No packet selected"
-        sub="Choose a row in the queue to see its supporting documents."
       />
     );
   }
@@ -357,11 +351,7 @@ function BillingPacketDetailPanel({
         {isOverdue(selected) ? 'Overdue' : STATE_LABEL[selected.state]}
       </span>
 
-      <p className="billing-detail-note">
-        {selected.blockers.length === 0
-          ? `All supporting documents are on file and training has reached ${selected.scholars > 0 ? 'the release threshold' : 'completion'}. This packet can be generated.`
-          : selected.blockers.join(' ')}
-      </p>
+      {selected.blockers.length > 0 && <p className="billing-detail-note">{selected.blockers.join(' ')}</p>}
 
       <ul className="billing-doc-list">
         {selected.docs.map((doc) => (

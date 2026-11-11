@@ -55,7 +55,7 @@ export default async function TableViewPage({ params, searchParams }: {
         </div>
         {syncFailed ? (
           <InfoCallout variant="warning">
-            Sync with Supabase failed — batches could not be loaded.
+            Batch data could not be loaded.
             <Link href={scopedPath(scope.code, 'table-view')} className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
           </InfoCallout>
         ) : noTenantAccess ? (

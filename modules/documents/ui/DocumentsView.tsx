@@ -199,9 +199,6 @@ export function DocumentsView({
     <div>
       <Header />
       <SyncFailedCallout syncFailed={syncFailed} />
-      <InfoCallout variant="info">
-        Document audit follows TESDA Circular 014-2026. Critical documents are required for billing release; missing items block the BSRS submission.
-      </InfoCallout>
 
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${colCount}, 1fr)`, gap: 12, margin: '16px 0' }}>
         {batches.map((b, i) => {
@@ -319,7 +316,7 @@ function Header() {
   return (
     <div className="page-head">
       <h1>Documents</h1>
-      <span className="subline">TESDA Circular 014-2026 · critical docs gate billing</span>
+      <span className="subline">Critical documents must be verified before billing.</span>
     </div>
   );
 }

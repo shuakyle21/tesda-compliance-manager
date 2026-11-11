@@ -165,13 +165,15 @@ function FPSubmittedBanner({ canVerify, adminName }: { canVerify?: boolean; admi
 }
 
 function FPFooterStatus({ file, hasFile, adminName }: { file: PreviewFile; hasFile: boolean; adminName?: string | null }) {
+  // Keep an empty span so the footer actions stay right-aligned.
+  if (file.status !== 'verified' && hasFile) return <span />;
   return (
     <span style={{ fontSize: 11.5, color: 'var(--color-text-muted)', display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
       <Icon name={file.status === 'verified' ? 'check' : 'info-circle'} size={12} />
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {file.status === 'verified'
           ? `Verified by ${file.verifiedBy || adminName || 'admin'} · ${file.verifiedDate || file.updated || ''}`
-          : hasFile ? 'Stored securely · school-level access only' : 'Awaiting upload'}
+          : 'Awaiting upload'}
       </span>
     </span>
   );
@@ -191,7 +193,7 @@ function FPFooterActions({ file, hasFile, canVerify, onVerify, onRequestChanges,
   return (
     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
       {hasFile && (
-        <button className="btn ghost" title="Download (demo)"><Icon name="download" size={14} />Download</button>
+        <button className="btn ghost" title="Download"><Icon name="download" size={14} />Download</button>
       )}
       {file.status === 'submitted' && canVerify && (
         <>

@@ -351,18 +351,6 @@ export function SignInCard() {
         />
       )}
 
-      {/* "Secured by Clerk" badge — Figma node 743:2908. The prebuilt widget
-          rendered this automatically; the custom card adds it back. */}
-      <div className={styles.badge}>
-        <span>Secured by</span>
-        <Image
-          src="/assets/clerk-logo.svg"
-          alt="Clerk"
-          width={37}
-          height={11}
-        />
-      </div>
-
       {/* Sign-up modal — renders over the auth screen; closing (X, backdrop,
           Escape, or "Go to sign in") returns to this card. */}
       <SignUpModal open={signUpOpen} onClose={() => setSignUpOpen(false)} />

@@ -97,7 +97,7 @@ export function EmploymentReportTable({ empScholars, isMulti, tenantOf, empTone 
       <div className="egace-footnote">
         <Icon name="info-circle" size={12} />
         <span>
-          Schools must file each certified graduate&apos;s current employment status with TESDA — mandatory by the 6-month mark, though it may be reported earlier. Updates here flow straight into the EGACE “Employed” figure, the dashboard, and the Excel export.
+          Schools must file each certified graduate&apos;s current employment status with TESDA — mandatory by the 6-month mark, though it may be reported earlier.
         </span>
       </div>
     </div>

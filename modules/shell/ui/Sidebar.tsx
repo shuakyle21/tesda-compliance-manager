@@ -438,7 +438,7 @@ function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boo
 
   if (!item.href) {
     return (
-      <span className="sb-nav-item" aria-disabled="true" title="Coming soon" style={{ opacity: 0.45, cursor: 'default' }}>
+      <span className="sb-nav-item" aria-disabled="true" style={{ opacity: 0.45, cursor: 'default' }}>
         {inner}
       </span>
     );

@@ -49,7 +49,7 @@ export default async function BatchCardsPage({ params }: { params: Promise<{ ten
         </div>
         {syncFailed ? (
           <InfoCallout variant="warning">
-            Sync with Supabase failed — batches could not be loaded.
+            Batch data could not be loaded.
             <Link href={scopedPath(scope.code, 'batch-cards')} className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
           </InfoCallout>
         ) : noTenantAccess ? (
