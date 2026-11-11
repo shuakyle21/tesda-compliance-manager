@@ -43,7 +43,6 @@ export interface StatementSummaryLine {
 export interface BillingStatement {
   trackId: BillingTrackId;
   trackLabel: string;
-  batchId: string;
   school: string;
   region: string;
   /** Uppercase program banner, e.g. "COCONUT FARMERS SCHOLARSHIP PROGRAM (CFSP)". */
@@ -139,7 +138,6 @@ export function buildStatement(
   const header = {
     trackId,
     trackLabel: track.label,
-    batchId: batch.id,
     school: tenant.name,
     region: tenant.region,
     programLine: programBanner(batch.program).toUpperCase(),

@@ -84,6 +84,16 @@ describe('attentionItems', () => {
     expect(items).toEqual([{ kind: 'billing-deadline-missing', severity: 'due', batchIds: ['A', 'B'], batchLabels: ['A', 'B'] }]);
   });
 
+  it('labels attention items with the RQM code while ids stay the internal code', () => {
+    const RQM = 'RQM3-2026-CFSP-0000-0001';
+    const missing = attentionItems([batch({ id: 'A', rqmCode: RQM }), batch({ id: 'B' })], { syncFailed: false });
+    expect(missing).toEqual([{ kind: 'billing-deadline-missing', severity: 'due', batchIds: ['A', 'B'], batchLabels: [RQM, 'B'] }]);
+    const docs = attentionItems([dated(60, {
+      rqmCode: RQM, documentRequirements: REQS, documents: { ntp: doc('missing') },
+    })], { syncFailed: false });
+    expect(docs).toEqual([{ kind: 'documents-missing', severity: 'due', batchId: 'BAT-1', batchLabel: RQM, documents: ['Notice to Proceed'] }]);
+  });
+
   it('names required documents recorded as missing — not untracked or optional ones', () => {
     const items = attentionItems([dated(60, {
       documentRequirements: REQS,
@@ -144,6 +154,9 @@ describe('deriveDashboardMetrics', () => {
     ]);
     expect(metrics.nextBilling).toEqual({ batchId: 'OVERDUE', batchLabel: 'OVERDUE', deadline: '2026-11-01', daysToBilling: -4 });
     expect(metrics.openBillingObligations).toBe(3);
+    const RQM = 'RQM3-2026-CFSP-0000-0001';
+    const labelled = deriveDashboardMetrics([dated(-4, { id: 'OVERDUE', rqmCode: RQM })]);
+    expect(labelled.nextBilling).toMatchObject({ batchId: 'OVERDUE', batchLabel: RQM });
     expect(metrics.billingDeadlinesMissing).toBe(1);
     expect(metrics.overdueBilling).toBe(1);
   });

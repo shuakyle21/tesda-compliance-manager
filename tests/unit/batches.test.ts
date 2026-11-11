@@ -281,6 +281,11 @@ describe('RQM code', () => {
     expect(mapBatchRow(fixtureRow({ rqm_code: ` ${RQM} ` })).rqmCode).toBe(RQM);
   });
 
+  it('builds name from the RQM code when recorded, else the internal code', () => {
+    expect(mapBatchRow(fixtureRow({ rqm_code: RQM, batch_section: 'Morning' })).name).toBe(`${RQM} (Morning)`);
+    expect(mapBatchRow(fixtureRow({ rqm_code: null, batch_section: 'Morning' })).name).toBe('BAT-2 (Morning)');
+  });
+
   it('keeps id as the internal batch code when an RQM code is set', () => {
     expect(mapBatchRow(fixtureRow({ rqm_code: RQM })).id).toBe('BAT-2');
   });
@@ -295,7 +300,6 @@ describe('RQM code', () => {
     expect(withCode.rqm).toBe(RQM);
     const without = buildStatement(mapBatchRow(fixtureRow({ rqm_code: null })), 'training_cost', tenant);
     expect(without.rqm).toBeNull();
-    expect(String(without.rqm).startsWith('RQM3-2026')).toBe(false);
   });
 
   it('search matches by RQM code as well as the internal code', () => {

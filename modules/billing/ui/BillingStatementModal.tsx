@@ -23,9 +23,7 @@ import type { BillingTrackId } from '@/modules/billing/domain/tracks';
 interface BillingStatementModalProps {
   card: BillingCard;
   initialTrackId: BillingTrackId;
-  readOnly?: boolean;
   onClose: () => void;
-  onSave?: (label: string) => void;
 }
 
 /** Grid track sizing per column role — numerics size to content, name flexes. */
@@ -40,7 +38,7 @@ function cellAlign(align: StatementColumn['align']): 'left' | 'center' | 'right'
   return align;
 }
 
-export function BillingStatementModal({ card, initialTrackId, readOnly, onClose, onSave }: BillingStatementModalProps) {
+export function BillingStatementModal({ card, initialTrackId, onClose }: BillingStatementModalProps) {
   const [trackId, setTrackId] = useState<BillingTrackId>(initialTrackId);
 
   useEffect(() => {
@@ -172,16 +170,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Internal working copy · TESDA SIS and BSRS remain authoritative</span>
           </span>
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-            {readOnly ? (
-              <button className="btn primary" onClick={onClose}>Close</button>
-            ) : (
-              <>
-                <button className="btn secondary" onClick={onClose}>Close</button>
-                <button className="btn primary" onClick={() => onSave?.(`${statement.trackLabel} · ${displayBatchId(card.batch)}`)}>
-                  <Icon name="download" size={14} />Save working copy
-                </button>
-              </>
-            )}
+            <button className="btn primary" onClick={onClose}>Close preview</button>
           </div>
         </div>
       </div>

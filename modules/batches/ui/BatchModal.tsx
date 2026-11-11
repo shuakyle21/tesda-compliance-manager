@@ -14,7 +14,6 @@ import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
 import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
-import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
@@ -176,7 +175,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <div className="nm-breadcrumb">
               <span className="crumb" onClick={close}>Training Batch Manager</span>
               <Icon name="chevron-right" size={12} style={{ opacity: 0.4, flexShrink: 0 }} />
-              <span className="current">{displayBatchId(batch)} · {batch.name}</span>
+              <span className="current">{batch.name}</span>
             </div>
             <button className="nm-close" onClick={close} aria-label="Close"><Icon name="x" size={16} /></button>
           </div>

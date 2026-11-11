@@ -1,7 +1,7 @@
 /**
  * The batch's displayed ID: its RQM code, or — while none is recorded — the
  * internal batch code plus a visible "RQM code not recorded" label (icon + text,
- * never colour alone). Colour and size are inherited from the parent.
+ * never colour alone). Colour and size are inherited from the parent, except the "not recorded" note, which sets its own small amber text.
  */
 
 import { Icon } from '@/shared/ui/Icon';

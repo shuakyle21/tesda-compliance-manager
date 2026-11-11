@@ -228,12 +228,13 @@ function batchDisplayName(code: string, section: string | null): string {
 // Mapper — pure, no I/O. Unit-test this against a fixture row.
 // ---------------------------------------------------------------------------
 export function mapBatchRow(row: BatchRowWithProgram): Batch {
+  const rqmCode = row.rqm_code?.trim() || null;
   return {
     // Direct from the contract:
     id: row.batch_code, // human code (e.g. "BAT-2") for display continuity
-    rqmCode: row.rqm_code?.trim() || null,
+    rqmCode,
     tenantId: row.tenant_id,
-    name: batchDisplayName(row.batch_code, row.batch_section),
+    name: batchDisplayName(rqmCode ?? row.batch_code, row.batch_section),
     qualification: row.qualification_title, // closes the TES-60 gap (AC1)
     programId: row.program_id,
     program: orEmpty(row.scholarship_programs?.code),
