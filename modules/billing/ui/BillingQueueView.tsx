@@ -182,24 +182,32 @@ function BillingSummaryTiles({ summary }: { summary: PacketSummary }) {
       <MetricCard
         label="Ready"
         value={formatPesoCompact(summary.ready)}
+        sub={`${summary.readyCount} ${summary.readyCount === 1 ? 'packet' : 'packets'} can be generated`}
         iconName="check"
       />
       <MetricCard
         label="Awaiting docs"
         value={formatPesoCompact(summary.pendingReview)}
+        sub={`${summary.pendingCount} blocked on documents`}
         iconName="clock"
         variant="warning"
       />
       <MetricCard
         label="Overdue"
         value={formatPesoCompact(summary.overdue)}
+        sub={`${summary.overdueCount} past the tranche deadline`}
         iconName="alert-triangle"
         variant="critical"
       />
-      {/* ADR-003 P6 — an observation total, not a reconciliation. */}
+      {/* ADR-003 P6 — an observation total, not a reconciliation. The status line
+          names where the figure comes from so it is never read as authoritative.
+          It says "batches marked completed" because that is what this prototype
+          derives `settled` from (packets.ts); ADR-003 P3's target is a mark a
+          coordinator records, and the wording should change when that exists. */}
       <MetricCard
         label="Recorded as paid"
         value={formatPesoCompact(summary.settled)}
+        sub={`${summary.settledCount} from batches marked completed`}
         iconName="receipt"
       />
     </div>
