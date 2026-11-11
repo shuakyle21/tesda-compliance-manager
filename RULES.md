@@ -123,7 +123,7 @@ reviewing, or merging code.
 ## 9. Testing (when the runner exists)
 
 34. There is **no test runner yet** — `pnpm test` is a placeholder. Standing up Vitest is Phase 0.4
-    of `docs/IMPLEMENTATION_PLAN.md`.
+    of `implementation_plan.md`.
 35. When tests exist: **mappers and module `domain/` layers are unit-tested with fixed as-of
     dates**; **RLS/tenant-isolation tests run against real Supabase, no mocks.** **[review]**
 
