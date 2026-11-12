@@ -205,7 +205,7 @@ export function Sidebar({
   const closeOrg = useCallback(() => setOrgOpen(false), []);
   const { tenant, currentSection } = resolveActiveSchool(pathname, tenants, defaultTenantId);
 
-  // Operations overlays (Import CSV / Settings);.
+  // Operations overlays (Import CSV / Settings).
   const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
 
   // Esc closes the dropdown, then the drawer (the op modals own their own Esc).

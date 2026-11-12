@@ -68,6 +68,16 @@ export function tsfDaysFor(qualification: string): number | null {
 }
 
 /**
+ * TSF days for a batch: the batch's own snapshotted `total_sessions` (ADR-001 E2,
+ * nominal hours ÷ 8 fixed at creation) when positive, else the qualification
+ * table, else `null`.
+ */
+export function tsfDaysForBatch(batch: { totalSessions: number | null; qualification: string }): number | null {
+  const own = batch.totalSessions;
+  return own !== null && Number.isFinite(own) && own > 0 ? own : tsfDaysFor(batch.qualification);
+}
+
+/**
  * Per-scholar Training Cost for a qualification, or `null` when it is not in
  * the reference table — the caller must show "Rate unavailable", not a default.
  */
@@ -88,3 +98,6 @@ export function pesoLabel(n: number): string {
 }
 
 export const RATE_UNAVAILABLE = 'Rate unavailable for this qualification';
+
+/** Shown instead of any scholar-dependent amount when the roster was never attached. */
+export const ROSTER_NOT_LOADED = 'Scholar roster not loaded';

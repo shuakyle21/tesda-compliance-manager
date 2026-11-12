@@ -89,6 +89,7 @@ export function mapDocumentRow(row: DocumentRow): DocRecord {
     // submission. Falls back to updated_at so a row always has a timestamp.
     updated: row.verified_at ?? row.submitted_at ?? row.updated_at,
     source: row.storage_path ? 'Uploaded file' : row.external_url ? 'External link' : null,
+    // Raw profile id, never shown: resolving the verifier's name needs a profile join.
     verifiedBy: row.verified_by,
     verifiedDate: row.verified_at,
   };

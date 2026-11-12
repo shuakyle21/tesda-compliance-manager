@@ -13,7 +13,7 @@
 
 import { docRecordFor, isDocOnFile } from '@/modules/documents/domain/compliance';
 import { BILLING_READY_THRESHOLD } from './readiness';
-import { TSF_DAY_RATE, trainingCostFor } from './rates';
+import { TSF_DAY_RATE, trainingCostFor, tsfDaysForBatch } from './rates';
 import type { Batch, DocRecord, DocStatus, DocumentRequirement } from '@/shared/types';
 
 /**
@@ -161,8 +161,8 @@ export function buildPacket(
 
   // An unmapped qualification has no rate (never a made-up default), so the
   // Training Cost document cannot be generated for it.
-  if (trainingCostFor(batch.qualification) === null) {
-    blockers.push('No training-cost rate is set for this qualification.');
+  if (trainingCostFor(batch.qualification) === null || tsfDaysForBatch(batch) === null) {
+    blockers.push('No rate is set for this qualification.');
   }
 
   const state: PacketState =

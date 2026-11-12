@@ -335,7 +335,7 @@ export default async function ProfilePage() {
           <SecRow
             icon="shield-check"
             title="Two-step verification"
-            desc={totpEnabled ? 'Authenticator app' : 'No authenticator app set up'}
+            desc={totpEnabled ? 'Authenticator app' : twoFactorEnabled ? 'Two-step verification is on' : 'Two-step verification is off'}
             status={twoFactorEnabled ? 'On' : 'Off'}
             statusTone={twoFactorEnabled ? 'green' : 'amber'}
             last

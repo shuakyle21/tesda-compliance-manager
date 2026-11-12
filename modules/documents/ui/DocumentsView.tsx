@@ -83,7 +83,6 @@ export function DocumentsView({
   documentRequirements,
   syncFailed,
   canVerify,
-  verifierName,
 }: {
   batches: Batch[];
   // The matrix columns: every requirement any shown batch's program asks for
@@ -94,8 +93,6 @@ export function DocumentsView({
   syncFailed: boolean;
   // From the trusted role (`profiles.role`), never the `?role=` preview override.
   canVerify: boolean;
-  // The signed-in user's display name; null when the profile has none.
-  verifierName: string | null;
 }) {
   const [preview, setPreview] = useState<PreviewFile | null>(null);
 
@@ -159,7 +156,7 @@ export function DocumentsView({
     name: req.label, batchId: b.id, batchLabel: displayBatchId(b), batchName: b.name, program: b.program,
     tenantId: b.tenantId, docKey: req.key, url: doc.url, status: doc.status,
     updated: formatDate(doc.updated), source: doc.source, critical: req.critical,
-    verifiedBy: doc.verifiedBy || null, verifiedDate: formatDate(doc.verifiedDate),
+    verifiedDate: formatDate(doc.verifiedDate),
   });
 
   const onCellClick = (b: Batch, req: DocumentRequirement) => {
@@ -251,7 +248,8 @@ export function DocumentsView({
                     type="button"
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
-                    disabled={!doc || (s !== 'verified' && s !== 'submitted')}
+                    aria-disabled={!doc || (s !== 'verified' && s !== 'submitted') ? 'true' : undefined}
+                    aria-label={`${req.label}, ${displayBatchId(b)}: ${doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}`}
                     title={cellTitle(doc, s)}
                   >
                     <Icon name={cellIcon(doc, s)} size={11} />
@@ -271,7 +269,6 @@ export function DocumentsView({
         <FilePreviewModal
           file={preview}
           canVerify={canVerify}
-          adminName={verifierName}
           verifyUnavailable="Verification can't be saved yet."
           onClose={() => setPreview(null)}
         />

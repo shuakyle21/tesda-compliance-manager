@@ -159,7 +159,13 @@ export function BillingStatementModal({ card, initialTrackId, onClose }: Billing
               <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-text-primary)' }}>{statement.totalLabel}</span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>{statement.grandTotalLabel}</span>
             </div>
-            <div style={{ fontSize: 11.5, fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>Amount in words: {statement.grandWords}</div>
+            {statement.grandTotal === null ? (
+              statement.unavailableReason && (
+                <div style={{ fontSize: 11.5, color: 'var(--color-text-secondary)' }}>Total unavailable: {statement.unavailableReason}</div>
+              )
+            ) : (
+              <div style={{ fontSize: 11.5, fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>Amount in words: {statement.grandWords}</div>
+            )}
           </div>
         </div>
 

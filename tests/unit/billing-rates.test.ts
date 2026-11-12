@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildStatement } from '@/modules/billing/domain/statement';
 import { trackById } from '@/modules/billing/domain/tracks';
 import { buildPacket, isOverdue, summarizePackets } from '@/modules/billing/domain/packets';
-import { nominalHoursFor, trainingCostFor, tsfDaysFor } from '@/modules/billing/domain/rates';
+import { nominalHoursFor, trainingCostFor, tsfDaysFor, tsfDaysForBatch } from '@/modules/billing/domain/rates';
 import type { Batch, ScholarRow } from '@/shared/types';
 
 const scholar = (n: number) => ({ lastName: `L${n}`, firstName: 'F', middleInit: '', sex: 'F' }) as unknown as ScholarRow;
@@ -69,16 +69,28 @@ describe('unmapped qualification', () => {
     expect(s.rows[0].cells.slice(3)).toEqual(['—', '—']);
   });
 
-  it('CFSP TSF total excludes the missing TSF and says so', () => {
+  it('CFSP with no TSF rate has no total, but still lists the known components', () => {
     const s = buildStatement(unmapped, 'tsf_allowance', tenant);
-    expect(s.grandTotal).toBe((1_000 + 100.8) * 2);
-    expect(s.summary.some((l) => l.label.startsWith('Total excludes TSF'))).toBe(true);
-    expect(s.summary[0].label).toBe('TSF — Rate unavailable for this qualification');
+    expect(s.grandTotal).toBeNull();
+    expect(s.grandWords).toBe('—');
+    expect(s.unavailableReason).toBe('Rate unavailable for this qualification');
+    expect(s.summary.map((l) => l.label)).toEqual([
+      'TSF — Rate unavailable for this qualification',
+      'New Normal Assistance — ₱1,000 × 2',
+      'Accident Insurance — ₱100.80 × 2',
+    ]);
+    expect(s.summary[1].amount).toBe('₱2,000.00');
+  });
+
+  it('packet gets one rate blocker line, not two', () => {
+    const only = fixtureBatch({ qualification: 'Not In The Table' });
+    const blockers = buildPacket(only, [], 'S', 1).blockers.filter((b) => b.startsWith('No rate'));
+    expect(blockers).toEqual(['No rate is set for this qualification.']);
   });
 
   it('packet is blocked, not ready', () => {
     const packet = buildPacket(unmapped, [{ key: 'k', label: 'K', stage: 'aou' }] as never, 'S', 1);
-    expect(packet.blockers).toContain('No training-cost rate is set for this qualification.');
+    expect(packet.blockers).toContain('No rate is set for this qualification.');
     expect(packet.state).toBe('draft');
   });
 });
@@ -92,6 +104,35 @@ describe('statement with no roster loaded', () => {
 
   it('shows "—" for a missing program banner', () => {
     expect(buildStatement(fixtureBatch({ program: '' }), 'training_cost', tenant).programLine).toBe('—');
+  });
+});
+
+describe('roster not loaded vs loaded empty', () => {
+  const kinds = ['training_cost', 'tsf_allowance', 'entrepreneurship'] as const;
+
+  it.each(kinds)('%s: no total, no words, visible reason', (kind) => {
+    const s = buildStatement(fixtureBatch({ scholars_list: undefined }), kind, tenant);
+    expect(s.grandTotal).toBeNull();
+    expect(s.grandTotalLabel).toBe('—');
+    expect(s.grandWords).toBe('—');
+    expect(s.unavailableReason).toContain('Scholar roster not loaded');
+    expect(s.summary.some((l) => /× 0|0 scholars/.test(l.label))).toBe(false);
+  });
+
+  it.each(kinds)('%s: a loaded empty roster keeps its honest zero', (kind) => {
+    const s = buildStatement(fixtureBatch({ scholars_list: [] }), kind, tenant);
+    expect(s.grandTotal).toBe(0);
+    expect(s.unavailableReason).toBeNull();
+  });
+});
+
+describe('TSF days prefer the batch snapshot (ADR-001 E2)', () => {
+  it('uses the batch total_sessions when positive, else the table, else null', () => {
+    expect(tsfDaysForBatch({ totalSessions: 40, qualification: 'Agri Crops Production NC II' })).toBe(40);
+    expect(tsfDaysForBatch({ totalSessions: 0, qualification: 'Agri Crops Production NC II' })).toBe(45);
+    expect(tsfDaysForBatch({ totalSessions: null, qualification: 'Agri Crops Production NC II' })).toBe(45);
+    expect(tsfDaysForBatch({ totalSessions: null, qualification: 'Nope' })).toBeNull();
+    expect(tsfDaysForBatch({ totalSessions: 30, qualification: 'Nope' })).toBe(30);
   });
 });
 

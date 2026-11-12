@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
+import { ENTREPRENEURSHIP_BLOCK_DAYS } from '@/modules/billing/domain/rates';
 import { LifecyclePipeline } from './LifecyclePipeline';
 import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { RqmCodeEditor } from '@/modules/batches/ui/RqmCodeEditor';
@@ -97,8 +98,8 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Duration</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>—</div>
-          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>Not set</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>{ENTREPRENEURSHIP_BLOCK_DAYS}</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>days</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Status</div>

@@ -49,7 +49,6 @@ export default async function DocumentsPage({ params }: { params: Promise<{ tena
       documentRequirements={documentRequirements}
       syncFailed={snapshot.status === 'sync-failed'}
       canVerify={role === 'admin' || role === 'coordinator'}
-      verifierName={profile.fullName}
     />
   );
 }
