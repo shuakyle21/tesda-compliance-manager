@@ -206,8 +206,23 @@ export interface SchoolsOverviewProps {
   hiddenSchools: number;
   /** ISO time the data was read. */
   fetchedAt: string;
-  /** Only when one school is selected: activity events carry no school name. */
-  activity?: { events: readonly ActivityEvent[]; href: string };
+  /** Only when one school is selected: activity events carry no school name. `'failed'` = the read failed. */
+  activity?: { events: readonly ActivityEvent[]; href: string } | 'failed';
+}
+
+function Activity({ activity }: { activity: NonNullable<SchoolsOverviewProps['activity']> }) {
+  if (activity !== 'failed') return <RecentActivityPanel events={activity.events} viewAllHref={activity.href} />;
+  return (
+    <section className="dash-panel" aria-labelledby="activity-failed-heading">
+      <div className="dash-panel-head">
+        <h2 id="activity-failed-heading" className="dash-panel-title"><Icon name="timeline" size={13} /> Recent activity</h2>
+      </div>
+      <p className="attention-more" role="status">
+        <span className="attention-due"><Icon name="alert-circle" size={14} /></span>
+        Recent activity for this school could not be loaded. Reload the page to try again.
+      </p>
+    </section>
+  );
 }
 
 export function SchoolsOverview({ summaries, queue, metrics, batches, filters, options, hiddenSchools, fetchedAt, activity }: SchoolsOverviewProps) {
@@ -217,6 +232,9 @@ export function SchoolsOverview({ summaries, queue, metrics, batches, filters, o
   const withActive = summaries.filter((summary) => summary.metrics.activeBatches > 0).length;
   const leadSub = filtered ? `${summaries.length} in view with these filters` : `${withActive} with active batches`;
   const active = batches.filter((batch) => batch.status === 'ongoing');
+  // A school with no batches is not a failed search: only a program or
+  // qualification filter can "match nothing".
+  const noMatches = batches.length === 0 && (filters.program !== null || filters.qualification !== null);
 
   return (
     <div className="dashboard-view">
@@ -230,18 +248,16 @@ export function SchoolsOverview({ summaries, queue, metrics, batches, filters, o
 
       <OverviewFilters filters={filters} options={options} />
 
-      {batches.length === 0 ? (
-        filtered ? (
-          <EmptyState iconName="search-off" heading="No batches match these filters"
-            sub="Change or clear the filters to see your schools."
-            action={<Link href="/overview" className="btn primary" style={{ marginTop: 12 }}>Clear filters</Link>} />
-        ) : (
-          <>
-            <EmptyState iconName="folders" heading="No batches yet"
-              sub="Batches appear here once a school coordinator imports or assigns them." />
-            <SchoolsTable summaries={summaries} hiddenSchools={0} />
-          </>
-        )
+      {noMatches ? (
+        <EmptyState iconName="search-off" heading="No batches match these filters"
+          sub="Change or clear the filters to see your schools."
+          action={<Link href="/overview" className="btn primary" style={{ marginTop: 12 }}>Clear filters</Link>} />
+      ) : batches.length === 0 ? (
+        <>
+          <EmptyState iconName="folders" heading="No batches yet"
+            sub="Batches appear here once a school coordinator imports or assigns them." />
+          <SchoolsTable summaries={summaries} hiddenSchools={0} />
+        </>
       ) : (
         <>
           <KpiSummary
@@ -264,10 +280,10 @@ export function SchoolsOverview({ summaries, queue, metrics, batches, filters, o
             <BatchStageDistribution batches={batches} />
             <DocumentStatusDonut batches={active} />
           </div>
-
-          {activity && <RecentActivityPanel events={activity.events} viewAllHref={activity.href} />}
         </>
       )}
+
+      {activity && !noMatches && <Activity activity={activity} />}
     </div>
   );
 }

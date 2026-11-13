@@ -62,14 +62,22 @@ export default async function OverviewPage({ searchParams }: { searchParams: Sea
   const options = overviewFilterOptions(snapshot.batches, schools);
   const filters = parseOverviewFilters(await searchParams, options);
   const inView = applyOverviewFilters(snapshot.batches, schools, filters);
-  // UTC date, the same day basis the batch mapper counts deadlines from.
-  const summaries = schoolSummaries(inView.batches, inView.schools, new Date().toISOString().slice(0, 10));
+  // Training dates are Philippine calendar dates, so "today" is the Manila date
+  // (en-CA formats as YYYY-MM-DD). A UTC date would lag a day until 08:00.
+  const todayIso = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' }).format(new Date());
+  const summaries = schoolSummaries(inView.batches, inView.schools, todayIso);
 
   // Activity events carry no school name, so the feed is shown only for one
   // selected school. Its tenant id comes from the caller's own memberships:
   // scope selection on top of RLS, not authorization.
   const selected = filters.school ? inView.schools[0] : undefined;
   const activity = selected ? await getActivitySnapshot(6, 0, selected.tenantId) : null;
+  // A failed read is shown as a failure, never as a missing section (RULES.md rule 19).
+  const activityProp = !selected || !activity
+    ? undefined
+    : activity.status === 'ok'
+      ? { events: activity.events, href: scopedPath(selected.code, 'activity-log') }
+      : 'failed' as const;
 
   return (
     <SchoolsOverview
@@ -81,9 +89,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Sea
       options={options}
       hiddenSchools={inView.hiddenSchools}
       fetchedAt={snapshot.fetchedAt}
-      activity={selected && activity?.status === 'ok'
-        ? { events: activity.events, href: scopedPath(selected.code, 'activity-log') }
-        : undefined}
+      activity={activityProp}
     />
   );
 }

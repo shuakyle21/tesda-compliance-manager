@@ -49,19 +49,21 @@ function batch(overrides: Partial<Batch>): Batch {
 const BATCHES: Batch[] = [
   batch({ id: 'BAT-1', tenantId: 'akb', billingDeadline: '2026-11-08', daysToBilling: -5, completedSessions: 30, totalSessions: 40, documents: { ntp: doc('verified'), tip: doc('missing') } }),
   batch({ id: 'BAT-2', tenantId: 'akb', program: 'CFSP', qualification: 'Rice Machinery Operations NC II', scholars: 20, trainingEnd: '2026-11-01', lifecycle: lifecycle('assess'), billingDeadline: '2026-11-25', daysToBilling: 12, documents: { ntp: doc('verified'), tip: doc('submitted') } }),
-  batch({ id: 'BAT-1', tenantId: 'nen', scholars: 18, blocked: true, status: 'pending', lifecycle: lifecycle(null) }),
+  batch({ id: 'BAT-4', tenantId: 'nen', scholars: 18, blocked: true, status: 'pending', lifecycle: lifecycle(null) }),
   batch({ id: 'BAT-3', tenantId: 'nen', program: 'CFSP', qualification: 'Rice Machinery Operations NC II', scholars: 22, completedSessions: 10, totalSessions: 40, billingDeadline: '2027-02-10', daysToBilling: 89, documents: { ntp: doc('pending') } }),
   batch({ id: 'BAT-9', tenantId: 'j3', status: 'completed', bsrs: true, lifecycle: lifecycle(null) }),
 ];
 
-function render(params: Record<string, string>, batches = BATCHES): string {
+type Activity = Parameters<typeof SchoolsOverview>[0]['activity'];
+
+function render(params: Record<string, string>, batches = BATCHES, activity?: Activity): string {
   const options = overviewFilterOptions(batches, SCHOOLS);
   const filters = parseOverviewFilters(params, options);
   const inView = applyOverviewFilters(batches, SCHOOLS, filters);
   const summaries = schoolSummaries(inView.batches, inView.schools, '2026-11-13');
   return renderToStaticMarkup(createElement(SchoolsOverview, {
     summaries, queue: crossSchoolQueue(summaries), metrics: deriveDashboardMetrics(inView.batches), batches: inView.batches,
-    filters, options, hiddenSchools: inView.hiddenSchools, fetchedAt: '2026-11-13T02:15:00.000Z',
+    filters, options, hiddenSchools: inView.hiddenSchools, fetchedAt: '2026-11-13T02:15:00.000Z', activity,
   }));
 }
 function text(html: string): string {
@@ -108,6 +110,19 @@ describe('SchoolsOverview', () => {
     const out = text(render({}, []));
     expect(out).toContain('No batches yet');
     expect(out).toContain('Nenita Farm School');
+  });
+
+  it('says a selected school has no batches yet, not that the filters matched nothing', () => {
+    const out = text(render({ school: 'j3ed' }, BATCHES.filter((b) => b.tenantId !== 'j3')));
+    expect(out).toContain('No batches yet');
+    expect(out).not.toContain('No batches match these filters');
+    expect(out).toContain('J3ed Farm School');
+  });
+
+  it('shows a failed activity read as a failure, never as a missing section', () => {
+    expect(text(render({ school: 'akb' }, BATCHES, 'failed'))).toContain('Recent activity for this school could not be loaded');
+    expect(text(render({ school: 'akb' }, BATCHES, { events: [], href: '/t/akb/activity-log' }))).toContain('No recent activity yet');
+    expect(text(render({ school: 'akb' }))).not.toContain('Recent activity');
   });
 
   it('never implies official approval or certification', () => {

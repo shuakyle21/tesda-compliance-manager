@@ -89,8 +89,18 @@ export interface OverviewFilterOptions {
   qualifications: string[];
 }
 
+/** Schools type their own titles, so "NC II" and "nc ii " must be one choice, not two. */
+function norm(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+/** Distinct by trimmed, case-insensitive value; the first spelling seen is the label. */
 function distinct(values: string[]): string[] {
-  return [...new Set(values.map((v) => v.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const seen = new Map<string, string>();
+  for (const value of values) {
+    if (value.trim() && !seen.has(norm(value))) seen.set(norm(value), value.trim());
+  }
+  return [...seen.values()].sort((a, b) => a.localeCompare(b));
 }
 
 /** The choices each filter offers: the caller's schools, and the programs and qualifications present in their batches. */
@@ -104,9 +114,9 @@ export function overviewFilterOptions(batches: readonly Batch[], schools: readon
 
 /** First value, trimmed, matched case-insensitively to an offered option; anything else is `null` ("All"). */
 function pick(raw: string | string[] | undefined, allowed: readonly string[]): string | null {
-  const value = (Array.isArray(raw) ? raw[0] : raw)?.trim().toLowerCase();
+  const value = norm((Array.isArray(raw) ? raw[0] : raw) ?? '');
   if (!value) return null;
-  return allowed.find((option) => option.toLowerCase() === value) ?? null;
+  return allowed.find((option) => norm(option) === value) ?? null;
 }
 
 export function parseOverviewFilters(
@@ -138,8 +148,8 @@ export function applyOverviewFilters(
   const tenantIds = new Set(inScope.map((s) => s.tenantId));
   const matching = batches.filter((b) =>
     tenantIds.has(b.tenantId)
-    && (filters.program === null || b.program === filters.program)
-    && (filters.qualification === null || b.qualification.trim() === filters.qualification));
+    && (filters.program === null || norm(b.program) === norm(filters.program))
+    && (filters.qualification === null || norm(b.qualification) === norm(filters.qualification)));
 
   if (filters.program === null && filters.qualification === null) {
     return { batches: matching, schools: inScope, hiddenSchools: 0 };
@@ -172,8 +182,10 @@ export function stageDistribution(batches: readonly Batch[]): StageCount[] {
   for (const batch of batches) {
     const active = batch.lifecycle.find((stage) => stage.status === 'active');
     const row = active && stages.find((stage) => stage.key === active.key);
+    // Every stage done is a recorded completion even if `status` lags behind it.
+    const allDone = batch.lifecycle.length > 0 && batch.lifecycle.every((stage) => stage.status === 'done');
     if (batch.blocked) extra.blocked += 1;
-    else if (batch.status === 'completed') extra.completed += 1;
+    else if (batch.status === 'completed' || allDone) extra.completed += 1;
     else if (row) row.count += 1;
     else extra.unrecorded += 1;
   }

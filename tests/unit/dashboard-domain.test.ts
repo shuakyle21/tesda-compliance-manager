@@ -224,11 +224,16 @@ describe('schoolSummaries', () => {
   });
 
   it('queues every open item with its school, urgent before due', () => {
+    // AKB sorts first (2 urgent) and also holds a due item, so only the
+    // queue's own sort can lift NEN's urgent item above it.
     const queue = crossSchoolQueue(schoolSummaries([
-      dated(60, { id: 'A1', tenantId: 'akb', documentRequirements: REQS, documents: { ntp: doc('missing') } }),
+      dated(-9, { id: 'A1', tenantId: 'akb', documentRequirements: REQS, documents: { ntp: doc('missing') } }),
+      dated(-2, { id: 'A2', tenantId: 'akb' }),
       dated(-3, { id: 'N1', tenantId: 'nen' }),
     ], [AKB, NEN], TODAY));
     expect(queue.map((entry) => [entry.school.code, entry.item.kind])).toEqual([
+      ['AKB', 'billing-overdue'],
+      ['AKB', 'billing-overdue'],
       ['NEN', 'billing-overdue'],
       ['AKB', 'documents-missing'],
     ]);
@@ -265,6 +270,19 @@ describe('overview filters', () => {
       .toEqual({ school: null, program: null, qualification: null });
   });
 
+  it('treats spellings that differ only by case or spacing as one choice that matches every batch', () => {
+    const mixed = [
+      batch({ id: 'A1', tenantId: 'akb', program: 'TWSP', qualification: 'Organic Agriculture Production NC II' }),
+      batch({ id: 'N1', tenantId: 'nen', program: ' twsp', qualification: 'organic agriculture production NC II ' }),
+    ];
+    const opts = overviewFilterOptions(mixed, [AKB, NEN]);
+    expect(opts.qualifications).toEqual(['Organic Agriculture Production NC II']);
+    expect(opts.programs).toEqual(['TWSP']);
+
+    const filters = parseOverviewFilters({ qualification: 'ORGANIC agriculture production nc ii', program: 'twsp' }, opts);
+    expect(applyOverviewFilters(mixed, [AKB, NEN], filters).batches.map((b) => b.id)).toEqual(['A1', 'N1']);
+  });
+
   it('never returns a batch outside the given schools', () => {
     const all = applyOverviewFilters(BATCHES, [AKB, NEN], { school: null, program: null, qualification: null });
     expect(all.batches.map((b) => b.id)).toEqual(['A1', 'N1']);
@@ -297,5 +315,11 @@ describe('stageDistribution', () => {
     expect(rows.map((row) => [row.key, row.count])).toEqual([
       ['train', 2], ['assess', 0], ['bill', 0], ['blocked', 1], ['completed', 1],
     ]);
+  });
+
+  it('counts a batch with every stage done as completed, and one with no active stage as not recorded', () => {
+    const done: LifecycleStage[] = steps('').map((stage) => ({ ...stage, status: 'done' }));
+    const rows = stageDistribution([batch({ lifecycle: steps('train') }), batch({ lifecycle: done }), batch({ lifecycle: steps('') })]);
+    expect(rows.slice(3).map((row) => [row.key, row.count])).toEqual([['completed', 1], ['unrecorded', 1]]);
   });
 });
