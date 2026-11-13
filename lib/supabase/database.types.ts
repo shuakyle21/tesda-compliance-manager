@@ -168,6 +168,7 @@ export interface Database {
           nc_level: string | null;
           sector: string | null;
           cluster: string | null;
+          header_image_path: string | null;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -179,6 +180,7 @@ export interface Database {
           nc_level?: string | null;
           sector?: string | null;
           cluster?: string | null;
+          header_image_path?: string | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;

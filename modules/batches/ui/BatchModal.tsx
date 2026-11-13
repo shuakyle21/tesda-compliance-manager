@@ -66,21 +66,39 @@ function buildBatchProps(batch: Batch, isTwsp: boolean, billingReady: boolean): 
   ];
 }
 
+/**
+ * Hero header. With a qualification header image (set per national
+ * qualification on /qualifications), the photo fills the right of the hero and
+ * a surface-colored fade keeps the title readable. Without one, the original
+ * program-tinted header is the fallback.
+ */
 function BatchModalHero({ batch, isTwsp, billingReady }: { batch: Batch; isTwsp: boolean; billingReady: boolean }) {
+  const image = batch.headerImageUrl ?? null;
   return (
-    <div className="nm-hero" style={{
-      background: isTwsp
-        ? 'linear-gradient(135deg, var(--color-blue-lt) 0%, var(--color-surface) 62%)'
-        : 'linear-gradient(135deg, var(--color-teal-lt) 0%, var(--color-surface) 62%)',
-    }}>
-      <div className="nm-hero-badges">
-        <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
-        <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
-        {billingReady ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-text-muted)' }}><BatchIdLabel batch={batch} /></span>
+    <div
+      className={`nm-hero${image ? ' nm-hero--media' : ''}`}
+      style={image ? undefined : {
+        background: isTwsp
+          ? 'linear-gradient(135deg, var(--color-blue-lt) 0%, var(--color-surface) 62%)'
+          : 'linear-gradient(135deg, var(--color-teal-lt) 0%, var(--color-surface) 62%)',
+      }}
+    >
+      {image && (
+        <div className="nm-hero-media" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL; decorative */}
+          <img src={image} alt="" />
+        </div>
+      )}
+      <div className="nm-hero-content">
+        <div className="nm-hero-badges">
+          <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
+          <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
+          {billingReady ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
+          {!image && <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-text-muted)' }}><BatchIdLabel batch={batch} /></span>}
+        </div>
+        <div className="nm-title">{batch.name}</div>
+        <div className="nm-subtitle">{batch.qualification}</div>
       </div>
-      <div className="nm-title">{batch.name}</div>
-      <div className="nm-subtitle">{batch.qualification}</div>
     </div>
   );
 }
