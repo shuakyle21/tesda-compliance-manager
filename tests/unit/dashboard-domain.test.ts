@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { attentionItems, BILLING_DUE_WINDOW_DAYS } from '@/modules/batches/domain/attention';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
-import { crossSchoolExceptions, schoolSummaries } from '@/modules/batches/domain/overview';
+import {
+  applyOverviewFilters, crossSchoolQueue, isPastTrainingEnd, overviewFilterOptions,
+  parseOverviewFilters, schoolSummaries, stageDistribution,
+} from '@/modules/batches/domain/overview';
 import { describeSessionProgress, sessionProgress } from '@/modules/batches/domain/progress';
 import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from '@/modules/batches/domain/urgency';
 import type { Batch, DocRecord, DocumentRequirement, LifecycleStage } from '@/shared/types';
@@ -195,13 +198,14 @@ describe('schoolSummaries', () => {
   const AKB = { tenantId: 'akb', code: 'AKB', name: 'AKB School' };
   const NEN = { tenantId: 'nen', code: 'NEN', name: 'NEN School' };
   const EMPTY = { tenantId: 'empty', code: 'EMP', name: 'Empty School' };
+  const TODAY = '2026-11-13';
 
   it('groups every figure by school, keeps schools with no batches, and sorts the most urgent first', () => {
     const summaries = schoolSummaries([
       dated(10, { id: 'A1', tenantId: 'akb' }),
       dated(-3, { id: 'N1', tenantId: 'nen' }),
       dated(60, { id: 'N2', tenantId: 'nen' }),
-    ], [AKB, NEN, EMPTY]);
+    ], [AKB, NEN, EMPTY], TODAY);
 
     expect(summaries.map((s) => s.school.code)).toEqual(['NEN', 'AKB', 'EMP']);
     expect(summaries[0].metrics.activeBatches).toBe(2);
@@ -209,13 +213,89 @@ describe('schoolSummaries', () => {
     expect(summaries[2].metrics.activeBatches).toBe(0);
   });
 
-  it('lists only urgent items as cross-school exceptions, each labelled with its school', () => {
-    const exceptions = crossSchoolExceptions(schoolSummaries([
-      dated(10, { id: 'A1', tenantId: 'akb' }),
+  it('counts batches still ongoing past their recorded training end, per school', () => {
+    const summaries = schoolSummaries([
+      batch({ id: 'A1', tenantId: 'akb', trainingEnd: '2026-11-12' }),
+      batch({ id: 'A2', tenantId: 'akb', trainingEnd: '2026-12-01' }),
+      batch({ id: 'N1', tenantId: 'nen', trainingEnd: '' }),
+    ], [AKB, NEN], TODAY);
+    expect(summaries.find((s) => s.school.code === 'AKB')?.pastTrainingEnd).toBe(1);
+    expect(summaries.find((s) => s.school.code === 'NEN')?.pastTrainingEnd).toBe(0);
+  });
+
+  it('queues every open item with its school, urgent before due', () => {
+    const queue = crossSchoolQueue(schoolSummaries([
+      dated(60, { id: 'A1', tenantId: 'akb', documentRequirements: REQS, documents: { ntp: doc('missing') } }),
       dated(-3, { id: 'N1', tenantId: 'nen' }),
-    ], [AKB, NEN]));
-    expect(exceptions).toHaveLength(1);
-    expect(exceptions[0].school.code).toBe('NEN');
-    expect(exceptions[0].item).toMatchObject({ kind: 'billing-overdue', batchId: 'N1' });
+    ], [AKB, NEN], TODAY));
+    expect(queue.map((entry) => [entry.school.code, entry.item.kind])).toEqual([
+      ['NEN', 'billing-overdue'],
+      ['AKB', 'documents-missing'],
+    ]);
+  });
+
+  it('treats only an ongoing batch with a passed end date as past training end', () => {
+    expect(isPastTrainingEnd(batch({ trainingEnd: '2026-11-12' }), TODAY)).toBe(true);
+    expect(isPastTrainingEnd(batch({ trainingEnd: '2026-11-13' }), TODAY)).toBe(false);
+    expect(isPastTrainingEnd(batch({ trainingEnd: '' }), TODAY)).toBe(false);
+    expect(isPastTrainingEnd(batch({ trainingEnd: '2026-11-12', status: 'completed' }), TODAY)).toBe(false);
+  });
+});
+
+describe('overview filters', () => {
+  const AKB = { tenantId: 'akb', code: 'AKB', name: 'AKB School' };
+  const NEN = { tenantId: 'nen', code: 'NEN', name: 'NEN School' };
+  const BATCHES = [
+    batch({ id: 'A1', tenantId: 'akb', program: 'TWSP', qualification: 'Organic Agriculture Production NC II' }),
+    batch({ id: 'N1', tenantId: 'nen', program: 'CFSP', qualification: 'Rice Machinery Operations NC II' }),
+    batch({ id: 'X1', tenantId: 'not-mine', program: 'TWSP' }),
+  ];
+  const options = overviewFilterOptions(BATCHES, [NEN, AKB]);
+
+  it('offers the schools by name and the distinct programs and qualifications', () => {
+    expect(options.schools.map((s) => s.code)).toEqual(['AKB', 'NEN']);
+    expect(options.programs).toEqual(['CFSP', 'TWSP']);
+    expect(options.qualifications).toHaveLength(3);
+  });
+
+  it('accepts only offered values, case-insensitively, and reads anything else as All', () => {
+    expect(parseOverviewFilters({ program: 'twsp', school: ['nen', 'akb'] }, options))
+      .toEqual({ school: 'NEN', program: 'TWSP', qualification: null });
+    expect(parseOverviewFilters({ school: 'not-mine', program: '', qualification: 'Welding' }, options))
+      .toEqual({ school: null, program: null, qualification: null });
+  });
+
+  it('never returns a batch outside the given schools', () => {
+    const all = applyOverviewFilters(BATCHES, [AKB, NEN], { school: null, program: null, qualification: null });
+    expect(all.batches.map((b) => b.id)).toEqual(['A1', 'N1']);
+    expect(all.hiddenSchools).toBe(0);
+  });
+
+  it('keeps one school for the school filter, and hides schools with no match for a program filter', () => {
+    const one = applyOverviewFilters(BATCHES, [AKB, NEN], { school: 'NEN', program: null, qualification: null });
+    expect(one.schools).toEqual([NEN]);
+    expect(one.batches.map((b) => b.id)).toEqual(['N1']);
+
+    const twsp = applyOverviewFilters(BATCHES, [AKB, NEN], { school: null, program: 'TWSP', qualification: null });
+    expect(twsp.schools).toEqual([AKB]);
+    expect(twsp.hiddenSchools).toBe(1);
+  });
+});
+
+describe('stageDistribution', () => {
+  const steps = (active: string): LifecycleStage[] => ['train', 'assess', 'bill'].map((key) => ({
+    key: key as LifecycleStage['key'], label: key, status: key === active ? 'active' : 'pending', date: '',
+  }));
+
+  it('counts each batch once: blocked, completed, or its active stage', () => {
+    const rows = stageDistribution([
+      batch({ lifecycle: steps('train') }),
+      batch({ lifecycle: steps('train') }),
+      batch({ lifecycle: steps('assess'), blocked: true }),
+      batch({ lifecycle: steps(''), status: 'completed' }),
+    ]);
+    expect(rows.map((row) => [row.key, row.count])).toEqual([
+      ['train', 2], ['assess', 0], ['bill', 0], ['blocked', 1], ['completed', 1],
+    ]);
   });
 });
