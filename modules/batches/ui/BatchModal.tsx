@@ -61,7 +61,7 @@ function buildBatchProps(batch: Batch, isTwsp: boolean, billingReady: boolean): 
     { label: 'TIP', icon: 'check', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.tipDate || 'Not recorded'}</span> },
     { label: 'AOU', icon: 'file-invoice', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.aouDate || 'Not recorded'}</span> },
     { label: 'Report dates', icon: 'file-text', value: (
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {batch.ntpDate || 'not recorded'} · Report {batch.reportDate || 'not recorded'}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {formatDate(batch.ntpDate) ?? (batch.ntpDate || 'not recorded')} · Report {batch.reportDate || 'not recorded'}</span>
     ) },
   ];
 }

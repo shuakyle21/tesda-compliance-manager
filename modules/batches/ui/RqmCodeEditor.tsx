@@ -12,6 +12,7 @@ import { useActionState, useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 import { normalizeRqmCode, ntpReadOutcome, type NtpOutcome, type RqmFormState } from '@/modules/batches/domain/rqm';
 import { readPdfText } from '@/modules/batches/ui/ntpPdfText';
+import { PdfPickButton } from '@/modules/batches/ui/PdfPickButton';
 import type { Batch } from '@/shared/types';
 
 type Mode = 'view' | 'edit' | 'confirm-replace' | 'confirm-remove';
@@ -165,7 +166,6 @@ function Feedback({ id, mode, message, state }: { id: string; mode: Mode; messag
 
 /** State for the "Read from NTP PDF" flow. Nothing is chosen or saved until the user acts. */
 function useNtpPdf(current: string | null, takenCodes: string[] | undefined, setDraft: (code: string) => void) {
-  const fileRef = useRef<HTMLInputElement>(null);
   const [reading, setReading] = useState(false);
   const [outcome, setOutcome] = useState<NtpOutcome | null>(null);
   const [picked, setPicked] = useState<string | null>(null);
@@ -174,7 +174,6 @@ function useNtpPdf(current: string | null, takenCodes: string[] | undefined, set
   useEffect(() => () => void latest.current++, []);
 
   return {
-    fileRef,
     reading,
     outcome,
     picked,
@@ -183,7 +182,6 @@ function useNtpPdf(current: string | null, takenCodes: string[] | undefined, set
       setReading(false);
       setOutcome(null);
       setPicked(null);
-      if (fileRef.current) fileRef.current.value = '';
     },
     async read(file: File | undefined) {
       if (!file) return;
@@ -203,31 +201,19 @@ function useNtpPdf(current: string | null, takenCodes: string[] | undefined, set
 }
 
 function NtpReader({ id, pdf, disabled }: { id: string; pdf: ReturnType<typeof useNtpPdf>; disabled: boolean }) {
-  const { fileRef, reading, outcome, picked } = pdf;
-  const onFile = pdf.read;
+  const { reading, outcome, picked } = pdf;
   const onPick = pdf.pick;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={ROW}>
-        <input
-          ref={fileRef}
-          id={`${id}-pdf`}
-          type="file"
-          accept="application/pdf,.pdf"
-          tabIndex={-1}
-          style={HIDDEN}
-          disabled={disabled || reading}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            e.target.value = '';
-            onFile(file);
-          }}
-        />
-        <label htmlFor={`${id}-pdf`} style={HIDDEN}>Notice to Proceed PDF</label>
-        <PendingButton pending={reading} onClick={() => fileRef.current?.click()}>Read from NTP PDF</PendingButton>
-        <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Read on this device. The file is not uploaded.</span>
-      </div>
-      <span role="status" aria-live="polite" style={reading ? undefined : HIDDEN}>{reading ? 'Reading the PDF…' : ''}</span>
+      <PdfPickButton
+        id={id}
+        small
+        label="Read from NTP PDF"
+        note="Read on this device. The file is not uploaded."
+        reading={reading}
+        disabled={disabled}
+        onFile={pdf.read}
+      />
       {outcome?.kind === 'message' && (
         <p className="user-form-error" role="alert">
           <Icon name="alert-circle" size={14} />
@@ -261,14 +247,6 @@ function NtpReader({ id, pdf, disabled }: { id: string; pdf: ReturnType<typeof u
   );
 }
 
-const HIDDEN = {
-  position: 'absolute',
-  width: 1,
-  height: 1,
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
-} as const;
 
 const ROW = { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } as const;
 

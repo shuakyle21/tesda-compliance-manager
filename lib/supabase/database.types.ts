@@ -25,6 +25,11 @@
  * `supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql`,
  * which is NOT YET APPLIED. Regenerate and re-check once it is.
  *
+ * `tenant_aou`, `batches.ntp_date` and the `create_batches_from_ntp` function
+ * were written by hand from
+ * `supabase/migrations/20261114120000_add_tenant_aou_and_ntp_batch_creation.sql`
+ * (TES-105), which is NOT YET APPLIED. Regenerate and re-check once it is.
+ *
  * NOTE FOR A FUTURE CLEANUP: this file is hand-maintained and stubs every
  * table's `Relationships` as `[]`. That stub is what makes supabase-js unable
  * to infer embedded joins, which is the root of the four long-standing TS2352
@@ -188,6 +193,28 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['qualifications']['Insert']>;
         Relationships: [];
       };
+      tenant_aou: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          fiscal_year: number;
+          storage_path: string;
+          recorded_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          fiscal_year: number;
+          storage_path: string;
+          recorded_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['tenant_aou']['Insert']>;
+        Relationships: [];
+      };
       tenant_qualifications: {
         Row: {
           id: string;
@@ -316,6 +343,7 @@ export interface Database {
           progress_percent: number;
           billing_report_status: DocumentStatus;
           official_system_reference: string | null;
+          ntp_date: string | null;
           created_by: string | null;
           updated_by: string | null;
           created_at: string;
@@ -327,6 +355,7 @@ export interface Database {
           program_id: string;
           batch_code: string;
           rqm_code?: string | null;
+          ntp_date?: string | null;
           batch_section?: string | null;
           qualification_title: string;
           nc_level?: string | null;
@@ -678,6 +707,19 @@ export interface Database {
         };
         /** The new tenant's id. */
         Returns: string;
+      };
+      create_batches_from_ntp: {
+        Args: {
+          p_tenant_id: string;
+          p_receipt_date: string;
+          p_ntp_date: string;
+          p_ntp_approval_date: string;
+          p_ntp_path: string;
+          p_aou_path: string | null;
+          p_rows: Json;
+        };
+        /** The created batch ids. */
+        Returns: string[];
       };
     };
     Enums: {

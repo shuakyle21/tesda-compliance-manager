@@ -212,6 +212,11 @@ function orEmpty(value: string | null | undefined): string {
   return value ?? '';
 }
 
+/** null to undefined, for optional `Batch` fields; a helper so mapBatchRow stays under the complexity limit. */
+function orUndefined<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
 /**
  * Same `?? 0` default repeated across mapBatchRow's count fields. These are typed
  * non-null by the contract, but a null slipping through at runtime would feed NaN
@@ -283,6 +288,8 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     currentDay: completedSessions(row.attendance_records, row.total_sessions) ?? 0,
     totalDays: row.total_sessions ?? 0,
     ntpLag: null,
+    // The date printed on the NTP. `?? undefined`: absent until migration 20261114120000 is applied.
+    ntpDate: orUndefined(row.ntp_date),
     tipDate: '',
     remark: orEmpty(row.official_system_reference),
   };
