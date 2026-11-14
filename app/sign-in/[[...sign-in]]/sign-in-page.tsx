@@ -7,6 +7,7 @@ import { useState, type SubmitEvent } from 'react';
 import { SignUpModal } from '@/modules/auth/ui/SignUpModal';
 import { startGoogleSignIn } from '@/modules/auth/domain/oauthSignIn';
 import { sanitizeRedirectUrl } from '@/modules/auth/domain/redirectUrl';
+import { isSessionExistsError } from '@/modules/auth/domain/sessionExists';
 import styles from './sign-in.module.css';
 
 const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL;
@@ -90,6 +91,15 @@ export function SignInCard() {
     setError('Additional verification is required to finish signing in.');
   }
 
+  // A sign-in started while the browser already holds a session (another tab,
+  // or a stale client state) gets Clerk's `session_exists` 400. The user is
+  // already signed in, so send them on rather than show an error. A full
+  // navigation, not router.push: the server must re-read the session cookie
+  // clerk-js just refreshed, or the layout bounces the user back here.
+  function continueExistingSession() {
+    window.location.assign(redirectUrl);
+  }
+
   // Email + password
   async function handleSignIn(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -105,11 +115,13 @@ export function SignInCard() {
       if (signIn.status) signIn.reset();
       const { error: signInError } = await signIn.password({ emailAddress: email.trim(), password });
       if (signInError) {
+        if (isSessionExistsError(signInError)) return continueExistingSession();
         setError(clerkError(signInError));
         return;
       }
       await resolveAfterVerification();
     } catch (err) {
+      if (isSessionExistsError(err)) return continueExistingSession();
       setError(clerkError(err));
     } finally {
       setBusy(false);
@@ -180,11 +192,13 @@ export function SignInCard() {
     try {
       const { error: ssoError } = await startGoogleSignIn(signIn, redirectUrl);
       if (ssoError) {
+        if (isSessionExistsError(ssoError)) return continueExistingSession();
         setError(clerkError(ssoError));
         setOauthBusy(false);
       }
       // On success the browser is navigating away to the OAuth provider.
     } catch (err) {
+      if (isSessionExistsError(err)) return continueExistingSession();
       setError(clerkError(err));
       setOauthBusy(false);
     }
@@ -199,6 +213,7 @@ export function SignInCard() {
     try {
       const { error: createError } = await signIn.create({ identifier: email.trim() });
       if (createError) {
+        if (isSessionExistsError(createError)) return continueExistingSession();
         setError(clerkError(createError));
         return;
       }
@@ -209,6 +224,7 @@ export function SignInCard() {
       }
       setResetSent(true);
     } catch (err) {
+      if (isSessionExistsError(err)) return continueExistingSession();
       setError(clerkError(err));
     } finally {
       setBusy(false);
@@ -448,7 +464,7 @@ function SignInView({
             id="email"
             type="email"
             className={styles.input}
-            placeholder="you@school.ph"
+            placeholder="name@example.com"
             autoComplete="email"
             required
             value={email}
@@ -687,7 +703,7 @@ function ForgotView({
               id="reset-email"
               type="email"
               className={styles.input}
-              placeholder="you@school.ph"
+              placeholder="name@example.com"
               autoComplete="email"
               required
               value={email}
