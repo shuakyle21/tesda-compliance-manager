@@ -7,6 +7,7 @@ import {
   parseNtpDate,
   parseNtpText,
   programOfRqmCode,
+  tooLargeToSend,
   validateNtpSubmission,
   type NtpDraftRow,
 } from '@/modules/batches/domain/ntp';
@@ -151,6 +152,13 @@ describe('draftRowsFromJson', () => {
   it('treats non-JSON and non-arrays as no rows', () => {
     expect(draftRowsFromJson('{oops')).toEqual([]);
     expect(draftRowsFromJson('{"a":1}')).toEqual([]);
+  });
+});
+
+describe('tooLargeToSend', () => {
+  it('keeps the files together under the Server Action body limit', () => {
+    expect(tooLargeToSend([2 * 1024 * 1024, 3 * 1024 * 1024])).toBe(false);
+    expect(tooLargeToSend([3 * 1024 * 1024, 3 * 1024 * 1024])).toBe(true);
   });
 });
 

@@ -130,6 +130,7 @@ declare
   v_aou_path text;
   v_unknown text;
   v_ids uuid[];
+  v_count integer;
 begin
   if p_rows is null or jsonb_typeof(p_rows) <> 'array' or jsonb_array_length(p_rows) = 0 then
     raise exception using errcode = 'P0001', message = 'ntp:no-rows';
@@ -177,65 +178,69 @@ begin
     where tenant_id = p_tenant_id and fiscal_year = v_year;
   end if;
 
-  with inserted as (
-    insert into public.batches (
-      id, tenant_id, program_id, batch_code, rqm_code, qualification_title,
-      approved_slots, total_amount, indicative_start_date,
-      ntp_date, ntp_approval_date, ntp_received_date,
-      current_stage, created_by, updated_by
-    )
-    select
-      (e ->> 'id')::uuid,
-      p_tenant_id,
-      sp.id,
-      e ->> 'rqm_code',
-      e ->> 'rqm_code',
-      e ->> 'qualification_title',
-      (e ->> 'approved_slots')::integer,
-      (e ->> 'total_amount')::numeric,
-      (e ->> 'indicative_start_date')::date,
-      p_ntp_date,
-      p_ntp_approval_date,
-      p_receipt_date,
-      'ntp'::public.lifecycle_stage,
-      app_private.current_profile_id(),
-      app_private.current_profile_id()
-    from jsonb_array_elements(p_rows) as e
-    join public.scholarship_programs sp on sp.code = e ->> 'program_code'
-    where (e ->> 'approved_slots')::integer >= 1
-    returning id, program_id
-  ),
-  docs(document_key, storage_path) as (
-    values ('ntp', p_ntp_path), ('aou', v_aou_path)
-  ),
-  inserted_docs as (
-    insert into public.documents (
-      tenant_id, batch_id, requirement_id, document_key, document_name,
-      status, audience, storage_path, submitted_by, submitted_at
-    )
-    select
-      p_tenant_id,
-      b.id,
-      r.id,
-      d.document_key,
-      coalesce(r.document_name, d.document_key),
-      'submitted'::public.document_status,
-      coalesce(r.audience, 'all'::public.document_audience),
-      d.storage_path,
-      app_private.current_profile_id(),
-      now()
-    from inserted b
-    cross join docs d
-    left join public.program_document_requirements r
-      on r.program_id = b.program_id and r.document_key = d.document_key
-    returning batch_id
-  )
-  select array_agg(distinct batch_id) into v_ids from inserted_docs;
-
-  if coalesce(array_length(v_ids, 1), 0) <> jsonb_array_length(p_rows) then
+  if exists (
+    select 1 from jsonb_array_elements(p_rows) as e
+    where coalesce((e ->> 'approved_slots')::integer, 0) < 1
+  ) then
     raise exception using errcode = 'P0001', message = 'ntp:bad-row';
   end if;
 
+  -- Separate statements, and no RETURNING on purpose: the batches SELECT policy
+  -- (can_read_batch) looks the row up in public.batches, and a row inserted by
+  -- the same statement is not visible to that lookup, so INSERT ... RETURNING
+  -- would be refused. A later statement in this function does see it.
+  insert into public.batches (
+    id, tenant_id, program_id, batch_code, rqm_code, qualification_title,
+    approved_slots, total_amount, indicative_start_date,
+    ntp_date, ntp_approval_date, ntp_received_date,
+    current_stage, created_by, updated_by
+  )
+  select
+    (e ->> 'id')::uuid,
+    p_tenant_id,
+    sp.id,
+    e ->> 'rqm_code',
+    e ->> 'rqm_code',
+    e ->> 'qualification_title',
+    (e ->> 'approved_slots')::integer,
+    (e ->> 'total_amount')::numeric,
+    (e ->> 'indicative_start_date')::date,
+    p_ntp_date,
+    p_ntp_approval_date,
+    p_receipt_date,
+    'ntp'::public.lifecycle_stage,
+    app_private.current_profile_id(),
+    app_private.current_profile_id()
+  from jsonb_array_elements(p_rows) as e
+  join public.scholarship_programs sp on sp.code = e ->> 'program_code';
+
+  get diagnostics v_count = row_count;
+  if v_count <> jsonb_array_length(p_rows) then
+    raise exception using errcode = 'P0001', message = 'ntp:bad-row';
+  end if;
+
+  insert into public.documents (
+    tenant_id, batch_id, requirement_id, document_key, document_name,
+    status, audience, storage_path, submitted_by, submitted_at
+  )
+  select
+    p_tenant_id,
+    (e ->> 'id')::uuid,
+    r.id,
+    d.document_key,
+    coalesce(r.document_name, d.document_key),
+    'submitted'::public.document_status,
+    coalesce(r.audience, 'all'::public.document_audience),
+    d.storage_path,
+    app_private.current_profile_id(),
+    now()
+  from jsonb_array_elements(p_rows) as e
+  join public.scholarship_programs sp on sp.code = e ->> 'program_code'
+  cross join (values ('ntp', p_ntp_path), ('aou', v_aou_path)) as d(document_key, storage_path)
+  left join public.program_document_requirements r
+    on r.program_id = sp.id and r.document_key = d.document_key;
+
+  select array_agg((e ->> 'id')::uuid) into v_ids from jsonb_array_elements(p_rows) as e;
   return v_ids;
 end;
 $$;

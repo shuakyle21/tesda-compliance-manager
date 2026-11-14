@@ -12,7 +12,7 @@
 
 import { startTransition, useActionState, useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/shared/ui/Icon';
-import { parseNtpText, programOfRqmCode, type NtpDraft, type NtpDraftRow, type NtpFormState } from '@/modules/batches/domain/ntp';
+import { parseNtpText, programOfRqmCode, tooLargeToSend, type NtpDraft, type NtpDraftRow, type NtpFormState } from '@/modules/batches/domain/ntp';
 import { normalizeRqmCode, type NtpReadResult } from '@/modules/batches/domain/rqm';
 import { aouOnFile, fiscalYearOf } from '@/modules/tenancy/domain/aou';
 import { readPdfText } from '@/modules/batches/ui/ntpPdfText';
@@ -107,6 +107,11 @@ function AddBatchModal({ tenantCode, province, aouYears, action, onClose }: AddB
 
   function save() {
     if (!draft || !ntpFile) return;
+    const sending = needsAou && aouFile ? [ntpFile.size, aouFile.size] : [ntpFile.size];
+    if (tooLargeToSend(sending)) {
+      return setReadError('These files are too large to send together (about 5 MB at most). Use a smaller scan and try again.');
+    }
+    setReadError(null);
     const fd = new FormData();
     fd.set('tenantCode', tenantCode);
     fd.set('receiptDate', receiptDate);

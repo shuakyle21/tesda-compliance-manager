@@ -239,6 +239,19 @@ export function draftRowsFromJson(raw: string): NtpDraftRow[] {
   });
 }
 
+/**
+ * Both files travel in one Server Action body, and Next refuses a body over
+ * `serverActions.bodySizeLimit` (6 MB in next.config.ts) before the action
+ * runs, which would crash the page instead of showing a message. This budget
+ * leaves room for multipart overhead and the rows; keep it below that limit.
+ */
+export const NTP_SEND_BUDGET_BYTES = 5.5 * 1024 * 1024;
+
+/** True when the files together are too large to send in one save. */
+export function tooLargeToSend(sizes: readonly number[]): boolean {
+  return sizes.reduce((a, b) => a + b, 0) > NTP_SEND_BUDGET_BYTES;
+}
+
 /** What the create-batches action hands back to the modal. Types only. */
 export type NtpFormState =
   | { status: 'idle' }
