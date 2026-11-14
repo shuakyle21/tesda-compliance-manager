@@ -26,7 +26,7 @@ import { appendActivity } from '@/modules/activity/data/activity';
 import { getBatchesSnapshot, setBatchRqmCode, type SetRqmResult } from '@/modules/batches/data/batches';
 import { createBatchesFromNtp, type CreateBatchesResult } from '@/modules/batches/data/createBatches';
 import { checkRqmCode, type RqmFormState } from '@/modules/batches/domain/rqm';
-import { manilaToday, validateNtpSubmission, type NtpDraftRow, type NtpFormState } from '@/modules/batches/domain/ntp';
+import { manilaToday, validateNtpSubmission, type NtpDraftRow, type NtpFormState, type NtpSubmission } from '@/modules/batches/domain/ntp';
 import { uploadEvidence, type EvidenceUploadResult } from '@/modules/documents/data/evidence';
 import {
   EVIDENCE_REJECTION_COPY,
@@ -218,16 +218,25 @@ function createFailure(result: Exclude<CreateBatchesResult, { status: 'created' 
   }
 }
 
-export async function createBatchesFromNtpAction(_previous: NtpFormState, formData: FormData): Promise<NtpFormState> {
-  const resolved = await resolveRouteScope(text(formData, 'tenantCode'));
-  if (resolved.status === 'unknown') return NTP_SAVE_FAILED;
-  if (resolved.status !== 'ok') return NTP_DENIED;
-  const { scope, profile } = resolved;
+/** A step that either yields a value or stops the action with a modal state. */
+type Step<T> = { ok: true; value: T } | { ok: false; state: NtpFormState };
+const stop = (state: NtpFormState): { ok: false; state: NtpFormState } => ({ ok: false, state });
 
-  const role = await resolveTrustedRole(profile.role);
-  if (role !== 'admin' && role !== 'coordinator') return NTP_DENIED;
+type PickedFile = { file: File; mimeType: string };
 
-  const submission = validateNtpSubmission(
+/** The school from the URL code, and an admin or coordinator of it. */
+async function authorizeCreate(tenantCode: string): Promise<Step<{ scope: TenantScope; profile: Profile }>> {
+  const resolved = await resolveRouteScope(tenantCode);
+  if (resolved.status === 'unknown') return stop(NTP_SAVE_FAILED);
+  if (resolved.status !== 'ok') return stop(NTP_DENIED);
+  const role = await resolveTrustedRole(resolved.profile.role);
+  if (role !== 'admin' && role !== 'coordinator') return stop(NTP_DENIED);
+  return { ok: true, value: { scope: resolved.scope, profile: resolved.profile } };
+}
+
+/** The rows and dates, re-validated through the domain, and the NTP file. */
+function readSubmission(formData: FormData): Step<{ submission: NtpSubmission; ntp: PickedFile }> {
+  const checked = validateNtpSubmission(
     {
       receiptDate: text(formData, 'receiptDate'),
       ntpDate: text(formData, 'ntpDate'),
@@ -236,67 +245,77 @@ export async function createBatchesFromNtpAction(_previous: NtpFormState, formDa
     },
     manilaToday(new Date()),
   );
-  if (!submission.ok) return invalid(submission.error);
-  const { receiptDate, ntpDate, approvalDate, rows } = submission.value;
+  if (!checked.ok) return stop(invalid(checked.error));
+  const file = attachedFile(formData, 'ntpFile');
+  if (!file) return stop(invalid('Choose the Notice to Proceed PDF.'));
+  const ntp = checkedFile(file, { pdfOnly: true, label: 'Notice to Proceed' });
+  if ('error' in ntp) return stop(invalid(ntp.error));
+  return { ok: true, value: { submission: checked.value, ntp: { file, mimeType: ntp.mimeType } } };
+}
 
-  const ntpFile = attachedFile(formData, 'ntpFile');
-  if (!ntpFile) return invalid('Choose the Notice to Proceed PDF.');
-  const ntp = checkedFile(ntpFile, { pdfOnly: true, label: 'Notice to Proceed' });
-  if ('error' in ntp) return invalid(ntp.error);
+/** The AOU file to store: none when one is on file for the receipt year, else the attached one (ADR-009 AOU2). */
+async function aouToStore(tenantId: string, receiptDate: string, formData: FormData): Promise<Step<PickedFile | null>> {
+  const years = await getAouYears(tenantId);
+  if (years.status !== 'ok') return stop(NTP_SAVE_FAILED);
+  if (aouOnFile(years.years, receiptDate)) return { ok: true, value: null };
+  const file = attachedFile(formData, 'aouFile');
+  if (!file) return stop({ status: 'aou-required', year: fiscalYearOf(receiptDate) });
+  const aou = checkedFile(file, { pdfOnly: false, label: 'Affidavit of Undertaking' });
+  if ('error' in aou) return stop(invalid(aou.error));
+  return { ok: true, value: { file, mimeType: aou.mimeType } };
+}
 
-  // The school's AOU for the receipt date's fiscal year (ADR-009 AOU2).
-  const years = await getAouYears(scope.tenantId);
-  if (years.status !== 'ok') return NTP_SAVE_FAILED;
-  const year = fiscalYearOf(receiptDate);
-  const aouFile = aouOnFile(years.years, receiptDate) ? null : attachedFile(formData, 'aouFile');
-  if (!aouOnFile(years.years, receiptDate) && !aouFile) return { status: 'aou-required', year };
-  const aou = aouFile ? checkedFile(aouFile, { pdfOnly: false, label: 'Affidavit of Undertaking' }) : null;
-  if (aou && 'error' in aou) return invalid(aou.error);
+async function store(tenantId: string, batchId: string, documentKey: 'ntp' | 'aou', filename: string, picked: PickedFile): Promise<Step<string>> {
+  const result = await uploadEvidence({ tenantId, batchId, documentKey, filename, body: picked.file, size: picked.file.size, mimeType: picked.mimeType });
+  return result.status === 'ok' ? { ok: true, value: result.path } : stop(uploadFailure(result));
+}
+
+/** Stores the files under the first batch id, NTP first (ADR-009 NTP8). */
+async function storeFiles(
+  tenantId: string,
+  first: { id: string; rqmCode: string },
+  year: number,
+  ntp: PickedFile,
+  aou: PickedFile | null,
+): Promise<Step<{ ntpPath: string; aouPath: string | null }>> {
+  const ntpPath = await store(tenantId, first.id, 'ntp', `NTP-${first.rqmCode}.pdf`, ntp);
+  if (!ntpPath.ok) return ntpPath;
+  if (!aou) return { ok: true, value: { ntpPath: ntpPath.value, aouPath: null } };
+  const ext = evidenceExtensionOf(aou.mimeType);
+  const aouPath = await store(tenantId, first.id, 'aou', ext ? `AOU-${year}.${ext}` : `AOU-${year}`, aou);
+  return aouPath.ok ? { ok: true, value: { ntpPath: ntpPath.value, aouPath: aouPath.value } } : aouPath;
+}
+
+export async function createBatchesFromNtpAction(_previous: NtpFormState, formData: FormData): Promise<NtpFormState> {
+  const who = await authorizeCreate(text(formData, 'tenantCode'));
+  if (!who.ok) return who.state;
+  const { scope, profile } = who.value;
+
+  const request = readSubmission(formData);
+  if (!request.ok) return request.state;
+  const { submission, ntp } = request.value;
+
+  const aou = await aouToStore(scope.tenantId, submission.receiptDate, formData);
+  if (!aou.ok) return aou.state;
 
   // Ids are made here so the files can be stored before any row exists.
-  const withIds = rows.map((r) => ({ ...r, id: randomUUID() }));
-  const first = withIds[0]!;
+  const rows = submission.rows.map((r) => ({ ...r, id: randomUUID() }));
+  const first = rows[0]!;
+  const files = await storeFiles(scope.tenantId, first, fiscalYearOf(submission.receiptDate), ntp, aou.value);
+  if (!files.ok) return files.state;
 
-  const ntpUpload = await uploadEvidence({
-    tenantId: scope.tenantId,
-    batchId: first.id,
-    documentKey: 'ntp',
-    filename: `NTP-${first.rqmCode}.pdf`,
-    body: ntpFile,
-    size: ntpFile.size,
-    mimeType: ntp.mimeType,
-  });
-  if (ntpUpload.status !== 'ok') return uploadFailure(ntpUpload);
-
-  let aouPath: string | null = null;
-  if (aouFile && aou && 'mimeType' in aou) {
-    const ext = evidenceExtensionOf(aou.mimeType);
-    const aouUpload = await uploadEvidence({
-      tenantId: scope.tenantId,
-      batchId: first.id,
-      documentKey: 'aou',
-      filename: ext ? `AOU-${year}.${ext}` : `AOU-${year}`,
-      body: aouFile,
-      size: aouFile.size,
-      mimeType: aou.mimeType,
-    });
-    if (aouUpload.status !== 'ok') return uploadFailure(aouUpload);
-    aouPath = aouUpload.path;
-  }
-
-  // shortcut: a refused save leaves the uploaded files unreferenced; TES-107 removes them.
+  // shortcut: a refused save leaves the stored files unreferenced; TES-107 removes them.
   const created = await createBatchesFromNtp({
     tenantId: scope.tenantId,
-    receiptDate,
-    ntpDate,
-    approvalDate,
-    ntpPath: ntpUpload.path,
-    aouPath,
-    rows: withIds,
+    receiptDate: submission.receiptDate,
+    ntpDate: submission.ntpDate,
+    approvalDate: submission.approvalDate,
+    ...files.value,
+    rows,
   });
   if (created.status !== 'created') return createFailure(created);
 
-  const codes = withIds.map((r) => r.rqmCode);
+  const codes = rows.map((r) => r.rqmCode);
   const logged = await appendActivity({
     tenantId: scope.tenantId,
     batchId: first.id,
@@ -305,7 +324,7 @@ export async function createBatchesFromNtpAction(_previous: NtpFormState, formDa
     entityType: 'batch',
     entityId: first.id,
     summary: `${codes.length === 1 ? 'Batch' : `${codes.length} batches`} created from a Notice to Proceed: ${codes.join(', ')}`,
-    metadata: { source: 'ntp-pdf', rqm_codes: codes, ntp_received_date: receiptDate, aou_recorded: aouPath !== null },
+    metadata: { source: 'ntp-pdf', rqm_codes: codes, ntp_received_date: submission.receiptDate, aou_recorded: files.value.aouPath !== null },
   });
 
   revalidatePath('/t/[tenantCode]', 'layout');

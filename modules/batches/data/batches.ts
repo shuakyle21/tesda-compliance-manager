@@ -217,6 +217,10 @@ function orEmpty(value: string | null | undefined): string {
  * non-null by the contract, but a null slipping through at runtime would feed NaN
  * into roster totals and progress bars.
  */
+function orUndefined<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
 function orZero(value: number | null | undefined): number {
   return value ?? 0;
 }
@@ -284,7 +288,7 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     totalDays: row.total_sessions ?? 0,
     ntpLag: null,
     // The date printed on the NTP. `?? undefined`: absent until migration 20261114120000 is applied.
-    ntpDate: row.ntp_date ?? undefined,
+    ntpDate: orUndefined(row.ntp_date),
     tipDate: '',
     remark: orEmpty(row.official_system_reference),
   };
