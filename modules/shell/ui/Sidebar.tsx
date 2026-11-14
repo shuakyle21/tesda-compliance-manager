@@ -401,15 +401,7 @@ function SidebarOverlays({ activeOp, tenant, fullName, role, onClose }: {
   const [toast, setToast] = useState<ToastData | null>(null);
   return (
     <>
-      {activeOp === 'import' && (
-        <ImportCsvModal
-          onClose={onClose}
-          onImported={(message) => {
-            onClose();
-            setToast({ title: 'Import complete', message });
-          }}
-        />
-      )}
+      {activeOp === 'import' && <ImportCsvModal onClose={onClose} />}
       {activeOp === 'settings' && (
         <SettingsModal
           workspaceName={tenant?.name ?? NO_TENANT_NAME}
