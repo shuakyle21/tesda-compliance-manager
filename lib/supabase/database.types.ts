@@ -15,6 +15,10 @@
  * `current_user_is_platform_admin`'s `Args` stays `Record<string, never>`
  * rather than the generator's `never`, matching this file's existing style.
  *
+ * `batches.rqm_code` was added by hand from
+ * `supabase/migrations/20260910120000_add_adr001_billing_domain.sql`, which is
+ * APPLIED.
+ *
  * The T2MIS columns (`tenants.congressional_district`, `qualifications.cluster`,
  * `batches.training_calendar_code` / `.tenant_qualification_id`, and the 23
  * learner demographic/employment columns) were written by hand from
@@ -292,6 +296,7 @@ export interface Database {
           tenant_id: string;
           program_id: string;
           batch_code: string;
+          rqm_code: string | null;
           batch_section: string | null;
           qualification_title: string;
           nc_level: string | null;
@@ -319,6 +324,7 @@ export interface Database {
           tenant_id: string;
           program_id: string;
           batch_code: string;
+          rqm_code?: string | null;
           batch_section?: string | null;
           qualification_title: string;
           nc_level?: string | null;

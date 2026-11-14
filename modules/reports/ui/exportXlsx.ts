@@ -7,11 +7,20 @@
 import type { Batch, Tenant } from '@/shared/types';
 import type { ToastData } from '@/shared/ui/Toast';
 import { T2MIS_HEADERS, buildT2misRows } from '@/modules/import-export/domain/t2mis';
+import { pluralize } from '@/shared/text';
 import { buildXlsx } from '@/modules/reports/domain/xlsx';
 
 /** Builds and downloads the T2MIS EGACE + employment .xlsx, then reports the result via `onResult`. */
-export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onResult: (toast: ToastData) => void): void {
+export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onResult: (toast: ToastData) => void, rosterFailed = false): void {
   const data = buildT2misRows(rows, tenantOf);
+  if (data.length === 0) {
+    if (rosterFailed) {
+      onResult({ title: 'Export unavailable', message: "Scholar records couldn't be loaded. Try again." });
+      return;
+    }
+    onResult({ title: 'Nothing to export', message: 'No scholar records are attached to these batches yet.' });
+    return;
+  }
   try {
     const blob = buildXlsx(T2MIS_HEADERS, data, 'EGACE-Employment');
     const url = URL.createObjectURL(blob);
@@ -21,10 +30,11 @@ export function exportXlsx(rows: Batch[], tenantOf: (id: string) => Tenant, onRe
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Revoking immediately can cancel the download in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 40_000);
     onResult({
       title: 'Excel export ready',
-      message: `TESDA-T2MIS-EGACE-Employment-Report.xlsx downloaded — ${data.length} scholar records across ${rows.length} batches.`,
+      message: `TESDA-T2MIS-EGACE-Employment-Report.xlsx downloaded — ${data.length} scholar ${pluralize(data.length, 'record', 'records')} across ${rows.length} ${pluralize(rows.length)}.`,
     });
   } catch {
     onResult({ title: 'Export failed', message: 'Could not build the workbook in this browser.' });
