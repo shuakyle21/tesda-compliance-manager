@@ -15,6 +15,7 @@
 import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { getAuthUserId } from '@/modules/auth/data/auth';
+import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import type { Profile } from '@/modules/tenancy/domain/profile';
 import {
@@ -68,7 +69,20 @@ export async function requireScope(
   return resolved.status === 'ok' ? { scope: resolved.scope, profile: resolved.profile } : null;
 }
 
-export type DefaultScopeOutcome = { status: 'no-tenant-access' } | { status: 'unknown' };
+/**
+ * For an office page that shows financial or scholar data: `requireScope`, plus
+ * a server-side redirect for trainers. Gated on `profiles.role` via
+ * `resolveTrustedRole`, never the `?role=` preview override.
+ */
+export async function requireOfficeScope(
+  params: Promise<{ tenantCode: string }>,
+): Promise<{ scope: TenantScope; profile: Profile } | null> {
+  const resolved = await requireScope(params);
+  if (resolved && (await resolveTrustedRole(resolved.profile.role)) === 'trainer') redirect('/trainer');
+  return resolved;
+}
+
+export type DefaultScopeOutcome ={ status: 'no-tenant-access' } | { status: 'unknown' };
 
 /**
  * Legacy unscoped path (`/batch-cards`, a bookmark, an old link) → the same

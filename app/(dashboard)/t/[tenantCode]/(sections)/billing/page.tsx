@@ -12,51 +12,28 @@
  * is `modules/billing/data`.
  */
 
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
+import { SnapshotStatusNotice } from '@/shared/ui/SnapshotStatusNotice';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
-import { getAuthUserId } from '@/modules/auth/data/auth';
-import { firstParam, resolveRouteRole, resolveTrustedRole, toOfficeRole } from '@/modules/auth/data/role';
-import { getProfileSnapshot, deriveTenantAccess } from '@/modules/tenancy/data/tenancy';
-import { withTenantAccess } from '@/modules/tenancy/domain/access';
-import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
+import { firstParam, resolveRouteRole, toOfficeRole } from '@/modules/auth/data/role';
+import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { buildPackets } from '@/modules/billing/domain/packets';
 import { buildBillingCards } from '@/modules/billing/data/billing';
 import { BillingQueueView } from '@/modules/billing/ui/BillingQueueView';
 import { scopedPath } from '@/modules/tenancy/domain/scope';
 import { formatDateTime } from '@/shared/dates';
-import { requireScope } from '../../../../tenant-scope';
+import { requireOfficeScope } from '../../../../tenant-scope';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function BillingPage({ params: routeParams, searchParams }: { params: Promise<{ tenantCode: string }>; searchParams: SearchParams }) {
   // One school, validated against the caller's memberships by the segment layout.
-  const resolved = await requireScope(routeParams);
+  // Scope + trainer redirect (ADR-001 §9): trainers never reach billing data.
+  const resolved = await requireOfficeScope(routeParams);
   if (!resolved) return null;
-  const { scope } = resolved;
+  const { scope, profile } = resolved;
   const params = await searchParams;
-
-  // Real role/tenant identity (Phase 1 of the live-data cutover): fetched
-  // here, not inside resolveRouteRole, because a module's data/ is private
-  // to it — role.ts (auth) can't import tenancy.ts (tenancy) directly, so
-  // this app/ route fetches both and passes the result down. `null` when
-  // unsigned-in, not-found (no profiles row yet), or Supabase isn't
-  // configured — resolveRouteRole falls through to its other sources.
-  const clerkUserId = await getAuthUserId();
-  const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
-  const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
-
-  // Trainer DTOs must omit billing entirely — server-denied, never CSS-hidden
-  // (ADR-001 §9 Scope, and the load-bearing role rule in CLAUDE.md). Gated on
-  // `resolveTrustedRole` (`profiles.role` only): `resolveRouteRole`'s `?role=`
-  // preview override must never decide this, or a real trainer could request
-  // `?role=admin` and skip the redirect entirely.
-  const trustedRole = await resolveTrustedRole(dbRole);
-  if (trustedRole === 'trainer') {
-    redirect('/trainer');
-  }
 
   // Presentation only, past this point — `?role=` may still change how
   // BillingQueueView renders (e.g. previewing the coordinator/viewer variant)
@@ -64,14 +41,11 @@ export default async function BillingPage({ params: routeParams, searchParams }:
   // tenant/role resolver lands (TES-34): an unresolved or non-office role
   // (including a previewed 'trainer', which BillingQueueView has no variant
   // for) renders read-only rather than write-enabled.
-  const billingRole = toOfficeRole(await resolveRouteRole(params, dbRole));
+  const billingRole = toOfficeRole(await resolveRouteRole(params, profile.role));
 
-  // This route already holds the profile snapshot for the trainer redirect
-  // above, so the membership verdict is derived from it rather than fetched a
-  // second time. `withTenantAccess` rewrites only an `ok` snapshot, so "you
-  // belong to no school" never masks a real fetch failure.
-  const tenantAccess = profileSnapshot ? deriveTenantAccess(profileSnapshot) : 'unknown';
-  const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccess);
+  // `withTenantAccess` rewrites only an `ok` snapshot, so "you belong to no
+  // school" never masks a real fetch failure.
+  const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccessOf(profile));
   const forcedState = firstParam(params.state);
 
   // `unconfigured`/`sync-failed` render empty rather than substituting mock
@@ -90,29 +64,6 @@ export default async function BillingPage({ params: routeParams, searchParams }:
           iconName="shield-off"
           heading="You do not have access to billing"
           sub="Billing figures are limited to coordinators and admins for this school. Contact a coordinator to request access."
-        />
-      </div>
-    );
-  }
-
-  // A real sync failure yields zero batches (no mock fallback), which would
-  // otherwise satisfy the "no batches to bill yet" empty state below and hide
-  // the retry banner behind a misleading message. Check this first so a
-  // failed fetch always reads as a failure (RULES.md rule 19). The
-  // `?state=sync-failed` preview override on a real non-empty snapshot still
-  // falls through to `BillingQueueView`'s inline `syncFailed` banner below,
-  // unaffected.
-  if (syncFailed && batches.length === 0) {
-    return (
-      <div className="page">
-        <div className="page-head">
-          <h1 className="page-title">Billing</h1>
-        </div>
-        <EmptyState
-          iconName="refresh"
-          heading="Couldn't reach Supabase"
-          sub="Billing data isn't available right now. Try again in a moment."
-          action={<Link href={scopedPath(scope.code, 'billing')} className="btn primary" style={{ marginTop: 12 }}>Retry</Link>}
         />
       </div>
     );
@@ -147,15 +98,19 @@ export default async function BillingPage({ params: routeParams, searchParams }:
         <div className="page-head">
           <h1 className="page-title">Billing</h1>
         </div>
-        {snapshot.status === 'no-tenant-access' ? (
-          <NoTenantAccessState subject="the billing queue" />
-        ) : (
-          <EmptyState
-            iconName="file-off"
-            heading="No batches to bill yet"
-            sub="Packets appear here once a batch reaches training. Import a batch to get started."
-          />
-        )}
+        <SnapshotStatusNotice
+          status={syncFailed ? 'sync-failed' : snapshot.status}
+          hasRows={false}
+          subject="the billing queue"
+          retryHref={scopedPath(scope.code, 'billing')}
+          emptyFallback={
+            <EmptyState
+              iconName="file-off"
+              heading="No batches to bill yet"
+              sub="Packets appear here once a batch reaches training. Import a batch to get started."
+            />
+          }
+        />
       </div>
     );
   }

@@ -13,55 +13,26 @@
  * and historical cohorts, not just active ones.
  */
 
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
-import { InfoCallout } from '@/shared/ui/InfoCallout';
-import { deriveTenantAccess } from '@/modules/tenancy/data/tenancy';
-import { withTenantAccess } from '@/modules/tenancy/domain/access';
+import { SnapshotStatusNotice } from '@/shared/ui/SnapshotStatusNotice';
+import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { attachRoster, getTenantRosterSnapshot } from '@/modules/batches/data/learners';
-import { getAuthUserId } from '@/modules/auth/data/auth';
-import { resolveTrustedRole } from '@/modules/auth/data/role';
-import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
 import { ReportView } from '@/modules/reports/ui/ReportView';
 import { scopedPath } from '@/modules/tenancy/domain/scope';
-import { requireScope } from '../../../../tenant-scope';
+import { requireOfficeScope } from '../../../../tenant-scope';
 import type { Batch } from '@/shared/types';
 
 export default async function ReportPage({ params }: { params: Promise<{ tenantCode: string }> }) {
-  // One school, validated against the caller's memberships by the segment layout.
-  const resolved = await requireScope(params);
+  // Scope + trainer redirect (ADR-001 §9): EGACE/employment outcomes are
+  // per-scholar financial and employment data, so trainers never reach them.
+  const resolved = await requireOfficeScope(params);
   if (!resolved) return null;
-  const { scope } = resolved;
+  const { scope, profile } = resolved;
 
-  // EGACE/employment outcomes are per-scholar financial and employment data —
-  // the same trainer-omission boundary billing enforces (CLAUDE.md's
-  // load-bearing role rule; ADR-001 §9 Scope) applies here too. This route had
-  // no redirect prior to this change; while the page rendered mock data that
-  // was low-risk, but now that it reads live batches it must be server-denied
-  // for trainers like every other financial/preparation surface — not merely
-  // hidden from the nav (Sidebar.tsx's comment already assumed this redirect
-  // existed).
-  //
-  // Gated on `resolveTrustedRole` (`profiles.role` only), never `resolveRouteRole`
-  // — the latter's `?role=` preview override would let a real trainer request
-  // `?role=admin` and skip this redirect entirely.
-  const clerkUserId = await getAuthUserId();
-  const profileSnapshot = clerkUserId ? await getProfileSnapshot(clerkUserId) : null;
-  const dbRole = profileSnapshot?.status === 'ok' ? profileSnapshot.profile.role : null;
-  const trustedRole = await resolveTrustedRole(dbRole);
-  if (trustedRole === 'trainer') {
-    redirect('/trainer');
-  }
-
-  // This route already holds the profile snapshot for the trainer redirect
-  // above, so the membership verdict is derived from it rather than fetched a
-  // second time. `withTenantAccess` rewrites only an `ok` snapshot, so "you
-  // belong to no school" never masks a real fetch failure.
-  const tenantAccess = profileSnapshot ? deriveTenantAccess(profileSnapshot) : 'unknown';
-  const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccess);
+  // `withTenantAccess` rewrites only an `ok` snapshot, so "you belong to no
+  // school" never masks a real fetch failure.
+  const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccessOf(profile));
   // Scholars are fetched here, not in the shared batches snapshot: the roster
   // carries contact and employment data that no other screen should load.
   const rosterSnapshot = await getTenantRosterSnapshot(scope.tenantId);
@@ -69,7 +40,10 @@ export default async function ReportPage({ params }: { params: Promise<{ tenantC
     selectBatchesForDisplay(snapshot),
     rosterSnapshot.status === 'ok' ? rosterSnapshot.roster : {},
   );
-  const syncFailed = snapshot.status === 'sync-failed' || rosterSnapshot.status === 'sync-failed';
+  // Either fetch failing makes the whole report possibly incomplete.
+  const status = snapshot.status === 'sync-failed' || rosterSnapshot.status === 'sync-failed' ? 'sync-failed' : snapshot.status;
+  const subject = 'EGACE and employment reporting';
+  const retryHref = scopedPath(scope.code, 'report');
 
   if (batches.length === 0) {
     return (
@@ -77,33 +51,27 @@ export default async function ReportPage({ params }: { params: Promise<{ tenantC
         <div className="page-head">
           <h1 className="page-title">Report</h1>
         </div>
-        {syncFailed && <SyncFailedCallout retryHref={scopedPath(scope.code, 'report')} />}
-        {snapshot.status === 'no-tenant-access' ? (
-          <NoTenantAccessState subject="EGACE and employment reporting" />
-        ) : (
-          <EmptyState
-            iconName="certificate"
-            heading="No batches to report"
-            sub="EGACE outcomes and the post-training employment report appear here once a batch is imported or assigned to you."
-          />
-        )}
+        <SnapshotStatusNotice
+          status={status}
+          hasRows={false}
+          subject={subject}
+          retryHref={retryHref}
+          emptyFallback={
+            <EmptyState
+              iconName="certificate"
+              heading="No batches to report"
+              sub="EGACE outcomes and the post-training employment report appear here once a batch is imported or assigned to you."
+            />
+          }
+        />
       </div>
     );
   }
 
   return (
     <>
-      {syncFailed && <SyncFailedCallout retryHref={scopedPath(scope.code, 'report')} />}
-      <ReportView batches={batches} tenants={resolved.profile.tenants} />
+      <SnapshotStatusNotice status={status} hasRows subject={subject} retryHref={retryHref} emptyFallback={null} />
+      <ReportView batches={batches} tenants={profile.tenants} />
     </>
-  );
-}
-
-function SyncFailedCallout({ retryHref }: { retryHref: string }) {
-  return (
-    <InfoCallout variant="warning">
-      Batch data couldn&apos;t be loaded — this report may be incomplete.
-      <Link href={retryHref} className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
-    </InfoCallout>
   );
 }

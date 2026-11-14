@@ -14,8 +14,7 @@
 import Link from 'next/link';
 import { getActivitySnapshot } from '@/modules/activity/data/activity';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
-import { InfoCallout } from '@/shared/ui/InfoCallout';
+import { SnapshotStatusNotice } from '@/shared/ui/SnapshotStatusNotice';
 import { Icon } from '@/shared/ui/Icon';
 import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { scopedPath } from '@/modules/tenancy/domain/scope';
@@ -43,8 +42,6 @@ export default async function ActivityLogPage({ params: routeParams, searchParam
   );
   const events = activitySnapshot.status === 'ok' ? activitySnapshot.events : [];
   const hasMore = activitySnapshot.status === 'ok' && activitySnapshot.hasMore;
-  const syncFailed = activitySnapshot.status === 'sync-failed';
-  const noTenantAccess = activitySnapshot.status === 'no-tenant-access';
 
   return (
     <div>
@@ -61,22 +58,21 @@ export default async function ActivityLogPage({ params: routeParams, searchParam
         </div>
       </div>
 
-      {syncFailed && (
-        <InfoCallout variant="warning">
-          Sync with Supabase failed — the activity feed could not be loaded.
-          <Link href={scopedPath(scope.code, 'activity-log')} className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
-        </InfoCallout>
-      )}
+      <SnapshotStatusNotice
+        status={activitySnapshot.status}
+        hasRows={events.length > 0}
+        subject="the activity log"
+        retryHref={scopedPath(scope.code, 'activity-log')}
+        emptyFallback={
+          <EmptyState
+            iconName="timeline"
+            heading="No activity yet"
+            sub="Uploads, verifications, and batch changes appear here as they happen."
+          />
+        }
+      />
 
-      {events.length === 0 && noTenantAccess ? (
-        <NoTenantAccessState subject="the activity log" />
-      ) : events.length === 0 ? (
-        <EmptyState
-          iconName="timeline"
-          heading="No activity yet"
-          sub="Uploads, verifications, and batch changes appear here as they happen."
-        />
-      ) : (
+      {events.length > 0 && (
         <div className="surface" style={{ padding: '8px 18px' }}>
           <div className="activity">
             {events.map((a) => (
