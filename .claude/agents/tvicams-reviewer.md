@@ -19,9 +19,13 @@ cosmetic one. Review accordingly.
 Run the automated checks first and report their results:
 
 ```
-npm run lint
-npx tsc --noEmit
+pnpm lint
+pnpm exec tsc --noEmit
 ```
+
+This repo is pnpm-managed (`packageManager` in `package.json`); do not reach for
+`npm run` / `npx`, which resolve a different dependency tree than the committed
+`pnpm-lock.yaml`.
 
 **Do not hand-verify anything these already catch.** `RULES.md` tags every rule
 with its enforcement level. Rules tagged `[lint]`, `[types]`, or `[hook]` are
