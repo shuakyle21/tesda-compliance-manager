@@ -14,6 +14,8 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Icon } from '@/shared/ui/Icon';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import type { BillingCard } from '@/modules/billing/data/billing';
 import { buildStatement, type StatementColumn } from '@/modules/billing/domain/statement';
 import type { BillingTrackId } from '@/modules/billing/domain/tracks';
@@ -21,9 +23,7 @@ import type { BillingTrackId } from '@/modules/billing/domain/tracks';
 interface BillingStatementModalProps {
   card: BillingCard;
   initialTrackId: BillingTrackId;
-  readOnly?: boolean;
   onClose: () => void;
-  onSave?: (label: string) => void;
 }
 
 /** Grid track sizing per column role — numerics size to content, name flexes. */
@@ -38,7 +38,7 @@ function cellAlign(align: StatementColumn['align']): 'left' | 'center' | 'right'
   return align;
 }
 
-export function BillingStatementModal({ card, initialTrackId, readOnly, onClose, onSave }: BillingStatementModalProps) {
+export function BillingStatementModal({ card, initialTrackId, onClose }: BillingStatementModalProps) {
   const [trackId, setTrackId] = useState<BillingTrackId>(initialTrackId);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
   return (
     <>
       <div className="scrim" style={{ zIndex: 100 }} onClick={onClose} />
-      <div className="modal" role="dialog" aria-modal="true" aria-label={`Billing statement for ${card.batch.id}`} style={{ zIndex: 110, width: 820 }}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label={`Billing statement for ${displayBatchId(card.batch)}`} style={{ zIndex: 110, width: 820 }}>
 
         {/* Header */}
         <div className="modal-head">
@@ -68,7 +68,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
             <div style={{ minWidth: 0 }}>
               <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Billing statement — {statement.trackLabel}</h3>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)', marginTop: 1 }}>
-                {statement.batchId} · internal working copy
+                <BatchIdLabel batch={card.batch} /> · internal working copy
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, padding: '12px 0', borderTop: '1px solid var(--color-border-faint)', borderBottom: '1px solid var(--color-border-faint)' }}>
             <MetaCell label="Qualification">{statement.qualification}</MetaCell>
             <MetaCell label="Name of trainer">{statement.trainerName}</MetaCell>
-            <MetaCell label="RQM code" mono>{statement.rqm}</MetaCell>
+            <MetaCell label="RQM code" mono={statement.rqm !== null}>{statement.rqm ?? 'Not recorded'}</MetaCell>
             <MetaCell label="Training duration" mono>{statement.period}</MetaCell>
             <MetaCell label="Scholars" mono>{statement.scholarsLabel}</MetaCell>
           </div>
@@ -159,7 +159,13 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
               <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--color-text-primary)' }}>{statement.totalLabel}</span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>{statement.grandTotalLabel}</span>
             </div>
-            <div style={{ fontSize: 11.5, fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>Amount in words: {statement.grandWords}</div>
+            {statement.grandTotal === null ? (
+              statement.unavailableReason && (
+                <div style={{ fontSize: 11.5, color: 'var(--color-text-secondary)' }}>Total unavailable: {statement.unavailableReason}</div>
+              )
+            ) : (
+              <div style={{ fontSize: 11.5, fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>Amount in words: {statement.grandWords}</div>
+            )}
           </div>
         </div>
 
@@ -170,16 +176,7 @@ export function BillingStatementModal({ card, initialTrackId, readOnly, onClose,
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Internal working copy · TESDA SIS and BSRS remain authoritative</span>
           </span>
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-            {readOnly ? (
-              <button className="btn primary" onClick={onClose}>Close</button>
-            ) : (
-              <>
-                <button className="btn secondary" onClick={onClose}>Close</button>
-                <button className="btn primary" onClick={() => onSave?.(`${statement.trackLabel} · ${statement.batchId}`)}>
-                  <Icon name="download" size={14} />Save working copy
-                </button>
-              </>
-            )}
+            <button className="btn primary" onClick={onClose}>Close preview</button>
           </div>
         </div>
       </div>

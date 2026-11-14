@@ -8,6 +8,7 @@
  * it never shows a zero it cannot vouch for.
  */
 
+import type { ReactNode } from 'react';
 import { MetricCard } from '@/shared/ui/MetricCard';
 import { UrgencyIndicator } from '@/shared/ui/UrgencyIndicator';
 import { formatDate } from '@/shared/dates';
@@ -28,8 +29,13 @@ export interface AttentionCounts {
   urgent: number;
 }
 
-function ActiveBatchesCard({ metrics, href }: { metrics: DashboardMetrics; href: string }) {
-  const scholars = `${metrics.activeScholars} ${pluralize(metrics.activeScholars, 'scholar', 'scholars')} enrolled`;
+/** Appends the population a total describes ("across 3 schools") to a status line. */
+function scoped(sub: string, population?: string): string {
+  return population ? `${sub} · ${population}` : sub;
+}
+
+function ActiveBatchesCard({ metrics, href, population }: { metrics: DashboardMetrics; href: string; population?: string }) {
+  const scholars = scoped(`${metrics.activeScholars} ${pluralize(metrics.activeScholars, 'scholar', 'scholars')} enrolled`, population);
   return (
     <MetricCard
       label="Active batches"
@@ -42,11 +48,11 @@ function ActiveBatchesCard({ metrics, href }: { metrics: DashboardMetrics; href:
   );
 }
 
-function AttentionCard({ attention, href }: { attention: AttentionCounts; href: string }) {
+function AttentionCard({ attention, href, population }: { attention: AttentionCounts; href: string; population?: string }) {
   const variant: Variant = attention.urgent ? 'critical' : attention.total ? 'warning' : 'neutral';
-  const sub = attention.urgent
+  const sub = scoped(attention.urgent
     ? `${attention.urgent} overdue or blocked`
-    : attention.total ? 'Coming due or needs a record' : 'No open items in recorded data';
+    : attention.total ? 'Coming due or needs a record' : 'No open items in recorded data', population);
   return (
     <MetricCard
       label="Needs attention"
@@ -81,11 +87,11 @@ function NextBillingCard({ metrics, href }: { metrics: DashboardMetrics; href: s
     <MetricCard
       label="Next billing due"
       value={date}
-      sub={<><span>{next.batchId}</span><UrgencyIndicator days={next.daysToBilling} variant="badge" /></>}
+      sub={<><span>{next.batchLabel}</span><UrgencyIndicator days={next.daysToBilling} variant="badge" /></>}
       iconName="receipt"
       variant={billingVariant(next.daysToBilling)}
       href={href}
-      ariaLabel={`Next billing due: ${date}, ${next.batchId}, ${next.daysToBilling < 0 ? `${-next.daysToBilling} days overdue` : `${next.daysToBilling} days left`}.`}
+      ariaLabel={`Next billing due: ${date}, ${next.batchLabel}, ${next.daysToBilling < 0 ? `${-next.daysToBilling} days overdue` : `${next.daysToBilling} days left`}.`}
     />
   );
 }
@@ -97,9 +103,10 @@ function documentStatus(metrics: DashboardMetrics): { sub: string; variant: Vari
   return { sub: 'All required documents on file', variant: 'neutral' };
 }
 
-function DocumentsCard({ metrics, href }: { metrics: DashboardMetrics; href: string }) {
+function DocumentsCard({ metrics, href, population }: { metrics: DashboardMetrics; href: string; population?: string }) {
   const value = metrics.docCompliancePct === null ? '—' : `${metrics.docCompliancePct}%`;
-  const { sub, variant } = documentStatus(metrics);
+  const { sub: status, variant } = documentStatus(metrics);
+  const sub = scoped(status, population);
   return (
     <MetricCard
       label="Required documents"
@@ -113,11 +120,11 @@ function DocumentsCard({ metrics, href }: { metrics: DashboardMetrics; href: str
   );
 }
 
-function ProgressCard({ metrics }: { metrics: DashboardMetrics }) {
+function ProgressCard({ metrics, population }: { metrics: DashboardMetrics; population?: string }) {
   const value = metrics.sessionProgressPct === null ? '—' : `${metrics.sessionProgressPct}%`;
-  const sub = metrics.sessionProgressPct === null
+  const sub = scoped(metrics.sessionProgressPct === null
     ? 'Attendance not recorded yet'
-    : `Sessions held · ${metrics.sessionTrackedBatches} of ${metrics.activeBatches} active ${pluralize(metrics.activeBatches)}`;
+    : `Sessions held · ${metrics.sessionTrackedBatches} of ${metrics.activeBatches} active ${pluralize(metrics.activeBatches)}`, population);
   return (
     <MetricCard
       label="Session progress"
@@ -136,16 +143,21 @@ interface KpiSummaryProps {
   attention?: AttentionCounts;
   /** Trainer routes omit billing figures server-side (CLAUDE.md role rules). */
   hideBilling?: boolean;
+  /** Cross-school overview only: the population every total describes, e.g. "across 3 schools". */
+  population?: string;
+  /** Cross-school overview only: a card rendered before the shared ones. */
+  lead?: ReactNode;
 }
 
-export function KpiSummary({ metrics, links, attention, hideBilling = false }: KpiSummaryProps) {
+export function KpiSummary({ metrics, links, attention, hideBilling = false, population, lead }: KpiSummaryProps) {
   return (
     <section className="dash-kpi-grid" aria-label="Key metrics">
-      <ActiveBatchesCard metrics={metrics} href={links.batches} />
-      {attention && <AttentionCard attention={attention} href={links.attention} />}
+      {lead}
+      <ActiveBatchesCard metrics={metrics} href={links.batches} population={population} />
+      {attention && <AttentionCard attention={attention} href={links.attention} population={population} />}
       {!hideBilling && <NextBillingCard metrics={metrics} href={links.batches} />}
-      <DocumentsCard metrics={metrics} href={links.documents} />
-      <ProgressCard metrics={metrics} />
+      <DocumentsCard metrics={metrics} href={links.documents} population={population} />
+      <ProgressCard metrics={metrics} population={population} />
     </section>
   );
 }

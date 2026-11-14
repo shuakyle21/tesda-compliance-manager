@@ -12,7 +12,10 @@ import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
+import { ENTREPRENEURSHIP_BLOCK_DAYS } from '@/modules/billing/domain/rates';
 import { LifecyclePipeline } from './LifecyclePipeline';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
+import { RqmCodeEditor } from '@/modules/batches/ui/RqmCodeEditor';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
@@ -21,7 +24,16 @@ import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress, describeSessionProgress } from '@/modules/batches/domain/progress';
 import { formatDate } from '@/shared/dates';
 import { deriveBillTone } from './billTone';
+import type { RqmFormState } from '@/modules/batches/domain/rqm';
 import type { Batch, LifecycleStage } from '@/shared/types';
+
+/** Present only for callers whose trusted role may change the RQM code. */
+export type RqmEdit = {
+  tenantCode: string;
+  action: (previous: RqmFormState, formData: FormData) => Promise<RqmFormState>;
+  /** RQM codes already recorded on the school's other batches. */
+  takenCodes?: string[];
+};
 
 type BatchPropRow = { label: string; icon: IconName; value: ReactNode };
 
@@ -65,7 +77,7 @@ function BatchModalHero({ batch, isTwsp, billingReady }: { batch: Batch; isTwsp:
         <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
         <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
         {billingReady ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
-        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.id}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-text-muted)' }}><BatchIdLabel batch={batch} /></span>
       </div>
       <div className="nm-title">{batch.name}</div>
       <div className="nm-subtitle">{batch.qualification}</div>
@@ -82,13 +94,12 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
       <div className="nm-entre-grid">
         <div className="nm-entre-card" style={{ background: 'var(--color-entre-lt)', borderColor: 'var(--color-entre)' }}>
           <div className="nm-entre-cap" style={{ color: 'var(--color-entre)' }}>Schedule</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-entre-dk)' }}>{entre.date || 'TBD'}</div>
-          <div style={{ fontSize: 11, color: 'var(--color-entre)', marginTop: 3, opacity: 0.85 }}>Immediately after training</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-entre-dk)' }}>{entre.date || 'Not set'}</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Duration</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>3</div>
-          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>training days</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: 'var(--color-text-primary)' }}>{ENTREPRENEURSHIP_BLOCK_DAYS}</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 3 }}>days</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Status</div>
@@ -107,6 +118,18 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
   );
 }
 
+// Shown only when the batch carries a real updated timestamp.
+function LastUpdated({ iso }: { iso?: string }) {
+  const date = formatDate(iso);
+  if (!date) return null;
+  return (
+    <>
+      <span>Last updated {date}</span>
+      <span style={{ color: 'var(--color-border-strong)' }}>·</span>
+    </>
+  );
+}
+
 function BatchScholarsGrid({ batch }: { batch: Batch }) {
   const dropoutColor = (batch.dropouts ?? 0) > 0 ? 'var(--color-red-dk)' : 'var(--color-text-muted)';
   const stats = [
@@ -121,13 +144,19 @@ function BatchScholarsGrid({ batch }: { batch: Batch }) {
       <div className="nm-scholars-grid">
         {stats.map((s) => (
           <div key={s.label} className="nm-scholar-card">
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: s.color }}>{s.value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, lineHeight: 1, color: s.color }}>{s.value ?? '—'}</div>
             <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 5 }}>{s.label}</div>
           </div>
         ))}
       </div>
     </div>
   );
+}
+
+function withRqmRow(rows: BatchPropRow[], batch: Batch, rqmEdit?: RqmEdit): BatchPropRow[] {
+  if (!rqmEdit) return rows;
+  const value = <RqmCodeEditor batch={batch} tenantCode={rqmEdit.tenantCode} action={rqmEdit.action} takenCodes={rqmEdit.takenCodes} />;
+  return [{ label: 'RQM code', icon: 'file-invoice', value }, ...rows];
 }
 
 /** The batch's recorded status in words — not "Training Ongoing" for every batch. */
@@ -138,7 +167,7 @@ function BatchStatusBadge({ batch }: { batch: Batch }) {
   return <StatusBadge variant="ongoing" iconName="check">Training ongoing</StatusBadge>;
 }
 
-export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => void }) {
+export function BatchModal({ batch, onClose, rqmEdit }: { batch: Batch; onClose: () => void; rqmEdit?: RqmEdit }) {
   const [closing, setClosing] = useState(false);
 
   const close = useCallback(() => {
@@ -163,7 +192,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
   const billTone = deriveBillTone(tier);
   const entre = (batch.lifecycle || []).find((s) => s.key === 'entre');
   const sessions = sessionProgress(batch);
-  const props = buildBatchProps(batch, isTwsp, billingReady);
+  const props = withRqmRow(buildBatchProps(batch, isTwsp, billingReady), batch, rqmEdit);
 
   return (
     <div className={`nm-backdrop${closing ? ' closing' : ''}`} onClick={close}>
@@ -174,7 +203,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <div className="nm-breadcrumb">
               <span className="crumb" onClick={close}>Training Batch Manager</span>
               <Icon name="chevron-right" size={12} style={{ opacity: 0.4, flexShrink: 0 }} />
-              <span className="current">{batch.id} · {batch.name}</span>
+              <span className="current">{batch.name}</span>
             </div>
             <button className="nm-close" onClick={close} aria-label="Close"><Icon name="x" size={16} /></button>
           </div>
@@ -245,9 +274,8 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
           </div>
 
           <div className="nm-footer">
-            <span>Last updated Jun 1, 2026</span>
-            <span style={{ color: 'var(--color-border-strong)' }}>·</span>
-            <span>{batch.id}</span>
+            <LastUpdated iso={batch.updatedAt} />
+            <BatchIdLabel batch={batch} />
             <button className="btn ghost" style={{ marginLeft: 'auto', height: 28, fontSize: 12, gap: 4 }} onClick={close}>
               <Icon name="x" size={12} />Close
             </button>

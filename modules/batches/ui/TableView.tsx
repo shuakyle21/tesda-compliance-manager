@@ -13,21 +13,24 @@ import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
-import { BatchModal } from '@/modules/batches/ui/BatchModal';
+import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
+import { takenRqmCodes } from '@/modules/batches/domain/rqm';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { filterBatches } from './filter';
-import { criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
+import { DOC_TIER_ON_TRACK, criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress } from '@/modules/batches/domain/progress';
-import { pluralize } from '@/shared/text';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export function TableView({
   batches,
   initialBatchId = null,
+  rqmEdit,
 }: {
   batches: Batch[];
+  rqmEdit?: RqmEdit;
   /**
    * `?batch=<code>` deep link: opens that batch's detail on arrival, so the
    * dashboard's Needs-attention items land on the batch they name.
@@ -36,9 +39,11 @@ export function TableView({
 }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
-  const [open, setOpen] = useState<Batch | null>(
-    () => (initialBatchId ? batches.find((b) => b.id.toLowerCase() === initialBatchId.toLowerCase()) ?? null : null),
+  const [openId, setOpenId] = useState<string | null>(
+    () => (initialBatchId ? batches.find((b) => b.id.toLowerCase() === initialBatchId.toLowerCase())?.id ?? null : null),
   );
+  // Looked up from the live list (not a stored copy) so a save shows up in the open modal.
+  const open = batches.find((b) => b.id === openId) ?? null;
 
   const filtered = useMemo(() => filterBatches(batches, query, program), [batches, query, program]);
 
@@ -46,7 +51,6 @@ export function TableView({
     <div>
       <div className="page-head">
         <h1>Table View</h1>
-        <span className="subline">{batches.length} {pluralize(batches.length)} · {batches.filter((b) => b.status === 'ongoing').length} active</span>
       </div>
 
       <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} />
@@ -62,7 +66,6 @@ export function TableView({
                 {filtered.length} {filtered.length === 1 ? 'batch' : 'batches'}
               </span>
             </div>
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--color-text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>2026 cycle</span>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', minWidth: 760, borderCollapse: 'collapse', tableLayout: 'fixed' }}>
@@ -79,7 +82,7 @@ export function TableView({
               </thead>
               <tbody>
                 {filtered.map((b, i) => (
-                  <TableRow key={b.id} batch={b} critical={criticalRequirements(b.documentRequirements)} odd={i % 2 === 0} onClick={() => setOpen(b)} />
+                  <TableRow key={b.id} batch={b} critical={criticalRequirements(b.documentRequirements)} odd={i % 2 === 0} onClick={() => setOpenId(b.id)} />
                 ))}
               </tbody>
             </table>
@@ -87,7 +90,7 @@ export function TableView({
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpen(null)} />}
+      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit && { ...rqmEdit, takenCodes: takenRqmCodes(batches, open.id) }} />}
     </div>
   );
 }
@@ -109,7 +112,7 @@ function programBadgeVariant(program: string): 'twsp' | 'cfsp' {
 function docCellColor(docs: DocComplianceSummary): string {
   if (docs.tracked === 0) return 'var(--color-text-muted)';
   if (docs.missing > 0) return 'var(--color-red-dk)';
-  return (docs.verifiedPct ?? 0) >= 90 ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
+  return (docs.verifiedPct ?? 0) >= DOC_TIER_ON_TRACK ? 'var(--color-green-dk)' : 'var(--color-amber-dk)';
 }
 
 function docCellIcon(docs: DocComplianceSummary): IconName {
@@ -163,7 +166,7 @@ function TableRow({
 
   return (
     <tr style={{ cursor: 'pointer' }} onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-      <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>{batch.id}</td>
+      <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}><BatchIdLabel batch={batch} /></td>
       <td style={cellStyle}>
         <div style={{ fontWeight: 500 }}>{batch.name.replace(/ · Batch \d+$/, '')}</div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.qualification}</div>

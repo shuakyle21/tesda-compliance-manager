@@ -199,12 +199,15 @@ function BillingSummaryTiles({ summary }: { summary: PacketSummary }) {
         iconName="alert-triangle"
         variant="critical"
       />
-      {/* ADR-003 P6 — an observation total, not a reconciliation. The sub-label
-          says who asserted it so the figure is never read as authoritative. */}
+      {/* ADR-003 P6 — an observation total, not a reconciliation. The status line
+          names where the figure comes from so it is never read as authoritative.
+          It says "batches marked completed" because that is what this prototype
+          derives `settled` from (packets.ts); ADR-003 P3's target is a mark a
+          coordinator records, and the wording should change when that exists. */}
       <MetricCard
         label="Recorded as paid"
         value={formatPesoCompact(summary.settled)}
-        sub={`${summary.settledCount} marked settled by a coordinator`}
+        sub={`${summary.settledCount} from batches marked completed`}
         iconName="receipt"
       />
     </div>
@@ -341,7 +344,6 @@ function BillingPacketDetailPanel({
       <EmptyState
         iconName="file-off"
         heading="No packet selected"
-        sub="Choose a row in the queue to see its supporting documents."
       />
     );
   }
@@ -357,11 +359,7 @@ function BillingPacketDetailPanel({
         {isOverdue(selected) ? 'Overdue' : STATE_LABEL[selected.state]}
       </span>
 
-      <p className="billing-detail-note">
-        {selected.blockers.length === 0
-          ? `All supporting documents are on file and training has reached ${selected.scholars > 0 ? 'the release threshold' : 'completion'}. This packet can be generated.`
-          : selected.blockers.join(' ')}
-      </p>
+      {selected.blockers.length > 0 && <p className="billing-detail-note">{selected.blockers.join(' ')}</p>}
 
       <ul className="billing-doc-list">
         {selected.docs.map((doc) => (
@@ -423,11 +421,12 @@ export function BillingQueueView({
     if (card?.gate.ready) setPreview(card);
   };
 
-  const handleSave = (label: string) => {
+  // Every close path (button, X, Esc, scrim) lands here so they all give the same outcome.
+  const closePreview = () => {
     setPreview(null);
     setToast({
-      title: 'Working copy saved',
-      message: `${label} recorded to the generation log (append-only). Nothing was submitted to TESDA.`,
+      title: 'Preview closed',
+      message: 'Preview only — nothing was saved. Nothing was submitted to TESDA.',
     });
   };
 
@@ -481,9 +480,7 @@ export function BillingQueueView({
         <BillingStatementModal
           card={preview}
           initialTrackId={preview.tracks[0].id}
-          readOnly={!canWrite}
-          onClose={() => setPreview(null)}
-          onSave={handleSave}
+          onClose={closePreview}
         />
       )}
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}

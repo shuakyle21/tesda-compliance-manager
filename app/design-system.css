@@ -546,8 +546,15 @@ body { min-height: 100vh; margin: 0; }
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface-alt) 25%, var(--color-border-faint) 50%, var(--color-surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .skeleton { animation: none !important; }
 }
 
 /* ----- Activity log ----------------------------------------- */
@@ -2592,3 +2599,29 @@ select.input { padding-right: 28px; height: 34px; }
 .overview-muted { color: var(--color-text-secondary); font-size: 12px; }
 .overview-cell-stack { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; }
 .overview-cell-stack .attention-urgent, .overview-cell-stack .attention-due { display: inline-flex; align-items: center; gap: 4px; font-weight: 500; }
+
+/* Overview filters: labelled selects in the shared .filters row. */
+.overview-filters { align-items: flex-end; gap: 12px; margin-bottom: 0; }
+.overview-filter-field { display: inline-flex; flex-direction: column; gap: 4px; min-width: 0; flex: 0 1 220px; }
+.overview-filter-field label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-secondary);
+}
+.overview-filter-field select { width: 100%; }
+.overview-filters .dash-link { align-self: center; padding: 8px 0; }
+@media (max-width: 720px) { .overview-filter-field { flex: 1 1 100%; } }
+
+/* The school column stays in view while the wide table scrolls sideways. */
+.overview-table tbody th[scope="row"], .overview-table thead th:first-child { position: sticky; left: 0; z-index: 1; }
+.overview-table tbody th[scope="row"] { background: var(--color-surface); }
+.overview-table-wrap:focus-visible { outline: 2px solid var(--color-blue); outline-offset: -2px; }
+
+/* ----- Batches by stage (BatchStageDistribution) ------------- */
+.stage-dist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.stage-dist-row { display: grid; grid-template-columns: minmax(96px, 132px) minmax(0, 1fr) 32px; align-items: center; gap: 12px; font-size: 12px; }
+.stage-dist-label { display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-primary); }
+.stage-dist-track { height: 12px; border-radius: var(--radius-sm); background: var(--color-surface-alt); overflow: hidden; }
+.stage-dist-fill { display: block; height: 100%; border-radius: var(--radius-sm); background: var(--color-blue); }
+.stage-dist-count { font-family: var(--font-mono); text-align: right; color: var(--color-text-primary); }
+.stage-dist-blocked .stage-dist-label { color: var(--color-red-dk); font-weight: 500; }
+.stage-dist-blocked .stage-dist-fill { background: var(--color-red); }

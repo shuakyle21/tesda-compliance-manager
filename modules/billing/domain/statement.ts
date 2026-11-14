@@ -21,10 +21,13 @@ import {
   ACCIDENT_INSURANCE,
   ENTREPRENEURSHIP_FEE,
   NEW_NORMAL_ASSISTANCE,
+  RATE_UNAVAILABLE,
+  ROSTER_NOT_LOADED,
   TSF_DAY_RATE,
   nominalHoursFor,
   trainingCostFor,
-  tsfDaysFor,
+  pesoLabel,
+  tsfDaysForBatch,
 } from './rates';
 
 export interface StatementColumn {
@@ -43,7 +46,6 @@ export interface StatementSummaryLine {
 export interface BillingStatement {
   trackId: BillingTrackId;
   trackLabel: string;
-  batchId: string;
   school: string;
   region: string;
   /** Uppercase program banner, e.g. "COCONUT FARMERS SCHOLARSHIP PROGRAM (CFSP)". */
@@ -52,7 +54,7 @@ export interface BillingStatement {
   subtitle: string;
   qualification: string;
   trainerName: string;
-  rqm: string;
+  rqm: string | null;
   period: string;
   scholarsLabel: string;
   columns: StatementColumn[];
@@ -60,9 +62,12 @@ export interface BillingStatement {
   rows: { cells: string[] }[];
   summary: StatementSummaryLine[];
   totalLabel: string;
-  grandTotal: number;
+  /** `null` when no component of the document has a rate (shown as "—"). */
+  grandTotal: number | null;
   grandTotalLabel: string;
   grandWords: string;
+  /** Why `grandTotal` is "—" (e.g. missing rate, roster not loaded); `null` when the total is complete. */
+  unavailableReason: string | null;
 }
 
 /** Minimal school context the statement header needs (from the tenant record). */
@@ -90,31 +95,18 @@ function scholarName(s: ScholarRow): string {
 }
 
 /**
- * Synthesizes an RQM code (ADR-001 structure `RQM<tranche>-<year>-<program>-<institution>-<seq>`).
- * Deterministic from the batch code so the same batch always shows the same
- * authorization. This is a prototype value until `rqm_code` is on the contract.
- *
- * @param batch - The batch to generate an RQM code for
- * @returns RQM code like "RQM3-2026-CFSP-1263-0001"
- */
-function rqmCode(batch: Batch): string {
-  const seq = (batch.id.match(/\d+/)?.[0] ?? '0').padStart(4, '0');
-  const program = batch.program.trim().toUpperCase() || 'CFSP';
-  return `RQM3-2026-${program}-1263-${seq}`;
-}
-
-/**
- * Formats the training period for the statement header (e.g., "Apr 21 – Jun 8, 2026 (360 hrs)").
+ * Formats the training period for the statement header (e.g., "Apr 21 – Jun 8, 2026 (<n> hrs)").
  */
 function trainingPeriod(batch: Batch): string {
   const hrs = nominalHoursFor(batch.qualification);
-  return `${formatDate(batch.trainingStart) ?? '—'} – ${formatDate(batch.trainingEnd) ?? '—'} (${hrs} hrs)`;
+  return `${formatDate(batch.trainingStart) ?? '—'} – ${formatDate(batch.trainingEnd) ?? '—'} (${hrs ?? '—'} hrs)`;
 }
 
 /**
  * Returns the full program banner for the statement cover (CFSP or TWSP).
  */
 function programBanner(program: string): string {
+  if (!program.trim()) return '—';
   return isCfsp(program)
     ? 'Coconut Farmers Scholarship Program (CFSP)'
     : 'Training for Work Scholarship Program (TWSP)';
@@ -126,9 +118,9 @@ function programBanner(program: string): string {
  * Build a complete billing statement for a batch and track combination.
  *
  * Generates all components: header info, column definitions, per-scholar rows,
- * summary lines, and grand total with amount-in-words. Falls back to an empty
- * roster gracefully (the modal shows a zero-row table) when a batch has no
- * `scholars_list` yet.
+ * summary lines, and grand total with amount-in-words. When a batch has no
+ * `scholars_list` loaded, every scholar-dependent amount is "—" with a reason
+ * (a loaded empty roster keeps its honest zero).
  *
  * @param batch - The batch to bill
  * @param trackId - The billing track (training_cost, tsf_allowance, or entrepreneurship)
@@ -142,6 +134,7 @@ export function buildStatement(
 ): BillingStatement {
   const track = trackById(trackId);
   const roster = batch.scholars_list ?? [];
+  const n: number | null = batch.scholars_list === undefined ? null : roster.length;
 
   // TSF's cover title is program-aware: TWSP has no New Normal component, so it
   // must not claim one (copy accuracy — this is a compliance document).
@@ -153,26 +146,25 @@ export function buildStatement(
   const header = {
     trackId,
     trackLabel: track.label,
-    batchId: batch.id,
     school: tenant.name,
     region: tenant.region,
     programLine: programBanner(batch.program).toUpperCase(),
     docTitle,
     qualification: batch.qualification,
     trainerName: batch.trainer || '—',
-    rqm: rqmCode(batch),
+    rqm: batch.rqmCode,
     period: trainingPeriod(batch),
-    scholarsLabel: `${roster.length} pax`,
+    scholarsLabel: batch.scholars_list ? `${roster.length} pax` : '—',
   };
 
-  if (trackId === 'training_cost') return buildTrainingCost(batch, roster, header);
-  if (trackId === 'tsf_allowance') return buildTsfAllowance(batch, roster, header);
-  return buildEntrepreneurship(batch, roster, header);
+  if (trackId === 'training_cost') return buildTrainingCost(batch, roster, n, header);
+  if (trackId === 'tsf_allowance') return buildTsfAllowance(batch, roster, n, header);
+  return buildEntrepreneurship(batch, roster, n, header);
 }
 
 type Header = Omit<
   BillingStatement,
-  'subtitle' | 'columns' | 'rows' | 'summary' | 'totalLabel' | 'grandTotal' | 'grandTotalLabel' | 'grandWords'
+  'subtitle' | 'columns' | 'rows' | 'summary' | 'totalLabel' | 'grandTotal' | 'grandTotalLabel' | 'grandWords' | 'unavailableReason'
 >;
 
 /**
@@ -185,7 +177,8 @@ function finalize(
   columns: StatementColumn[],
   rows: { cells: string[] }[],
   summary: StatementSummaryLine[],
-  grandTotal: number,
+  grandTotal: number | null,
+  reasons: string[],
 ): BillingStatement {
   return {
     ...header,
@@ -195,8 +188,9 @@ function finalize(
     summary,
     totalLabel: 'Total amount due',
     grandTotal,
-    grandTotalLabel: formatPeso(grandTotal),
-    grandWords: pesosInWords(grandTotal),
+    grandTotalLabel: grandTotal === null ? '—' : formatPeso(grandTotal),
+    grandWords: grandTotal === null ? '—' : pesosInWords(grandTotal),
+    unavailableReason: reasons.length ? reasons.join(' · ') : null,
   };
 }
 
@@ -204,7 +198,7 @@ function finalize(
  * Builds the Training Cost statement (flat per-scholar cost).
  * Matches the source docx exactly.
  */
-function buildTrainingCost(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
+function buildTrainingCost(batch: Batch, roster: ScholarRow[], n: number | null, header: Header): BillingStatement {
   const unit = trainingCostFor(batch.qualification);
   const columns: StatementColumn[] = [
     { key: 'no', label: 'No.', align: 'left', mono: true },
@@ -213,31 +207,40 @@ function buildTrainingCost(batch: Batch, roster: ScholarRow[], header: Header): 
     { key: 'cost', label: 'Training Cost', align: 'right', mono: true },
     { key: 'total', label: 'Total Cost', align: 'right', mono: true },
   ];
+  const cost = unit === null ? '—' : formatPeso(unit);
   const rows = roster.map((s, i) => ({
-    cells: [String(i + 1), scholarName(s), s.sex || '—', formatPeso(unit), formatPeso(unit)],
+    cells: [String(i + 1), scholarName(s), s.sex || '—', cost, cost],
   }));
-  const grandTotal = unit * roster.length;
+  // Unmapped qualification: no rate, so no amount — never a guessed default.
+  const reasons = [...(unit === null ? [RATE_UNAVAILABLE] : []), ...(n === null ? [ROSTER_NOT_LOADED] : [])];
+  if (unit === null || n === null) {
+    const summary = reasons.map((label) => ({ label, amount: '—' }));
+    const subtitle = unit === null ? RATE_UNAVAILABLE : `${formatPeso(unit)} per scholar`;
+    return finalize(header, `${subtitle} · ${header.scholarsLabel}`, columns, rows, summary, null, reasons);
+  }
+  const grandTotal = unit * n;
   const summary: StatementSummaryLine[] = [
-    { label: `${roster.length} scholars × ${formatPeso(unit)}`, amount: formatPeso(grandTotal) },
+    { label: `${n} scholars × ${formatPeso(unit)}`, amount: formatPeso(grandTotal) },
   ];
-  return finalize(header, `${formatPeso(unit)} per scholar · ${roster.length} pax`, columns, rows, summary, grandTotal);
+  return finalize(header, `${formatPeso(unit)} per scholar · ${header.scholarsLabel}`, columns, rows, summary, grandTotal, []);
 }
 
 /**
  * Builds the TSF / Allowance statement. Includes TSF days plus (CFSP only)
  * New Normal Assistance and Accident Insurance per scholar.
  */
-function buildTsfAllowance(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
+function buildTsfAllowance(batch: Batch, roster: ScholarRow[], n: number | null, header: Header): BillingStatement {
   const cfsp = isCfsp(batch.program);
-  const days = tsfDaysFor(batch.qualification);
-  const tsf = days * TSF_DAY_RATE;
-  const perScholar = tsf + (cfsp ? NEW_NORMAL_ASSISTANCE + ACCIDENT_INSURANCE : 0);
+  const days = tsfDaysForBatch(batch);
+  const tsf = days === null ? null : days * TSF_DAY_RATE;
+  // A per-scholar total exists only when every component has a rate; never a partial sum.
+  const perScholar = tsf === null ? null : tsf + (cfsp ? NEW_NORMAL_ASSISTANCE + ACCIDENT_INSURANCE : 0);
 
   const columns: StatementColumn[] = [
     { key: 'no', label: 'No.', align: 'left', mono: true },
     { key: 'name', label: 'Name', align: 'left' },
     { key: 'sex', label: 'Sex', align: 'center' },
-    { key: 'tsf', label: `TSF (${days}×₱160)`, align: 'right', mono: true },
+    { key: 'tsf', label: `TSF (${days ?? '—'}×${pesoLabel(TSF_DAY_RATE)})`, align: 'right', mono: true },
     ...(cfsp
       ? [
           { key: 'nn', label: 'New Normal', align: 'right' as const, mono: true },
@@ -252,31 +255,36 @@ function buildTsfAllowance(batch: Batch, roster: ScholarRow[], header: Header): 
       String(i + 1),
       scholarName(s),
       s.sex || '—',
-      formatPeso(tsf),
+      tsf === null ? '—' : formatPeso(tsf),
       ...(cfsp ? [formatPeso(NEW_NORMAL_ASSISTANCE), formatPeso(ACCIDENT_INSURANCE)] : []),
-      formatPeso(perScholar),
+      perScholar === null ? '—' : formatPeso(perScholar),
     ],
   }));
 
-  const n = roster.length;
-  const grandTotal = perScholar * n;
+  const grandTotal = perScholar !== null && n !== null ? perScholar * n : null;
+  const times = n === null ? ' per scholar' : ` × ${n}`;
+  const amount = (unit: number) => (n === null ? '—' : formatPeso(unit * n));
   const summary: StatementSummaryLine[] = [
-    { label: `TSF — ${days} days × ₱160 × ${n}`, amount: formatPeso(tsf * n) },
+    tsf === null
+      ? { label: `TSF — ${RATE_UNAVAILABLE}`, amount: '—' }
+      : { label: `TSF — ${days} days × ${pesoLabel(TSF_DAY_RATE)}${times}`, amount: amount(tsf) },
     ...(cfsp
       ? [
-          { label: `New Normal Assistance — ₱1,000 × ${n}`, amount: formatPeso(NEW_NORMAL_ASSISTANCE * n) },
-          { label: `Accident Insurance — ₱100.80 × ${n}`, amount: formatPeso(ACCIDENT_INSURANCE * n) },
+          { label: `New Normal Assistance — ${pesoLabel(NEW_NORMAL_ASSISTANCE)}${times}`, amount: amount(NEW_NORMAL_ASSISTANCE) },
+          { label: `Accident Insurance — ${pesoLabel(ACCIDENT_INSURANCE)}${times}`, amount: amount(ACCIDENT_INSURANCE) },
         ]
       : []),
   ];
-  return finalize(header, `${formatPeso(perScholar)} per scholar · ${n} pax`, columns, rows, summary, grandTotal);
+  const reasons = [...(tsf === null ? [RATE_UNAVAILABLE] : []), ...(n === null ? [ROSTER_NOT_LOADED] : [])];
+  const subtitle = perScholar === null ? RATE_UNAVAILABLE : `${formatPeso(perScholar)} per scholar`;
+  return finalize(header, `${subtitle} · ${header.scholarsLabel}`, columns, rows, summary, grandTotal, reasons);
 }
 
 /**
  * Builds the Entrepreneurship statement. ₱800 per scholar, CFSP only
  * (single payment on delivery).
  */
-function buildEntrepreneurship(batch: Batch, roster: ScholarRow[], header: Header): BillingStatement {
+function buildEntrepreneurship(batch: Batch, roster: ScholarRow[], n: number | null, header: Header): BillingStatement {
   const columns: StatementColumn[] = [
     { key: 'no', label: 'No.', align: 'left', mono: true },
     { key: 'name', label: 'Name', align: 'left' },
@@ -293,9 +301,14 @@ function buildEntrepreneurship(batch: Batch, roster: ScholarRow[], header: Heade
       formatPeso(ENTREPRENEURSHIP_FEE),
     ],
   }));
-  const grandTotal = ENTREPRENEURSHIP_FEE * roster.length;
+  const subtitle = `${pesoLabel(ENTREPRENEURSHIP_FEE)} per scholar · ${header.scholarsLabel}`;
+  if (n === null) {
+    const summary = [{ label: ROSTER_NOT_LOADED, amount: '—' }];
+    return finalize(header, subtitle, columns, rows, summary, null, [ROSTER_NOT_LOADED]);
+  }
+  const grandTotal = ENTREPRENEURSHIP_FEE * n;
   const summary: StatementSummaryLine[] = [
-    { label: `₱800 × ${roster.length} scholars`, amount: formatPeso(grandTotal) },
+    { label: `${pesoLabel(ENTREPRENEURSHIP_FEE)} × ${n} scholars`, amount: formatPeso(grandTotal) },
   ];
-  return finalize(header, `₱800 per scholar · ${roster.length} pax`, columns, rows, summary, grandTotal);
+  return finalize(header, subtitle, columns, rows, summary, grandTotal, []);
 }
