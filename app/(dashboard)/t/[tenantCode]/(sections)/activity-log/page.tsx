@@ -50,12 +50,7 @@ export default async function ActivityLogPage({ params: routeParams, searchParam
     <div>
       <div className="page-head">
         <h1>Activity Log</h1>
-        {/* Bounded page, not the full audit log — the subline describes what's
-            actually loaded (this page), not a claimed total. */}
-        <span className="subline">
-          audit · showing {events.length} {events.length === 1 ? 'event' : 'events'}
-          {page > 0 ? ` (page ${page + 1})` : ''}
-        </span>
+        {page > 0 && <span className="subline">Page {page + 1}</span>}
         <div style={{ marginLeft: 'auto' }}>
           <button className="btn secondary"><Icon name="download" size={14} />Export</button>
         </div>
@@ -63,7 +58,7 @@ export default async function ActivityLogPage({ params: routeParams, searchParam
 
       {syncFailed && (
         <InfoCallout variant="warning">
-          Sync with Supabase failed — the activity feed could not be loaded.
+          The activity feed could not be loaded.
           <Link href={scopedPath(scope.code, 'activity-log')} className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
         </InfoCallout>
       )}

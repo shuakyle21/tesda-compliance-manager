@@ -10,7 +10,7 @@
  * through the matrix and the preview via local override state. Client Component.
  */
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
@@ -18,6 +18,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
 import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -111,13 +112,13 @@ export function DocumentsView({
    * row a batch has, so a requirement outside this batch's own catalog is
    * untracked even if an old record for it exists.
    */
-  const docOf = (b: Batch, key: string): DocRecord | null => {
+  const docOf = useCallback((b: Batch, key: string): DocRecord | null => {
     if (!b.documentRequirements.some((r) => r.key === key)) return null;
     const base = docRecordFor(b, key);
     if (!base) return null;
     const ov = overrides[b.id + ':' + key];
     return ov ? { ...base, ...ov } : base;
-  };
+  }, [overrides]);
 
   const completeness = useMemo(() => batches.map((b) => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
@@ -133,7 +134,7 @@ export function DocumentsView({
     const untracked = crit.length - tracked.length;
     const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, tier };
-  }), [batches, documentRequirements, overrides]);
+  }), [batches, docOf]);
 
   if (!batches.length) {
     return (
@@ -164,7 +165,7 @@ export function DocumentsView({
   }
 
   const buildPreview = (b: Batch, req: DocumentRequirement, doc: DocRecord): PreviewFile => ({
-    name: req.label, batchId: b.id, batchName: b.name, program: b.program,
+    name: req.label, batchId: b.id, batchLabel: displayBatchId(b), batchName: b.name, program: b.program,
     tenantId: b.tenantId, docKey: req.key, url: doc.url, status: doc.status,
     updated: doc.updated, source: doc.source, critical: req.critical,
     verifiedBy: doc.verifiedBy || null, verifiedDate: doc.verifiedDate || null,
@@ -174,7 +175,7 @@ export function DocumentsView({
     const doc = docOf(b, req.key);
     if (!doc) return; // untracked — nothing to preview and nothing to attach against
     if (doc.status === 'verified' || doc.status === 'submitted') setPreview(buildPreview(b, req, doc));
-    else if (isWriter) setToast({ title: 'Attach document', message: `Open uploader ⇢ ${b.id} · ${req.label}` });
+    else if (isWriter) setToast({ title: 'Attach document', message: `Open uploader ⇢ ${displayBatchId(b)} · ${req.label}` });
   };
 
   const handleVerify = (file: PreviewFile) => {
@@ -198,9 +199,6 @@ export function DocumentsView({
     <div>
       <Header />
       <SyncFailedCallout syncFailed={syncFailed} />
-      <InfoCallout variant="info">
-        Document audit follows TESDA Circular 014-2026. Critical documents are required for billing release; missing items block the BSRS submission.
-      </InfoCallout>
 
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${colCount}, 1fr)`, gap: 12, margin: '16px 0' }}>
         {batches.map((b, i) => {
@@ -211,7 +209,7 @@ export function DocumentsView({
               borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{b.id}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{displayBatchId(b)}</span>
                 <StatusBadge variant={programBadgeVariant(b.program)}>{b.program}</StatusBadge>
               </div>
               <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -248,7 +246,7 @@ export function DocumentsView({
           <div>Document</div>
           {batches.map((b) => (
             <div key={b.id} style={{ justifyContent: 'space-between' }}>
-              <span>{b.id}</span>
+              <span>{displayBatchId(b)}</span>
               <span style={{ fontFamily: 'var(--font-mono)', textTransform: 'none', letterSpacing: 0, fontSize: 10, color: 'var(--color-text-muted)' }}>{b.program}</span>
             </div>
           ))}
@@ -318,7 +316,7 @@ function Header() {
   return (
     <div className="page-head">
       <h1>Documents</h1>
-      <span className="subline">TESDA Circular 014-2026 · critical docs gate billing</span>
+      <span className="subline">Critical documents must be verified before billing.</span>
     </div>
   );
 }

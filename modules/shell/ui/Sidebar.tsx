@@ -401,15 +401,7 @@ function SidebarOverlays({ activeOp, tenant, fullName, role, onClose }: {
   const [toast, setToast] = useState<ToastData | null>(null);
   return (
     <>
-      {activeOp === 'import' && (
-        <ImportCsvModal
-          onClose={onClose}
-          onImported={(message) => {
-            onClose();
-            setToast({ title: 'Import complete', message });
-          }}
-        />
-      )}
+      {activeOp === 'import' && <ImportCsvModal onClose={onClose} />}
       {activeOp === 'settings' && (
         <SettingsModal
           workspaceName={tenant?.name ?? NO_TENANT_NAME}
@@ -446,7 +438,7 @@ function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boo
 
   if (!item.href) {
     return (
-      <span className="sb-nav-item" aria-disabled="true" title="Coming soon" style={{ opacity: 0.45, cursor: 'default' }}>
+      <span className="sb-nav-item" aria-disabled="true" style={{ opacity: 0.45, cursor: 'default' }}>
         {inner}
       </span>
     );

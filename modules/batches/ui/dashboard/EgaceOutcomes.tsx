@@ -43,7 +43,6 @@ export function EgaceOutcomes({ batches }: { batches: Batch[] }) {
           <Icon name="certificate" size={13} />
           EGACE Outcomes
         </div>
-        <div className="dash-panel-meta">Reported cohort outcomes</div>
       </div>
 
       <div className="dash-panel-body">

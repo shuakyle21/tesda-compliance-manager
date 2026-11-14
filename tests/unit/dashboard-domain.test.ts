@@ -25,7 +25,7 @@ function lifecycle(billStatus: LifecycleStage['status'] = 'pending'): LifecycleS
 
 function batch(overrides: Partial<Batch> = {}): Batch {
   return {
-    id: 'BAT-1', tenantId: 'tenant-1', programId: 'program-1', name: 'BAT-1',
+    id: 'BAT-1', rqmCode: null, tenantId: 'tenant-1', programId: 'program-1', name: 'BAT-1',
     qualification: 'Agricultural Crops Production NC II', program: 'TWSP', ncLevel: 'NC II',
     trainer: '', trainerId: '', scholars: 20, trainingDays: '', trainingDaySchedule: [], notes: '',
     trainingStart: '2026-01-15', trainingEnd: '2026-06-18', duration: 0,
@@ -81,7 +81,17 @@ describe('attentionItems', () => {
 
   it('groups open batches without a recorded deadline into one data-gap item', () => {
     const items = attentionItems([batch({ id: 'A' }), batch({ id: 'B' })], { syncFailed: false });
-    expect(items).toEqual([{ kind: 'billing-deadline-missing', severity: 'due', batchIds: ['A', 'B'] }]);
+    expect(items).toEqual([{ kind: 'billing-deadline-missing', severity: 'due', batchIds: ['A', 'B'], batchLabels: ['A', 'B'] }]);
+  });
+
+  it('labels attention items with the RQM code while ids stay the internal code', () => {
+    const RQM = 'RQM3-2026-CFSP-0000-0001';
+    const missing = attentionItems([batch({ id: 'A', rqmCode: RQM }), batch({ id: 'B' })], { syncFailed: false });
+    expect(missing).toEqual([{ kind: 'billing-deadline-missing', severity: 'due', batchIds: ['A', 'B'], batchLabels: [RQM, 'B'] }]);
+    const docs = attentionItems([dated(60, {
+      rqmCode: RQM, documentRequirements: REQS, documents: { ntp: doc('missing') },
+    })], { syncFailed: false });
+    expect(docs).toEqual([{ kind: 'documents-missing', severity: 'due', batchId: 'BAT-1', batchLabel: RQM, documents: ['Notice to Proceed'] }]);
   });
 
   it('names required documents recorded as missing — not untracked or optional ones', () => {
@@ -89,7 +99,7 @@ describe('attentionItems', () => {
       documentRequirements: REQS,
       documents: { ntp: doc('missing'), photos: doc('missing') }, // tip untracked
     })], { syncFailed: false });
-    expect(items).toEqual([{ kind: 'documents-missing', severity: 'due', batchId: 'BAT-1', documents: ['Notice to Proceed'] }]);
+    expect(items).toEqual([{ kind: 'documents-missing', severity: 'due', batchId: 'BAT-1', batchLabel: 'BAT-1', documents: ['Notice to Proceed'] }]);
   });
 
   it('lists a blocked batch as urgent', () => {
@@ -142,8 +152,11 @@ describe('deriveDashboardMetrics', () => {
       dated(-200, { id: 'BILLED', bsrs: true }),
       batch({ id: 'UNDATED' }),
     ]);
-    expect(metrics.nextBilling).toEqual({ batchId: 'OVERDUE', deadline: '2026-11-01', daysToBilling: -4 });
+    expect(metrics.nextBilling).toEqual({ batchId: 'OVERDUE', batchLabel: 'OVERDUE', deadline: '2026-11-01', daysToBilling: -4 });
     expect(metrics.openBillingObligations).toBe(3);
+    const RQM = 'RQM3-2026-CFSP-0000-0001';
+    const labelled = deriveDashboardMetrics([dated(-4, { id: 'OVERDUE', rqmCode: RQM })]);
+    expect(labelled.nextBilling).toMatchObject({ batchId: 'OVERDUE', batchLabel: RQM });
     expect(metrics.billingDeadlinesMissing).toBe(1);
     expect(metrics.overdueBilling).toBe(1);
   });

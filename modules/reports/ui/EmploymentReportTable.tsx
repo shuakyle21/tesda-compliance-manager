@@ -1,5 +1,6 @@
 'use client';
 
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { Icon } from '@/shared/ui/Icon';
 import type { Tenant } from '@/shared/types';
 import { EMPLOYMENT_STATUSES } from '@/shared/vocab';
@@ -58,7 +59,7 @@ export function EmploymentReportTable({ empScholars, isMulti, tenantOf, empTone 
                     </td>
                     <td className="egc-td egc-mono">{r.s.sex.slice(0, 1)}</td>
                     <td className="egc-td">
-                      <div style={{ fontSize: 11.5 }}>{r.batch.id}</div>
+                      <div style={{ fontSize: 11.5 }}>{displayBatchId(r.batch)}</div>
                       <div className="egc-meta">{r.batch.qualification}</div>
                     </td>
                     <td className="egc-td">
@@ -96,7 +97,7 @@ export function EmploymentReportTable({ empScholars, isMulti, tenantOf, empTone 
       <div className="egace-footnote">
         <Icon name="info-circle" size={12} />
         <span>
-          Schools must file each certified graduate&apos;s current employment status with TESDA — mandatory by the 6-month mark, though it may be reported earlier. Updates here flow straight into the EGACE “Employed” figure, the dashboard, and the Excel export.
+          Schools must file each certified graduate&apos;s current employment status with TESDA — mandatory by the 6-month mark, though it may be reported earlier.
         </span>
       </div>
     </div>

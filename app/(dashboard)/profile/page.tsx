@@ -411,7 +411,7 @@ function ManagedByClerk() {
       fontFamily: 'var(--font-sans)', fontSize: 10.5, color: 'var(--color-text-secondary)',
     }}>
       <Icon name="shield-check" size={11} style={{ color: 'var(--color-text-muted)' }} />
-      Managed by Clerk
+      Managed by your sign-in provider
     </span>
   );
 }

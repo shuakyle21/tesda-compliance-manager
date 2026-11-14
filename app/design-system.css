@@ -546,8 +546,15 @@ body { min-height: 100vh; margin: 0; }
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface-alt) 25%, var(--color-border-faint) 50%, var(--color-surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .skeleton { animation: none !important; }
 }
 
 /* ----- Activity log ----------------------------------------- */

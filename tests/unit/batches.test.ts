@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mapBatchRow, selectBatchesForDisplay } from '@/modules/batches/data/batches';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
+import { filterBatches } from '@/modules/batches/ui/filter';
+import { buildStatement } from '@/modules/billing/domain/statement';
 
 // batches.ts keeps its join-row type module-private; derive the fixture's
 // shape from the function signature instead of duplicating it by hand.
@@ -11,6 +14,7 @@ function fixtureRow(overrides: Partial<BatchRowWithProgram> = {}): BatchRowWithP
     tenant_id: 'tenant-1',
     program_id: 'program-1',
     batch_code: 'BAT-2',
+    rqm_code: null,
     batch_section: null,
     qualification_title: 'Agricultural Crops Production NC II',
     nc_level: 'NC II',
@@ -264,5 +268,44 @@ describe('mapBatchRow — dashboard contract (unavailable is null, never zero)',
 
   it('never claims an NTP lag it has no dates for', () => {
     expect(mapBatchRow(fixtureRow()).ntpLag).toBeNull();
+  });
+});
+
+describe('RQM code', () => {
+  const RQM = 'RQM3-2026-CFSP-1263-0009';
+  const tenant = { name: 'Test School', region: 'Region 1' };
+
+  it('maps rqm_code: null stays null, blank becomes null, a value is trimmed', () => {
+    expect(mapBatchRow(fixtureRow({ rqm_code: null })).rqmCode).toBeNull();
+    expect(mapBatchRow(fixtureRow({ rqm_code: '   ' })).rqmCode).toBeNull();
+    expect(mapBatchRow(fixtureRow({ rqm_code: ` ${RQM} ` })).rqmCode).toBe(RQM);
+  });
+
+  it('builds name from the RQM code when recorded, else the internal code', () => {
+    expect(mapBatchRow(fixtureRow({ rqm_code: RQM, batch_section: 'Morning' })).name).toBe(`${RQM} (Morning)`);
+    expect(mapBatchRow(fixtureRow({ rqm_code: null, batch_section: 'Morning' })).name).toBe('BAT-2 (Morning)');
+  });
+
+  it('keeps id as the internal batch code when an RQM code is set', () => {
+    expect(mapBatchRow(fixtureRow({ rqm_code: RQM })).id).toBe('BAT-2');
+  });
+
+  it('displayBatchId prefers the RQM code and falls back to the internal id', () => {
+    expect(displayBatchId({ id: 'BAT-2', rqmCode: RQM })).toBe(RQM);
+    expect(displayBatchId({ id: 'BAT-2', rqmCode: null })).toBe('BAT-2');
+  });
+
+  it('statement shows the real RQM code, or null — never an invented one', () => {
+    const withCode = buildStatement(mapBatchRow(fixtureRow({ rqm_code: RQM })), 'training_cost', tenant);
+    expect(withCode.rqm).toBe(RQM);
+    const without = buildStatement(mapBatchRow(fixtureRow({ rqm_code: null })), 'training_cost', tenant);
+    expect(without.rqm).toBeNull();
+  });
+
+  it('search matches by RQM code as well as the internal code', () => {
+    const batches = [mapBatchRow(fixtureRow({ rqm_code: RQM }))];
+    expect(filterBatches(batches, 'rqm3-2026-cfsp-1263-0009', 'all')).toHaveLength(1);
+    expect(filterBatches(batches, 'bat-2', 'all')).toHaveLength(1);
+    expect(filterBatches(batches, 'nope-0000', 'all')).toHaveLength(0);
   });
 });

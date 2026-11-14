@@ -31,6 +31,7 @@ function doc(status: DocStatus): DocRecord {
 function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
   return {
     id: 'BAT-1',
+    rqmCode: null,
     tenantId: 'tenant-1',
     programId: 'program-1',
     name: 'BAT-1',

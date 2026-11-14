@@ -25,6 +25,7 @@ import { attachRoster, getTenantRosterSnapshot } from '@/modules/batches/data/le
 import { getAuthUserId } from '@/modules/auth/data/auth';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { getProfileSnapshot } from '@/modules/tenancy/data/tenancy';
+import { formatDateTime } from '@/shared/dates';
 import { ReportView } from '@/modules/reports/ui/ReportView';
 import { scopedPath } from '@/modules/tenancy/domain/scope';
 import { requireScope } from '../../../../tenant-scope';
@@ -94,7 +95,7 @@ export default async function ReportPage({ params }: { params: Promise<{ tenantC
   return (
     <>
       {syncFailed && <SyncFailedCallout retryHref={scopedPath(scope.code, 'report')} />}
-      <ReportView batches={batches} tenants={resolved.profile.tenants} />
+      <ReportView batches={batches} tenants={resolved.profile.tenants} rosterFailed={rosterSnapshot.status === 'sync-failed'} asOf={snapshot.status === 'ok' ? formatDateTime(snapshot.fetchedAt) : null} />
     </>
   );
 }

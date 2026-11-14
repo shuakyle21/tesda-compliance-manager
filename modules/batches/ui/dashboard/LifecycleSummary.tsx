@@ -11,6 +11,7 @@
 import Link from 'next/link';
 import { Icon } from '@/shared/ui/Icon';
 import { pluralize } from '@/shared/text';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { LifecyclePipeline } from '@/modules/batches/ui/LifecyclePipeline';
 import type { Batch } from '@/shared/types';
 
@@ -37,18 +38,14 @@ export function LifecycleSummary({ batches, batchHref, allHref }: {
         <p className="attention-empty">No active batches.</p>
       ) : (
         <ul className="lifecycle-rows">
-          {shown.map((batch) => {
-            const done = batch.lifecycle.filter((stage) => stage.status === 'done').length;
-            return (
-              <li key={batch.id} className="lifecycle-row">
-                <div className="lifecycle-row-head">
-                  <Link href={batchHref(batch.id)} className="lifecycle-batch">{batch.id}</Link>
-                  <span className="lifecycle-count">{done} of {batch.lifecycle.length} stages done</span>
-                </div>
-                <LifecyclePipeline steps={batch.lifecycle} />
-              </li>
-            );
-          })}
+          {shown.map((batch) => (
+            <li key={batch.id} className="lifecycle-row">
+              <div className="lifecycle-row-head">
+                <Link href={batchHref(batch.id)} className="lifecycle-batch"><BatchIdLabel batch={batch} /></Link>
+              </div>
+              <LifecyclePipeline steps={batch.lifecycle} />
+            </li>
+          ))}
         </ul>
       )}
       {hidden > 0 && (
