@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { summariseWrites } from '@/modules/import-export/data/learnerImport';
 import { parseCsvRows, rowsToRecords } from '@/modules/import-export/domain/csv';
 import {
   parseLearnerCsv,
@@ -113,5 +114,24 @@ describe('reconcileWithExisting', () => {
     const reconciled = reconcileWithExisting(rows, existing);
     expect(reconciled.find((r) => r.row.uli === 'MATCH-0001')?.existingId).toBe('learner-1');
     expect(reconciled.find((r) => r.row.uli === 'NEW-0002')?.existingId).toBeNull();
+  });
+});
+
+describe('summariseWrites', () => {
+  const done = (saved: number) => ({ saved, error: null });
+
+  it('is ok with the counts when both steps finish', () => {
+    expect(summariseWrites(done(3), done(2), [])).toEqual({ status: 'ok', inserted: 3, updated: 2, skipped: [] });
+  });
+
+  it('is sync-failed when nothing was saved', () => {
+    expect(summariseWrites({ saved: 0, error: 'boom' }, done(0), [])).toEqual({ status: 'sync-failed', error: 'boom' });
+  });
+
+  it('is partial, with real counts, when learners were saved before the stop', () => {
+    expect(summariseWrites({ saved: 3, error: 'details failed' }, done(0), [])).toEqual({
+      status: 'partial', inserted: 3, updated: 0, skipped: [], error: 'details failed',
+    });
+    expect(summariseWrites(done(3), { saved: 1, error: 'row 2 failed' }, [])).toMatchObject({ status: 'partial', inserted: 3, updated: 1 });
   });
 });
