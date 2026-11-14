@@ -101,6 +101,17 @@ describe('createBatchesFromNtpAction', () => {
     expect(m.uploadEvidence).not.toHaveBeenCalled();
   });
 
+  it('refuses a file named .pdf whose content is not a PDF', async () => {
+    const fake = new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47])], 'notice.pdf', { type: 'application/pdf' });
+    expect(await createBatchesFromNtpAction(IDLE, form({ ntpFile: fake }))).toEqual({ status: 'invalid', message: 'The Notice to Proceed must be a PDF.' });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+  });
+
+  it('treats malformed rows JSON as no rows', async () => {
+    expect(await createBatchesFromNtpAction(IDLE, form({ rows: '{not json' }))).toMatchObject({ status: 'invalid' });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+  });
+
   it('asks for the AOU when none is on file for the year and none is attached, uploading nothing', async () => {
     m.getAouYears.mockResolvedValue({ status: 'ok', years: [2025] });
     expect(await createBatchesFromNtpAction(IDLE, form())).toEqual({ status: 'aou-required', year: 2026 });

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  draftRowsFromJson,
   manilaToday,
   parseNtpDate,
   parseNtpText,
@@ -138,6 +139,18 @@ describe('manilaToday', () => {
   });
   it('is the same day as UTC before 16:00 UTC', () => {
     expect(manilaToday(new Date('2026-04-15T15:59:00Z'))).toBe('2026-04-15');
+  });
+});
+
+describe('draftRowsFromJson', () => {
+  it('keeps text fields and blanks anything else', () => {
+    expect(draftRowsFromJson(JSON.stringify([{ rqmCode: 'X', approvedSlots: 17, extra: 'y' }]))).toEqual([
+      { rqmCode: 'X', qualification: '', approvedSlots: '', totalAmount: '', indicativeStartDate: '' },
+    ]);
+  });
+  it('treats non-JSON and non-arrays as no rows', () => {
+    expect(draftRowsFromJson('{oops')).toEqual([]);
+    expect(draftRowsFromJson('{"a":1}')).toEqual([]);
   });
 });
 

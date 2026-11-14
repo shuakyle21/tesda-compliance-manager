@@ -26,14 +26,9 @@ import { appendActivity } from '@/modules/activity/data/activity';
 import { getBatchesSnapshot, setBatchRqmCode, type SetRqmResult } from '@/modules/batches/data/batches';
 import { createBatchesFromNtp, type CreateBatchesResult } from '@/modules/batches/data/createBatches';
 import { checkRqmCode, type RqmFormState } from '@/modules/batches/domain/rqm';
-import { manilaToday, validateNtpSubmission, type NtpDraftRow, type NtpFormState, type NtpSubmission } from '@/modules/batches/domain/ntp';
+import { draftRowsFromJson, manilaToday, validateNtpSubmission, type NtpFormState, type NtpSubmission } from '@/modules/batches/domain/ntp';
 import { uploadEvidence, type EvidenceUploadResult } from '@/modules/documents/data/evidence';
-import {
-  EVIDENCE_REJECTION_COPY,
-  evidenceExtensionOf,
-  evidenceMimeOf,
-  validateEvidenceFile,
-} from '@/modules/documents/domain/evidencePath';
+import { EVIDENCE_REJECTION_COPY, checkPickedEvidence, evidenceExtensionOf } from '@/modules/documents/domain/evidencePath';
 import { getAouYears } from '@/modules/tenancy/data/tenantAou';
 import { aouOnFile, fiscalYearOf } from '@/modules/tenancy/domain/aou';
 import type { Profile } from '@/modules/tenancy/domain/profile';
@@ -164,38 +159,14 @@ const NTP_SAVE_FAILED: NtpFormState = { status: 'error', message: "The batches c
 
 const invalid = (message: string): NtpFormState => ({ status: 'invalid', message });
 
-/** The rows field is JSON from our own modal; anything else is treated as empty. */
-function draftRows(raw: string): NtpDraftRow[] {
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map((r) => {
-      const o = (r ?? {}) as Record<string, unknown>;
-      const s = (k: string) => (typeof o[k] === 'string' ? (o[k] as string) : '');
-      return {
-        rqmCode: s('rqmCode'),
-        qualification: s('qualification'),
-        approvedSlots: s('approvedSlots'),
-        totalAmount: s('totalAmount'),
-        indicativeStartDate: s('indicativeStartDate'),
-      };
-    });
-  } catch {
-    return [];
-  }
-}
-
 function attachedFile(formData: FormData, key: string): File | null {
   const value = formData.get(key);
   return value instanceof File && value.size > 0 ? value : null;
 }
 
-/** A file as Storage will receive it, or the copy saying why it can't be. */
-function checkedFile(file: File, opts: { pdfOnly: boolean; label: string }): { mimeType: string } | { error: string } {
-  const mimeType = evidenceMimeOf(file);
-  if (opts.pdfOnly && mimeType !== 'application/pdf') return { error: `The ${opts.label} must be a PDF.` };
-  const checked = validateEvidenceFile({ size: file.size, mimeType });
-  return checked.ok ? { mimeType } : { error: EVIDENCE_REJECTION_COPY[checked.reason] };
+/** The first bytes, so a non-PDF renamed to .pdf is caught by its content, not its name. */
+async function headOf(file: File): Promise<Uint8Array> {
+  return new Uint8Array(await file.slice(0, 8).arrayBuffer());
 }
 
 function uploadFailure(result: EvidenceUploadResult): NtpFormState {
@@ -235,21 +206,21 @@ async function authorizeCreate(tenantCode: string): Promise<Step<{ scope: Tenant
 }
 
 /** The rows and dates, re-validated through the domain, and the NTP file. */
-function readSubmission(formData: FormData): Step<{ submission: NtpSubmission; ntp: PickedFile }> {
+async function readSubmission(formData: FormData): Promise<Step<{ submission: NtpSubmission; ntp: PickedFile }>> {
   const checked = validateNtpSubmission(
     {
       receiptDate: text(formData, 'receiptDate'),
       ntpDate: text(formData, 'ntpDate'),
       approvalDate: text(formData, 'approvalDate'),
-      rows: draftRows(text(formData, 'rows')),
+      rows: draftRowsFromJson(text(formData, 'rows')),
     },
     manilaToday(new Date()),
   );
   if (!checked.ok) return stop(invalid(checked.error));
   const file = attachedFile(formData, 'ntpFile');
   if (!file) return stop(invalid('Choose the Notice to Proceed PDF.'));
-  const ntp = checkedFile(file, { pdfOnly: true, label: 'Notice to Proceed' });
-  if ('error' in ntp) return stop(invalid(ntp.error));
+  const ntp = checkPickedEvidence(file, { pdfOnly: true, label: 'Notice to Proceed', head: await headOf(file) });
+  if (!ntp.ok) return stop(invalid(ntp.message));
   return { ok: true, value: { submission: checked.value, ntp: { file, mimeType: ntp.mimeType } } };
 }
 
@@ -260,8 +231,8 @@ async function aouToStore(tenantId: string, receiptDate: string, formData: FormD
   if (aouOnFile(years.years, receiptDate)) return { ok: true, value: null };
   const file = attachedFile(formData, 'aouFile');
   if (!file) return stop({ status: 'aou-required', year: fiscalYearOf(receiptDate) });
-  const aou = checkedFile(file, { pdfOnly: false, label: 'Affidavit of Undertaking' });
-  if ('error' in aou) return stop(invalid(aou.error));
+  const aou = checkPickedEvidence(file, { pdfOnly: false, label: 'Affidavit of Undertaking', head: await headOf(file) });
+  if (!aou.ok) return stop(invalid(aou.message));
   return { ok: true, value: { file, mimeType: aou.mimeType } };
 }
 
@@ -291,7 +262,7 @@ export async function createBatchesFromNtpAction(_previous: NtpFormState, formDa
   if (!who.ok) return who.state;
   const { scope, profile } = who.value;
 
-  const request = readSubmission(formData);
+  const request = await readSubmission(formData);
   if (!request.ok) return request.state;
   const { submission, ntp } = request.value;
 

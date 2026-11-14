@@ -212,15 +212,16 @@ function orEmpty(value: string | null | undefined): string {
   return value ?? '';
 }
 
+/** null to undefined, for optional `Batch` fields; a helper so mapBatchRow stays under the complexity limit. */
+function orUndefined<T>(value: T | null | undefined): T | undefined {
+  return value ?? undefined;
+}
+
 /**
  * Same `?? 0` default repeated across mapBatchRow's count fields. These are typed
  * non-null by the contract, but a null slipping through at runtime would feed NaN
  * into roster totals and progress bars.
  */
-function orUndefined<T>(value: T | null | undefined): T | undefined {
-  return value ?? undefined;
-}
-
 function orZero(value: number | null | undefined): number {
   return value ?? 0;
 }

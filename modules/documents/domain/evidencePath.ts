@@ -218,6 +218,29 @@ export function evidenceMimeOf(file: { type: string; name: string }): string {
   return MIME_BY_EXTENSION[ext] ?? '';
 }
 
+/** True when the bytes start with the PDF signature "%PDF". */
+export function hasPdfSignature(head: Uint8Array): boolean {
+  return head.length >= 4 && head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
+}
+
+export type PickedEvidenceCheck = { ok: true; mimeType: string } | { ok: false; message: string };
+
+/**
+ * A picked file as Storage will receive it, or the copy saying why it can't be.
+ * `head` is the file's first bytes: a PDF-only file must carry the PDF
+ * signature, so a renamed image or document is refused by content, not name.
+ */
+export function checkPickedEvidence(
+  file: { size: number; type: string; name: string },
+  opts: { pdfOnly: boolean; label: string; head: Uint8Array },
+): PickedEvidenceCheck {
+  const mimeType = evidenceMimeOf(file);
+  const notPdf = mimeType !== 'application/pdf' || !hasPdfSignature(opts.head);
+  if (opts.pdfOnly && notPdf) return { ok: false, message: `The ${opts.label} must be a PDF.` };
+  const checked = validateEvidenceFile({ size: file.size, mimeType });
+  return checked.ok ? { ok: true, mimeType } : { ok: false, message: EVIDENCE_REJECTION_COPY[checked.reason] };
+}
+
 /** A file extension for a server-built filename, or '' for a type without one here. */
 export function evidenceExtensionOf(mimeType: string): string {
   return EXTENSION_BY_MIME[mimeType.split(';')[0]!.trim().toLowerCase()] ?? '';

@@ -213,6 +213,32 @@ export function validateNtpSubmission(
   return { ok: true, value: { receiptDate, ntpDate, approvalDate, rows } };
 }
 
+/**
+ * The rows field the modal posts, as JSON. It is untrusted: anything that is
+ * not an array of objects becomes no rows, and a non-text field becomes ''.
+ * `validateNtpSubmission` then refuses whatever is missing.
+ */
+export function draftRowsFromJson(raw: string): NtpDraftRow[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed.map((r) => {
+    const o = (r && typeof r === 'object' ? r : {}) as Record<string, unknown>;
+    const s = (k: keyof NtpDraftRow) => (typeof o[k] === 'string' ? (o[k] as string) : '');
+    return {
+      rqmCode: s('rqmCode'),
+      qualification: s('qualification'),
+      approvedSlots: s('approvedSlots'),
+      totalAmount: s('totalAmount'),
+      indicativeStartDate: s('indicativeStartDate'),
+    };
+  });
+}
+
 /** What the create-batches action hands back to the modal. Types only. */
 export type NtpFormState =
   | { status: 'idle' }
