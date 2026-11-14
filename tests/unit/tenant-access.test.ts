@@ -37,6 +37,7 @@ const TENANT: Tenant = {
 
 function profile(tenants: Tenant[]): Profile {
   return {
+    id: 'profile-1',
     clerkUserId: 'user_1',
     fullName: 'Karina Cruz',
     email: 'k@example.test',

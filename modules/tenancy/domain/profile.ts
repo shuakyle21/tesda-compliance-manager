@@ -9,6 +9,8 @@ import type { Tenant, UserRole } from '@/shared/types';
  * against (`modules/auth/data/role.ts`), rather than a second role vocabulary.
  */
 export interface Profile {
+  /** `profiles.id` — the FK the activity log's `profile_id` takes. */
+  id: string;
   clerkUserId: string;
   fullName: string | null;
   email: string | null;

@@ -15,7 +15,7 @@ function tenant(id: string, code: string): Tenant {
 }
 
 function profile(tenants: Tenant[], defaultTenantId: string | null = null): Profile {
-  return { clerkUserId: 'user_1', fullName: 'Test', email: null, role: 'coordinator', tenants, defaultTenantId };
+  return { id: 'profile-1', clerkUserId: 'user_1', fullName: 'Test', email: null, role: 'coordinator', tenants, defaultTenantId };
 }
 
 const AKB = tenant('t-akb', 'AKB');

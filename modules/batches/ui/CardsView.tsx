@@ -11,7 +11,7 @@
 
 import { useMemo, useState } from 'react';
 import { BatchCard } from '@/modules/batches/ui/BatchCard';
-import { BatchModal } from '@/modules/batches/ui/BatchModal';
+import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
@@ -24,10 +24,12 @@ import type { Batch } from '@/shared/types';
  * the client never re-formats it in another timezone). It replaced a
  * hardcoded "loaded at 14:02" (audit A19).
  */
-export function CardsView({ batches, loadedAt }: { batches: Batch[]; loadedAt: string | null }) {
+export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; loadedAt: string | null; rqmEdit?: RqmEdit }) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
-  const [open, setOpen] = useState<Batch | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  // Looked up from the live list (not a stored copy) so a save shows up in the open modal.
+  const open = batches.find((b) => b.id === openId) ?? null;
 
   const filtered = useMemo(() => filterBatches(batches, query, program), [batches, query, program]);
 
@@ -48,12 +50,12 @@ export function CardsView({ batches, loadedAt }: { batches: Batch[]; loadedAt: s
             {filtered.length} batch {pluralize(filtered.length, 'record', 'records')}{loadedAt ? ` loaded ${loadedAt}` : ''}. Sorted by earliest billing deadline first; batches with no deadline recorded come last, by training end date.
           </InfoCallout>
           {filtered.map((b) => (
-            <BatchCard key={b.id} batch={b} onClick={() => setOpen(b)} />
+            <BatchCard key={b.id} batch={b} onClick={() => setOpenId(b.id)} />
           ))}
         </div>
       )}
 
-      {open && <BatchModal batch={open} onClose={() => setOpen(null)} />}
+      {open && <BatchModal batch={open} onClose={() => setOpenId(null)} rqmEdit={rqmEdit} />}
     </div>
   );
 }

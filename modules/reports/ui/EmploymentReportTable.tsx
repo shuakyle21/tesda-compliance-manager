@@ -1,5 +1,6 @@
 'use client';
 
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { Icon } from '@/shared/ui/Icon';
 import type { Tenant } from '@/shared/types';
 import { EMPLOYMENT_STATUSES } from '@/shared/vocab';
@@ -58,7 +59,7 @@ export function EmploymentReportTable({ empScholars, isMulti, tenantOf, empTone 
                     </td>
                     <td className="egc-td egc-mono">{r.s.sex.slice(0, 1)}</td>
                     <td className="egc-td">
-                      <div style={{ fontSize: 11.5 }}>{r.batch.id}</div>
+                      <div style={{ fontSize: 11.5 }}>{displayBatchId(r.batch)}</div>
                       <div className="egc-meta">{r.batch.qualification}</div>
                     </td>
                     <td className="egc-td">
