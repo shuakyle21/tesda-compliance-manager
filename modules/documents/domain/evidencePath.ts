@@ -192,6 +192,37 @@ export function validateEvidenceFile(file: {
   return { ok: true };
 }
 
+const MIME_BY_EXTENSION: Record<string, string> = {
+  pdf: 'application/pdf',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+};
+
+const EXTENSION_BY_MIME: Record<string, string> = {
+  'application/pdf': 'pdf',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
+
+/**
+ * The MIME type to validate a picked file against. Browsers often leave
+ * `File.type` empty for a PDF, so an empty type falls back to the extension;
+ * a type the browser did report is never overridden.
+ */
+export function evidenceMimeOf(file: { type: string; name: string }): string {
+  if (file.type) return file.type;
+  const ext = /\.([a-z0-9]+)$/i.exec(file.name)?.[1]?.toLowerCase() ?? '';
+  return MIME_BY_EXTENSION[ext] ?? '';
+}
+
+/** A file extension for a server-built filename, or '' for a type without one here. */
+export function evidenceExtensionOf(mimeType: string): string {
+  return EXTENSION_BY_MIME[mimeType.split(';')[0]!.trim().toLowerCase()] ?? '';
+}
+
 /**
  * User-facing copy for each rejection.
  *
