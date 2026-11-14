@@ -283,6 +283,8 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     currentDay: completedSessions(row.attendance_records, row.total_sessions) ?? 0,
     totalDays: row.total_sessions ?? 0,
     ntpLag: null,
+    // The date printed on the NTP. `?? undefined`: absent until migration 20261114120000 is applied.
+    ntpDate: row.ntp_date ?? undefined,
     tipDate: '',
     remark: orEmpty(row.official_system_reference),
   };
