@@ -16,7 +16,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon, type IconName } from '@/shared/ui/Icon';
-import { Toast, type ToastData } from '@/shared/ui/Toast';
 import type { Tenant, UserRole } from '@/shared/types';
 import { ImportCsvModal } from '@/modules/import-export/ui/ImportCsvModal';
 import { SettingsModal } from '@/modules/settings/ui/SettingsModal';
@@ -206,7 +205,7 @@ export function Sidebar({
   const closeOrg = useCallback(() => setOrgOpen(false), []);
   const { tenant, currentSection } = resolveActiveSchool(pathname, tenants, defaultTenantId);
 
-  // Operations overlays (Import CSV / Settings); their completion toast lives in <SidebarOverlays>.
+  // Operations overlays (Import CSV / Settings).
   const [activeOp, setActiveOp] = useState<'import' | 'settings' | null>(null);
 
   // Esc closes the dropdown, then the drawer (the op modals own their own Esc).
@@ -390,7 +389,7 @@ function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, hrefFor, onN
   );
 }
 
-/** Operations overlays (Import CSV / Settings) and their completion toast. */
+/** Operations overlays (Import CSV / Settings). */
 function SidebarOverlays({ activeOp, tenant, fullName, role, onClose }: {
   activeOp: 'import' | 'settings' | null;
   tenant: Tenant | null;
@@ -398,18 +397,9 @@ function SidebarOverlays({ activeOp, tenant, fullName, role, onClose }: {
   role: UserRole | null;
   onClose: () => void;
 }) {
-  const [toast, setToast] = useState<ToastData | null>(null);
   return (
     <>
-      {activeOp === 'import' && (
-        <ImportCsvModal
-          onClose={onClose}
-          onImported={(message) => {
-            onClose();
-            setToast({ title: 'Import complete', message });
-          }}
-        />
-      )}
+      {activeOp === 'import' && <ImportCsvModal onClose={onClose} />}
       {activeOp === 'settings' && (
         <SettingsModal
           workspaceName={tenant?.name ?? NO_TENANT_NAME}
@@ -417,13 +407,8 @@ function SidebarOverlays({ activeOp, tenant, fullName, role, onClose }: {
           userName={fullName ?? NO_NAME_LABEL}
           userLabel={role ?? NO_NAME_MARK}
           onClose={onClose}
-          onSaved={() => {
-            onClose();
-            setToast({ title: 'Settings saved' });
-          }}
         />
       )}
-      {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </>
   );
 }
@@ -446,7 +431,7 @@ function NavRow({ item, active, onNavigate, onOp }: { item: NavItem; active: boo
 
   if (!item.href) {
     return (
-      <span className="sb-nav-item" aria-disabled="true" title="Coming soon" style={{ opacity: 0.45, cursor: 'default' }}>
+      <span className="sb-nav-item" aria-disabled="true" style={{ opacity: 0.45, cursor: 'default' }}>
         {inner}
       </span>
     );

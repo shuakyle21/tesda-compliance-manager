@@ -16,6 +16,8 @@ import { StatusBadge, type BadgeVariant } from './StatusBadge';
 export interface PreviewFile {
   name: string;
   batchId: string;
+  /** Finished display string for the batch ID (RQM code or internal code); falls back to `batchId`. */
+  batchLabel?: string;
   batchName?: string;
   program: string;
   tenantId?: string;
@@ -27,6 +29,8 @@ export interface PreviewFile {
   critical?: boolean;
   verifiedBy?: string | null;
   verifiedDate?: string | null;
+  /** The stored file's real name, when one is known. */
+  fileName?: string | null;
 }
 
 const FP_STATUS_META: Record<string, { label: string; variant: BadgeVariant; icon: IconName }> = {
@@ -37,10 +41,7 @@ const FP_STATUS_META: Record<string, { label: string; variant: BadgeVariant; ico
   na:        { label: 'N/A',       variant: 'not-approved', icon: 'minus' },
 };
 
-function fpInitials(name: string) {
-  return (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
-}
-
+// Vendor-neutral wording for the storage backend's own label.
 const FP_SOURCE_LABELS: Record<string, string> = { Supabase: 'Uploaded file', Storage: 'Uploaded file' };
 
 function fpSourceLabel(file: PreviewFile, hasFile: boolean) {
@@ -53,14 +54,15 @@ interface FilePreviewModalProps {
   file: PreviewFile;
   role?: string;
   canVerify?: boolean;
-  adminName?: string | null;
   onVerify?: (f: PreviewFile) => void;
   onRequestChanges?: (f: PreviewFile) => void;
   onNotifyAdmin?: (f: PreviewFile) => void;
+  /** When set, verification cannot be saved: the Verify control is disabled and this text is shown. */
+  verifyUnavailable?: string;
   onClose: () => void;
 }
 
-export function FilePreviewModal({ file, canVerify, adminName, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FilePreviewModalProps) {
+export function FilePreviewModal({ file, canVerify, verifyUnavailable, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FilePreviewModalProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -69,7 +71,8 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
 
   const meta = FP_STATUS_META[file.status] || FP_STATUS_META.na;
   const hasFile = !!file.url && file.status !== 'missing';
-  const fileName = (file.name || 'Document').replace(/\s+/g, '_') + '.pdf';
+  // The real file name when known; otherwise the document's label, with no invented extension.
+  const fileName = file.fileName || file.name || 'Document';
   const sourceLabel = fpSourceLabel(file, hasFile);
 
   return (
@@ -85,7 +88,7 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
             <div style={{ minWidth: 0 }}>
               <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</h3>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>
-                {file.batchId} · {file.program} · {file.critical ? 'Required' : 'Optional'}
+                {file.batchLabel ?? file.batchId} · {file.program} · {file.critical ? 'Required' : 'Optional'}
               </div>
             </div>
           </div>
@@ -110,9 +113,9 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
               <StatusBadge variant={meta.variant}><Icon name={meta.icon} size={11} />{meta.label}</StatusBadge>
             </FPMetaRow>
             <FPMetaRow label="Verified by">
-              <FPVerifiedByMeta file={file} adminName={adminName} />
+              <FPVerifiedByMeta file={file} />
             </FPMetaRow>
-            <FPMetaRow label="Batch"><span style={{ fontSize: 12.5, color: 'var(--color-text-primary)' }}>{file.batchName || file.batchId}</span></FPMetaRow>
+            <FPMetaRow label="Batch"><span style={{ fontSize: 12.5, color: 'var(--color-text-primary)' }}>{file.batchName || file.batchLabel || file.batchId}</span></FPMetaRow>
             <FPMetaRow label="Program"><StatusBadge variant={file.program === 'TWSP' ? 'twsp' : 'cfsp'}>{file.program}</StatusBadge></FPMetaRow>
             <FPMetaRow label="Last updated">
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)' }}>{file.updated || '—'}</span>
@@ -130,14 +133,15 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
           </div>
         </div>
 
-        {file.status === 'submitted' && <FPSubmittedBanner canVerify={canVerify} adminName={adminName} />}
+        {file.status === 'submitted' && <FPSubmittedBanner canVerify={canVerify} verifyUnavailable={verifyUnavailable} />}
 
         <div className="modal-foot">
-          <FPFooterStatus file={file} hasFile={hasFile} adminName={adminName} />
+          <FPFooterStatus file={file} hasFile={hasFile} />
           <FPFooterActions
             file={file}
             hasFile={hasFile}
             canVerify={canVerify}
+            verifyUnavailable={verifyUnavailable}
             onVerify={onVerify}
             onRequestChanges={onRequestChanges}
             onNotifyAdmin={onNotifyAdmin}
@@ -149,27 +153,31 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
   );
 }
 
-function FPSubmittedBanner({ canVerify, adminName }: { canVerify?: boolean; adminName?: string | null }) {
+function FPSubmittedBanner({ canVerify, verifyUnavailable }: { canVerify?: boolean; verifyUnavailable?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 18px', borderTop: '1px solid var(--color-border)', background: 'var(--color-blue-lt)', color: 'var(--color-blue-dk)' }}>
       <Icon name="clock" size={14} style={{ flexShrink: 0 }} />
       <span style={{ fontSize: 12, lineHeight: 1.4, flex: 1 }}>
-        {canVerify
-          ? 'Submitted for verification. Review the document above, then accept it or send it back for correction.'
-          : `Submitted — pending acceptance by ${adminName || 'the school admin'}. Only the school admin can verify this document.`}
+        {!canVerify
+          ? 'Submitted — pending acceptance by the school admin. Only the school admin can verify this document.'
+          : verifyUnavailable
+            ? 'Submitted for verification.'
+            : 'Submitted for verification. Review the document above, then accept it or send it back for correction.'}
       </span>
     </div>
   );
 }
 
-function FPFooterStatus({ file, hasFile, adminName }: { file: PreviewFile; hasFile: boolean; adminName?: string | null }) {
+function FPFooterStatus({ file, hasFile }: { file: PreviewFile; hasFile: boolean }) {
+  // Keep an empty span so the footer actions stay right-aligned.
+  if (file.status !== 'verified' && hasFile) return <span />;
   return (
     <span style={{ fontSize: 11.5, color: 'var(--color-text-muted)', display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
       <Icon name={file.status === 'verified' ? 'check' : 'info-circle'} size={12} />
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {file.status === 'verified'
-          ? `Verified by ${file.verifiedBy || adminName || 'admin'} · ${file.verifiedDate || file.updated || ''}`
-          : hasFile ? 'Stored securely · school-level access only' : 'Awaiting upload'}
+          ? ['Verified', file.verifiedDate || file.updated].filter(Boolean).join(' · ')
+          : 'Awaiting upload'}
       </span>
     </span>
   );
@@ -179,19 +187,26 @@ interface FPFooterActionsProps {
   file: PreviewFile;
   hasFile: boolean;
   canVerify?: boolean;
+  verifyUnavailable?: string;
   onVerify?: (f: PreviewFile) => void;
   onRequestChanges?: (f: PreviewFile) => void;
   onNotifyAdmin?: (f: PreviewFile) => void;
   onClose: () => void;
 }
 
-function FPFooterActions({ file, hasFile, canVerify, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FPFooterActionsProps) {
+function FPFooterActions({ file, hasFile, canVerify, verifyUnavailable, onVerify, onRequestChanges, onNotifyAdmin, onClose }: FPFooterActionsProps) {
   return (
     <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
       {hasFile && (
-        <button className="btn ghost" title="Download (demo)"><Icon name="download" size={14} />Download</button>
+        <button className="btn ghost" title="Download"><Icon name="download" size={14} />Download</button>
       )}
-      {file.status === 'submitted' && canVerify && (
+      {file.status === 'submitted' && canVerify && verifyUnavailable && (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--color-text-muted)' }}>
+          <button className="btn" disabled title={verifyUnavailable}><Icon name="check" size={14} />Verify document</button>
+          <Icon name="info-circle" size={12} />{verifyUnavailable}
+        </span>
+      )}
+      {file.status === 'submitted' && canVerify && !verifyUnavailable && (
         <>
           <button className="btn secondary" onClick={() => onRequestChanges && onRequestChanges(file)}>
             <Icon name="refresh" size={14} />Request changes
@@ -201,31 +216,31 @@ function FPFooterActions({ file, hasFile, canVerify, onVerify, onRequestChanges,
           </button>
         </>
       )}
-      {file.status === 'submitted' && !canVerify && (
+      {file.status === 'submitted' && !canVerify && onNotifyAdmin && (
         <button className="btn secondary" onClick={() => onNotifyAdmin && onNotifyAdmin(file)}>
           <Icon name="bell" size={14} />Notify admin
         </button>
       )}
-      {file.status !== 'submitted' && (
+      {(file.status !== 'submitted' || (!canVerify && !onNotifyAdmin)) && (
         <button className="btn primary" onClick={onClose}>Close</button>
       )}
     </div>
   );
 }
 
-function FPVerifiedByMeta({ file, adminName }: { file: PreviewFile; adminName?: string | null }) {
+function FPVerifiedByMeta({ file }: { file: PreviewFile }) {
   if (file.status === 'verified') {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
         <span style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, background: 'var(--color-green)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sans)', fontSize: 9, fontWeight: 600, letterSpacing: '0.02em' }}>
-          {fpInitials(file.verifiedBy || adminName || 'Admin')}
+          <Icon name="check" size={11} />
         </span>
         <span style={{ minWidth: 0 }}>
           <div style={{ fontSize: 12.5, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {file.verifiedBy || adminName || 'School admin'}
+            Verified
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
-            Admin · accepted {file.verifiedDate || file.updated || '—'}
+            Accepted {file.verifiedDate || file.updated || '—'}
           </div>
         </span>
       </div>
@@ -234,7 +249,7 @@ function FPVerifiedByMeta({ file, adminName }: { file: PreviewFile; adminName?: 
   if (file.status === 'submitted') {
     return (
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--color-amber-dk)' }}>
-        <Icon name="clock" size={11} />Awaiting {adminName || 'admin'}
+        <Icon name="clock" size={11} />Awaiting verification
       </span>
     );
   }

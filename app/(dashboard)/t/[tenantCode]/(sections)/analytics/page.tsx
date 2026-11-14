@@ -55,7 +55,6 @@ function Header() {
   return (
     <div className="page-head">
       <h1>Analytics</h1>
-      <span className="subline">6 charts · tenant-scoped</span>
       <div style={{ marginLeft: 'auto' }}>
         <button className="btn secondary"><Icon name="download" size={14} />Export</button>
       </div>

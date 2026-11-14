@@ -10,6 +10,7 @@
  */
 
 import { isBillingReady } from '@/modules/billing/domain/readiness';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { hasOpenBillingObligation, urgencyTier } from '@/modules/batches/domain/urgency';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import type { Batch, DocumentRequirement } from '@/shared/types';
@@ -17,6 +18,13 @@ import type { Batch, DocumentRequirement } from '@/shared/types';
 export type AlertTone = 'green' | 'amber' | 'red';
 export type AlertCategory = 'billing-ready' | 'bsrs-approved' | 'billing-critical' | 'doc-missing' | 'ntp-lag';
 export type AlertRow = { text: string; tone: AlertTone; category: AlertCategory };
+
+/**
+ * UNCONFIRMED: the threshold is not in an ADR; the analytics screen previously
+ * cited 15 days. Confirm with TESDA guidance before relying on this alert.
+ * It cannot fire today because ntpLag is never recorded.
+ */
+export const NTP_LAG_ALERT_DAYS = 7;
 
 export const ALERT_CATEGORY_LABEL: Record<AlertCategory, string> = {
   'billing-ready': 'Billing ready',
@@ -32,9 +40,9 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
   // it does not check documents, so this row must not claim the batch is
   // actually ready to bill. billingGate() is the compound gate for that claim.
   if (isBillingReady(b)) {
-    rows.push({ tone: 'green', category: 'billing-ready', text: `${b.id} reached the billing progress threshold.` });
+    rows.push({ tone: 'green', category: 'billing-ready', text: `${displayBatchId(b)} reached the billing progress threshold.` });
   }
-  if (b.bsrs) rows.push({ tone: 'green', category: 'bsrs-approved', text: `${b.id} BSRS report marked verified in TVI-CAMS.` });
+  if (b.bsrs) rows.push({ tone: 'green', category: 'bsrs-approved', text: `${displayBatchId(b)} BSRS report marked verified in TVI-CAMS.` });
   // Same "billing stage already done" guard BatchTimeline uses to hide
   // completed cohorts — without it, a finished batch's now-negative
   // daysToBilling reads as a critical alert instead of disappearing.
@@ -43,7 +51,7 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
     const timing = billingUrgency === 'overdue'
       ? `is ${Math.abs(b.daysToBilling)} days overdue.`
       : `is due in ${b.daysToBilling} days.`;
-    rows.push({ tone: 'red', category: 'billing-critical', text: `${b.id} billing ${timing}` });
+    rows.push({ tone: 'red', category: 'billing-critical', text: `${displayBatchId(b)} billing ${timing}` });
   }
   // Only flag missing critical docs once this batch actually tracks at least
   // one critical requirement — an untracked key (ADR-004) means "not synced
@@ -56,10 +64,10 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
     rows.push({
       tone: 'amber',
       category: 'doc-missing',
-      text: `${b.id} missing ${docCompliance.missing} critical document${docCompliance.missing > 1 ? 's' : ''}.`,
+      text: `${displayBatchId(b)} missing ${docCompliance.missing} critical document${docCompliance.missing > 1 ? 's' : ''}.`,
     });
   }
-  if (b.ntpLag !== null && b.ntpLag > 7) rows.push({ tone: 'red', category: 'ntp-lag', text: `${b.id} NTP-to-start lag exceeded 7 days.` });
+  if (b.ntpLag !== null && b.ntpLag > NTP_LAG_ALERT_DAYS) rows.push({ tone: 'red', category: 'ntp-lag', text: `${displayBatchId(b)} NTP-to-start lag exceeded ${NTP_LAG_ALERT_DAYS} days.` });
   return rows;
 }
 

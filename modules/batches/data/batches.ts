@@ -228,11 +228,13 @@ function batchDisplayName(code: string, section: string | null): string {
 // Mapper — pure, no I/O. Unit-test this against a fixture row.
 // ---------------------------------------------------------------------------
 export function mapBatchRow(row: BatchRowWithProgram): Batch {
+  const rqmCode = row.rqm_code?.trim() || null;
   return {
     // Direct from the contract:
     id: row.batch_code, // human code (e.g. "BAT-2") for display continuity
+    rqmCode,
     tenantId: row.tenant_id,
-    name: batchDisplayName(row.batch_code, row.batch_section),
+    name: batchDisplayName(rqmCode ?? row.batch_code, row.batch_section),
     qualification: row.qualification_title, // closes the TES-60 gap (AC1)
     programId: row.program_id,
     program: orEmpty(row.scholarship_programs?.code),
@@ -358,4 +360,59 @@ export async function getBatches(): Promise<Batch[]> {
   if (snap.status === 'unconfigured') throw new Error('getBatches failed: Supabase is not configured');
   if (snap.status === 'no-tenant-access') throw new Error('getBatches failed: no tenant access');
   throw new Error(`getBatches failed: ${snap.error}`);
+}
+
+// ---------------------------------------------------------------------------
+// Write — the RQM code (NTP authorization) on a batch. First write to `batches`.
+// ---------------------------------------------------------------------------
+const UNIQUE_VIOLATION = '23505';
+
+export type SetRqmResult =
+  | { status: 'saved'; batchUuid: string; from: string | null; to: string | null }
+  | { status: 'duplicate' }
+  /** RLS refusal and a concurrent change both return zero rows — indistinguishable by design. */
+  | { status: 'conflict-or-denied' }
+  | { status: 'sync-failed' }
+  | { status: 'unconfigured' };
+
+/**
+ * Sets, replaces or clears (`next: null`) a batch's RQM code. The write only
+ * lands if the stored value still equals `expectedPrevious`, so a concurrent
+ * edit is reported instead of overwritten. RLS decides who may write; the
+ * `tenant_id` filter is scope selection from a validated `TenantScope`. Raw
+ * errors stay in the server log — never in the result.
+ */
+export async function setBatchRqmCode(args: {
+  tenantId: string;
+  batchCode: string;
+  expectedPrevious: string | null;
+  next: string | null;
+}): Promise<SetRqmResult> {
+  if (!isSupabaseConfigured()) return { status: 'unconfigured' };
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    let query = supabase
+      .from('batches')
+      .update({ rqm_code: args.next })
+      .eq('tenant_id', args.tenantId)
+      .eq('batch_code', args.batchCode);
+    query =
+      args.expectedPrevious === null
+        ? query.is('rqm_code', null)
+        : query.eq('rqm_code', args.expectedPrevious);
+    const { data, error } = await query.select('id');
+
+    if (error) {
+      if (error.code === UNIQUE_VIOLATION) return { status: 'duplicate' };
+      console.error('setBatchRqmCode failed', error);
+      return { status: 'sync-failed' };
+    }
+    const row = data?.[0];
+    if (!row) return { status: 'conflict-or-denied' };
+    return { status: 'saved', batchUuid: row.id, from: args.expectedPrevious, to: args.next };
+  } catch (err) {
+    console.error('setBatchRqmCode failed', err);
+    return { status: 'sync-failed' };
+  }
 }
