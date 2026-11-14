@@ -14,6 +14,7 @@
  */
 
 import { summarizeOwnCatalogCompliance } from '@/modules/documents/domain/compliance';
+import { displayBatchId } from './rqm';
 import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from './urgency';
 import type { Batch, DashboardMetrics } from '@/shared/types';
 
@@ -50,7 +51,7 @@ export function deriveDashboardMetrics(batches: readonly Batch[]): DashboardMetr
     sessionProgressPct: progress.pct,
     sessionTrackedBatches: progress.tracked,
     nextBilling: next && next.billingDeadline
-      ? { batchId: next.id, deadline: next.billingDeadline, daysToBilling: next.daysToBilling }
+      ? { batchId: next.id, batchLabel: displayBatchId(next), deadline: next.billingDeadline, daysToBilling: next.daysToBilling }
       : null,
     openBillingObligations: open.length,
     billingDeadlinesMissing: open.length - dated.length,

@@ -45,7 +45,7 @@ describe('MetricCard', () => {
 
 describe('TableView row', () => {
   const batch = {
-    id: 'DEV-NEN-001', tenantId: 't', programId: 'p', name: 'DEV-NEN-001 (Batch 1)', qualification: 'Rice Machinery Operations NC II',
+    id: 'DEV-NEN-001', rqmCode: null, tenantId: 't', programId: 'p', name: 'DEV-NEN-001 (Batch 1)', qualification: 'Rice Machinery Operations NC II',
     program: 'CFSP', ncLevel: 'NC II', trainer: 'A Trainer', trainerId: 'tr', scholars: 17,
     trainingDays: '', trainingDaySchedule: [], notes: '', trainingStart: '2026-05-05', trainingEnd: '2026-07-10', duration: 0,
     completedSessions: null, totalSessions: 45, currentDay: 0, totalDays: 45, progressPct: 81, ntpLag: null, tipDate: '',

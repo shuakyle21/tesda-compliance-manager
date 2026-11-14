@@ -191,6 +191,8 @@ export interface ScheduleAdjustment {
 // ---------------------------------------------------------------------------
 export interface Batch {
   id: string;
+  /** RQM code from the Notice to Proceed; null until recorded. `id` stays the internal batch code and is what keys and URLs use. */
+  rqmCode: string | null;
   tenantId: string;
   /** Database identifier of the program requirement catalog for this batch. */
   programId: string;
@@ -314,7 +316,7 @@ export interface DashboardMetrics {
   /** How many active batches the progress figure is drawn from. */
   sessionTrackedBatches: number;
   /** Nearest recorded deadline among open billing obligations; null when none recorded. */
-  nextBilling: { batchId: string; deadline: string; daysToBilling: number } | null;
+  nextBilling: { batchId: string; batchLabel: string; deadline: string; daysToBilling: number } | null;
   /** Batches that still owe billing work, with or without a recorded deadline. */
   openBillingObligations: number;
   /** Open obligations whose deadline has not been recorded. */

@@ -86,6 +86,7 @@ export function mapProfileRow(row: ProfileRowWithTenants): Profile {
   const defaultMembership = memberships.find((m) => m.is_default) ?? memberships[0];
 
   return {
+    id: row.id,
     clerkUserId: row.clerk_user_id,
     fullName: row.full_name,
     email: row.email,

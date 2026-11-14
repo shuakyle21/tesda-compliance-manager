@@ -1,5 +1,6 @@
 'use client';
 
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { Icon } from '@/shared/ui/Icon';
 import type { Batch, EgaceStage, Tenant } from '@/shared/types';
 import { formatDate } from '@/shared/dates';
@@ -11,21 +12,22 @@ interface EgaceOutcomesTableProps {
   tenantOf: (id: string) => Tenant;
   totals: Record<string, number>;
   rate: (v: number) => number;
-  today: string;
+  asOf: string | null;
+  hasOutcomes: boolean;
   egaceVal: (b: Batch, key: string) => number;
 }
 
 const colorVar = (k: string) => `var(--color-${k})`;
 const colorDk = (k: string) => `var(--color-${k}-dk)`;
 
-export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, rate, today, egaceVal }: EgaceOutcomesTableProps) {
+export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, rate, asOf, hasOutcomes, egaceVal }: EgaceOutcomesTableProps) {
   return (
     <div className="egace-table-card surface">
       <div className="egace-table-head">
         <div>
           <h2 className="egace-table-title">EGACE Outcomes</h2>
           <span className="egace-table-sub">
-            {rows.length} {rows.length === 1 ? 'batch' : 'batches'} · TESDA TWSP &amp; CFSP · as of {today}
+            {rows.length} {rows.length === 1 ? 'batch' : 'batches'} · TESDA TWSP &amp; CFSP{asOf ? ` · as of ${asOf}` : ''}
           </span>
         </div>
       </div>
@@ -80,7 +82,7 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
                 <td className="egc-td">
                   <div className="egc-qual">{b.qualification}</div>
                   <div className="egc-meta">
-                    {b.program} · {b.id}
+                    {b.program} · {displayBatchId(b)}
                     {b.status === 'completed' ? ' · completed' : ''}
                   </div>
                 </td>
@@ -88,6 +90,13 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
                 <td className="egc-td egc-mono">{formatDate(b.trainingStart) ?? '—'}</td>
                 <td className="egc-td egc-mono">{formatDate(b.trainingEnd) ?? '—'}</td>
                 {stages.map((s) => {
+                  if (s.key !== 'enrolled' && !b.egace) {
+                    return (
+                      <td key={s.key} className="egc-td egc-num egc-val" style={{ color: 'var(--color-text-muted)' }}>
+                        —<span className="sr-only"> Not recorded yet</span>
+                      </td>
+                    );
+                  }
                   const v = egaceVal(b, s.key);
                   return (
                     <td key={s.key} className="egc-td egc-num egc-val" style={{ color: v === 0 ? 'var(--color-text-disabled)' : colorDk(s.colorKey) }}>
@@ -105,7 +114,7 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
               </td>
               {stages.map((s) => (
                 <td key={s.key} className="egc-td egc-num egc-total-val" style={{ color: colorDk(s.colorKey) }}>
-                  {totals[s.key]}
+                  {s.key !== 'enrolled' && !hasOutcomes ? <>—<span className="sr-only"> Not recorded yet</span></> : totals[s.key]}
                 </td>
               ))}
             </tr>
@@ -115,7 +124,9 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
       <div className="egace-footnote">
         <Icon name="info-circle" size={12} />
         <span>
-          Funnel fills as each cohort advances — columns stay blank (—) for batches still in training. Conversion vs enrolled: {rate(totals.graduate)}% graduated · {rate(totals.certified)}% certified · {rate(totals.employed)}% employed.
+          {hasOutcomes
+            ? `Funnel fills as each cohort advances — columns stay blank (—) for batches still in training. Conversion vs enrolled: ${rate(totals.graduate)}% graduated · ${rate(totals.certified)}% certified · ${rate(totals.employed)}% employed.${rows.some((b) => !b.egace) ? ' Batches without recorded outcomes show a dash and are left out of the rates.' : ''}`
+            : "Graduate, assessed, certified and employed counts aren't recorded in TVI-CAMS yet. Enrolled is each batch's enrolled scholar count."}
         </span>
       </div>
     </div>

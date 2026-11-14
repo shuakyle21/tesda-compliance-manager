@@ -14,6 +14,7 @@ import { Icon } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
@@ -138,8 +139,8 @@ function CardHeaderBadges({ batch, billingReady }: { batch: Batch; billingReady:
       {billingReady
         ? <BillingReadyBadge pulse />
         : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
-      <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>
-        {batch.id}
+      <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-text-muted)' }}>
+        <BatchIdLabel batch={batch} />
       </span>
     </div>
   );

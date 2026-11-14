@@ -59,7 +59,7 @@ const PARAM_TO_FIELD: Record<string, FieldKey> = {
 };
 
 type ClerkErrorShape = {
-  errors?: Array<{ longMessage?: string; message?: string; meta?: { paramName?: string } }>;
+  errors?: Array<{ code?: string; longMessage?: string; message?: string; meta?: { paramName?: string } }>;
 };
 
 /** Pull the most user-friendly message out of a Clerk error. */
@@ -557,15 +557,19 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
       return;
     }
     setBusy(true);
+    setError(null);
+    setCodeError(false);
     try {
       const res = await signUp.attemptEmailAddressVerification({ code: code.join('') });
       if (res.status === 'complete') {
         setStep('done');
         return;
       }
-      setCodeError(true);
-    } catch {
-      setCodeError(true);
+      setError('Could not verify the code. Please try again.');
+    } catch (err) {
+      // A wrong code shows only the code-field error; any other failure shows the general one.
+      if ((err as ClerkErrorShape)?.errors?.[0]?.code === 'form_code_incorrect') setCodeError(true);
+      else setError(clerkError(err));
     } finally {
       setBusy(false);
     }
@@ -573,12 +577,16 @@ export function SignUpModal({ open, onClose }: { open: boolean; onClose: () => v
 
   async function handleResend(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    if (!isLoaded || resent) return;
+    if (!isLoaded || resent || busy) return;
+    setBusy(true);
     try {
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       setResent(true);
+      setError(null);
     } catch (err) {
       setError(clerkError(err));
+    } finally {
+      setBusy(false);
     }
   }
 
