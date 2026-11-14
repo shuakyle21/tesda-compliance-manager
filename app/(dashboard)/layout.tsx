@@ -41,8 +41,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   // The KPI row is not rendered here: a root layout does not re-render on
   // client-side navigation, so a row placed here kept the previous school's
-  // numbers after a school switch. It is owned by the segment it describes —
-  // `t/[tenantCode]/(sections)/layout.tsx` and `trainer/layout.tsx`.
+  // numbers after a school switch. Only the two dashboard pages render one,
+  // each from its own page: `t/[tenantCode]/dashboard` and `trainer`.
 
   return (
     <NavDrawerProvider>
