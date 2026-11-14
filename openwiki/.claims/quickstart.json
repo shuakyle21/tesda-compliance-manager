@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:19c1cca1d78de36f4ddae285d005582baa70e75bfd3e78a8cec783b2b96f1bb1",
+  "pageVersion": "sha256:65efb072d3df6fe5c713d70b8f5beceaa81dc7948f09768849576f09a6302766",
   "claims": [
     {
       "id": "claim_989cf53fa86c46e3a2f936984aa0acee",
@@ -50,15 +50,15 @@
     },
     {
       "id": "claim_bfc905ff86cd479180ed3f7d20bc785f",
-      "statement": "By the 2026-10-24 state recorded first-hand in supabase/migrations/README.md, every migration in its first state table is both recorded and present — including 20260904120000 (repaired and recorded), 20260906120000 (applied transactionally; its ensure_profile_tenant_membership gap is closed) and 20260910120000 (repair-recorded with its full object inventory verified live) — and 20261024071359 (ADR-007) is recorded and applied with its four column assertions verified; 20261024110000 (ADR-008) is the only checked-in migration not applied.",
+      "statement": "supabase/migrations/README.md records every migration in its first state table as both recorded and present (20260904120000 and 20260910120000 repair-recorded, 20260906120000 applied transactionally) and its 2026-10-24 block records 20261024071359 (ADR-007) as applied with four column assertions verified, but that ledger stops there: both later checked-in migrations, 20261024110000 (ADR-008 billing_deadline) and 20261111120000 (T2MIS terminal-report fields), carry their own `NOT APPLIED — RULES.md rule 36` header and appear in no state table, so both are checked in and unapplied until someone verifies otherwise.",
       "evidence": [
         {
-          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L1-L29",
-          "version": "repo-lines-v1:sha256:ed9286dcc3be2c5f3038b695dea4ce52f1b903662d43446b6d6f1afe58580dd6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkMDFkODA0YzgwOTIwZmM5NjkyOGRiNTIzYmE1YTMxNGFlYTY5MmRmY2YwMTkwMjQ3ZjllYTU1NDlmZTkyOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2NTg4YTUxMjg0NmUxMWI3NjliYjJlOTQxZDRjOGZmYWY3YTMwZWU1NmU3MjEzZjA3MmQ1NjJmMTIxOThmYzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVkMDMzYmUzODljNDYwZGI4NmYwNzY2YjU2NDA2MWUxMWVmYzU4NzUxZjU5NDExMzRjZjI0YmI3MmFlZDZkODIifQ"
+          "resource": "repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql#L1-L11",
+          "version": "repo-lines-v1:sha256:1143d5e53513a65a87f14cfee7c97819c63988741b9b63657b66086dd2c8423d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlOTJjY2QzNDE0M2YyYTZiYzA5Y2QyZWE1MGI5M2JiY2U1YTQyMGVmNzk0YTM4MDRhMzA1MzIzZmMxMTE3MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2ODg1YzA0MjQyZTI3NWNlOGJmYjY2ZDc5Y2M4NjliZDYyOTM5YTAxMjUxMGJiM2NlYjRjYzgyNTY0YjVhN2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzMzM1MjQ2NDM4YjIyMmQxNWZlMWE1ODNmMWJlNGQ3ZTM4NjJjYTc5NzY4YmVkNDFkMDY0YWYxN2UzMzU0ZjgifQ"
         },
         {
-          "resource": "repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql#L1-L17",
-          "version": "repo-lines-v1:sha256:2e24855c7363ebcf333d5e658d1317a72197be9d8995fb7b81ae2cd0b46e5c53:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlOTJjY2QzNDE0M2YyYTZiYzA5Y2QyZWE1MGI5M2JiY2U1YTQyMGVmNzk0YTM4MDRhMzA1MzIzZmMxMTE3MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhY2U3YjE2YTY2N2U3Y2I3ODAyZWViYmRjZGNkOWU5Y2VhMTg4ZjczOWVmM2RlMzZlN2M5YjcxNWI3YzY5YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmNjllM2RlZmUwODU3OGY5ZDI5OTk0ZDNkNmMzZjc0OGZkYzYyOTBlYjIzMjk5NDljNGFmZWIwZGNiNzNlMTMifQ"
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L1-L16",
+          "version": "repo-lines-v1:sha256:5266f03a19697ef7ac1bfebfedf65187609b99df8a2bf98fe5ec7edc001d4f66:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkY2E4ZTg2YjAyMTllNThjOGMyZjIzMjg4NGM5Yzg3NzczMWMwZWNiYWZiOTdjN2UwZjcxZWNkZWY3NTk4YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzNzhkYWFhNzk3ZjEzN2E2M2IwYTgzNzk2MGUxOWJiZjNhODg5MDRiNWYyYjU3NzE1MWQ0ZWUzYjliMDg5MWMifQ"
         },
         {
           "resource": "repo://supabase/migrations/README.md#L44-L93",
@@ -92,7 +92,7 @@
     },
     {
       "id": "claim_9970a007496b4376b33382e28a3f6b58",
-      "statement": "After any migration (RULES §3 rule 20) the agent must regenerate lib/supabase/database.types.ts and then update the affected mappers and domain types; new migrations are additive with 20260528160300 canonical. The directory is not the ledger: supabase/migrations/README.md is updated in the same PR and a row moves to applied only once the migration has actually run, whereas docs/DATA_MODEL.md stops at seven versions and is history.",
+      "statement": "After any migration (RULES §3 rule 20) the agent must regenerate lib/supabase/database.types.ts and then update the affected mappers and domain types; new migrations are additive with 20260528160300 canonical. supabase/migrations/README.md is what gets updated in the same PR, and a row moves to applied only once a migration has actually run — docs/DATA_MODEL.md stops at seven versions and is history.",
       "evidence": [
         {
           "resource": "repo://CLAUDE.md#L95-L98",
@@ -387,10 +387,124 @@
           "version": "repo-lines-v1:sha256:ed42e0f0d8fbeef0015285986c7e7d51ce1d3bc65b7d965ae29a771ab22adc8b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MjdjMzExZTFhNTQ4OGI0ZDE2ZGVjMjYwY2Y1OGY1Njg5NDk5ZTExYzA3OGMwMzkyZWNkZDEzZTdhZTVhZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_c94401ac172e465ca24f505a1b05fab6",
+      "statement": "The pending-vs-applied question has no trustworthy checked-in answer: neither a `NOT APPLIED` line in a migration header nor any wiki sentence is evidence, because checked-in text never runs. The only authority is list_migrations plus confirming objects by name, and reaching either is gated by rule 36.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L123-L144",
+          "version": "repo-lines-v1:sha256:65f169701ec5ffcea0e5c7dc736747027e7bc9712a5ce6226dc33f65ec7824f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkMmFhODg2MWQ1MDM3YjkyMGRlOTIzM2UxNTcxNDAzZTdhYjI2ZTZlMjgxZTkzYmIyMjBmYzk5MGJlZGJhMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1YzM4OGQxNTljZmFmYzFlNDE3OTcwMjBlMzY3NzIzNTNiZWQ0MmUwZjhkNGQwMGE1Y2EwNGNkMGEwNmU0MTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkNTA5ODgyNmI1MDI4ZDYzYWU1ZTEwOWU1YTMzYWY4NDZmZGQzZDU4OWUwNWViMWUxN2I2MGUyYWUxN2RmYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlNjY0MjcyYjVlZDljZjA0OWRjN2QzN2JjZTJlZTBjZWQ0MzQ2YjgzZTMwZjc3ZTNhN2RjZjQyNzYwMmQxNzYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L1-L3",
+          "version": "repo-lines-v1:sha256:28acd497b9710c90c095d73e38f015998de2e4127fcad88c184cb9b618398834:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGRjYThlODZiMDIxOWU1OGM4YzJmMjMyODg0YzljODc3NzMxYzBlY2JhZmI5N2M3ZTBmNzFlY2RlZjc1OThhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzlkOTY3NjBkYjE4OGEzZGNkN2VhNTM5YzE0MzY5ZDQ2Y2JmOWEzYzJmNWZhZDZmMDQ0MDk2MzBmM2MwZDkyMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmIzZjM1OTYyZjg5MTRjNzEwNGQzMTY3YTM1NDA2OWQ5OWQwMDM3MTAyZDA4ZmJkOWU2MDYyNzg2MWFjMGI3MyJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L8-L43",
+          "version": "repo-lines-v1:sha256:9c413e7336877c63be409b7a8cef9e7392af529c7b34db61f013f6d0ec0cb445:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5NWQyYzIwMWY0MmEyZTQwMGYyZGFkZDgyYTAzODg3ZjkwZDc1ZDY3NmQ3MDQxZDViMmI1Nzc1MTQ5N2YwMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzOWZmN2U5MjI0NjFiNzY4MWJiZTYwNmVkYWNmZmUxY2NkYTY2ODk5NTA3YjgyYmViNWJkZmE3NzIxMDEwYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjYzljYTUwZmMwYmI3ZWNkYTNlODAwMjJiMjNjNDU5NGUwMGVmNGE2MjgyNzg5MWQ0NmQ3MGMyNjI0Y2YwZjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f16992ca537e4b3db801deaaba313ef0",
+      "statement": "The T2MIS import half of FR-10 is built but has no screen: importLearnersCsv in modules/import-export/data/learnerImport.ts has no caller anywhere in app/, and ImportCsvModal is still a canned three-sample picker, so the (sections)/report path is the only intended surface. The pipeline is ULI-keyed — a row without a well-formed ULI is rejected because ULI is the permanent learner key, a duplicate ULI inside one file rejects the later row, and a file spanning more than one batch returns `multiple-batches`, so importing is one batch per file.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/README.md#L3-L27",
+          "version": "repo-lines-v1:sha256:41ffa27f2502925412b5b2f3c90f7deb5fbd388e2feca598b105b66fd6199120:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiMmI2MzcwMTQ1NDExYjZhNDYwZmE1MGJmZTFkMWMyMDJiNDI2Y2NjNDM3NDUwNTMwZTA1ODc0Y2FjN2U5NWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxYjk4ZDM1MmIwNGJiMzI0MDgxMjMxNzA5MTlkNjA0MDIzNWQyYmI0ZTViYTFiZmFjYmRiNmZlOTBiYjFhMzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkMTEyNDYwYWUxMjk1MTY3MDAyMTAxNzQ4MDc1ZDllZjU5NDEwNjUyMjUzY2NmNTg4ZTVkZmVhYjI1MzBjNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L119-L159",
+          "version": "repo-lines-v1:sha256:89f4569d89629caac089d85e8542349452e1f8a9683a769d8ef6a5a92a8d8e26:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4OTI2M2NlNDg0ZTcwNmMwMjg3NjJmYzUwNDc3NWIyMWE3NjRhZTNlOTU1NDM1ZDFiODVlY2U3Yzg3NjRjNmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5ZjFiZmNiZGUyMzdhMTIxNDEyMDUyNDRhOWNhNDAzM2I4OGVkYzAwNTlmNmQ1YzAzM2U0MTcxMmRhYTEyMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3MWVhZDdmYmIxYTQzNjZhN2VhNGY4ZThjOGQyMTk1ZjJjMGFkYWJhMWJmMzVlYTU3YmQzZjBkNTE4NWVhNzIifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L75-L113",
+          "version": "repo-lines-v1:sha256:191df8fc65d7048a6a2584f2da4e4ab5c59876c3bcd3969eebae2dd873cf76a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiMjMyZmY5ODNlZTVkMTU1MTE4YjMxZGM4MWJhODNhYmVmZTEzZjg4NWIwMGU1MzM3MDVlM2UyZmJhNDAyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0N2E0NmNhMmFlN2QwOTRhNGVjMWMyNDcyZmY3MTViNjIzMzFkZDkzZTU1ZmYwNWRlMGI5MGM1MjYzNTg5MDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwY2MxOTk4NDFiNjYzODJkOTMyZDA0ZWM2ODlkMTY0YWVhMDc3M2VhOGI5ZDU2ZTk4OTQyZWY2NzA1YTA3OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkMGFjZWJhNWNjMmQ3YTgwNzI5MjZkNGJjZTEwNTk0NDUxZmY1Y2UxMzc1OGIwNjBmZjZmYjc3MjE0YmI2NzAifQ"
+        },
+        {
+          "resource": "repo://tests/unit/learner-import.test.ts#L93-L116",
+          "version": "repo-lines-v1:sha256:083e4d596108ff6cd9bd9370765f05d7b490bf5a45913553e41abdc84017e916:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNGFmMTg5NTI2YTEyYTMxMmFmZGRlY2YwZDdiODkyZjIyMTIwZTg4M2EyMDY4MDFjNDE5NjNkM2I1YzgxN2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1Y2MwMTQ0YWYyMTUzZjhhZmJkYmMxNWJhYWM3YzVlYWIwYzI2YTEyZmQzYmQzZWFjNWFiMWMxMjkyODcxMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/t2mis.test.ts#L73-L77",
+          "version": "repo-lines-v1:sha256:30a9ae018e236967f12f5349a97b13d8a3a28d80cbe295164ecab30a522ccc21:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWFiNTZmOTZhOTkzN2NmODE5N2U4MWRhMzZkMzRlYjg3M2RjZjFiNmZhMTRmMjQ4MWQ4ODVhYWMxNzU4NzExOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzFmMTkzZTBmNjQwNTVhZDhhNWE2ODZhZGNhODk1ZmZmMjNhNGNhNWFiNmRhOGJlNTlkYzZjMmQzMjBkZmE5YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWIyZmNiNDMxZjIwYjk5MDVhM2M1ZTQ1NDYwODlmY2E2NTBhNjkxMDliYzgyY2MyNWZmN2YzMTMyNTZlNjI3YSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a89cc236fd644786b5ef70c4687014e4",
+      "statement": "modules/batches/data/learners.ts reads the NeW learner detail columns and tenant_qualifications that migration 20261111120000 adds, and importLearnersCsv writes them into learners. The read is written defensively so the unmigrated schema degrades instead of failing: row cells go through `?? ''` (null and undefined both read as not-recorded), and the separate qualification-facts query tolerates exactly 42703 / PGRST200 / PGRST204 by leaving only the qualification cells blank, while any other error fails the whole snapshot — because a blank cell must stay distinguishable from a real failure. The T2MIS export layout in modules/import-export/domain/t2mis.ts supplies 48 verbatim TESDA headers (two both called \"Municipality City\", one with a trailing space) and is pinned by tests/unit/t2mis.test.ts.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L10-L17",
+          "version": "repo-lines-v1:sha256:ad3ec341282a666d9c83b99f94d127b831a3887d85ae7f389b81525d25b8f756:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWRlOGY4ZjNkNGY3MzgwNWJkMDM0Y2IxYTgwYTUxYjY2YzRkYWQyNGYxZWJhOGM3ZjJkMTRhODJiZDI0YTA5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWExZmJlOTNlOTRjYTg3M2Q5NzEzZThlMTFhM2FlM2YzMDM5MjE5MGE3NjkzNTEyMDgyNjE4NjkzM2IwNTY5YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWJlMzc2YWFjODcyZjZiNzFjOWUzYmJiYWQ4NGNhZWI2ZjI3M2QzZjVkNzM1YjliNjk4ZWUxMmZmZDQ3Y2FlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2ViYjhiNjZjOTRjYzVhYTUzMmFkNTA2MzUxMzQ3MGYzZDM1NGJhN2I4ZDE5NzYxNGU0ZmY5YmEzMzYwZTA0ZiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L179-L183",
+          "version": "repo-lines-v1:sha256:9f96071c6481e86f3a600d13e8c7897975ba7fe09f70a2f7f27ecc9eb25c08c7:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmM1YjI0YjdjM2M5NDg5M2NlNzNmNWU2NjE5YTkyNmM2ZjRjYzRiZThjODczZWMzMGZjYWZmY2YxZjJkZGI0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE5ZWNjMDYxMDY2ZmZkOThlNWZjMGY0ZTBhMzMwZTJkMWY2YmI0MjhjM2U4OGZiMTdmMGE0MTQzOTc0OWIxNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzU2Y2U0ZjAzMDllODIxMjRmOGM3ZDVlMzM3NTMzYjdiMjFlNzY1ODA3YWY5MDUzZWIyODE3MmQyN2FkZjA4NyJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L256-L272",
+          "version": "repo-lines-v1:sha256:7e8df4b2da48661055ac2af95135ca35b84bb9d711a77c35774e67c841774d8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYjQzZTBiOGUzMWM1NWU2ZTI1YTU1YjQzOGI3N2UzYjgxNjUwZDQ0MGYyYzMyYTA2N2NiNGZlYjdmYThjMjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1NWEyNDllODE5YWVhMGFmMWNhZTg0MGMxNDViNWZjMjFmZjJhN2U0MWY4NDY0ZWY2YzdlZGJlMjk2NmUxNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NGZmZTBkYWE5NDZkMzhmYmIxZWQ1YjU5YjVhOWQxNjdjZmQ1ZmU2YTVmMzAyZGZiMTExMWE5NjdhNjNmNjEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L41-L42",
+          "version": "repo-lines-v1:sha256:7296ffb3c4c051939657039921e8fd7b5c1ac2f7cffa6d8ba63be0207d37aa0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWFiNWY1YTJlYzRkZGM3NmI1MzNlYWZiMTY2ZTdmMTIwYWUzZTA0NzdlYzM3YWRiMzk1ZGFmYjYxNGE3ZTI5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWM0ZGNkZjA2MzQzNzZhNzgyMTE4M2ZlNTQwYmUzNGEzNjEzZjA1NjA2MjQ1ZjgzM2Q1ZTE0YWYxNzI1YWNiOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmEzYzZhYzc0NzhjNGEwZjg5OTVjYzRhOGM5ZWE2NGE2ZjUyYTQ1MzViZjc0MGRiMGY1OGIwMDcwYjAzNDdjOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjQ2MWUxM2I5OGIxYzJkY2RlOGMzNjQ4OWQ3NGQ5MTQ2MmFjMjBmNzMyODIwYTE3ODkyZDQwNDk0YjQzMDIzZSJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/t2mis.ts#L1-L11",
+          "version": "repo-lines-v1:sha256:1674873053d7aa4432c3ac25892a084f25b22f68633335fb4c0db2ac1914e9c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhMGExMjY4OTFhYmIxZjZiMjJmZmE5MDZiOWM0NWVkNWUwYmQwZmRiZmMyNmYzNTcwZTRjZTI2MTVmMDkxYWIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/t2mis.test.ts#L18-L29",
+          "version": "repo-lines-v1:sha256:eaf705f7d4e2e4ab606948598a57bcf5a90d62f2dc4479ba70ae49ed7d6510c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MjZhOGY2MTNhMWYxZjBhOGVkYThmNWQ4OGQ0OGE5ZTVkNDRjNzNlMGUxNjViOGE5ZWJmN2FjMzQ1ODNjYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhNjg3MjIwM2NhOWUxNTUyODFhODUwM2M5YTg0NzhkYmRjODA4YTMzMjNhNmNhNjdlZjFhOGFmYmRmOWZmZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwMjNlOThlMzBjODgyN2NlOTBmZjZjMTEwOWE3NDYwOTRiYmFhMzdmNDA4ZTRmODA5YjBkYjI5MTVkZTk5NDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9fdbe8e7d0b04874ab9c254b6866a76b",
+      "statement": "Export and import split across two modules rather than one: the 48-column T2MIS layout belongs to modules/import-export/domain/t2mis.ts, while the workbook writer and browser download live in modules/reports (domain/xlsx.ts, ui/exportXlsx.ts). The report surface is /t/<tenantCode>/(sections)/report and it server-redirects trainers to /trainer, gated on resolveTrustedRole rather than resolveRouteRole so the ?role= preview override cannot bypass the omission boundary.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L48-L57",
+          "version": "repo-lines-v1:sha256:22385b4f098cb83c975f38e27262fa5b7d87c28288d40d00103db6c907a0dc09:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMzM2ODY3ZDFlODc0N2FhYzUzMWY3MDExZGM3MDYzMTA5NzE5Y2FkYzgzYzM4MmFmNjQ3ODNjNzI4ZjU0NGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzYTIxN2NmNzgyM2NkOWE1MTFlNDFlYWQ2NmRiN2YyNDZkY2Y3MjlhYjY0NzQxNmQ5NzM5N2UwZTcwNDJlNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MGUzOTI3ZTY3NGE3OGJmMTI1MmYxMTk2MzQ0NWFlYzc0NzFjNTY2YWY4MGM3NTUwM2M3YjI0MzU5N2U5MzgifQ"
+        },
+        {
+          "resource": "repo://modules/reports/README.md#L1-L17",
+          "version": "repo-lines-v1:sha256:ac30f5b9171c6a51e172688e6e79c17a03b447d394a233cad57cc1cee50247d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4MmY1OTljOGNkMjkwZThiODAzMTg1YmRhODU3NjE5Mjc2MTRiOWFhNjJkOGQzOTAxYTAzNmQ5MjgwM2YwNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWQ2NWI4YjBmYjU3Y2NiMjY4ODY2NzcxMzdhNzc5NzhlYTIxZGQ3NjAyZmVmYzMxN2U5ZDgzNWU0YmZjMGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1OTJmYmI5MDNkNzc5NzQzY2Y1MTFjMTc0MTE4YzYwNjNlMTNkYzg2NmUwZmUyMGQ4M2Q3NjcwYmQ1OWY2NGEifQ"
+        },
+        {
+          "resource": "repo://modules/reports/ui/exportXlsx.ts#L1-L23",
+          "version": "repo-lines-v1:sha256:5b069c133b8fd3c53f413965a3142f5d7339f113efc5c6d612095847c166bebb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5YTdhMDc5YTI1MzQxYmFhODQ5MWVmNThkNjJjM2YyNGEzODQ5OTcwNzIwMjM1NTNhZjAxN2U3MDg4YmU4NTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmZTRmMDM4NTFhMzAxN2YxZDQ0NmI0NTcyODRmYzY3NTQxYTViYWZlOWYyODZkMjk2OTBhOTNhZGExOTIyZjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_29d1a376833542548d12f8bbb9e8a002",
+      "statement": "Tenant context resolves through the URL path segment /t/<tenantCode>, validated against the caller's own memberships before any page under it renders by app/(dashboard)/t/[tenantCode]/layout.tsx — a code that is not one of the caller's schools never falls back to all schools. /schools/new sits outside that segment because school creation needs an actor outside the tenant boundary, and the older unsegmented routes survive only as forwarders through app/(dashboard)/legacy-redirect.tsx.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/legacy-redirect.tsx#L30-L30",
+          "version": "repo-lines-v1:sha256:27467e564dcbe60ccd52844bcfbafabeb60d42d223b4724bfde7c5994c70615e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjc0NjdlNTY0ZGNiZTYwY2NkNTI4NDRiY2ZiYWZhYmViNjBkNDJkMjIzYjQ3MjRiZmRlN2M1OTk0YzcwNjE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjc0NjdlNTY0ZGNiZTYwY2NkNTI4NDRiY2ZiYWZhYmViNjBkNDJkMjIzYjQ3MjRiZmRlN2M1OTk0YzcwNjE1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTUwNTJiZjExYTdkNzA3YWRiMzVkZmY5MDVjYTg5ZDg2ZGE5NjFjYWQ0NTk0NTU3ZjNhZThiYTAzZDVhZTJlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDg0MjY5ODJhOTM0NTlmZjVkNWMwYmE0MGQ3NzUxMTc5YWRkZjdhZWIzNTZlZjdhOTI1Mzk3NWNhNzhhODNjMSJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/report/page.tsx#L1-L3",
+          "version": "repo-lines-v1:sha256:bf258503875d137c699d507c44a1b29605e633c0e41ef27ed3f0544446f1c131:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2IxNmE4NTZjZDBlZDM3ZDUwZGEzOTc4MmJiOTJiZWRkZjk1NGFmZDM2ZDZmNTlhNWFjZDllYjc5MmRhOGIxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWZhYjdhMmI2YWM4MWE5Njg1YmVjYTllMzljNDU3OTk2MzVmYmNlYzRmZmViYjQxMWNhZWMwM2Q4M2Q4NjQyOCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L1-L20",
+          "version": "repo-lines-v1:sha256:fb98b2002ae77ef24aafd80a848429adb86d1d9b018203a473afedaf11fca405:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4NDlhYmUyZTFhZmUwODk4NzYxMjg4Y2ExMmE2YTAxYzc3MWQ2Yzk5Y2Y0YjMxNmZhYjZjOGJjMzI1YWQ1OTIifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L1-L29",
+          "version": "repo-lines-v1:sha256:76e6108569daea72b79e051fc98e9476a8b9f7f6c4dee2f40d044941a04386ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5MzJjYWNkMmIxOWU2NDhlNjA1MGRmNjhiNDEzNjE3MWUyZDIwYWMxZjNlY2I1OTc4OGMwZTE4MjBjNWNlMDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkOWFiNWViM2E5MmY0OTFiOTVmZDZhMjVlMjRkYTc4N2M0NTRhMmQ4NGI0ZjI2MTgyMzk2M2RhODI1ZDUxMGQifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-10-26T00:51:40.902Z"
+    "at": "2026-11-14T02:48:13.100Z"
   }
 }
