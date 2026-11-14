@@ -32,6 +32,7 @@ import type {
   LifecycleStageKey,
   LifecycleStatus,
 } from '@/shared/types';
+import { pickHeaderImagePath, normalizeQualificationTitle } from '@/modules/batches/domain/headerImage';
 
 type BatchRow = Database['public']['Tables']['batches']['Row'];
 type DocumentRow = Database['public']['Tables']['documents']['Row'];
@@ -321,6 +322,54 @@ function latestUpdatedAt(batches: Batch[]): string | null {
   );
 }
 
+const QUALIFICATION_IMAGE_BUCKET = 'qualification-images';
+const HEADER_IMAGE_URL_TTL_SECONDS = 60 * 60;
+
+type ServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+
+/**
+ * The batch-detail hero image for each row (migration 20261113120000), as a
+ * signed URL or null. Deliberately a separate lookup from the batches select
+ * and deliberately unable to fail: an image is decoration, so a missing
+ * column, relation or object yields `null` (the neutral hero) instead of
+ * turning every batch screen into `sync-failed`.
+ */
+async function resolveHeaderImageUrls(supabase: ServerClient, rows: BatchRowWithProgram[]): Promise<(string | null)[]> {
+  const none = rows.map(() => null);
+  if (rows.length === 0) return none;
+  try {
+    const { data: quals, error } = await supabase
+      .from('qualifications')
+      .select('id, title, header_image_path')
+      .not('header_image_path', 'is', null);
+    if (error || !quals?.length) return none;
+
+    const linkIds = [...new Set(rows.flatMap((r) => (r.tenant_qualification_id ? [r.tenant_qualification_id] : [])))];
+    const links = linkIds.length
+      ? (await supabase.from('tenant_qualifications').select('id, qualification_id').in('id', linkIds)).data ?? []
+      : [];
+
+    const index = {
+      byQualificationId: new Map(quals.map((q) => [q.id, q.header_image_path as string])),
+      byTitle: new Map(quals.map((q) => [normalizeQualificationTitle(q.title), q.header_image_path as string])),
+      tenantQualificationToQualification: new Map(links.map((l) => [l.id, l.qualification_id])),
+    };
+    const paths = rows.map((r) =>
+      pickHeaderImagePath({ tenantQualificationId: r.tenant_qualification_id ?? null, qualificationTitle: r.qualification_title }, index),
+    );
+
+    const unique = [...new Set(paths.filter((p): p is string => p !== null))];
+    if (unique.length === 0) return none;
+    const { data: signed } = await supabase.storage
+      .from(QUALIFICATION_IMAGE_BUCKET)
+      .createSignedUrls(unique, HEADER_IMAGE_URL_TTL_SECONDS);
+    const urls = new Map((signed ?? []).flatMap((e) => (e.path && e.signedUrl && !e.error ? [[e.path, e.signedUrl] as const] : [])));
+    return paths.map((p) => (p ? urls.get(p) ?? null : null));
+  } catch {
+    return none;
+  }
+}
+
 /**
  * `cache()`-wrapped so the layout and its nested page share one Supabase
  * query per request instead of each `await getBatchesSnapshot()` call firing
@@ -346,7 +395,9 @@ export const getBatchesSnapshot = cache(async (tenantId?: string): Promise<Batch
 
     if (error) return { status: 'sync-failed', error: error.message };
 
-    const batches = (data ?? []).map((row) => mapBatchRow(row as unknown as BatchRowWithProgram));
+    const rows = (data ?? []) as unknown as BatchRowWithProgram[];
+    const imageUrls = await resolveHeaderImageUrls(supabase, rows);
+    const batches = rows.map((row, i) => ({ ...mapBatchRow(row), headerImageUrl: imageUrls[i] }));
     return { status: 'ok', batches, dataAsOf: latestUpdatedAt(batches), fetchedAt: new Date().toISOString() };
   } catch (err) {
     // Network / client-construction failures land here, not in `error` above.
