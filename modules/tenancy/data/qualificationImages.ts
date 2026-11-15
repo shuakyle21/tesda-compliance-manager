@@ -20,7 +20,7 @@ import {
 
 export const QUALIFICATION_IMAGE_BUCKET = 'qualification-images';
 /** Long enough for an open page; short enough not to be a share link. */
-export const QUALIFICATION_IMAGE_URL_TTL_SECONDS = 60 * 60;
+const QUALIFICATION_IMAGE_URL_TTL_SECONDS = 60 * 60;
 
 const RLS_VIOLATION = '42501';
 
@@ -28,7 +28,7 @@ function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : 'unknown error';
 }
 
-export interface QualificationImageRow {
+interface QualificationImageRow {
   id: string;
   code: string;
   title: string;
@@ -38,7 +38,7 @@ export interface QualificationImageRow {
   imageUrl: string | null;
 }
 
-export type QualificationImagesSnapshot =
+type QualificationImagesSnapshot =
   | { status: 'ok'; qualifications: QualificationImageRow[] }
   | { status: 'sync-failed'; error: string }
   | { status: 'unconfigured' };

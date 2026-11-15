@@ -444,7 +444,7 @@ attendance (Phase 3.2) and the document checklist (Phase 2.2). Full rules:
 
 - **Build:** Compute billing-ready on read (threshold reached AND tranche
   supporting docs verified — II2); per-tranche document checklist (MIS-0302,
-  Annex K, Daily Attendance Sheet) at tranche level (LL1); billing/NTP-lag alerts
+  tranche support packet, Daily Attendance Sheet) at tranche level (LL1); billing/NTP-lag alerts
   in the notifications drawer (JJ1), hidden from trainers.
 - **Files:** `modules/billing/domain/readiness.ts`, documents view, notifications
   drawer.

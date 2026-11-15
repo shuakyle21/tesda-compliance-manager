@@ -11,14 +11,14 @@
  */
 
 export const QUALIFICATION_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
-export type QualificationImageType = (typeof QUALIFICATION_IMAGE_TYPES)[number];
+type QualificationImageType = (typeof QUALIFICATION_IMAGE_TYPES)[number];
 
 /** Mirrors the bucket's `file_size_limit`. */
 export const QUALIFICATION_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
 /** Recommended size; smaller is accepted with a warning. */
-export const RECOMMENDED_WIDTH = 1600;
-export const RECOMMENDED_HEIGHT = 900;
+const RECOMMENDED_WIDTH = 1600;
+const RECOMMENDED_HEIGHT = 900;
 
 const EXTENSION: Record<QualificationImageType, string> = {
   'image/jpeg': 'jpg',
@@ -29,7 +29,7 @@ const EXTENSION: Record<QualificationImageType, string> = {
 export type QualificationImageRejection = 'missing' | 'type' | 'size' | 'portrait';
 export type QualificationImageWarning = 'not-16-9' | 'low-resolution';
 
-export type FileCheck =
+type FileCheck =
   | { ok: true; type: QualificationImageType }
   | { ok: false; reason: QualificationImageRejection };
 
@@ -45,7 +45,7 @@ export function checkImageFile(input: { mimeType: string; size: number }): FileC
   return { ok: true, type: input.mimeType };
 }
 
-export type DimensionCheck =
+type DimensionCheck =
   | { ok: true; warnings: QualificationImageWarning[] }
   | { ok: false; reason: 'portrait' };
 

@@ -91,3 +91,6 @@ requests/http-client.private.env.json
 # OpenWiki workflow stages it with `add-paths: openwiki`, and `git add` skips ignored paths,
 # so a blanket `openwiki/` entry silently drops newly generated pages from the update PR.
 openwiki/.run.json
+
+#
+.next-buildcheck/
