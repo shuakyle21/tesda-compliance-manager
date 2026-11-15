@@ -9,7 +9,7 @@
  * BatchModal); hover elevation is CSS (.batch-card).
  */
 
-import type { CSSProperties, KeyboardEvent, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
@@ -31,27 +31,17 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
   const className = 'batch-card' + (billingReady ? ' billing-ready' : '') + (onClick ? ' clickable' : '');
 
   return (
-    <div
-      onClick={onClick}
-      className={className}
-      // A clickable div is invisible to the keyboard: expose it as a button.
-      {...(onClick && {
-        role: 'button',
-        tabIndex: 0,
-        'aria-label': `Open batch ${batch.name}`,
-        onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => {
-          if (e.target !== e.currentTarget) return;
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }
-        },
-      })}
-    >
+    <div onClick={onClick} className={className}>
       {billingReady && <div className="billing-ready-stripe" />}
 
       {/* Header */}
       <div style={{ padding: '14px 16px 10px' }}>
         <CardHeaderBadges batch={batch} billingReady={billingReady} />
         <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', marginTop: 8 }}>
-          {batch.name}
+          {/* The keyboard path: a real button whose click bubbles to the card's
+              onClick. role="button" on the whole card would hide its contents
+              from screen readers. */}
+          {onClick ? <button type="button" className="batch-card-open">{batch.name}</button> : batch.name}
         </div>
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 2 }}>
           {batch.qualification}

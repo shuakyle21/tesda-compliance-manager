@@ -573,6 +573,10 @@ body { min-height: 100vh; margin: 0; }
   }
 }
 .batch-card.clickable { cursor: pointer; }
+.batch-card-open {
+  background: none; border: 0; padding: 0;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
 .batch-card.clickable:active { transform: scale(0.99); }
 @media (hover: hover) and (pointer: fine) {
   .batch-card:hover { background: var(--color-surface-raised); box-shadow: var(--shadow-md); }

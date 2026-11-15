@@ -237,7 +237,9 @@ export function DocumentsView({
               {/* The bar's color never stands alone: each state is also said in words. */}
               <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: '4px 14px', fontSize: 11.5 }}>
                 {c.pct === 100 && (
-                  <CardNote icon="check" color="var(--color-green-dk)">All required documents verified</CardNote>
+                  <CardNote icon="check" color="var(--color-green-dk)">
+                    {c.untracked > 0 ? 'All tracked required documents verified' : 'All required documents verified'}
+                  </CardNote>
                 )}
                 {c.missing > 0 && (
                   <CardNote icon="alert-triangle" color="var(--color-red-dk)">{c.missing} missing</CardNote>
