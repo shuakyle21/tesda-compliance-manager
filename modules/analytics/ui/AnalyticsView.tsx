@@ -21,6 +21,7 @@ import { BarChart, BarList, DonutChart, Card, Title, Text, Grid, Col } from '@tr
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { criticalRequirements, summarizeBatchDocCompliance } from '@/modules/documents/domain/compliance';
 import { ALERT_CATEGORY_LABEL, alertCategoryCounts } from '@/modules/batches/domain/alerts';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import type { Batch } from '@/shared/types';
 
 export function AnalyticsView({ batches }: { batches: Batch[] }) {
@@ -29,16 +30,16 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
   }
 
   const progressData = batches
-    .map((b) => ({ name: b.id, value: b.progressPct }))
+    .map((b) => ({ name: displayBatchId(b), value: b.progressPct }))
     .sort((a, b) => b.value - a.value);
 
   const daysData = batches.map((b) => ({
-    name: b.id,
+    name: displayBatchId(b),
     Elapsed: b.currentDay,
     Remaining: Math.max(b.totalDays - b.currentDay, 0),
   }));
 
-  const ntpData = batches.map((b) => ({ name: b.id, 'NTP lag (days)': b.ntpLag }));
+  const ntpData = batches.map((b) => ({ name: displayBatchId(b), 'NTP lag (days)': b.ntpLag }));
 
   // ADR-004: a batch that tracks none of the critical requirements is left out
   // of the ranking entirely — plotting it as 0% would read as a compliance
@@ -46,12 +47,12 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
   // own program's catalog, never a cross-program list.
   const hasCriticalReqs = batches.some((b) => criticalRequirements(b.documentRequirements).length > 0);
   const docData = batches
-    .map((b) => ({ name: b.id, summary: summarizeBatchDocCompliance(b, criticalRequirements(b.documentRequirements)) }))
+    .map((b) => ({ name: displayBatchId(b), summary: summarizeBatchDocCompliance(b, criticalRequirements(b.documentRequirements)) }))
     .filter((d) => d.summary.verifiedPct !== null)
     .map((d) => ({ name: d.name, value: d.summary.verifiedPct as number }))
     .sort((a, b) => b.value - a.value);
 
-  const scholarData = batches.map((b) => ({ name: b.id, Scholars: b.scholars }));
+  const scholarData = batches.map((b) => ({ name: displayBatchId(b), Scholars: b.scholars }));
   const avgScholars = scholarData.reduce((s, r) => s + r.Scholars, 0) / scholarData.length;
 
   // Live counts from the same alerts engine AlertsPanel uses (batches.ts,

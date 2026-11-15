@@ -16,6 +16,8 @@ import { StatusBadge, type BadgeVariant } from './StatusBadge';
 export interface PreviewFile {
   name: string;
   batchId: string;
+  /** Finished display string for the batch ID (RQM code or internal code); falls back to `batchId`. */
+  batchLabel?: string;
   batchName?: string;
   program: string;
   tenantId?: string;
@@ -85,7 +87,7 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
             <div style={{ minWidth: 0 }}>
               <h3 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</h3>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>
-                {file.batchId} · {file.program} · {file.critical ? 'Required' : 'Optional'}
+                {file.batchLabel ?? file.batchId} · {file.program} · {file.critical ? 'Required' : 'Optional'}
               </div>
             </div>
           </div>
@@ -112,7 +114,7 @@ export function FilePreviewModal({ file, canVerify, adminName, onVerify, onReque
             <FPMetaRow label="Verified by">
               <FPVerifiedByMeta file={file} adminName={adminName} />
             </FPMetaRow>
-            <FPMetaRow label="Batch"><span style={{ fontSize: 12.5, color: 'var(--color-text-primary)' }}>{file.batchName || file.batchId}</span></FPMetaRow>
+            <FPMetaRow label="Batch"><span style={{ fontSize: 12.5, color: 'var(--color-text-primary)' }}>{file.batchName || file.batchLabel || file.batchId}</span></FPMetaRow>
             <FPMetaRow label="Program"><StatusBadge variant={file.program === 'TWSP' ? 'twsp' : 'cfsp'}>{file.program}</StatusBadge></FPMetaRow>
             <FPMetaRow label="Last updated">
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)' }}>{file.updated || '—'}</span>

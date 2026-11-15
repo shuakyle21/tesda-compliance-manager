@@ -81,11 +81,11 @@ function NextBillingCard({ metrics, href }: { metrics: DashboardMetrics; href: s
     <MetricCard
       label="Next billing due"
       value={date}
-      sub={<><span>{next.batchId}</span><UrgencyIndicator days={next.daysToBilling} variant="badge" /></>}
+      sub={<><span>{next.batchLabel}</span><UrgencyIndicator days={next.daysToBilling} variant="badge" /></>}
       iconName="receipt"
       variant={billingVariant(next.daysToBilling)}
       href={href}
-      ariaLabel={`Next billing due: ${date}, ${next.batchId}, ${next.daysToBilling < 0 ? `${-next.daysToBilling} days overdue` : `${next.daysToBilling} days left`}.`}
+      ariaLabel={`Next billing due: ${date}, ${next.batchLabel}, ${next.daysToBilling < 0 ? `${-next.daysToBilling} days overdue` : `${next.daysToBilling} days left`}.`}
     />
   );
 }

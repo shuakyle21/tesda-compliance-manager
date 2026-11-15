@@ -13,6 +13,7 @@ import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { LifecyclePipeline } from './LifecyclePipeline';
+import { BatchIdLabel } from '@/modules/batches/ui/BatchIdLabel';
 import { TrainerAvatar } from '@/shared/ui/TrainerAvatar';
 import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicator';
 import { TrainingDayPills } from '@/shared/ui/TrainingDayPills';
@@ -65,7 +66,7 @@ function BatchModalHero({ batch, isTwsp, billingReady }: { batch: Batch; isTwsp:
         <StatusBadge variant={isTwsp ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
         <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
         {billingReady ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}
-        <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>{batch.id}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-text-muted)' }}><BatchIdLabel batch={batch} /></span>
       </div>
       <div className="nm-title">{batch.name}</div>
       <div className="nm-subtitle">{batch.qualification}</div>
@@ -174,7 +175,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
             <div className="nm-breadcrumb">
               <span className="crumb" onClick={close}>Training Batch Manager</span>
               <Icon name="chevron-right" size={12} style={{ opacity: 0.4, flexShrink: 0 }} />
-              <span className="current">{batch.id} · {batch.name}</span>
+              <span className="current">{batch.name}</span>
             </div>
             <button className="nm-close" onClick={close} aria-label="Close"><Icon name="x" size={16} /></button>
           </div>
@@ -247,7 +248,7 @@ export function BatchModal({ batch, onClose }: { batch: Batch; onClose: () => vo
           <div className="nm-footer">
             <span>Last updated Jun 1, 2026</span>
             <span style={{ color: 'var(--color-border-strong)' }}>·</span>
-            <span>{batch.id}</span>
+            <BatchIdLabel batch={batch} />
             <button className="btn ghost" style={{ marginLeft: 'auto', height: 28, fontSize: 12, gap: 4 }} onClick={close}>
               <Icon name="x" size={12} />Close
             </button>

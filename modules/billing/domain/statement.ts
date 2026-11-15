@@ -43,7 +43,6 @@ export interface StatementSummaryLine {
 export interface BillingStatement {
   trackId: BillingTrackId;
   trackLabel: string;
-  batchId: string;
   school: string;
   region: string;
   /** Uppercase program banner, e.g. "COCONUT FARMERS SCHOLARSHIP PROGRAM (CFSP)". */
@@ -52,7 +51,7 @@ export interface BillingStatement {
   subtitle: string;
   qualification: string;
   trainerName: string;
-  rqm: string;
+  rqm: string | null;
   period: string;
   scholarsLabel: string;
   columns: StatementColumn[];
@@ -87,20 +86,6 @@ export function formatPeso(n: number): string {
 function scholarName(s: ScholarRow): string {
   const mi = s.middleInit ? ` ${s.middleInit.trim()}` : '';
   return `${s.lastName.toUpperCase()}, ${s.firstName}${mi}`.trim();
-}
-
-/**
- * Synthesizes an RQM code (ADR-001 structure `RQM<tranche>-<year>-<program>-<institution>-<seq>`).
- * Deterministic from the batch code so the same batch always shows the same
- * authorization. This is a prototype value until `rqm_code` is on the contract.
- *
- * @param batch - The batch to generate an RQM code for
- * @returns RQM code like "RQM3-2026-CFSP-1263-0001"
- */
-function rqmCode(batch: Batch): string {
-  const seq = (batch.id.match(/\d+/)?.[0] ?? '0').padStart(4, '0');
-  const program = batch.program.trim().toUpperCase() || 'CFSP';
-  return `RQM3-2026-${program}-1263-${seq}`;
 }
 
 /**
@@ -153,14 +138,13 @@ export function buildStatement(
   const header = {
     trackId,
     trackLabel: track.label,
-    batchId: batch.id,
     school: tenant.name,
     region: tenant.region,
     programLine: programBanner(batch.program).toUpperCase(),
     docTitle,
     qualification: batch.qualification,
     trainerName: batch.trainer || '—',
-    rqm: rqmCode(batch),
+    rqm: batch.rqmCode,
     period: trainingPeriod(batch),
     scholarsLabel: `${roster.length} pax`,
   };

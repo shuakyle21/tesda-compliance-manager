@@ -36,6 +36,7 @@ import { timeMonth } from 'd3-time';
 import { timeFormat } from 'd3-time-format';
 import { easeCubicOut } from 'd3-ease';
 import { Icon } from '@/shared/ui/Icon';
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import type { Batch, LifecycleStatus } from '@/shared/types';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -63,7 +64,7 @@ type Phase = {
   detail?: string;
 };
 type Milestone = { label: string; at: Date; status: LifecycleStatus };
-type GanttRow = { id: string; program: string; pct: number; phases: Phase[]; milestones: Milestone[] };
+type GanttRow = { label: string; program: string; pct: number; phases: Phase[]; milestones: Milestone[] };
 
 /**
  * Milestone diamond styling per lifecycle status, keyed so a new
@@ -152,7 +153,7 @@ export function ganttData(batches: Batch[]): GanttRow[] {
         .filter((m): m is [string, Date, string] => m[1] != null)
         .map(([label, at, key]) => ({ label, at, status: lifecycleStatus(b, key) }));
 
-      return { id: b.id, program: b.program, pct: b.progressPct, phases, milestones };
+      return { label: displayBatchId(b), program: b.program, pct: b.progressPct, phases, milestones };
     })
     .filter((r) => r.phases.length || r.milestones.length);
 }
@@ -273,7 +274,7 @@ export function BatchTimeline({ batches }: { batches: Batch[] }) {
         const g = svg.append('g');
         if (i % 2 === 1) g.append('rect').attr('x', 0).attr('y', y0).attr('width', w).attr('height', ROW).attr('fill', cssVar(host, '--color-surface-alt')).attr('opacity', 0.55);
         g.append('text').attr('x', 15).attr('y', y0 + 22).attr('fill', cssVar(host, '--color-text-primary'))
-          .style('font-family', 'var(--font-mono)').style('font-size', '11.5px').text(r.id);
+          .style('font-family', 'var(--font-mono)').style('font-size', '11.5px').text(r.label);
         const tw = r.program === 'TWSP';
         g.append('rect').attr('x', 15).attr('y', y0 + 30).attr('width', 44).attr('height', 15).attr('rx', 3).attr('fill', cssVar(host, tw ? '--color-blue-lt' : '--color-green-lt'));
         g.append('text').attr('x', 37).attr('y', y0 + 41).attr('text-anchor', 'middle').attr('fill', cssVar(host, tw ? '--color-blue-dk' : '--color-green-dk'))

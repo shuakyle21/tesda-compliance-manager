@@ -25,6 +25,7 @@ export function filterBatches(batches: Batch[], query: string, program: string):
     xs = xs.filter((b) =>
       b.name.toLowerCase().includes(q) ||
       b.id.toLowerCase().includes(q) ||
+      (b.rqmCode?.toLowerCase().includes(q) ?? false) ||
       b.qualification.toLowerCase().includes(q) ||
       b.trainer.toLowerCase().includes(q));
   }

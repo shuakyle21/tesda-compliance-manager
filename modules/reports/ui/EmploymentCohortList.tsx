@@ -1,5 +1,6 @@
 'use client';
 
+import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { Icon } from '@/shared/ui/Icon';
 import type { Batch, Tenant } from '@/shared/types';
 
@@ -21,7 +22,7 @@ export function EmploymentCohortList({ empCohorts, isMulti, tenantOf }: Employme
             <Icon name="clock" size={13} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
             <span className="emp-cohort-name">
               {isMulti ? tenantOf(b.tenantId).code + ' · ' : ''}
-              {b.id} {b.qualification}
+              {displayBatchId(b)} {b.qualification}
             </span>
             <span className="emp-cohort-meta">
               6-month follow-up due <strong>{f.due || '—'}</strong> · {f.employed}/{f.certified} employed · {f.awaiting} pending

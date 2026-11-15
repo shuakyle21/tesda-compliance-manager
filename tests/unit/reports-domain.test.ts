@@ -20,7 +20,7 @@ import type { Batch, ScholarRow } from '@/shared/types';
 
 function fixtureBatch(overrides: Partial<Batch> = {}): Batch {
   return {
-    id: 'BAT-1', tenantId: 'tenant-1', programId: 'program-1', name: 'BAT-1',
+    id: 'BAT-1', rqmCode: null, tenantId: 'tenant-1', programId: 'program-1', name: 'BAT-1',
     qualification: 'Agricultural Crops Production NC II', program: 'TWSP', ncLevel: 'NC II',
     trainer: 'Jane Dela Cruz', trainerId: 'trainer-1', scholars: 25,
     trainingDays: '', trainingDaySchedule: [], notes: '',

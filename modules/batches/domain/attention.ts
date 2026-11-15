@@ -18,6 +18,7 @@
 
 import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
 import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from './urgency';
+import { displayBatchId } from './rqm';
 import type { Batch } from '@/shared/types';
 
 /** Deadlines inside this window enter the queue (the warning tier's outer edge). */
@@ -27,21 +28,21 @@ export type AttentionSeverity = 'urgent' | 'due';
 
 export type AttentionItem =
   | { kind: 'sync-failed'; severity: 'urgent' }
-  | { kind: 'blocked'; severity: 'urgent'; batchId: string }
-  | { kind: 'billing-overdue'; severity: 'urgent'; batchId: string; deadline: string; daysOverdue: number }
-  | { kind: 'billing-due'; severity: 'due'; batchId: string; deadline: string; daysLeft: number }
-  | { kind: 'documents-missing'; severity: 'due'; batchId: string; documents: string[] }
-  | { kind: 'billing-deadline-missing'; severity: 'due'; batchIds: string[] };
+  | { kind: 'blocked'; severity: 'urgent'; batchId: string; batchLabel: string }
+  | { kind: 'billing-overdue'; severity: 'urgent'; batchId: string; batchLabel: string; deadline: string; daysOverdue: number }
+  | { kind: 'billing-due'; severity: 'due'; batchId: string; batchLabel: string; deadline: string; daysLeft: number }
+  | { kind: 'documents-missing'; severity: 'due'; batchId: string; batchLabel: string; documents: string[] }
+  | { kind: 'billing-deadline-missing'; severity: 'due'; batchIds: string[]; batchLabels: string[] };
 
 const SEVERITY_RANK: Record<AttentionSeverity, number> = { urgent: 0, due: 1 };
 
 function billingItem(batch: Batch): AttentionItem | null {
   if (!hasOpenBillingObligation(batch) || !hasRecordedBillingDeadline(batch) || !batch.billingDeadline) return null;
   if (urgencyTier(batch.daysToBilling) === 'overdue') {
-    return { kind: 'billing-overdue', severity: 'urgent', batchId: batch.id, deadline: batch.billingDeadline, daysOverdue: -batch.daysToBilling };
+    return { kind: 'billing-overdue', severity: 'urgent', batchId: batch.id, batchLabel: displayBatchId(batch), deadline: batch.billingDeadline, daysOverdue: -batch.daysToBilling };
   }
   if (batch.daysToBilling <= BILLING_DUE_WINDOW_DAYS) {
-    return { kind: 'billing-due', severity: 'due', batchId: batch.id, deadline: batch.billingDeadline, daysLeft: batch.daysToBilling };
+    return { kind: 'billing-due', severity: 'due', batchId: batch.id, batchLabel: displayBatchId(batch), deadline: batch.billingDeadline, daysLeft: batch.daysToBilling };
   }
   return null;
 }
@@ -51,7 +52,7 @@ function missingDocumentsItem(batch: Batch): AttentionItem | null {
   const documents = criticalRequirements(batch.documentRequirements)
     .filter((req) => docRecordFor(batch, req.key)?.status === 'missing')
     .map((req) => req.label);
-  return documents.length ? { kind: 'documents-missing', severity: 'due', batchId: batch.id, documents } : null;
+  return documents.length ? { kind: 'documents-missing', severity: 'due', batchId: batch.id, batchLabel: displayBatchId(batch), documents } : null;
 }
 
 /**
@@ -70,7 +71,7 @@ export function attentionItems(batches: readonly Batch[], options: { syncFailed:
   if (options.syncFailed) items.push({ kind: 'sync-failed', severity: 'urgent' });
 
   for (const batch of batches) {
-    if (batch.blocked) items.push({ kind: 'blocked', severity: 'urgent', batchId: batch.id });
+    if (batch.blocked) items.push({ kind: 'blocked', severity: 'urgent', batchId: batch.id, batchLabel: displayBatchId(batch) });
     const billing = billingItem(batch);
     if (billing) items.push(billing);
     const documents = missingDocumentsItem(batch);
@@ -80,9 +81,8 @@ export function attentionItems(batches: readonly Batch[], options: { syncFailed:
   // One aggregate row, not one per batch: a missing deadline is a data gap to
   // fill, and N identical rows would bury the real deadlines beneath it.
   const undated = batches
-    .filter((b) => hasOpenBillingObligation(b) && !hasRecordedBillingDeadline(b))
-    .map((b) => b.id);
-  if (undated.length) items.push({ kind: 'billing-deadline-missing', severity: 'due', batchIds: undated });
+    .filter((b) => hasOpenBillingObligation(b) && !hasRecordedBillingDeadline(b));
+  if (undated.length) items.push({ kind: 'billing-deadline-missing', severity: 'due', batchIds: undated.map((b) => b.id), batchLabels: undated.map(displayBatchId) });
 
   return items
     .map((item, index) => ({ item, index }))

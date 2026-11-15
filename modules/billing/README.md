@@ -18,4 +18,4 @@ Route: `app/(dashboard)/billing/page.tsx` — server-side role gate (trainers re
 ## Planned
 - Real `.docx` template population + the append-only `billing_records` generation log (ADR-001 §11; the ₱137k→₱145.2k re-generation story).
 - The 20/50/80 tranche ladder (§7.2.3) with per-tranche document checklists — the screen currently shows the compound gate, not the full ladder.
-- Live `rqm_code` / nominal-hours on the batch contract (currently synthesized for display, clearly-mock, per ADR-002).
+- Nominal-hours on the batch contract (currently derived for display, per ADR-002). `rqm_code` is live: the statement shows `batch.rqmCode` or "Not recorded", never a synthesized value.

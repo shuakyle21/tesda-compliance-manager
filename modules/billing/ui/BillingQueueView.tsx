@@ -423,11 +423,12 @@ export function BillingQueueView({
     if (card?.gate.ready) setPreview(card);
   };
 
-  const handleSave = (label: string) => {
+  // Every close path (button, X, Esc, scrim) lands here so they all give the same outcome.
+  const closePreview = () => {
     setPreview(null);
     setToast({
-      title: 'Working copy saved',
-      message: `${label} recorded to the generation log (append-only). Nothing was submitted to TESDA.`,
+      title: 'Preview closed',
+      message: 'Preview only — nothing was saved. Nothing was submitted to TESDA.',
     });
   };
 
@@ -481,9 +482,7 @@ export function BillingQueueView({
         <BillingStatementModal
           card={preview}
           initialTrackId={preview.tracks[0].id}
-          readOnly={!canWrite}
-          onClose={() => setPreview(null)}
-          onSave={handleSave}
+          onClose={closePreview}
         />
       )}
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}

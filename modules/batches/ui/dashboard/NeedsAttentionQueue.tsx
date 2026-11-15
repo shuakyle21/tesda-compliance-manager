@@ -32,23 +32,23 @@ export function describeAttention(item: AttentionItem): { title: string; detail:
     case 'sync-failed':
       return { title: 'Batch data could not be loaded', detail: 'Figures on this page may be incomplete. Reload to try again.' };
     case 'blocked':
-      return { title: `${item.batchId} is blocked`, detail: 'Recorded as blocked. Resolve the blocker to move the batch forward.' };
+      return { title: `${item.batchLabel} is blocked`, detail: 'Recorded as blocked. Resolve the blocker to move the batch forward.' };
     case 'billing-overdue':
-      return { title: `${item.batchId} billing overdue`, detail: `Was due ${formatDate(item.deadline) ?? 'on a recorded date'} · ${days(item.daysOverdue)} overdue` };
+      return { title: `${item.batchLabel} billing overdue`, detail: `Was due ${formatDate(item.deadline) ?? 'on a recorded date'} · ${days(item.daysOverdue)} overdue` };
     case 'billing-due':
       return {
-        title: `${item.batchId} billing due`,
+        title: `${item.batchLabel} billing due`,
         detail: `Due ${formatDate(item.deadline) ?? 'on a recorded date'} · ${item.daysLeft === 0 ? 'today' : `${days(item.daysLeft)} left`}`,
       };
     case 'documents-missing':
       return {
-        title: `${item.batchId} missing ${item.documents.length} required ${pluralize(item.documents.length, 'document', 'documents')}`,
+        title: `${item.batchLabel} missing ${item.documents.length} required ${pluralize(item.documents.length, 'document', 'documents')}`,
         detail: item.documents.join(' · '),
       };
     case 'billing-deadline-missing':
       return {
         title: `Billing deadline not recorded for ${item.batchIds.length} ${pluralize(item.batchIds.length)}`,
-        detail: item.batchIds.join(' · '),
+        detail: item.batchLabels.join(' · '),
       };
   }
 }
