@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:65efb072d3df6fe5c713d70b8f5beceaa81dc7948f09768849576f09a6302766",
+  "pageVersion": "sha256:dae67a15de0170016d067dc1e5ed1d785d59bbb40adcb66d4804c447740fffad",
   "claims": [
     {
       "id": "claim_989cf53fa86c46e3a2f936984aa0acee",
@@ -501,10 +501,30 @@
           "version": "repo-lines-v1:sha256:76e6108569daea72b79e051fc98e9476a8b9f7f6c4dee2f40d044941a04386ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5MzJjYWNkMmIxOWU2NDhlNjA1MGRmNjhiNDEzNjE3MWUyZDIwYWMxZjNlY2I1OTc4OGMwZTE4MjBjNWNlMDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkOWFiNWViM2E5MmY0OTFiOTVmZDZhMjVlMjRkYTc4N2M0NTRhMmQ4NGI0ZjI2MTgyMzk2M2RhODI1ZDUxMGQifQ"
         }
       ]
+    },
+    {
+      "id": "claim_b0a0a94b0f3946ed8511ea7459cbaefa",
+      "statement": "The report client surfaces live under `app/(dashboard)/t/[tenantCode]/(sections)/` (activity-log, analytics, batch-cards, billing, documents, report, table-view); that directory holds no `layout.tsx`, and the KPI row is not rendered by a section layout. `app/(dashboard)/layout.tsx` states the KPI row is rendered only by the two dashboard pages.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L42-L45",
+          "version": "repo-lines-v1:sha256:b4c0894da663888b2c48dc4997923dfaf8b1b852bfdad6ab3315257b76363ed7:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZlNzM0ZjI5OWE2ZGVjNThjY2U5MzFjMTEyYTVhYTllNDYxNjJkY2Q5NTdlMzFiZTkxZDQwOTFhNDk2MThkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjk2ZDgxYjMzMjhiNGM4ZWRlZWJkYzlkN2E5YTAxMTY4NDNhYjUyMWJkOTYxNGQxZGZiNjczMWZlZDI1ODVhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzk3NDMxNTM4NzE3M2RjZDIzNzAwZGVmNjc5M2E4NzkxMmQ1MzFmMzdmMDJkODBkNmU1ZWVhODBkYjZhNGQ3ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDJjNTY1NTdkMGViYjhmMjc2M2ZkODVmZGI5YzE0ZjE5YzA4OGQyZTcxYmY1ZjRmMmZiOTM3NTg2ZDA4Y2IyMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6a368c9aacc74285a0de8c13ed0bafb2",
+      "statement": "Auditing which checked-in migrations are applied is not done by reading the files: the only authority is `list_migrations` plus the named objects present, because a migration filename's numeric prefix is the recorded version and a README table is a dated snapshot. `supabase/migrations/README.md` latest block is dated 2026-10-24 and lists only eight files, so it is silent on `20261024110000` and `20261111120000` — both still declared NOT APPLIED by their own headers.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/README.md#L8-L42",
+          "version": "repo-lines-v1:sha256:3e9304fccd5b412507d05109f0d824356a77525610546c96a387529c1a882824:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5NWQyYzIwMWY0MmEyZTQwMGYyZGFkZDgyYTAzODg3ZjkwZDc1ZDY3NmQ3MDQxZDViMmI1Nzc1MTQ5N2YwMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0MGM1OWU4YjU4MTM5YTViYjI1NDJlZDk0NDFjZGQzY2E2ZGYzYzg1YjNmZGI0ZmUzNDgxNDJhZTY0ZTIyZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzOWZmN2U5MjI0NjFiNzY4MWJiZTYwNmVkYWNmZmUxY2NkYTY2ODk5NTA3YjgyYmViNWJkZmE3NzIxMDEwYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzZjM0YjYwMWVlNTE3NDE4ZjZmZDYwYTgzYmVlNDM0NDYzMzEwYzU3MjhmODA0OWE2NzJmMjkyYWQwYzJlODEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-14T02:48:13.100Z"
+    "at": "2026-11-15T02:16:31.147Z"
   }
 }
