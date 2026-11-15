@@ -9,10 +9,25 @@ import type { Batch, EgaceCounts, EgaceStage } from '@/shared/types';
 
 /**
  * Reads one EGACE stage count from a batch, defaulting to 0 when the batch does
- * not track EGACE data or the specific key is absent.
+ * not track EGACE data or the specific key is absent. Enrolled falls back to the
+ * batch's scholar count, which is recorded even when outcomes are not.
  */
 export function egaceVal(b: Batch, key: string): number {
+  if (key === 'enrolled') return b.egace?.enrolled ?? b.scholars;
   return b.egace ? b.egace[key as keyof EgaceCounts] ?? 0 : 0;
+}
+
+/** True when at least one batch carries recorded EGACE outcome counts. */
+export function hasEgaceOutcomes(rows: Batch[]): boolean {
+  return rows.some((b) => b.egace !== undefined);
+}
+
+/**
+ * Enrolled count of only the batches that record outcomes: the fair denominator
+ * for outcome-stage rates, so batches without outcomes don't dilute them.
+ */
+export function outcomeEnrolledBase(rows: Batch[]): number {
+  return rows.reduce((n, b) => n + (b.egace?.enrolled ?? 0), 0);
 }
 
 /**

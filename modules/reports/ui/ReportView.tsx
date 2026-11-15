@@ -22,7 +22,7 @@ import { Icon } from '@/shared/ui/Icon';
 import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { EGACE_STAGES, EMPLOYMENT_STATUSES } from '@/shared/vocab';
 import type { Batch, Tenant } from '@/shared/types';
-import { egaceVal, computeEgaceTotals, egaceRate } from '@/modules/reports/domain/egace';
+import { egaceVal, computeEgaceTotals, egaceRate, hasEgaceOutcomes, outcomeEnrolledBase } from '@/modules/reports/domain/egace';
 import {
   selectEmploymentCohorts,
   selectCertifiedScholars,
@@ -49,11 +49,14 @@ interface ReportViewProps {
   tenants?: Tenant[];
   /** Show School column + school count. Defaults to true when batches span >1 tenant. */
   multiSchool?: boolean;
+  /** When the batch data was loaded; null hides every "as of" line. */
+  asOf: string | null;
+  /** The scholar roster failed to load, so an empty export is a failure, not "no records". */
+  rosterFailed?: boolean;
 }
 
 const ES = EMPLOYMENT_STATUSES;
 const stages = EGACE_STAGES;
-const today = 'June 8, 2026';
 
 /** Derived state for the Report screen: EGACE totals + employment roster/rollup. */
 function useReportViewData(batches: Batch[], tenants: Tenant[], multiSchool: boolean | undefined) {
@@ -75,22 +78,23 @@ function useReportViewData(batches: Batch[], tenants: Tenant[], multiSchool: boo
     [batches],
   );
 
+  const hasOutcomes = hasEgaceOutcomes(rows);
   const totals = computeEgaceTotals(rows, stages);
-  const rate = (v: number) => egaceRate(totals, v);
+  const rate = (v: number) => egaceRate({ ...totals, enrolled: outcomeEnrolledBase(rows) }, v);
 
   const empCohorts = selectEmploymentCohorts(rows);
   const empScholars = selectCertifiedScholars(empCohorts);
   const empTotals = computeEmploymentTotals(empScholars, ES);
   const empRate = employmentRate(empTotals);
 
-  return { isMulti, schoolCount, tenantOf, rows, totals, rate, empCohorts, empScholars, empTotals, empRate };
+  return { isMulti, schoolCount, tenantOf, rows, hasOutcomes, totals, rate, empCohorts, empScholars, empTotals, empRate };
 }
 
-export function ReportView({ batches, tenants = [], multiSchool }: ReportViewProps) {
+export function ReportView({ batches, tenants = [], multiSchool, asOf, rosterFailed = false }: ReportViewProps) {
   const [active, setActive] = useState<'egace' | 'employment'>('egace');
   const [toast, setToast] = useState<ToastData | null>(null);
 
-  const { isMulti, schoolCount, tenantOf, rows, totals, rate, empCohorts, empScholars, empTotals, empRate } = useReportViewData(
+  const { isMulti, schoolCount, tenantOf, rows, hasOutcomes, totals, rate, empCohorts, empScholars, empTotals, empRate } = useReportViewData(
     batches,
     tenants,
     multiSchool,
@@ -114,14 +118,14 @@ export function ReportView({ batches, tenants = [], multiSchool }: ReportViewPro
         isMulti={isMulti}
         schoolCount={schoolCount}
         rowCount={rows.length}
-        today={today}
-        onExport={() => exportXlsx(rows, tenantOf, setToast)}
+        asOf={asOf}
+        onExport={() => exportXlsx(rows, tenantOf, setToast, rosterFailed)}
       />
 
       {active === 'egace' ? (
         <>
-          <EgaceSummaryStrip stages={stages} totals={totals} rate={rate} />
-          <EgaceOutcomesTable rows={rows} stages={stages} isMulti={isMulti} tenantOf={tenantOf} totals={totals} rate={rate} today={today} egaceVal={egaceVal} />
+          <EgaceSummaryStrip stages={stages} totals={totals} rate={rate} hasOutcomes={hasOutcomes} />
+          <EgaceOutcomesTable rows={rows} stages={stages} isMulti={isMulti} tenantOf={tenantOf} totals={totals} rate={rate} asOf={asOf} hasOutcomes={hasOutcomes} egaceVal={egaceVal} />
         </>
       ) : (
         <>

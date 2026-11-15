@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from '@/shared/ui/Icon';
+import { pluralize } from '@/shared/text';
 
 interface ReportToolbarProps {
   active: 'egace' | 'employment';
@@ -8,11 +9,11 @@ interface ReportToolbarProps {
   isMulti: boolean;
   schoolCount: number;
   rowCount: number;
-  today: string;
+  asOf: string | null;
   onExport: () => void;
 }
 
-export function ReportToolbar({ active, onActiveChange, isMulti, schoolCount, rowCount, today, onExport }: ReportToolbarProps) {
+export function ReportToolbar({ active, onActiveChange, isMulti, schoolCount, rowCount, asOf, onExport }: ReportToolbarProps) {
   return (
     <div className="report-toolbar">
       <div className="report-seg" role="tablist">
@@ -28,7 +29,8 @@ export function ReportToolbar({ active, onActiveChange, isMulti, schoolCount, ro
       <div className="report-toolbar-meta">
         <span>
           {isMulti ? schoolCount + ' schools · ' : ''}
-          {rowCount} batches · as of {today}
+          {rowCount} {pluralize(rowCount)}
+          {asOf ? ` · as of ${asOf}` : ''}
         </span>
         <button className="btn secondary" onClick={onExport}>
           <Icon name="download" size={14} />

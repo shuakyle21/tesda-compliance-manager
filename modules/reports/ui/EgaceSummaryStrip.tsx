@@ -7,18 +7,20 @@ interface EgaceSummaryStripProps {
   stages: EgaceStage[];
   totals: Record<string, number>;
   rate: (v: number) => number;
+  hasOutcomes: boolean;
 }
 
 const colorVar = (k: string) => `var(--color-${k})`;
 const colorLt = (k: string) => `var(--color-${k}-lt)`;
 const colorDk = (k: string) => `var(--color-${k}-dk)`;
 
-export function EgaceSummaryStrip({ stages, totals, rate }: EgaceSummaryStripProps) {
+export function EgaceSummaryStrip({ stages, totals, rate, hasOutcomes }: EgaceSummaryStripProps) {
   return (
     <div className="egace-summary">
       {stages.map((s, i) => {
         const val = totals[s.key];
         const pct = i === 0 ? 100 : rate(val);
+        const unrecorded = i > 0 && !hasOutcomes;
         return (
           <div key={s.key} style={{ display: 'contents' }}>
             <div className="egace-summary-tile" style={{ background: colorLt(s.colorKey), borderColor: colorVar(s.colorKey) }}>
@@ -31,10 +33,10 @@ export function EgaceSummaryStrip({ stages, totals, rate }: EgaceSummaryStripPro
                 </span>
               </div>
               <div className="egace-summary-val" style={{ color: colorDk(s.colorKey) }}>
-                {val}
+                {unrecorded ? '—' : val}
               </div>
               <div className="egace-summary-rate" style={{ color: colorDk(s.colorKey) }}>
-                {i === 0 ? 'of cohort' : pct + '% of enrolled'}
+                {unrecorded ? 'Not recorded yet' : i === 0 ? 'of cohort' : pct + '% of enrolled'}
               </div>
             </div>
             {i < stages.length - 1 && (

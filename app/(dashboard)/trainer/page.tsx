@@ -5,6 +5,7 @@
  * figures are omitted server-side, never CSS-hidden (CLAUDE.md role rules).
  */
 
+import Link from 'next/link';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
 import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
@@ -19,18 +20,8 @@ export default async function TrainerDashboardPage() {
       {metrics && <MetricsRow metrics={metrics} links={TRAINER_LINKS} hideBilling />}
       <div className="mb-6">
         <h1 className="t-page-title">Teaching dashboard</h1>
-        <p className="t-body mt-2">
-          Route mapped from Figma Frame 7 - Trainer Dashboard. This route is
-          trainer-only and must show assigned classes, attendance, progress, and
-          training-side tasks only.
-        </p>
-      </div>
-
-      <div className="bg-[var(--color-surface)] rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] p-4">
-        <p className="t-body">
-          Trainer dashboard placeholder - API must hide billing deadline, BSRS,
-          NTP lag, billing preparation, and financial document fields.
-        </p>
+        <p className="t-body mt-2">Your assigned classes, attendance and training progress.</p>
+        <Link href="/trainer/classes" className="btn secondary mt-3">View my classes</Link>
       </div>
     </div>
   );

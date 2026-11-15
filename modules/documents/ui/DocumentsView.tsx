@@ -10,7 +10,7 @@
  * through the matrix and the preview via local override state. Client Component.
  */
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
@@ -111,13 +111,13 @@ export function DocumentsView({
    * row a batch has, so a requirement outside this batch's own catalog is
    * untracked even if an old record for it exists.
    */
-  const docOf = (b: Batch, key: string): DocRecord | null => {
+  const docOf = useCallback((b: Batch, key: string): DocRecord | null => {
     if (!b.documentRequirements.some((r) => r.key === key)) return null;
     const base = docRecordFor(b, key);
     if (!base) return null;
     const ov = overrides[b.id + ':' + key];
     return ov ? { ...base, ...ov } : base;
-  };
+  }, [overrides]);
 
   const completeness = useMemo(() => batches.map((b) => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
@@ -133,7 +133,7 @@ export function DocumentsView({
     const untracked = crit.length - tracked.length;
     const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, tier };
-  }), [batches, documentRequirements, overrides]);
+  }), [batches, docOf]);
 
   if (!batches.length) {
     return (

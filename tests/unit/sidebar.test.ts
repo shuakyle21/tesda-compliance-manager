@@ -333,7 +333,7 @@ describe('SchoolSwitcher', () => {
 });
 
 describe('SidebarOverlays', () => {
-  it('closes a completed import and publishes its result in a toast', () => {
+  it('passes only onClose to the import modal and never toasts', () => {
     const SidebarOverlays = privateComponent('SidebarOverlays');
     const setToast = vi.fn();
     hooks.useState.mockReturnValue([null, setToast]);
@@ -341,11 +341,10 @@ describe('SidebarOverlays', () => {
 
     const tree = SidebarOverlays({ activeOp: 'import', tenant: TENANT_FIXTURE, fullName: null, role: null, onClose });
     const modal = componentElement(tree, ImportCsvModal);
-    (modal.props.onImported as (message: string) => void)('124 batches updated');
 
-    expect(modal.props.onClose).toBe(onClose);
-    expect(onClose).toHaveBeenCalledOnce();
-    expect(setToast).toHaveBeenCalledWith({ title: 'Import complete', message: '124 batches updated' });
+    expect(modal.props).toEqual({ onClose });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(setToast).not.toHaveBeenCalled();
   });
 
   it('passes the selected tenant to Settings and toasts after saving', () => {
@@ -395,7 +394,7 @@ describe('SidebarOverlays', () => {
   it('keeps a completion toast mounted after the operation closes and dismisses it', () => {
     const SidebarOverlays = privateComponent('SidebarOverlays');
     const setToast = vi.fn();
-    const toast = { title: 'Import complete', message: '3 batches updated' };
+    const toast = { title: 'Settings saved', message: 'Preferences updated' };
     hooks.useState.mockReturnValue([toast, setToast]);
 
     const tree = SidebarOverlays({ activeOp: null, tenant: TENANT_FIXTURE, fullName: null, role: null, onClose: vi.fn() });
