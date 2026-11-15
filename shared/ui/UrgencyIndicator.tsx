@@ -7,6 +7,7 @@
  */
 
 import { Icon, type IconName } from './Icon';
+import { URGENCY_CRITICAL_DAYS, URGENCY_WARNING_DAYS } from '../urgency';
 
 type Tier = 'critical' | 'warning' | 'on-track' | 'overdue' | 'unknown';
 
@@ -14,8 +15,8 @@ function tierOf(days: number | null | undefined): Tier {
   // `Infinity` is the mapper's "no deadline recorded" sentinel — never a countdown.
   if (days == null || !Number.isFinite(days)) return 'unknown';
   if (days < 0) return 'overdue';
-  if (days <= 6) return 'critical';
-  if (days <= 21) return 'warning';
+  if (days <= URGENCY_CRITICAL_DAYS) return 'critical';
+  if (days <= URGENCY_WARNING_DAYS) return 'warning';
   return 'on-track';
 }
 

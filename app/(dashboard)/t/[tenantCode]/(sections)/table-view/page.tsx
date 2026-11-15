@@ -16,6 +16,8 @@ import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { scopedPath } from '@/modules/tenancy/domain/scope';
 import { requireScope } from '../../../../tenant-scope';
+import { resolveTrustedRole } from '@/modules/auth/data/role';
+import { setBatchRqmCodeAction } from '../../actions';
 import type { Batch } from '@/shared/types';
 
 export default async function TableViewPage({ params, searchParams }: {
@@ -30,6 +32,13 @@ export default async function TableViewPage({ params, searchParams }: {
   // school" never masks a real fetch failure — see the fold's own note.
   const snapshot = withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccessOf(profile));
   const batches: Batch[] = selectBatchesForDisplay(snapshot);
+  // Usability only — the action re-checks the role and RLS refuses the write.
+  // Trusted role (`profiles.role`), never the `?role=` preview override.
+  const trustedRole = await resolveTrustedRole(profile.role);
+  const rqmEdit =
+    trustedRole === 'admin' || trustedRole === 'coordinator'
+      ? { tenantCode: scope.code, action: setBatchRqmCodeAction }
+      : undefined;
   const syncFailed = snapshot.status === 'sync-failed';
   const noTenantAccess = snapshot.status === 'no-tenant-access';
 
@@ -46,7 +55,7 @@ export default async function TableViewPage({ params, searchParams }: {
         </div>
         {syncFailed ? (
           <InfoCallout variant="warning">
-            Sync with Supabase failed — batches could not be loaded.
+            Batch data could not be loaded.
             <Link href={scopedPath(scope.code, 'table-view')} className="dash-link" style={{ marginLeft: 10 }}>Retry</Link>
           </InfoCallout>
         ) : noTenantAccess ? (
@@ -62,5 +71,5 @@ export default async function TableViewPage({ params, searchParams }: {
     );
   }
 
-  return <TableView batches={batches} initialBatchId={initialBatchId} />;
+  return <TableView batches={batches} initialBatchId={initialBatchId} rqmEdit={rqmEdit} />;
 }

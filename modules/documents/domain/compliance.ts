@@ -39,6 +39,10 @@
 
 import type { Batch, DocRecord, DocStatus, DocumentRequirement } from '@/shared/types';
 
+/** Document-completeness tiers (verified %): at/above on-track is green, at/above warning is amber, below is red. */
+export const DOC_TIER_ON_TRACK = 90;
+export const DOC_TIER_WARNING = 60;
+
 /** Statuses that count as "the document is in hand" (ADR-001 §7.2.4). */
 const ON_FILE_STATUSES: ReadonlySet<DocStatus> = new Set<DocStatus>(['verified', 'submitted']);
 

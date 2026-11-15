@@ -39,7 +39,10 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
     Remaining: Math.max(b.totalDays - b.currentDay, 0),
   }));
 
-  const ntpData = batches.map((b) => ({ name: displayBatchId(b), 'NTP lag (days)': b.ntpLag }));
+  // A batch with no recorded lag is left out — a null value draws a NaN bar.
+  const ntpData = batches
+    .filter((b) => b.ntpLag !== null && Number.isFinite(b.ntpLag))
+    .map((b) => ({ name: displayBatchId(b), 'NTP lag (days)': b.ntpLag as number }));
 
   // ADR-004: a batch that tracks none of the critical requirements is left out
   // of the ranking entirely — plotting it as 0% would read as a compliance
@@ -53,7 +56,6 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
     .sort((a, b) => b.value - a.value);
 
   const scholarData = batches.map((b) => ({ name: displayBatchId(b), Scholars: b.scholars }));
-  const avgScholars = scholarData.reduce((s, r) => s + r.Scholars, 0) / scholarData.length;
 
   // Live counts from the same alerts engine AlertsPanel uses (batches.ts,
   // computed on read) — no alerts_log table exists, so this can never drift
@@ -68,14 +70,12 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
       <Col>
         <Card>
           <Title>Training progress by batch</Title>
-          <Text>% complete · descending</Text>
           <BarList data={progressData} valueFormatter={(v: number) => `${v}%`} color="blue" className="mt-4" />
         </Card>
       </Col>
       <Col>
         <Card>
           <Title>Days elapsed vs remaining</Title>
-          <Text>stacked per batch</Text>
           <BarChart
             data={daysData}
             index="name"
@@ -89,14 +89,16 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
       <Col>
         <Card>
           <Title>NTP → Training start lag</Title>
-          <Text>15-day rule reference</Text>
-          <BarChart data={ntpData} index="name" categories={['NTP lag (days)']} colors={['amber']} className="mt-4 h-72" />
+          {ntpData.length ? (
+            <BarChart data={ntpData} index="name" categories={['NTP lag (days)']} colors={['amber']} className="mt-4 h-72" />
+          ) : (
+            <Text className="mt-4">NTP-to-start lag isn&apos;t recorded for any batch yet.</Text>
+          )}
         </Card>
       </Col>
       <Col>
         <Card>
           <Title>Document compliance</Title>
-          <Text>critical docs verified · %</Text>
           {docData.length ? (
             <BarList data={docData} valueFormatter={(v: number) => `${v}%`} color="emerald" className="mt-4" />
           ) : (
@@ -113,14 +115,12 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
       <Col>
         <Card>
           <Title>Enrolled scholars by batch</Title>
-          <Text>avg {avgScholars.toFixed(1)} per batch</Text>
           <BarChart data={scholarData} index="name" categories={['Scholars']} colors={['indigo']} className="mt-4 h-72" />
         </Card>
       </Col>
       <Col>
         <Card>
           <Title>Current alerts</Title>
-          <Text>by category · computed live from batches</Text>
           {alertsData.length ? (
             <DonutChart
               data={alertsData}

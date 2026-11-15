@@ -19,7 +19,7 @@
  */
 
 import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase/server';
-import type { Database, ActivityAction } from '@/lib/supabase/database.types';
+import type { Database, ActivityAction, Json } from '@/lib/supabase/database.types';
 import type { ActivityEvent } from '@/shared/types';
 
 type ActivityLogRow = Database['public']['Tables']['activity_log']['Row'];
@@ -132,5 +132,45 @@ export async function getActivitySnapshot(limit?: number, offset = 0, tenantId?:
     return { status: 'ok', events, hasMore };
   } catch (err) {
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
+  }
+}
+
+/**
+ * Appends one `activity_log` row. Best effort: the caller's write has already
+ * happened, so a failure is reported as `{ ok: false }` (raw error logged
+ * server-side only), never thrown.
+ */
+export async function appendActivity(entry: {
+  tenantId: string;
+  batchId: string | null;
+  profileId: string | null;
+  action: ActivityAction;
+  entityType: string;
+  entityId: string | null;
+  summary: string;
+  metadata: Json;
+}): Promise<{ ok: boolean }> {
+  if (!isSupabaseConfigured()) return { ok: false };
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.from('activity_log').insert({
+      tenant_id: entry.tenantId,
+      batch_id: entry.batchId,
+      profile_id: entry.profileId,
+      action: entry.action,
+      entity_type: entry.entityType,
+      entity_id: entry.entityId,
+      summary: entry.summary,
+      metadata: entry.metadata,
+    });
+    if (error) {
+      console.error('appendActivity failed', error);
+      return { ok: false };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error('appendActivity failed', err);
+    return { ok: false };
   }
 }

@@ -19,15 +19,14 @@
  * way the batch modal's stale pre-ADR-001 billing copy in the same bundle
  * gets skipped rather than ported: the ADR wins over the prototype.
  *
- * "Compact density" is left wired to nothing yet — `.density-compact` already
- * exists in design-system.css (unused) as the intended hook, but applying it
- * means lifting this flag above the Server Component layout, which is beyond
- * this port.
+ * The old "Compact density" toggle and "Save changes" button persisted
+ * nothing (the save was only a toast), so they were removed; the modal now
+ * says honestly that no settings exist yet.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Icon } from '@/shared/ui/Icon';
-import { Switch } from '@/shared/ui/Switch';
+import { EmptyState } from '@/shared/ui/EmptyState';
 
 interface SettingsModalProps {
   workspaceName: string;
@@ -35,12 +34,9 @@ interface SettingsModalProps {
   userName: string;
   userLabel: string;
   onClose: () => void;
-  onSaved: () => void;
 }
 
-export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabel, onClose, onSaved }: SettingsModalProps) {
-  const [compact, setCompact] = useState(false);
-
+export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabel, onClose }: SettingsModalProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -58,9 +54,6 @@ export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabe
             </span>
             <div>
               <h3>Settings</h3>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)', marginTop: 2 }}>
-                Workspace &amp; personal preferences
-              </div>
             </div>
           </div>
           <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
@@ -88,28 +81,12 @@ export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabe
             </div>
           </div>
 
-          <div className="settings-section">
-            <div className="settings-section-title">Preferences</div>
-            <div className="settings-rows">
-              <div className="settings-row">
-                <div style={{ minWidth: 0 }}>
-                  <div className="settings-row-label">Compact density</div>
-                  <div className="settings-row-hint">Tighter rows and cards</div>
-                </div>
-                <span className="settings-row-control">
-                  <Switch checked={compact} onChange={setCompact} label="Compact density" />
-                </span>
-              </div>
-            </div>
-          </div>
+          <EmptyState iconName="settings" heading="No settings are available yet." />
         </div>
 
         <div className="modal-foot">
           <div />
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" className="btn ghost" onClick={onClose}>Cancel</button>
-            <button type="button" className="btn primary" onClick={onSaved}>Save changes</button>
-          </div>
+          <button type="button" className="btn primary" onClick={onClose}>Close</button>
         </div>
       </div>
     </>
