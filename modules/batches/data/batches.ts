@@ -290,6 +290,9 @@ export function mapBatchRow(row: BatchRowWithProgram): Batch {
     ntpLag: null,
     // The date printed on the NTP. `?? undefined`: absent until migration 20261114120000 is applied.
     ntpDate: orUndefined(row.ntp_date),
+    // Approved slots on the NTP are the batch's required scholar count.
+    // `?? undefined`: absent until migration 20260910120000 is applied.
+    approvedSeats: orUndefined(row.approved_slots),
     tipDate: '',
     remark: orEmpty(row.official_system_reference),
   };

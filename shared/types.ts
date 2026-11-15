@@ -241,6 +241,7 @@ export interface Batch {
   // Enrichment-derived (optional when the source data or mapper is not connected)
   entreStart?: string;
   entreEnd?: string;
+  /** Approved slots from the NTP: the batch's required scholar count. Unset until recorded. */
   approvedSeats?: number;
   completers?: number;
   dropouts?: number;

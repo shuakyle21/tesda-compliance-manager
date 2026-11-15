@@ -344,6 +344,7 @@ export interface Database {
           billing_report_status: DocumentStatus;
           official_system_reference: string | null;
           ntp_date: string | null;
+          approved_slots: number | null;
           created_by: string | null;
           updated_by: string | null;
           created_at: string;
@@ -356,6 +357,7 @@ export interface Database {
           batch_code: string;
           rqm_code?: string | null;
           ntp_date?: string | null;
+          approved_slots?: number | null;
           batch_section?: string | null;
           qualification_title: string;
           nc_level?: string | null;
