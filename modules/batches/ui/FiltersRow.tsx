@@ -7,15 +7,18 @@
  * screen component, which owns the query/program state.
  */
 
+import type { ReactNode } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 
 export function FiltersRow({
-  query, onQuery, program, onProgram,
+  query, onQuery, program, onProgram, action,
 }: {
   query: string;
   onQuery: (v: string) => void;
   program: string;
   onProgram: (v: string) => void;
+  /** An extra control at the end of the row, e.g. "Add new batch". Shown only when passed. */
+  action?: ReactNode;
 }) {
   return (
     <div className="filters">
@@ -34,6 +37,7 @@ export function FiltersRow({
       <div style={{ flex: 1 }} />
       <button className="btn secondary"><Icon name="filter" size={14} />More filters</button>
       <button className="btn secondary"><Icon name="download" size={14} />Export</button>
+      {action}
     </div>
   );
 }

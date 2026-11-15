@@ -25,6 +25,7 @@ import { sessionProgress, describeSessionProgress } from '@/modules/batches/doma
 import { formatDate } from '@/shared/dates';
 import { deriveBillTone } from './billTone';
 import type { RqmFormState } from '@/modules/batches/domain/rqm';
+import { scholarCountLabel } from '@/modules/batches/domain/scholars';
 import type { Batch, LifecycleStage } from '@/shared/types';
 
 /** Present only for callers whose trusted role may change the RQM code. */
@@ -61,7 +62,7 @@ function buildBatchProps(batch: Batch, isTwsp: boolean, billingReady: boolean): 
     { label: 'TIP', icon: 'check', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.tipDate || 'Not recorded'}</span> },
     { label: 'AOU', icon: 'file-invoice', value: <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>{batch.aouDate || 'Not recorded'}</span> },
     { label: 'Report dates', icon: 'file-text', value: (
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {batch.ntpDate || 'not recorded'} · Report {batch.reportDate || 'not recorded'}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>NTP {formatDate(batch.ntpDate) ?? (batch.ntpDate || 'not recorded')} · Report {batch.reportDate || 'not recorded'}</span>
     ) },
   ];
 }
@@ -254,7 +255,7 @@ export function BatchModal({ batch, onClose, rqmEdit }: { batch: Batch; onClose:
                 {sessions && <ProgressBar percent={sessions.pct} />}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
                   <span>{sessions ? `${sessions.total - Math.min(sessions.held, sessions.total)} sessions remaining` : 'Attendance not recorded yet'}</span>
-                  <span>{batch.approvedSeats ? `${batch.scholars}/${batch.approvedSeats} enrolled` : `${batch.scholars} enrolled`}</span>
+                  <span>{scholarCountLabel(batch)} enrolled</span>
                 </div>
               </div>
             </div>

@@ -45,6 +45,9 @@ const dayMs = 86_400_000;
 /** A date with no year in it needs `fallbackYear`; without one it is unreadable (null), never a guessed year. */
 function parseDate(value: string | undefined | null, fallbackYear?: number): Date | null {
   if (!value) return null;
+  // The data layer hands over yyyy-mm-dd (e.g. ntp_date, start_date).
+  const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
   const clean = value.replace(/^by\s+/i, '').trim();
   const m = clean.match(/([A-Za-z]{3,})\s+(\d{1,2})(?:,\s*(\d{4}))?/);
   if (!m) return null;

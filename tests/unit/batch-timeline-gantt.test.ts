@@ -67,6 +67,12 @@ describe('ganttData', () => {
     expect(row.phases.map((p) => p.key)).toEqual(['prep', 'train', 'entre', 'bill']);
   });
 
+  it('reads the yyyy-mm-dd dates the data layer provides', () => {
+    const [row] = ganttData([fixtureBatch({ aouDate: '2026-01-01', ntpDate: '2026-01-15', trainingStart: '2026-02-01' })]);
+    expect(row.phases.find((p) => p.key === 'prep')?.s).toEqual(new Date(2026, 0, 1));
+    expect(row.phases.find((p) => p.key === 'train')?.s).toEqual(new Date(2026, 1, 1));
+  });
+
   it('omits the bill phase when the billing deadline is not after the billing-window start', () => {
     const [row] = ganttData([
       fixtureBatch({

@@ -1,4 +1,4 @@
-// Browser-only: reads the text of an NTP PDF on the user's device. The file is never uploaded.
+// Browser-only: reads the text of an NTP PDF on the user's device. Whether the file is then stored is up to the caller.
 import { EVIDENCE_MAX_BYTES } from '@/modules/documents/domain/evidencePath';
 import { joinPdfTextItems, type NtpReadResult, type PdfTextPiece } from '@/modules/batches/domain/rqm';
 

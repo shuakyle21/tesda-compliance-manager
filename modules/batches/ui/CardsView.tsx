@@ -15,6 +15,7 @@ import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
 import { takenRqmCodes } from '@/modules/batches/domain/rqm';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
+import { AddBatch, type AddBatchProps } from './AddBatch';
 import { filterBatches } from './filter';
 import type { Batch } from '@/shared/types';
 
@@ -23,7 +24,18 @@ import type { Batch } from '@/shared/types';
  * the client never re-formats it in another timezone). It replaced a
  * hardcoded "loaded at 14:02" (audit A19).
  */
-export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; loadedAt: string | null; rqmEdit?: RqmEdit }) {
+export function CardsView({
+  batches,
+  loadedAt,
+  rqmEdit,
+  addBatch,
+}: {
+  batches: Batch[];
+  loadedAt: string | null;
+  rqmEdit?: RqmEdit;
+  /** Admin/coordinator only; absent for every other role. */
+  addBatch?: AddBatchProps;
+}) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -39,7 +51,7 @@ export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; lo
         {loadedAt && <span className="subline">Data as of {loadedAt}</span>}
       </div>
 
-      <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} />
+      <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} action={addBatch && <AddBatch {...addBatch} />} />
 
       {filtered.length === 0 ? (
         <EmptyState heading="No batches match" sub="Try clearing the search or program filter." />

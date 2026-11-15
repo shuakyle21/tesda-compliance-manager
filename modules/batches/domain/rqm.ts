@@ -15,7 +15,7 @@ export function displayBatchId(b: Pick<Batch, 'id' | 'rqmCode'>): string {
 // ---------------------------------------------------------------------------
 
 /** tranche - year - program - provider - sequence, e.g. RQM3-2026-CFSP-0000-0001 */
-const RQM_CODE_PATTERN = /^RQM\d+-\d{4}-[A-Z]+-\d+-\d+$/;
+export const RQM_CODE_PATTERN = /^RQM\d+-\d{4}-[A-Z]+-\d+-\d+$/;
 const RQM_CODE_MAX_LENGTH = 64;
 
 /** Four parts: the NTP's request number, not a batch code. */

@@ -22,6 +22,7 @@ import { filterBatches } from './filter';
 import { DOC_TIER_ON_TRACK, criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress } from '@/modules/batches/domain/progress';
+import { scholarCountLabel } from '@/modules/batches/domain/scholars';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export function TableView({
@@ -180,7 +181,7 @@ function TableRow({
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{batch.trainer.split(' ').slice(-1)[0]}</span>
         </div>
       </td>
-      <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', textAlign: 'right' }}>{batch.scholars}</td>
+      <td style={{ ...cellStyle, fontFamily: 'var(--font-mono)', color: 'var(--color-text-secondary)', textAlign: 'right' }}>{scholarCountLabel(batch)}</td>
       <td style={cellStyle}><SessionCell batch={batch} /></td>
       <td style={cellStyle}>
         {isBillingReady(batch) ? <BillingReadyBadge pulse /> : <UrgencyIndicator days={batch.daysToBilling} variant="badge" />}

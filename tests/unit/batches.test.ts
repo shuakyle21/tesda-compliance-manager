@@ -32,6 +32,8 @@ function fixtureRow(overrides: Partial<BatchRowWithProgram> = {}): BatchRowWithP
     progress_percent: 60,
     billing_report_status: 'missing',
     official_system_reference: null,
+    ntp_date: null,
+    approved_slots: null,
     created_by: null,
     updated_by: null,
     created_at: '2026-01-01T00:00:00.000Z',
@@ -42,6 +44,20 @@ function fixtureRow(overrides: Partial<BatchRowWithProgram> = {}): BatchRowWithP
     ...overrides,
   };
 }
+
+describe('mapBatchRow — NTP date', () => {
+  it('maps the date printed on the NTP, and leaves it unset when none is recorded', () => {
+    expect(mapBatchRow(fixtureRow({ ntp_date: '2026-04-15' })).ntpDate).toBe('2026-04-15');
+    expect(mapBatchRow(fixtureRow()).ntpDate).toBeUndefined();
+  });
+});
+
+describe('mapBatchRow — approved slots', () => {
+  it('maps approved slots as the required scholar count, and leaves it unset when none is recorded', () => {
+    expect(mapBatchRow(fixtureRow({ approved_slots: 25 })).approvedSeats).toBe(25);
+    expect(mapBatchRow(fixtureRow()).approvedSeats).toBeUndefined();
+  });
+});
 
 describe('mapBatchRow', () => {
   it('gives the batch its display id and name from batch_code (no section)', () => {

@@ -36,7 +36,7 @@ function batchWith(documents: Record<string, DocRecord>): Batch {
 /** A catalog covering every blocking reason plus both on-file statuses. */
 const CATALOG: DocumentRequirement[] = [
   req('ntp', 'Notice to Proceed'),
-  req('aou', 'Agreement of Undertaking'),
+  req('aou', 'Affidavit of Undertaking'),
   req('tip_report', 'Training Induction Program Report', false),
   req('lamr', 'Learner Attendance and Monitoring Report'),
   req('training_schedule', 'Training Schedule', false),
@@ -168,7 +168,7 @@ describe('gate and measurement deliberately disagree (ADR-004 D2 vs D4)', () => 
   it('excludes untracked from compliance but counts it as a blocker', () => {
     // One requirement tracked and verified, one never recorded.
     const batch = batchWith({ ntp: doc('verified') });
-    const catalog = [req('ntp', 'Notice to Proceed'), req('aou', 'Agreement of Undertaking')];
+    const catalog = [req('ntp', 'Notice to Proceed'), req('aou', 'Affidavit of Undertaking')];
 
     // Measurement (D2): untracked leaves the numerator AND denominator, so the
     // batch reads as fully compliant on what it actually tracks.
