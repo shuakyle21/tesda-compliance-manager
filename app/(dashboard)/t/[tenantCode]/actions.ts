@@ -24,9 +24,9 @@ import { revalidatePath } from 'next/cache';
 import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { appendActivity } from '@/modules/activity/data/activity';
 import { getBatchesSnapshot, setBatchRqmCode, type SetRqmResult } from '@/modules/batches/data/batches';
-import { createBatchesFromNtp, type CreateBatchesResult } from '@/modules/batches/data/createBatches';
+import { createBatchesFromNtp, findTakenRqmCodes, type CreateBatchesResult } from '@/modules/batches/data/createBatches';
 import { checkRqmCode, type RqmFormState } from '@/modules/batches/domain/rqm';
-import { draftRowsFromJson, manilaToday, validateNtpSubmission, type NtpFormState, type NtpSubmission } from '@/modules/batches/domain/ntp';
+import { draftRowsFromJson, manilaToday, validateNtpSubmission, type NtpFormState, type NtpSchool, type NtpSubmission } from '@/modules/batches/domain/ntp';
 import { uploadEvidence, type EvidenceUploadResult } from '@/modules/documents/data/evidence';
 import { EVIDENCE_REJECTION_COPY, checkPickedEvidence, evidenceExtensionOf } from '@/modules/documents/domain/evidencePath';
 import { getAouYears } from '@/modules/tenancy/data/tenantAou';
@@ -148,9 +148,10 @@ export async function setBatchRqmCodeAction(
 //
 // Same security shape as above: school from the URL code, role from
 // `profiles.role`, every field re-validated through `modules/batches/domain/ntp`.
-// The files are stored FIRST, then one database transaction writes the batches,
-// the school's AOU record (when attached) and the checklist rows (NTP8), so a
-// failed upload writes nothing. The boundary is RLS on every table the
+// Codes already on a batch are looked up first, then the files are stored, then
+// one database transaction writes the batches, the school's AOU record (when
+// attached) and the checklist rows (NTP8), so a failed upload writes nothing
+// and a repeat upload stores nothing. The boundary is RLS on every table the
 // `security invoker` function touches.
 // ---------------------------------------------------------------------------
 
@@ -206,14 +207,19 @@ async function authorizeCreate(tenantCode: string): Promise<Step<{ scope: Tenant
 }
 
 /** The rows and dates, re-validated through the domain, and the NTP file. */
-async function readSubmission(formData: FormData): Promise<Step<{ submission: NtpSubmission; ntp: PickedFile }>> {
+async function readSubmission(
+  formData: FormData,
+  school: NtpSchool,
+): Promise<Step<{ submission: NtpSubmission; ntp: PickedFile }>> {
   const checked = validateNtpSubmission(
     {
+      schoolName: text(formData, 'schoolName'),
       receiptDate: text(formData, 'receiptDate'),
       ntpDate: text(formData, 'ntpDate'),
       approvalDate: text(formData, 'approvalDate'),
       rows: draftRowsFromJson(text(formData, 'rows')),
     },
+    school,
     manilaToday(new Date()),
   );
   if (!checked.ok) return stop(invalid(checked.error));
@@ -222,6 +228,17 @@ async function readSubmission(formData: FormData): Promise<Step<{ submission: Nt
   const ntp = checkPickedEvidence(file, { pdfOnly: true, label: 'Notice to Proceed', head: await headOf(file) });
   if (!ntp.ok) return stop(invalid(ntp.message));
   return { ok: true, value: { submission: checked.value, ntp: { file, mimeType: ntp.mimeType } } };
+}
+
+/** Stops when a code is already on a batch here, before anything is uploaded. */
+async function takenCodes(tenantId: string, codes: string[]): Promise<Step<null>> {
+  const found = await findTakenRqmCodes(tenantId, codes);
+  if (found.status !== 'ok') return stop(NTP_SAVE_FAILED);
+  if (found.codes.length === 0) return { ok: true, value: null };
+  const list = found.codes.join(', ');
+  return stop(invalid(found.codes.length === 1
+    ? `${list} is already recorded on a batch in this school.`
+    : `${list} are already recorded on batches in this school.`));
 }
 
 /** The AOU file to store: none when one is on file for the receipt year, else the attached one (ADR-009 AOU2). */
@@ -262,9 +279,14 @@ export async function createBatchesFromNtpAction(_previous: NtpFormState, formDa
   if (!who.ok) return who.state;
   const { scope, profile } = who.value;
 
-  const request = await readSubmission(formData);
+  // The school's facts come from the registry and the URL scope, never the form.
+  const school = { name: scope.name, province: profile.tenants.find((t) => t.id === scope.tenantId)?.province ?? '' };
+  const request = await readSubmission(formData, school);
   if (!request.ok) return request.state;
   const { submission, ntp } = request.value;
+
+  const taken = await takenCodes(scope.tenantId, submission.rows.map((r) => r.rqmCode));
+  if (!taken.ok) return taken.state;
 
   const aou = await aouToStore(scope.tenantId, submission.receiptDate, formData);
   if (!aou.ok) return aou.state;
@@ -275,7 +297,8 @@ export async function createBatchesFromNtpAction(_previous: NtpFormState, formDa
   const files = await storeFiles(scope.tenantId, first, fiscalYearOf(submission.receiptDate), ntp, aou.value);
   if (!files.ok) return files.state;
 
-  // shortcut: a refused save leaves the stored files unreferenced; TES-107 removes them.
+  // shortcut: the code pre-check removes the common repeat upload, but a race between
+  // two saves (or any other refused save) can still leave stored files unreferenced; TES-107 removes them.
   const created = await createBatchesFromNtp({
     tenantId: scope.tenantId,
     receiptDate: submission.receiptDate,

@@ -72,20 +72,29 @@ function AddBatchModal({ tenantCode, province, aouYears, action, onClose }: AddB
   const [readError, setReadError] = useState<string | null>(null);
   const [truncated, setTruncated] = useState(false);
   const [draft, setDraft] = useState<NtpDraft | null>(null);
+  // Whether the PDF gave a school name. Fixed at read time so the field does not flip while typing.
+  const [schoolRead, setSchoolRead] = useState(false);
   const [receiptDate, setReceiptDate] = useState('');
   const [aouFile, setAouFile] = useState<File | null>(null);
   const [state, dispatch, pending] = useActionState(action, IDLE);
+  // The server's message is about what was sent; once anything changes it no longer applies.
+  const [dismissed, setDismissed] = useState<NtpFormState | null>(null);
   // Latest read wins: a slower earlier read must not overwrite a newer file.
   const latest = useRef(0);
 
   const needsAou = aouNeeded(state, aouYears, receiptDate);
-  const message = readError ?? failureText(state);
+  const message = readError ?? (state === dismissed ? null : failureText(state));
   const saved = state.status === 'saved' ? state : null;
 
   useFocusTrap(dialog, pending ? () => {} : onClose);
 
+  function edited() {
+    setDismissed(state);
+  }
+
   async function read(file: File | undefined) {
     if (!file) return;
+    edited();
     const mine = ++latest.current;
     setReading(true);
     setReadError(null);
@@ -98,10 +107,12 @@ function AddBatchModal({ tenantCode, province, aouYears, action, onClose }: AddB
     if (parsed.rows.length === 0) return setReadError('No allocation rows were found in this PDF.');
     setNtpFile(file);
     setTruncated(Boolean(result.truncated));
+    setSchoolRead(parsed.schoolName !== '');
     setDraft(parsed);
   }
 
   function updateRow(i: number, patch: Partial<NtpDraftRow>) {
+    edited();
     setDraft((d) => d && { ...d, rows: d.rows.map((r, j) => (j === i ? { ...r, ...patch } : r)) });
   }
 
@@ -114,6 +125,7 @@ function AddBatchModal({ tenantCode, province, aouYears, action, onClose }: AddB
     setReadError(null);
     const fd = new FormData();
     fd.set('tenantCode', tenantCode);
+    fd.set('schoolName', draft.schoolName);
     fd.set('receiptDate', receiptDate);
     fd.set('ntpDate', draft.ntpDate);
     fd.set('approvalDate', draft.approvalDate);
@@ -154,13 +166,23 @@ function AddBatchModal({ tenantCode, province, aouYears, action, onClose }: AddB
                 <DraftForm
                   id={id}
                   draft={draft}
+                  schoolRead={schoolRead}
                   receiptDate={receiptDate}
                   needsAou={needsAou}
                   aouFile={aouFile}
                   disabled={pending}
-                  onDraft={setDraft}
-                  onReceiptDate={setReceiptDate}
-                  onAouFile={setAouFile}
+                  onDraft={(d) => {
+                    edited();
+                    setDraft(d);
+                  }}
+                  onReceiptDate={(v) => {
+                    edited();
+                    setReceiptDate(v);
+                  }}
+                  onAouFile={(f) => {
+                    edited();
+                    setAouFile(f);
+                  }}
                   onRow={updateRow}
                 />
               )}
@@ -197,10 +219,11 @@ function ErrorLine({ message }: { message: string | null }) {
 }
 
 function DraftForm({
-  id, draft, receiptDate, needsAou, aouFile, disabled, onDraft, onReceiptDate, onAouFile, onRow,
+  id, draft, schoolRead, receiptDate, needsAou, aouFile, disabled, onDraft, onReceiptDate, onAouFile, onRow,
 }: {
   id: string;
   draft: NtpDraft;
+  schoolRead: boolean;
   receiptDate: string;
   needsAou: boolean;
   aouFile: File | null;
@@ -213,7 +236,7 @@ function DraftForm({
   const count = draft.rows.length;
   return (
     <>
-      <NtpHeader id={id} draft={draft} disabled={disabled} onChange={(patch) => onDraft({ ...draft, ...patch })} />
+      <NtpHeader id={id} draft={draft} schoolRead={schoolRead} disabled={disabled} onChange={(patch) => onDraft({ ...draft, ...patch })} />
       <DateField
         id={`${id}-receipt`}
         label="Date your school received the NTP"
@@ -304,13 +327,24 @@ function Note({ icon, children }: { icon: 'alert-triangle' | 'check' | 'info-cir
   );
 }
 
-function NtpHeader({ id, draft, disabled, onChange }: { id: string; draft: NtpDraft; disabled: boolean; onChange: (patch: Partial<NtpDraft>) => void }) {
+function NtpHeader({ id, draft, schoolRead, disabled, onChange }: { id: string; draft: NtpDraft; schoolRead: boolean; disabled: boolean; onChange: (patch: Partial<NtpDraft>) => void }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-      <div className="user-form-field">
-        <span className="user-form-label">School on the NTP</span>
-        <span style={{ fontSize: 13 }}>{draft.schoolName || 'Not read from the PDF'}</span>
-      </div>
+      {schoolRead ? (
+        <div className="user-form-field">
+          <span className="user-form-label">School on the NTP</span>
+          <span style={{ fontSize: 13 }}>{draft.schoolName}</span>
+        </div>
+      ) : (
+        <TextField
+          id={`${id}-school`}
+          label="School name shown on the NTP"
+          hint="The school name could not be read from the PDF. Type it as shown on the Notice to Proceed."
+          value={draft.schoolName}
+          disabled={disabled}
+          onChange={(name) => onChange({ schoolName: name })}
+        />
+      )}
       <DateField id={`${id}-ntpdate`} label="Date on the NTP" value={draft.ntpDate} disabled={disabled} onChange={(ntpDate) => onChange({ ntpDate })} />
       <DateField id={`${id}-approval`} label="Approval date shown on the NTP" value={draft.approvalDate} disabled={disabled} onChange={(approvalDate) => onChange({ approvalDate })} />
     </div>
@@ -347,8 +381,9 @@ function RowCard({ id, n, row, disabled, onChange }: { id: string; n: number; ro
         <span className="user-form-label">Program</span>
         <span style={{ fontSize: 13 }}>{program || 'Read from the RQM code'}</span>
       </div>
+      <TextField id={`${id}-province`} label="Province" value={row.province} disabled={disabled} onChange={(province) => onChange({ province })} />
       <TextField id={`${id}-qual`} label="Qualification" value={row.qualification} disabled={disabled} onChange={(qualification) => onChange({ qualification })} />
-      <TextField id={`${id}-slots`} label="Approved slots" value={row.approvedSlots} disabled={disabled} inputMode="numeric" onChange={(approvedSlots) => onChange({ approvedSlots })} />
+      <TextField id={`${id}-slots`} label="Approved slots" value={row.approvedSlots} disabled={disabled} inputMode="numeric" maxLength={4} onChange={(approvedSlots) => onChange({ approvedSlots })} />
       <TextField id={`${id}-amount`} label="Total amount (PHP)" value={row.totalAmount} disabled={disabled} inputMode="decimal" onChange={(totalAmount) => onChange({ totalAmount })} />
       <DateField id={`${id}-start`} label="Indicative start date" value={row.indicativeStartDate} disabled={disabled} onChange={(indicativeStartDate) => onChange({ indicativeStartDate })} />
     </div>
@@ -356,10 +391,10 @@ function RowCard({ id, n, row, disabled, onChange }: { id: string; n: number; ro
 }
 
 function TextField({
-  id, label, value, disabled, mono, inputMode, onChange,
+  id, label, hint, value, disabled, mono, inputMode, maxLength, onChange,
 }: {
-  id: string; label: string; value: string; disabled: boolean; mono?: boolean;
-  inputMode?: 'numeric' | 'decimal'; onChange: (v: string) => void;
+  id: string; label: string; hint?: string; value: string; disabled: boolean; mono?: boolean;
+  inputMode?: 'numeric' | 'decimal'; maxLength?: number; onChange: (v: string) => void;
 }) {
   return (
     <div className="user-form-field">
@@ -370,11 +405,14 @@ function TextField({
         type="text"
         autoComplete="off"
         inputMode={inputMode}
+        maxLength={maxLength}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         value={value}
         disabled={disabled}
         style={mono ? { fontFamily: 'var(--font-mono)' } : undefined}
         onChange={(e) => onChange(e.target.value)}
       />
+      {hint && <p className="user-form-hint" id={`${id}-hint`}>{hint}</p>}
     </div>
   );
 }

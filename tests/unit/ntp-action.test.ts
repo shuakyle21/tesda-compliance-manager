@@ -8,6 +8,7 @@ const m = vi.hoisted(() => ({
   getAouYears: vi.fn(),
   uploadEvidence: vi.fn(),
   createBatchesFromNtp: vi.fn(),
+  findTakenRqmCodes: vi.fn(),
 }));
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
@@ -16,19 +17,20 @@ vi.mock('@/modules/auth/data/role', () => ({ resolveTrustedRole: m.resolveTruste
 vi.mock('@/modules/activity/data/activity', () => ({ appendActivity: m.appendActivity }));
 vi.mock('@/modules/tenancy/data/tenantAou', () => ({ getAouYears: m.getAouYears }));
 vi.mock('@/modules/documents/data/evidence', () => ({ uploadEvidence: m.uploadEvidence }));
-vi.mock('@/modules/batches/data/createBatches', () => ({ createBatchesFromNtp: m.createBatchesFromNtp }));
+vi.mock('@/modules/batches/data/createBatches', () => ({ createBatchesFromNtp: m.createBatchesFromNtp, findTakenRqmCodes: m.findTakenRqmCodes }));
 // The other action in the same file imports the batches data layer.
 vi.mock('@/modules/batches/data/batches', () => ({ getBatchesSnapshot: vi.fn(), setBatchRqmCode: vi.fn() }));
 
 const TENANT = '11111111-1111-4111-8111-111111111111';
 const OK_SCOPE = {
   status: 'ok',
-  scope: { tenantId: TENANT, code: 'nen' },
+  scope: { tenantId: TENANT, code: 'nen', name: 'Nenita Farm Rice-Based Farm' },
   profile: { id: 'p-1', role: 'coordinator', tenants: [{ id: TENANT, province: 'South Cotabato' }] },
 };
 
 const ROW = {
   rqmCode: 'RQM3-2026-CFSP-1263-0009',
+  province: 'South Cotabato',
   qualification: 'Agricultural Crops Production NC II',
   approvedSlots: '17',
   totalAmount: '416343.60',
@@ -41,6 +43,7 @@ function form(fields: Record<string, string | File> = {}): FormData {
   const f = new FormData();
   const all: Record<string, string | File> = {
     tenantCode: 'nen',
+    schoolName: 'NENITA FARM RICE-BASED FARM',
     receiptDate: '2026-04-16',
     ntpDate: '2026-04-15',
     approvalDate: '2026-04-06',
@@ -67,6 +70,7 @@ describe('createBatchesFromNtpAction', () => {
       status: 'ok',
       path: `${i.tenantId}/${i.batchId}/${i.documentKey}/${i.filename}`,
     }));
+    m.findTakenRqmCodes.mockResolvedValue({ status: 'ok', codes: [] });
     m.createBatchesFromNtp.mockImplementation(async (a: { rows: { id: string }[] }) => ({ status: 'created', batchIds: a.rows.map((r) => r.id) }));
   });
 
@@ -168,6 +172,70 @@ describe('createBatchesFromNtpAction', () => {
     m.createBatchesFromNtp.mockResolvedValue(refusal);
     expect(await createBatchesFromNtpAction(IDLE, form())).toEqual(expected);
     expect(m.appendActivity).not.toHaveBeenCalled();
+  });
+
+  it('refuses a taken code before uploading anything, naming it', async () => {
+    m.findTakenRqmCodes.mockResolvedValue({ status: 'ok', codes: ['RQM3-2026-CFSP-1263-0009'] });
+    expect(await createBatchesFromNtpAction(IDLE, form())).toEqual({
+      status: 'invalid',
+      message: 'RQM3-2026-CFSP-1263-0009 is already recorded on a batch in this school.',
+    });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+    expect(m.createBatchesFromNtp).not.toHaveBeenCalled();
+  });
+
+  it('names every taken code, in the plural', async () => {
+    const second = { ...ROW, rqmCode: 'RQM3-2026-CFSP-1263-0010' };
+    m.findTakenRqmCodes.mockResolvedValue({ status: 'ok', codes: [ROW.rqmCode, second.rqmCode] });
+    expect(await createBatchesFromNtpAction(IDLE, form({ rows: JSON.stringify([ROW, second]) }))).toEqual({
+      status: 'invalid',
+      message: 'RQM3-2026-CFSP-1263-0009, RQM3-2026-CFSP-1263-0010 are already recorded on batches in this school.',
+    });
+  });
+
+  it.each(['sync-failed', 'unconfigured'])('returns the save-failed state without uploading when the code check is %s', async (status) => {
+    m.findTakenRqmCodes.mockResolvedValue({ status });
+    expect(await createBatchesFromNtpAction(IDLE, form())).toEqual({ status: 'error', message: "The batches couldn't be saved. Nothing was saved. Try again." });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+    expect(m.createBatchesFromNtp).not.toHaveBeenCalled();
+  });
+
+  it('checks the validated codes for the scope school before the first upload', async () => {
+    await createBatchesFromNtpAction(IDLE, form({ rows: JSON.stringify([{ ...ROW, rqmCode: ' rqm3-2026-cfsp-1263-0009 ' }]) }));
+    expect(m.findTakenRqmCodes).toHaveBeenCalledWith(TENANT, ['RQM3-2026-CFSP-1263-0009']);
+    expect(m.findTakenRqmCodes.mock.invocationCallOrder[0]).toBeLessThan(m.uploadEvidence.mock.invocationCallOrder[0]!);
+  });
+
+  it('refuses a Notice to Proceed for another school, uploading nothing', async () => {
+    const result = await createBatchesFromNtpAction(IDLE, form({ schoolName: 'Other Training Center' }));
+    expect(result).toMatchObject({ status: 'invalid', message: expect.stringContaining('different school') });
+    expect(m.findTakenRqmCodes).not.toHaveBeenCalled();
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+  });
+
+  it('compares against the school from the URL scope: a posted name matching another school is refused', async () => {
+    m.resolveRouteScope.mockResolvedValue({ ...OK_SCOPE, scope: { ...OK_SCOPE.scope, name: 'Other Training Center' } });
+    // The form names the school the scope used to have; the scope now says otherwise.
+    const result = await createBatchesFromNtpAction(IDLE, form());
+    expect(result).toMatchObject({ status: 'invalid', message: expect.stringContaining('this school is "Other Training Center"') });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+    // The same name posted as the NTP school is accepted only because it equals the scope name.
+    expect(await createBatchesFromNtpAction(IDLE, form({ schoolName: 'Other Training Center' }))).toMatchObject({ status: 'saved' });
+  });
+
+  it('cannot be made to match by extra form fields that carry a school name', async () => {
+    const result = await createBatchesFromNtpAction(
+      IDLE,
+      form({ schoolName: 'Other Training Center', name: 'Other Training Center', schoolRegisteredName: 'Other Training Center', tenantName: 'Other Training Center' }),
+    );
+    expect(result).toMatchObject({ status: 'invalid', message: expect.stringContaining('this school is "Nenita Farm Rice-Based Farm"') });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
+  });
+
+  it('refuses a row in another province, uploading nothing', async () => {
+    const result = await createBatchesFromNtpAction(IDLE, form({ rows: JSON.stringify([{ ...ROW, province: 'Laguna' }]) }));
+    expect(result).toEqual({ status: 'invalid', message: 'Row 1 is for a different province. This school is in South Cotabato.' });
+    expect(m.uploadEvidence).not.toHaveBeenCalled();
   });
 
   it('flags logFailed when the activity entry cannot be written', async () => {
