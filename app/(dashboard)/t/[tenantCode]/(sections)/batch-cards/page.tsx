@@ -36,13 +36,11 @@ export default async function BatchCardsPage({ params }: { params: Promise<{ ten
   // Usability only — the action re-checks the role and RLS refuses the write.
   // Trusted role (`profiles.role`), never the `?role=` preview override.
   const trustedRole = await resolveTrustedRole(profile.role);
-  const rqmEdit =
-    trustedRole === 'admin' || trustedRole === 'coordinator'
-      ? { tenantCode: scope.code, action: setBatchRqmCodeAction }
-      : undefined;
+  const canEditBatches = trustedRole === 'admin' || trustedRole === 'coordinator';
+  const rqmEdit = canEditBatches ? { tenantCode: scope.code, action: setBatchRqmCodeAction } : undefined;
   // "Add new batch" (TES-105): admin/coordinator, and only over an authoritative `ok` snapshot.
   const addBatch: AddBatchProps | undefined =
-    rqmEdit && snapshot.status === 'ok'
+    canEditBatches && snapshot.status === 'ok'
       ? {
           tenantCode: scope.code,
           province: profile.tenants.find((t) => t.id === scope.tenantId)?.province ?? '',

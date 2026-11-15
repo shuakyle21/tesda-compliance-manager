@@ -83,3 +83,42 @@ export async function createBatchesFromNtp(args: {
     return { status: 'sync-failed' };
   }
 }
+
+export type TakenRqmCodesResult =
+  | { status: 'ok'; codes: string[] }
+  | { status: 'sync-failed' }
+  | { status: 'unconfigured' };
+
+/**
+ * Which of these RQM codes are already on a batch of the school, in the order
+ * submitted. The create function writes the code into both `rqm_code` and
+ * `batch_code`, and both are unique, so both are checked. Asked before any file
+ * is stored so a repeat upload leaves nothing behind; the unique constraints
+ * still decide a race between two saves. `tenant_id` is scope selection on top
+ * of RLS.
+ */
+export async function findTakenRqmCodes(tenantId: string, codes: string[]): Promise<TakenRqmCodesResult> {
+  if (!isSupabaseConfigured()) return { status: 'unconfigured' };
+  if (codes.length === 0) return { status: 'ok', codes: [] };
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const [byRqm, byBatch] = await Promise.all([
+      supabase.from('batches').select('rqm_code').eq('tenant_id', tenantId).in('rqm_code', codes),
+      supabase.from('batches').select('batch_code').eq('tenant_id', tenantId).in('batch_code', codes),
+    ]);
+    const error = byRqm.error ?? byBatch.error;
+    if (error) {
+      console.error('findTakenRqmCodes failed', error);
+      return { status: 'sync-failed' };
+    }
+    const used = new Set<string>([
+      ...(byRqm.data ?? []).map((r) => r.rqm_code),
+      ...(byBatch.data ?? []).map((r) => r.batch_code),
+    ].filter((c): c is string => typeof c === 'string'));
+    return { status: 'ok', codes: [...new Set(codes)].filter((c) => used.has(c)) };
+  } catch (err) {
+    console.error('findTakenRqmCodes failed', err);
+    return { status: 'sync-failed' };
+  }
+}

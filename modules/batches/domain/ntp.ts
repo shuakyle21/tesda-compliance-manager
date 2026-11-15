@@ -7,11 +7,13 @@
  * because nothing from the browser is trusted.
  */
 
-import { RQM_CODE_PATTERN, findRqmCodes, normalizeRqmCode } from './rqm';
+import { RQM_CODE_MAX_LENGTH, RQM_CODE_PATTERN, findRqmCodes, normalizeRqmCode } from './rqm';
 
 /** One allocation row as the coordinator edits it. Every field is text so an unread value can be typed. */
 export type NtpDraftRow = {
   rqmCode: string;
+  /** The school's province when the row starts with it, '' when it could not be read. */
+  province: string;
   qualification: string;
   approvedSlots: string;
   totalAmount: string;
@@ -55,6 +57,18 @@ const MONTHS = [
 // U+2010..U+2015, U+2212, U+FF0D -> '-'; the NTP prints U+2010 everywhere.
 const DASHES = /[‐-―−－]/g;
 
+/**
+ * Form used to compare school names and provinces. A deliberate reading of
+ * "trim, collapse spaces, drop punctuation, ignore case": every run of
+ * characters that is not a letter or digit (Unicode hyphens included) becomes
+ * one space. Accents are ignored too, because the PDF text layer and the
+ * registry may spell a letter such as n-tilde differently (one character or a
+ * letter plus a combining mark).
+ */
+export function normalizeForMatch(input: string): string {
+  return input.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+}
+
 function isRealDate(y: number, m: number, d: number): boolean {
   const t = new Date(Date.UTC(y, m - 1, d));
   return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
@@ -97,7 +111,8 @@ function tableRegion(text: string): string {
  * "<no> <code> <province + qualification> <slots> <amount> <start date>".
  * Province and qualification run together in the text layer, so the school's
  * own province (known from the registry) is what splits them; when the row does
- * not start with it, the whole run is offered as the qualification to correct.
+ * not start with it, the province is '' and the whole run is offered as the
+ * qualification to correct.
  */
 function parseRow(chunk: string, province: string): NtpDraftRow | null {
   const code = findRqmCodes(chunk)[0];
@@ -109,10 +124,15 @@ function parseRow(chunk: string, province: string): NtpDraftRow | null {
   const codeEnd = new RegExp(code.split('-').join(String.raw`\s*-\s*`)).exec(flat);
   const afterCode = codeEnd ? flat.slice(codeEnd.index + codeEnd[0].length) : '';
   let middle = (tail ? afterCode.slice(0, afterCode.length - tail[0].length) : afterCode).trim();
-  if (province && middle.toLowerCase().startsWith(province.toLowerCase())) middle = middle.slice(province.length).trim();
+  let rowProvince = '';
+  if (province && middle.toLowerCase().startsWith(province.toLowerCase())) {
+    rowProvince = province;
+    middle = middle.slice(province.length).trim();
+  }
 
   return {
     rqmCode: code,
+    province: rowProvince,
     qualification: middle,
     approvedSlots: tail?.[1] ?? '',
     totalAmount: tail ? tail[2]!.replace(/,/g, '') : '',
@@ -158,17 +178,26 @@ export function programOfRqmCode(code: string): string {
 export type NtpValidation = { ok: true; value: NtpSubmission } | { ok: false; error: string };
 
 const MAX_QUALIFICATION_LENGTH = 200;
+/** A safety limit far above a real class size, chosen so the value always fits a database integer. Not a TESDA rule. */
+export const MAX_APPROVED_SLOTS = 1000;
+/** A safety limit far above a real NTP, so a wrong file cannot produce a huge save. Not a TESDA rule. */
+export const MAX_NTP_ROWS = 100;
 const AMOUNT_PATTERN = /^\d{1,12}(\.\d{1,2})?$/;
 
 function rowError(row: NtpDraftRow, n: number): string | NtpBatchInput {
   const at = `Row ${n}`;
   const code = normalizeRqmCode(row.rqmCode);
-  if (!RQM_CODE_PATTERN.test(code)) return `${at}: the RQM code should look like RQM3-2026-CFSP-0000-0001.`;
+  if (code.length > RQM_CODE_MAX_LENGTH || !RQM_CODE_PATTERN.test(code)) return `${at}: the RQM code should look like RQM3-2026-CFSP-0000-0001.`;
   const qualification = row.qualification.replace(/\s+/g, ' ').trim();
   if (!qualification) return `${at}: enter the qualification.`;
   if (qualification.length > MAX_QUALIFICATION_LENGTH) return `${at}: the qualification is too long.`;
   const slots = row.approvedSlots.trim();
   if (!/^\d+$/.test(slots) || Number(slots) < 1) return `${at}: approved slots must be a whole number of at least 1.`;
+  // Leading zeros are dropped first, so the length check never depends on float precision.
+  const slotDigits = slots.replace(/^0+/, '');
+  if (slotDigits.length > String(MAX_APPROVED_SLOTS).length || Number(slotDigits) > MAX_APPROVED_SLOTS) {
+    return `${at}: approved slots cannot be more than ${MAX_APPROVED_SLOTS.toLocaleString('en-US')}.`;
+  }
   const amount = row.totalAmount.replace(/[₱,\s]/g, '');
   if (!AMOUNT_PATTERN.test(amount)) return `${at}: the total amount must be a number of pesos, not negative.`;
   const start = parseNtpDate(row.indicativeStartDate);
@@ -177,40 +206,82 @@ function rowError(row: NtpDraftRow, n: number): string | NtpBatchInput {
     rqmCode: code,
     programCode: programOfRqmCode(code),
     qualificationTitle: qualification,
-    approvedSlots: Number(slots),
+    approvedSlots: Number(slotDigits),
     totalAmount: amount,
     indicativeStartDate: start,
   };
 }
 
+/** The school the Notice to Proceed must belong to, from the registry (never from the form). */
+export type NtpSchool = { name: string; province: string };
+
+/** The NTP must name this school. */
+function schoolError(ntpSchoolName: string, school: NtpSchool): string | null {
+  const named = normalizeForMatch(ntpSchoolName);
+  if (!named) return 'Enter the school name shown on the Notice to Proceed.';
+  if (named !== normalizeForMatch(school.name)) {
+    return `This Notice to Proceed is for a different school. It names "${ntpSchoolName.trim()}", and this school is "${school.name}".`;
+  }
+  return null;
+}
+
+/** Every row must be in this school's province. */
+function provinceError(rows: NtpDraftRow[], school: NtpSchool): string | null {
+  const own = normalizeForMatch(school.province);
+  if (!own) return 'This school has no province on record. Set the province before recording a Notice to Proceed.';
+  for (const [i, row] of rows.entries()) {
+    const shown = normalizeForMatch(row.province);
+    if (!shown) return `Row ${i + 1}: enter the province shown on this row.`;
+    if (shown !== own) return `Row ${i + 1} is for a different province. This school is in ${school.province.trim()}.`;
+  }
+  return null;
+}
+
+/** The dates, in the order they are asked for. */
+function dateError(input: { receiptDate: string; ntpDate: string; approvalDate: string }, today: string): string | null {
+  const ntpDate = parseNtpDate(input.ntpDate);
+  if (!ntpDate) return 'Enter the date shown on the Notice to Proceed.';
+  if (!parseNtpDate(input.approvalDate)) return 'Enter the approval date shown on the Notice to Proceed.';
+  const receiptDate = parseNtpDate(input.receiptDate);
+  if (!receiptDate) return 'Enter the date your school received the Notice to Proceed.';
+  if (receiptDate > today) return 'The receipt date cannot be in the future.';
+  if (receiptDate < ntpDate) return 'The receipt date cannot be before the date on the Notice to Proceed.';
+  return null;
+}
+
 /**
  * What may be saved. `today` is the Manila date (see `manilaToday`). Any failed
- * row rejects the whole NTP (ADR-009 NTP1). The first problem found is reported.
+ * row rejects the whole NTP (ADR-009 NTP1). The first problem found is reported,
+ * in this order: school, province, dates, row count, each row, duplicate codes.
  */
 export function validateNtpSubmission(
-  input: { receiptDate: string; ntpDate: string; approvalDate: string; rows: NtpDraftRow[] },
+  input: { schoolName: string; receiptDate: string; ntpDate: string; approvalDate: string; rows: NtpDraftRow[] },
+  school: NtpSchool,
   today: string,
 ): NtpValidation {
-  const ntpDate = parseNtpDate(input.ntpDate);
-  if (!ntpDate) return { ok: false, error: 'Enter the date shown on the Notice to Proceed.' };
-  const approvalDate = parseNtpDate(input.approvalDate);
-  if (!approvalDate) return { ok: false, error: 'Enter the approval date shown on the Notice to Proceed.' };
-  const receiptDate = parseNtpDate(input.receiptDate);
-  if (!receiptDate) return { ok: false, error: 'Enter the date your school received the Notice to Proceed.' };
-  if (receiptDate > today) return { ok: false, error: 'The receipt date cannot be in the future.' };
-  if (receiptDate < ntpDate) return { ok: false, error: 'The receipt date cannot be before the date on the Notice to Proceed.' };
+  const early = schoolError(input.schoolName, school) ?? provinceError(input.rows, school) ?? dateError(input, today);
+  if (early) return { ok: false, error: early };
   if (input.rows.length === 0) return { ok: false, error: 'No allocation rows were found in this Notice to Proceed.' };
+  if (input.rows.length > MAX_NTP_ROWS) {
+    return { ok: false, error: `A Notice to Proceed can have at most ${MAX_NTP_ROWS} rows here. This one has ${input.rows.length}.` };
+  }
 
   const rows: NtpBatchInput[] = [];
-  const seen = new Set<string>();
   for (const [i, row] of input.rows.entries()) {
     const checked = rowError(row, i + 1);
     if (typeof checked === 'string') return { ok: false, error: checked };
-    if (seen.has(checked.rqmCode)) return { ok: false, error: `${checked.rqmCode} appears more than once in this Notice to Proceed.` };
-    seen.add(checked.rqmCode);
     rows.push(checked);
   }
-  return { ok: true, value: { receiptDate, ntpDate, approvalDate, rows } };
+  const seen = new Set<string>();
+  for (const { rqmCode } of rows) {
+    if (seen.has(rqmCode)) return { ok: false, error: `${rqmCode} appears more than once in this Notice to Proceed.` };
+    seen.add(rqmCode);
+  }
+  // Dates were checked above, so these parses cannot fail.
+  return {
+    ok: true,
+    value: { receiptDate: parseNtpDate(input.receiptDate)!, ntpDate: parseNtpDate(input.ntpDate)!, approvalDate: parseNtpDate(input.approvalDate)!, rows },
+  };
 }
 
 /**
@@ -231,6 +302,7 @@ export function draftRowsFromJson(raw: string): NtpDraftRow[] {
     const s = (k: keyof NtpDraftRow) => (typeof o[k] === 'string' ? (o[k] as string) : '');
     return {
       rqmCode: s('rqmCode'),
+      province: s('province'),
       qualification: s('qualification'),
       approvedSlots: s('approvedSlots'),
       totalAmount: s('totalAmount'),
