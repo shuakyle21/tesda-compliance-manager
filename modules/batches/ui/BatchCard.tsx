@@ -20,6 +20,7 @@ import { UrgencyIndicator, BillingReadyBadge } from '@/shared/ui/UrgencyIndicato
 import { urgencyTier } from '@/modules/batches/domain/urgency';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress, describeSessionProgress } from '@/modules/batches/domain/progress';
+import { scholarCountLabel } from '@/modules/batches/domain/scholars';
 import { formatDate } from '@/shared/dates';
 import type { Batch, UrgencyTier } from '@/shared/types';
 
@@ -87,7 +88,7 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
             </div>
           </Field>
           <Field label="Scholars" style={{ marginTop: 10 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-primary)' }}>{batch.scholars}</span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-primary)' }}>{scholarCountLabel(batch)}</span>
             <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginLeft: 6 }}>enrolled{batch.trainingDays ? ` · ${batch.trainingDays}` : ''}</span>
           </Field>
           <Field label="TIP" style={{ marginTop: 10 }}>
