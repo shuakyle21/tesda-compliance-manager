@@ -16,10 +16,12 @@
  * rather than the generator's `never`, matching this file's existing style.
  *
  * The T2MIS columns (`tenants.congressional_district`, `qualifications.cluster`,
- * `batches.training_calendar_code` / `.tenant_qualification_id`, and the 23
- * learner demographic/employment columns) were written by hand from
+ * `batches.training_calendar_code` / `.tenant_qualification_id`, and the
+ * `learner_details` table) were written by hand from
  * `supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql`,
- * which is NOT YET APPLIED. Regenerate and re-check once it is.
+ * which is now APPLIED (2026-11-11). Their Row and Insert shapes were checked
+ * field-by-field against `generate_typescript_types` on the live project and
+ * match.
  *
  * NOTE FOR A FUTURE CLEANUP: this file is hand-maintained and stubs every
  * table's `Relationships` as `[]`. That stub is what makes supabase-js unable
@@ -355,6 +357,33 @@ export interface Database {
           first_name: string;
           middle_name: string | null;
           extension_name: string | null;
+          assessment_result: AssessmentResult;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          batch_id: string;
+          learner_no?: string | null;
+          uli?: string | null;
+          last_name: string;
+          first_name: string;
+          middle_name?: string | null;
+          extension_name?: string | null;
+          assessment_result?: AssessmentResult;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['learners']['Insert']>;
+        Relationships: [];
+      };
+      learner_details: {
+        Row: {
+          learner_id: string;
+          tenant_id: string;
           contact_number: string | null;
           email: string | null;
           street_address: string | null;
@@ -378,21 +407,12 @@ export interface Database {
           employer_address: string | null;
           employer_classification: string | null;
           salary_range: string | null;
-          assessment_result: AssessmentResult;
-          is_active: boolean;
           created_at: string;
           updated_at: string;
         };
         Insert: {
-          id?: string;
+          learner_id: string;
           tenant_id: string;
-          batch_id: string;
-          learner_no?: string | null;
-          uli?: string | null;
-          last_name: string;
-          first_name: string;
-          middle_name?: string | null;
-          extension_name?: string | null;
           contact_number?: string | null;
           email?: string | null;
           street_address?: string | null;
@@ -416,12 +436,10 @@ export interface Database {
           employer_address?: string | null;
           employer_classification?: string | null;
           salary_range?: string | null;
-          assessment_result?: AssessmentResult;
-          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database['public']['Tables']['learners']['Insert']>;
+        Update: Partial<Database['public']['Tables']['learner_details']['Insert']>;
         Relationships: [];
       };
       documents: {
