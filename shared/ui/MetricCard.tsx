@@ -29,10 +29,12 @@ interface MetricCardProps {
   ariaLabel?: string;
 }
 
-const VARIANTS: Record<string, { tone?: string; statusIcon?: IconName }> = {
-  neutral: {},
-  warning: { tone: 'var(--color-amber-dk)', statusIcon: 'alert-circle' },
-  critical: { tone: 'var(--color-red-dk)', statusIcon: 'alert-triangle' },
+// chip/chipInk tint the label icon: a `-dk` glyph on its own `-lt` family, the
+// pairing DESIGN.md §18 already uses for AA-safe semantic text.
+const VARIANTS: Record<string, { tone?: string; statusIcon?: IconName; chip: string; chipInk: string }> = {
+  neutral: { chip: 'var(--color-blue-lt)', chipInk: 'var(--color-blue-dk)' },
+  warning: { tone: 'var(--color-amber-dk)', statusIcon: 'alert-circle', chip: 'var(--color-amber-lt)', chipInk: 'var(--color-amber-dk)' },
+  critical: { tone: 'var(--color-red-dk)', statusIcon: 'alert-triangle', chip: 'var(--color-red-lt)', chipInk: 'var(--color-red-dk)' },
 };
 
 export function MetricCard({ label, value, sub, variant = 'neutral', iconName, href, ariaLabel }: MetricCardProps) {
@@ -41,12 +43,20 @@ export function MetricCard({ label, value, sub, variant = 'neutral', iconName, h
   const body = (
     <>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500,
+        display: 'flex', alignItems: 'center', gap: 8,
+        fontSize: 11, fontWeight: 500,
         color: v.tone || 'var(--color-text-muted)',
         textTransform: 'uppercase', letterSpacing: '0.04em',
       }}>
-        {iconName && <Icon name={iconName} size={13} />}
+        {iconName && (
+          <span aria-hidden="true" style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 22, height: 22, flexShrink: 0,
+            borderRadius: 'var(--radius-md)', background: v.chip, color: v.chipInk,
+          }}>
+            <Icon name={iconName} size={13} />
+          </span>
+        )}
         {label}
       </div>
       <div style={{

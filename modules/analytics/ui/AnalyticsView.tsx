@@ -102,10 +102,10 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
           ) : (
             <Text className="mt-4">
               {!hasCriticalReqs
-                ? 'No critical document requirements defined.'
+                ? 'No required document checklist defined.'
                 // Untracked is unknown, not zero (ADR-004) — say so rather
                 // than leaving a titled card with an empty chart in it.
-                : 'No batch tracks a critical document yet, so compliance cannot be scored.'}
+                : 'No batch tracks a required document yet, so compliance cannot be scored.'}
             </Text>
           )}
         </Card>

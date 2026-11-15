@@ -20,6 +20,15 @@
         "value": "instrument serif",
         "createdAt": "2026-09-01T13:52:48.617Z",
         "reason": "User confirmed Instrument Serif is intentional — diagram-design skill default skin"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "app/design-system.css"
+        ],
+        "createdAt": "2026-11-15T18:23:38.998Z",
+        "reason": "User confirmed: sidebar margin collapse and data-driven progress bar widths are intentional"
       }
     ]
   }

@@ -19,7 +19,7 @@ function ActivityRow({ event }: { event: ActivityEvent }) {
       <div className="activity-body">
         <div style={{ fontSize: 13, color: 'var(--color-text-primary)', lineHeight: '19px' }}>
           <span className="who">{event.who}</span>
-          <span style={{ marginLeft: 6, fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+          <span style={{ marginLeft: 6, fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
             · {event.role}
           </span>
           <span style={{ color: 'var(--color-text-secondary)' }}> - {event.text}</span>

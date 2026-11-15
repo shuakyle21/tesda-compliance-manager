@@ -140,7 +140,7 @@ function SignUpFormStep({
   return (
     <>
       <h1 className={styles.title}>Create your account</h1>
-      <p className={styles.sub}>Set up access to the Compliance &amp; Audit dashboard.</p>
+      <p className={styles.sub}>Set up access to the TVI Scholarship Management System.</p>
 
       {error && <p className={styles.error} role="alert">{error}</p>}
 

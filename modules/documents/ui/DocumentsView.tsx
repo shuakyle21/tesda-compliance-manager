@@ -10,7 +10,7 @@
  * through the matrix and the preview via local override state. Client Component.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
@@ -60,6 +60,7 @@ type CompletenessSummary = {
   untracked: number;
   pct: number | null;
   missing: number;
+  awaiting: number;
   tier: CompletenessTier;
 };
 
@@ -77,8 +78,10 @@ function completenessPctLabel(pct: number | null): string {
   return pct === null ? '—' : `${pct}%`;
 }
 
+// "Critical" is the domain's word for a document billing depends on. On screen it
+// reads as a severity ("8/8 critical" beside 100%), so the UI says "required".
 function completenessSubLabel(c: CompletenessSummary): string {
-  return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
+  return c.pct === null ? 'No required documents tracked' : `${c.ok} of ${c.total} required verified`;
 }
 
 export function DocumentsView({
@@ -131,9 +134,11 @@ export function DocumentsView({
     const ok = tracked.filter((d) => d.status === 'verified').length;
     const pct = tracked.length ? Math.round((ok / tracked.length) * 100) : null;
     const missing = tracked.filter((d) => d.status === 'missing').length;
+    // Submitted or pending: on file but not yet verified, so neither done nor missing.
+    const awaiting = tracked.filter((d) => d.status === 'submitted' || d.status === 'pending').length;
     const untracked = crit.length - tracked.length;
     const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
-    return { ok, total: tracked.length, untracked, pct, missing, tier };
+    return { ok, total: tracked.length, untracked, pct, missing, awaiting, tier };
   }), [batches, docOf]);
 
   if (!batches.length) {
@@ -222,23 +227,28 @@ export function DocumentsView({
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' }}>
                   {completenessPctLabel(c.pct)}
                 </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
+                <span style={{ fontSize: 11.5, color: 'var(--color-text-secondary)' }}>
                   {completenessSubLabel(c)}
                 </span>
               </div>
               <div className={'completeness-bar ' + completenessBarClassName(c.tier)}>
                 <span style={{ width: (c.pct ?? 0) + '%' }} />
               </div>
-              {c.missing > 0 && (
-                <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-red-dk)' }}>
-                  <Icon name="alert-triangle" size={11} />{c.missing} missing
-                </div>
-              )}
-              {c.untracked > 0 && (
-                <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-                  <Icon name="info-circle" size={11} />{c.untracked} not tracked
-                </div>
-              )}
+              {/* The bar's color never stands alone: each state is also said in words. */}
+              <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: '4px 14px', fontSize: 11.5 }}>
+                {c.pct === 100 && (
+                  <CardNote icon="check" color="var(--color-green-dk)">All required documents verified</CardNote>
+                )}
+                {c.missing > 0 && (
+                  <CardNote icon="alert-triangle" color="var(--color-red-dk)">{c.missing} missing</CardNote>
+                )}
+                {c.awaiting > 0 && (
+                  <CardNote icon="clock" color="var(--color-text-secondary)">{c.awaiting} awaiting verification</CardNote>
+                )}
+                {c.untracked > 0 && (
+                  <CardNote icon="info-circle" color="var(--color-text-muted)">{c.untracked} not tracked</CardNote>
+                )}
+              </div>
             </div>
           );
         })}
@@ -250,18 +260,18 @@ export function DocumentsView({
           {batches.map((b) => (
             <div key={b.id} style={{ justifyContent: 'space-between' }}>
               <span>{displayBatchId(b)}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', textTransform: 'none', letterSpacing: 0, fontSize: 10, color: 'var(--color-text-muted)' }}>{b.program}</span>
+              <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: 10, color: 'var(--color-text-muted)' }}>{b.program}</span>
             </div>
           ))}
         </div>
 
         {documentRequirements.map((req) => (
           <div key={req.key} className="doc-row" style={gridStyle}>
-            <div className={'cell label-cell' + (req.critical ? ' critical' : '')}>
+            <div className="cell label-cell">
               <Icon name={req.icon as never} size={14} style={{ color: 'var(--color-text-muted)' }} />
               <span style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{req.label}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 1 }}>
+                <div style={{ fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 1 }}>
                   {req.critical ? 'Required' : 'Optional'} · stage {req.stage}
                 </div>
               </span>
@@ -281,7 +291,8 @@ export function DocumentsView({
                     <Icon name={cellIcon(doc, s)} size={11} />
                     {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
-                  {doc?.updated && (
+                  {/* No date beside "Missing": it reads as the day something arrived. */}
+                  {doc?.updated && s !== 'missing' && (
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{doc.updated}</span>
                   )}
                 </div>
@@ -319,8 +330,16 @@ function Header() {
   return (
     <div className="page-head">
       <h1>Documents</h1>
-      <span className="subline">TESDA Circular 014-2026 · critical docs gate billing</span>
+      <span className="subline">TESDA Circular 014-2026 · required documents gate billing</span>
     </div>
+  );
+}
+
+function CardNote({ icon, color, children }: { icon: IconName; color: string; children: ReactNode }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color }}>
+      <Icon name={icon} size={12} />{children}
+    </span>
   );
 }
 

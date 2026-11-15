@@ -77,7 +77,7 @@ export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabe
                   <div className="settings-row-label">{workspaceName}</div>
                   <div className="settings-row-hint">{workspaceMeta}</div>
                 </div>
-                <span className="settings-row-control" style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>active</span>
+                <span className="settings-row-control" style={{ fontSize: 10.5, color: 'var(--color-text-muted)' }}>active</span>
               </div>
               <div className="settings-row">
                 <div style={{ minWidth: 0 }}>

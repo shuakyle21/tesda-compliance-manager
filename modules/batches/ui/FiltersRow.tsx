@@ -42,6 +42,7 @@ function Pill({ label, active, onClick }: { label: string; active: boolean; onCl
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       style={{
         height: 32, padding: '0 12px',
