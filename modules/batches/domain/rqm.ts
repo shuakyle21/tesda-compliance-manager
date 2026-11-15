@@ -15,8 +15,8 @@ export function displayBatchId(b: Pick<Batch, 'id' | 'rqmCode'>): string {
 // ---------------------------------------------------------------------------
 
 /** tranche - year - program - provider - sequence, e.g. RQM3-2026-CFSP-0000-0001 */
-export const RQM_CODE_PATTERN = /^RQM\d+-\d{4}-[A-Z]+-\d+-\d+$/;
-export const RQM_CODE_MAX_LENGTH = 64;
+const RQM_CODE_PATTERN = /^RQM\d+-\d{4}-[A-Z]+-\d+-\d+$/;
+const RQM_CODE_MAX_LENGTH = 64;
 
 /** Four parts: the NTP's request number, not a batch code. */
 const RQM_REQUEST_NUMBER_PATTERN = /^RQM\d+-\d{4}-[A-Z]+-\d+$/;
@@ -38,7 +38,7 @@ export function normalizeRqmCode(input: string): string {
   return foldCode(input).replace(/\s+/g, '');
 }
 
-export type RqmCheck =
+type RqmCheck =
   | { ok: true; code: string; warnings: string[] }
   | { ok: false; error: string };
 
@@ -126,7 +126,7 @@ export type NtpReadResult =
   | { ok: true; text: string; /** The PDF had more pages than were read. */ truncated?: boolean }
   | { ok: false; reason: 'unreadable' | 'no-text' | 'too-large' | 'not-pdf' };
 
-export type NtpOption = { code: string; mark: 'current' | 'taken' | null; disabled: boolean };
+type NtpOption = { code: string; mark: 'current' | 'taken' | null; disabled: boolean };
 
 export type NtpOutcome = ({ kind: 'options'; options: NtpOption[] } | { kind: 'message'; message: string }) & {
   truncated?: boolean;

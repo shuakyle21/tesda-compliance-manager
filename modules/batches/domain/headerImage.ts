@@ -10,7 +10,7 @@
  * back to its neutral header.
  */
 
-export interface QualificationImageIndex {
+interface QualificationImageIndex {
   /** qualification id → storage path */
   byQualificationId: Map<string, string>;
   /** normalized title → storage path */

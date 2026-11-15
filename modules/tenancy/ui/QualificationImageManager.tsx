@@ -23,7 +23,7 @@ import {
   type QualificationImageWarning,
 } from '@/modules/tenancy/domain/qualificationImage';
 
-export interface QualificationImageItem {
+interface QualificationImageItem {
   id: string;
   code: string;
   title: string;
