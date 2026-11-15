@@ -15,10 +15,28 @@ The Request-for-QM authorization code that names a batch. Modeled as attributes 
 _Avoid_: Program-RQM table (a rejected design)
 
 **NTP**:
-Notice To Proceed — the approval that authorizes a batch to run. Lives on the batch (`ntp_number`, `ntp_approval_date`, `ntp_received_date`).
+Notice To Proceed — the approval that authorizes a batch to run. TESDA's PO/DO emails it to the TVI after the **AOU** is on file. One NTP lists one or more **allocation rows**. Its dates live on each batch (`ntp_date`, `ntp_approval_date`, `ntp_received_date`), and the batch's RQM code is its authorization reference (`ntp_number` stays empty). Uploading an NTP is how batches are created; each new batch starts at stage `ntp`. Annex letters change between circulars, so treat them as circular data, never as fixed copy.
+_Avoid_: Treating the NTP as a batch itself (one NTP can authorize several batches)
+
+**Allocation row**:
+One line of an NTP: an RQM code with its qualification, approved slots, total amount, and indicative start date. Each allocation row becomes exactly one batch.
+_Avoid_: RQM line (use allocation row for the NTP line and RQM code for its identifier)
+
+**NTP receipt date**:
+The date the TVI received the NTP at its registered email address. The coordinator enters it by hand; it is not read from the PDF. It starts the **commencement window**.
+
+**Commencement window**:
+The TVI must start training within **15 calendar days** of the NTP receipt date (Circular 014-2026). Delay is allowed only for force majeure. The number belongs to the circular, not to the code.
+
+**AOU**:
+Affidavit of Undertaking (Annex H in Circular 014-2026) — the TVI's notarized commitment. It belongs to the **school**, not to a batch, and covers one **fiscal year**. If one is already on file for the fiscal year, the TVI does not submit another and can proceed on receiving the NTP. Creating batches from an NTP requires a current AOU.
+_Avoid_: Agreement of Undertaking (wrong name); a per-batch AOU upload (the circular does not ask for one; each batch has an `aou` checklist row that only mirrors the school's AOU)
+
+**Fiscal year**:
+The government fiscal year (1 January to 31 December). The AOU's fiscal year is the calendar year of the NTP receipt date, shown read-only when the AOU is recorded and stored as a number.
 
 **Approved slots**:
-The billable-pax cap for a batch. You may bill for fewer scholars, never more.
+The billable-pax cap for a batch, and the number of scholars the batch is approved for. Enrollment may be below it (for example 13 of 15). You may bill for fewer scholars, never more, and a shortfall lowers the billable amount later in billing.
 
 **ULI**:
 The permanent national learner key (TESDA-issued). The same person at two schools is two tenant-scoped learner rows sharing one ULI.
@@ -50,8 +68,15 @@ A single releasable payment within a billing track, unlocked at an attendance th
 _Avoid_: Installment, milestone payment
 
 **Readiness gate**:
-The compound, per-tranche condition that unlocks document generation: the tranche's attendance threshold reached **AND** that tranche's supporting documents (MIS-0302/Terminal Report, Annex K, Daily Attendance Sheet) all Verified. Supporting docs are tracked at **tranche level**, not per scholar.
+The compound, per-tranche condition that unlocks document generation: the tranche's attendance threshold reached **AND** that tranche's supporting documents (MIS-0302/Terminal Report, tranche support packet, Daily Attendance Sheet) all Verified. Supporting docs are tracked at **tranche level**, not per scholar.
 _Avoid_: "Billing-ready" meaning threshold-only
+
+**Tranche support packet**:
+The one signed packet a billing tranche needs as supporting evidence. It has no official annex or name; this working name is provisional and reserved until one is chosen. Tracked per tranche, not per scholar.
+_Avoid_: "Annex K" (that annex is the **Commitment of Undertaking**)
+
+**Commitment of Undertaking**:
+Annex K in the 2026 Omnibus Guidelines. A per-scholar document. Its data comes from the roster import records, not from the NTP flow, and it is not modeled yet.
 
 **Billing document**:
 A populated `.docx` generated from the school's own template (letterhead, tenant signatories, TESDA-PO addressee). Generation is append-only history — corrections re-generate a new versioned snapshot, nothing is overwritten.

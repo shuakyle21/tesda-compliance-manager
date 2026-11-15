@@ -149,7 +149,7 @@ export const getProfileSnapshot = cache(async (clerkUserId: string): Promise<Pro
     // Network / client-construction failures land here, not in `error` above.
     return { status: 'sync-failed', error: err instanceof Error ? err.message : 'unknown error' };
   }
-});
+})
 
 // ---------------------------------------------------------------------------
 // Derive — pure, no I/O.
