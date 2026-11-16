@@ -234,7 +234,7 @@ export function Sidebar({
           />
           <span className="sb-brand-text">
             <span className="sb-brand-name">TVI-CAMS</span>
-            <span className="sb-brand-sub">Compliance &amp; Audit</span>
+            <span className="sb-brand-sub">TVI Scholarship Management System</span>
           </span>
           <button type="button" className="sb-close icon-btn" onClick={closeDrawer} aria-label="Close navigation">
             <Icon name="x" size={16} />
@@ -377,7 +377,7 @@ function SchoolSwitcher({ tenant, tenants, open, onToggle, onClose, hrefFor, onN
               </span>
               <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                 <span style={{ display: 'block', fontSize: 13, fontWeight: 500, lineHeight: 1.2 }}>{t.name}</span>
-                <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
+                <span style={{ display: 'block', fontSize: 10, color: 'var(--color-text-muted)' }}>
                   {t.region} · {t.type}
                 </span>
               </span>

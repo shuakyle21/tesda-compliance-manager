@@ -5,11 +5,11 @@
  *
  * The primary data display component. Encodes urgency, billing-readiness,
  * program/NC badges, trainer, training window, NTP lag, BSRS, the lifecycle
- * pipeline, and the auto-remark. Client Component for the hover elevation +
- * onClick (opens the BatchModal).
+ * pipeline, and the auto-remark. Client Component for onClick (opens the
+ * BatchModal); hover elevation is CSS (.batch-card).
  */
 
-import type { CSSProperties, ReactNode, MouseEvent } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Icon } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
@@ -23,62 +23,33 @@ import { sessionProgress, describeSessionProgress } from '@/modules/batches/doma
 import { formatDate } from '@/shared/dates';
 import type { Batch, UrgencyTier } from '@/shared/types';
 
-function cardChrome(billingReady: boolean, clickable: boolean) {
-  return {
-    border: billingReady ? 'var(--color-green)' : 'var(--color-border)',
-    boxShadow: billingReady ? '0 0 0 3px var(--color-green-lt), var(--shadow-sm)' : 'var(--shadow-sm)',
-    cursor: clickable ? 'pointer' : 'default',
-  };
-}
-
 export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => void }) {
   const tier = urgencyTier(batch.daysToBilling);
   const billingReady = isBillingReady(batch);
-  const chrome = cardChrome(billingReady, Boolean(onClick));
 
-  const onEnter = (e: MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.boxShadow = billingReady
-      ? '0 0 0 3px var(--color-green-lt), var(--shadow-md)'
-      : 'var(--shadow-md)';
-    e.currentTarget.style.background = 'var(--color-surface-raised)';
-  };
-  const onLeave = (e: MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.style.boxShadow = billingReady
-      ? '0 0 0 3px var(--color-green-lt), var(--shadow-sm)'
-      : 'var(--shadow-sm)';
-    e.currentTarget.style.background = 'var(--color-surface)';
-  };
+  // Chrome, hover and press live in design-system.css (.batch-card).
+  const className = 'batch-card' + (billingReady ? ' billing-ready' : '') + (onClick ? ' clickable' : '');
 
   return (
-    <div
-      onClick={onClick}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      style={{
-        background: 'var(--color-surface)',
-        border: `1px solid ${chrome.border}`,
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: chrome.boxShadow,
-        overflow: 'hidden',
-        cursor: chrome.cursor,
-        transition: 'box-shadow 150ms var(--ease-standard), background 150ms var(--ease-standard)',
-      }}
-    >
+    <div onClick={onClick} className={className}>
       {billingReady && <div className="billing-ready-stripe" />}
 
       {/* Header */}
       <div style={{ padding: '14px 16px 10px' }}>
         <CardHeaderBadges batch={batch} billingReady={billingReady} />
         <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', marginTop: 8 }}>
-          {batch.name}
+          {/* The keyboard path: a real button whose click bubbles to the card's
+              onClick. role="button" on the whole card would hide its contents
+              from screen readers. */}
+          {onClick ? <button type="button" className="batch-card-open">{batch.name}</button> : batch.name}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 2, fontFamily: 'var(--font-mono)' }}>
+        <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 2 }}>
           {batch.qualification}
         </div>
       </div>
 
       {/* Body */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, padding: '12px 16px 14px', borderTop: '1px solid var(--color-border-faint)' }}>
+      <div className="batch-card-body">
         <Col>
           <Field label="Trainer">
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -133,7 +104,7 @@ export function BatchCard({ batch, onClick }: { batch: Batch; onClick?: () => vo
 
 function CardHeaderBadges({ batch, billingReady }: { batch: Batch; billingReady: boolean }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
       <StatusBadge variant={batch.program === 'TWSP' ? 'twsp' : 'cfsp'}>{batch.program}</StatusBadge>
       <StatusBadge variant={batch.ncLevel === 'NC II' ? 'nc-ii' : 'nc-i'}>{batch.ncLevel}</StatusBadge>
       {billingReady
@@ -152,13 +123,14 @@ function BillingCol({ batch, tier }: { batch: Batch; tier: UrgencyTier }) {
   return (
     <Col borderLeft>
       <Field label="NTP → Start lag">
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: ntpSameDay ? 'var(--color-green-dk)' : 'var(--color-text-primary)' }}>
+        {/* Mono is for figures; the "Not recorded" / "Same-day" words read as sans. */}
+        <span style={{ fontFamily: batch.ntpLag ? 'var(--font-mono)' : undefined, fontSize: 12, color: ntpSameDay ? 'var(--color-green-dk)' : 'var(--color-text-primary)' }}>
           {batch.ntpLag === null ? 'Not recorded' : ntpSameDay ? 'Same-day' : `${batch.ntpLag} days`}
         </span>
       </Field>
       <Field label="Billing deadline" style={{ marginTop: 10 }}>
         <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500,
+          fontFamily: batch.billingDeadline ? 'var(--font-mono)' : undefined, fontSize: 12, fontWeight: 500,
           color: tier === 'critical' || tier === 'overdue' ? 'var(--color-red-dk)'
             : tier === 'warning' ? 'var(--color-amber-dk)'
             : 'var(--color-text-primary)',
@@ -185,9 +157,7 @@ function SessionBar({ batch }: { batch: Batch }) {
 
 function Col({ children, borderLeft }: { children: ReactNode; borderLeft?: boolean }) {
   return (
-    <div style={{ paddingLeft: borderLeft ? 16 : 0, borderLeft: borderLeft ? '1px solid var(--color-border-faint)' : 'none' }}>
-      {children}
-    </div>
+    <div className={borderLeft ? 'batch-card-col divided' : 'batch-card-col'}>{children}</div>
   );
 }
 

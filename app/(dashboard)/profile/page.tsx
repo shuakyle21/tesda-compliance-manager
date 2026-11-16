@@ -164,21 +164,19 @@ function SchoolAccessCard({
               <span style={{ display: 'block', fontSize: 12.5, fontWeight: 500, color: 'var(--color-text-primary)' }}>
                 {t.name}
               </span>
-              <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)' }}>
+              <span style={{ display: 'block', fontSize: 11.5, color: 'var(--color-text-muted)', marginTop: 1 }}>
                 {t.region} · {t.type}
               </span>
             </span>
             {t.id === activeTenantId && (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9.5, color: 'var(--color-blue-dk)', letterSpacing: '0.04em' }}>
-                ACTIVE
-              </span>
+              <StatusChip tone="blue" icon="check">Active</StatusChip>
             )}
           </div>
         ))}
       </div>
       {tenants.length > 1 && (
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 10, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-teal-dk)' }}>
-          <Icon name="shield-check" size={11} />
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 12, fontSize: 11.5, color: 'var(--color-text-secondary)' }}>
+          <Icon name="shield-check" size={13} />
           Access across {tenants.length} schools
         </div>
       )}
@@ -192,9 +190,10 @@ function ConnectedAccountsCard({ hasGoogle, email }: { hasGoogle: boolean; email
       <SecRow
         icon="external-link"
         title="Google"
-        desc={hasGoogle ? email : 'Not connected'}
-        status={hasGoogle ? 'Connected' : 'Off'}
-        statusTone={hasGoogle ? 'green' : 'amber'}
+        desc={hasGoogle ? email : 'Sign in with Google is not linked'}
+        status={hasGoogle ? 'Connected' : 'Not connected'}
+        // Not linking Google is a choice, not a warning: neutral, not amber.
+        statusTone={hasGoogle ? 'green' : 'neutral'}
         last
       />
 
@@ -280,7 +279,7 @@ export default async function ProfilePage() {
             </h1>
             <span className={`role-tag ${role}`} style={{ fontSize: 11 }}>{role}</span>
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginTop: 4, overflowWrap: 'anywhere' }}>
             {email}
           </div>
           <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 6, maxWidth: 560, lineHeight: 1.5 }}>
@@ -312,10 +311,11 @@ export default async function ProfilePage() {
         >
           <PRow label="Full name">{name}</PRow>
           <PRow label="Email">
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>{email}</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: 'var(--color-green-dk)', fontSize: 10.5 }}>
-                <Icon name="check" size={11} />verified
+            {/* Wraps: a long address used to push "verified" out of the card. */}
+            <span style={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap', gap: '2px 8px' }}>
+              <span style={{ overflowWrap: 'anywhere' }}>{email}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: 'var(--color-green-dk)', fontSize: 11.5 }}>
+                <Icon name="check" size={12} />Verified
               </span>
             </span>
           </PRow>
@@ -329,7 +329,7 @@ export default async function ProfilePage() {
           </PRow>
           <PRow label="Member since">{memberSince}</PRow>
           <PRow label="Last active" last>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5 }}>Today · {lastActiveTime}</span>
+            Today · {lastActiveTime}
           </PRow>
         </PCard>
 
@@ -436,13 +436,15 @@ function PCard({
       overflow: 'hidden',
     }}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
+        // Wraps the action under the title instead of breaking the title in two.
+        display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8,
         padding: '12px 16px',
-        borderBottom: '1px solid var(--color-border)',
+        borderBottom: '1px solid var(--color-border-faint)',
+        background: 'var(--color-surface-alt)',
       }}>
         <Icon name={icon} size={14} style={{ color: 'var(--color-text-secondary)' }} />
         <h2 style={{
-          margin: 0, flex: 1,
+          margin: 0, flex: '1 0 auto', whiteSpace: 'nowrap',
           fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 600,
           letterSpacing: '0.06em', textTransform: 'uppercase',
           color: 'var(--color-text-primary)',
@@ -482,7 +484,7 @@ function SecRow({
   title: string;
   desc: string;
   status?: string;
-  statusTone?: string;
+  statusTone?: ChipTone;
   action?: ReactNode;
   last?: boolean;
 }) {
@@ -503,23 +505,38 @@ function SecRow({
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--color-text-primary)' }}>{title}</div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)', marginTop: 1 }}>
+        <div style={{ fontSize: 11.5, color: 'var(--color-text-muted)', marginTop: 1 }}>
           {desc}
         </div>
       </div>
-      {status && (
-        <span style={{
-          display: 'inline-flex', alignItems: 'center',
-          height: 20, padding: '0 8px', borderRadius: 'var(--radius-md)',
-          background: `var(--color-${statusTone}-lt)`,
-          color: `var(--color-${statusTone}-dk)`,
-          fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500,
-          letterSpacing: '0.03em', textTransform: 'uppercase', flexShrink: 0,
-        }}>
-          {status}
-        </span>
-      )}
+      {status && <StatusChip tone={statusTone} icon={TONE_ICON[statusTone]}>{status}</StatusChip>}
       {action}
     </div>
+  );
+}
+
+type ChipTone = 'green' | 'amber' | 'blue' | 'neutral';
+
+// Each tone carries its own glyph so the chip never signals by color alone.
+const TONE_ICON: Record<ChipTone, IconName> = {
+  green: 'check',
+  amber: 'alert-circle',
+  blue: 'check',
+  neutral: 'info-circle',
+};
+
+function StatusChip({ tone, icon, children }: { tone: ChipTone; icon: IconName; children: ReactNode }) {
+  const neutral = tone === 'neutral';
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      height: 22, padding: '0 8px', borderRadius: 'var(--radius-md)',
+      background: neutral ? 'var(--color-surface-alt)' : `var(--color-${tone}-lt)`,
+      color: neutral ? 'var(--color-text-secondary)' : `var(--color-${tone}-dk)`,
+      fontSize: 11, fontWeight: 500, flexShrink: 0, whiteSpace: 'nowrap',
+    }}>
+      <Icon name={icon} size={12} />
+      {children}
+    </span>
   );
 }

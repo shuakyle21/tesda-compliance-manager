@@ -22,7 +22,7 @@ export const clerkLocalization: Localization = {
   signIn: {
     start: {
       title: 'Sign in to TVI-CAMS',
-      subtitle: 'Welcome back. Sign in to continue to the Compliance & Audit dashboard.',
+      subtitle: 'Welcome back. Sign in to continue to the TVI Scholarship Management System.',
     },
   },
   // Top-level key — matches the email field across sign-in and sign-up.

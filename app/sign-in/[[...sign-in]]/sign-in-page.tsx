@@ -413,8 +413,8 @@ function SignInView({
     <>
       <h1 className={styles.title}>Sign in to TVI-CAMS</h1>
       <p className={styles.sub}>
-        Welcome back. Sign in to continue to the Compliance &amp; Audit
-        dashboard.
+        Welcome back. Sign in to continue to the TVI Scholarship Management
+        System.
       </p>
 
       {error && (
