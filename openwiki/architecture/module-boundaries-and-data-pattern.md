@@ -1,11 +1,8 @@
 ---
 type: Reference
 title: Module Boundaries and the Data Layer Pattern
-description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the ESLint-enforced import direction, each module's private data/ surface, the fetch → map → derive contract and its write-side form (fetch existing rows → reconcile on ULI → explicit insert/update), the snapshot union every data-driven screen maps onto with its mandated guard order, and the ULI-only-key consequence of tenant-scoped learner rows.
-tags: [architecture, module-boundaries, data-layer, ddd, import-direction, supabase, snapshots, no-tenant-access, type-safety, uli, write-path]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-15T02:16:31.147Z
+description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the lint-enforced import direction and never edges (rules 7–10), each module's private data/ surface, the fetch → map → derive contract and its write-side form (fetch existing rows → reconcile on ULI → explicit insert/update), the discriminated snapshot union every data-driven screen maps onto with its mandated guard order, the total-enum forcing function, and the ULI-only-key consequence of tenant-scoped learner rows.
+tags: [architecture, module-boundaries, data-layer, ddd, import-direction, eslint, supabase, snapshots, no-tenant-access, type-safety, uli, write-path]
 sources:
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
     resource: repo://app/(dashboard)/layout.tsx
@@ -25,6 +22,8 @@ sources:
     resource: repo://app/(dashboard)/tenant-access.ts
   - id: openwiki-source-20d1ca31256bf756f33f5462
     resource: repo://app/(dashboard)/tenant-scope.ts
+  - id: openwiki-source-f8cfb11c14504e1f5bffb66c
+    resource: repo://app/(dashboard)/trainer/page.tsx
   - id: openwiki-source-6e6cc525e98e274ad6c10b29
     resource: repo://app/(dashboard)/users/new/actions.ts
   - id: openwiki-source-a2371d6362e5db4bc834ad03
@@ -73,6 +72,8 @@ sources:
     resource: repo://modules/batches/ui/TableView.tsx
   - id: openwiki-source-9a24e697708df788c06f44e3
     resource: repo://modules/billing/data/billing.ts
+  - id: openwiki-source-59b33492a169d8eadf1c8ad1
+    resource: repo://modules/billing/domain/readiness.ts
   - id: openwiki-source-fed00d96acb205744511b2bb
     resource: repo://modules/documents/data/documents.ts
   - id: openwiki-source-05b5b2c042bb4f3b47496b1f
@@ -87,6 +88,8 @@ sources:
     resource: repo://modules/import-export/data/learnerImport.ts
   - id: openwiki-source-4bbff9da266e44025f34a633
     resource: repo://modules/import-export/domain/learnerImport.ts
+  - id: openwiki-source-96569cd493431d4555cdd1d9
+    resource: repo://modules/import-export/ui/ImportCsvModal.tsx
   - id: openwiki-source-3f1f3f4919f6d868d27df2e3
     resource: repo://modules/tenancy/data/platform.ts
   - id: openwiki-source-6d398bd6713150c971d852b0
@@ -143,7 +146,10 @@ sources:
     resource: repo://tests/unit/learner-import.test.ts
   - id: openwiki-source-0fd3605db2590862922583b6
     resource: repo://tests/unit/tenant-access.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-15T02:16:31.147Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-16T02:29:16.800Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-16T02:29:16.800Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -191,7 +197,9 @@ The rules are not stylistic preferences. Each one closes a specific failure:
 - **`shared/` is leaf level.** A primitive in `shared/ui/` that starts reading module data or encoding a module rule has crossed the boundary and belongs in the owning module.
 - **Raw DB types stay in `data/`.** `modules/batches/data/batches.ts` imports `Database` and defines `BatchRowWithProgram` privately, so no component depends on a column name.
 
-The lesson generalizes past readability. `database.types.ts` stubs every table's `Relationships` as `[]`, which leaves supabase-js unable to infer embedded joins, so four long-standing `as unknown` row casts survive in `activity.ts`, `batches.ts`, `tenancy.ts` and `users.ts`. The casts are a boundary seam, not a hole in it: all four live in `data/`, and the file header records adopting the generator's real `Relationships` as the way to retire them.
+The lesson generalizes past readability. `database.types.ts` stubs every table's `Relationships` as `[]`, which leaves supabase-js unable to infer embedded joins, so six long-standing `as unknown` row casts survive in `activity.ts`, `batches.ts`, `learners.ts` (twice), `tenancy.ts` and `users.ts`. The casts are a boundary seam, not a hole in it: all of them live in `data/`, and the file header records adopting the generator's real `Relationships` as the way to retire them.
+
+One thing the zones cannot see: each `data/`-privacy zone is written with `modules/!(${d})/**` as the *target*, and a single zone's target set is evaluated as "path is any module except `d`, **and** a `data/` folder is imported". A module's own `data/` file importing a sibling `data/` file therefore matches the can-except-`d` half, so same-module `data/` → `data/` imports (e.g. `batches.ts` → `learners.ts`) pass lint and relying on the rule to catch them would not. Same-module `data/` → its own `domain/` is legal anyway.
 
 These restrictions are enforced in [`eslint.config.mjs`](/eslint.config.mjs) with `import/no-restricted-paths` (RULES rule 7) and reviewed in PRs. The `domains` array at the top of that file generates one `data/`-privacy zone per module, so the enforcement is only as complete as the array: a folder added under `modules/` but not to the array has no enforced boundary at all. A violation otherwise surfaces as a lint error naming the offending import.
 
@@ -276,6 +284,8 @@ flowchart TD
 
 Solid arrows are allowed import directions; dashed arrows are rejected by `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). The tenancy/batches/documents trio illustrates the cross-module rule with real modules — `BO1 → DD2` shows a batches domain file reaching documents' public `domain/` (compliance) but never its `data/`, and `BD2 → TDO1` shows an `import-export` `domain/` helper (`ageOn`) reached from `batches/data`, the same one-way move across a module boundary rather than a copy.
 
+One arrow is mislabelled above: the zone at rule 8 targets `modules/*/domain/**` too, so a `data/` → `domain/` import is only legal **inside the same module**. What crosses a module boundary from `data/` is a *domain* file of the other module (`BD2 → TDO1`, `BO1 → DD2`) — never that module's `data/`.
+
 ## The layer rules in detail
 
 ### `data/` — the fetch layer and the raw-type boundary
@@ -290,11 +300,13 @@ The shape every data function follows, from `modules/batches/data/batches.ts` (R
 4. On a Postgrest `error`, return `{ status: 'sync-failed', error }` with the raw message **kept server-side**.
 5. On a thrown error, return `{ status: 'sync-failed', error: String(err) }`.
 
-No branch ever returns fixture data. `selectBatchesForDisplay` is the display adapter (below); it turns the union into an array.
+No branch ever returns fixture data. `selectBatchesForDisplay` is the display adapter (below); it turns the union into an array. (The residual `shared/mocks/` seed dataset backs only a hand-set `?state=` preview override, not any snapshot branch.)
 
 ### `domain/` — pure rules, the only cross-module surface
 
-`domain/` holds functions and types with no I/O — input in, output out, no `await` (RULES rule 14). `modules/tenancy/domain/access.ts` maps a profile snapshot to an access verdict; `modules/batches/domain/metrics.ts` maps `Batch[]` to `DashboardMetrics`; `modules/documents/domain/compliance.ts` maps document records plus a catalog to compliance figures.
+`domain/` holds functions and types with no I/O — input in, output out, no `await` (RULES rule 14). `modules/tenancy/domain/access.ts` maps a profile snapshot to an access verdict; `modules/batches/domain/metrics.ts` maps a `Batch[]` to `DashboardMetrics`; `modules/documents/domain/compliance.ts` maps document records plus a catalog to compliance figures.
+
+`modules/batches/domain/metrics.ts` is also where the boundary shapes a design: its `deriveDashboardMetrics` needs document compliance, which lives in the documents module, so metrics sits in `domain/` — the only layer allowed to reach another module's `domain/`. It is called by the school dashboard and by the trainer page's metrics row, and reused per school by `modules/batches/domain/overview.ts` so the cross-school overview and a school's own dashboard cannot disagree about that school.
 
 `domain/` is what other modules may import (rule 8) and what `data/` layers import for shaping. It is also the natural hoist target: when two modules need the same rule, it moves into one of their `domain/` layers and the other imports it — never into `shared/`, which cannot import modules.
 
@@ -304,12 +316,13 @@ No branch ever returns fixture data. `selectBatchesForDisplay` is the display ad
 
 ### `shared/` — leaf level, never module-aware
 
-`shared/` holds four things and nothing else:
+`shared/` holds a fixed set and nothing else:
 
-- `shared/types.ts` — the single hand-written UI domain type file (`Batch`, `Tenant`, `ScholarRow`, `DocRecord`, `DashboardMetrics`, …). `ScholarRow` is shaped as the T2MIS terminal-report row and `BatchT2misFacts` as the batch-level facts the export repeats on each line, both grown by `20261111120000`; `Batch` is the hub referencing shapes from several other domains. It is a UI-report shape, not an entity model of its own — `LearnerRow` in `database.types.ts` remains the DB row, and `mapLearnerRow` is the only bridge.
+- `shared/types.ts` — the single hand-written UI domain type file (`Batch`, `Tenant`, `ScholarRow`, `DocRecord`, `DashboardMetrics`, …). `ScholarRow` is shaped as the T2MIS terminal-report row and `BatchT2misFacts` as the batch-level facts the export repeats on each line, both fed from `learner_details` and `tenant_qualifications`; `Batch` is the hub referencing shapes from several other domains. It is a UI-report shape, not an entity model of its own — `LearnerRow` in `database.types.ts` remains the DB row, and `mapLearnerRow` is the only bridge.
 - `shared/ui/` — props-only presentational primitives.
 - `shared/vocab.ts` — closed TESDA vocabulary (employment statuses, EGACE stages).
 - `shared/text.ts` — pure string shaping (`pluralize`, `initials`).
+- `shared/mocks/` — the hand-written seed dataset; it is what backs forced-preview states (a `?state=` override), not the `unconfigured` branch.
 
 `shared/` imports no module and no `database.types.ts` (RULES rule 9, rule 10). The dependency direction is total: everything may import `shared/`, `shared/` imports only itself.
 
@@ -325,7 +338,7 @@ Four edges are forbidden outright, each for a concrete reason (RULES rules 7–1
 
 | Edge | Why it is forbidden | Signature |
 |---|---|---|
-| `modules/*/data → another module's data/` | the other module's mapper is an internal detail; a copy kept in sync by hand beats coupling two private layers | `import/no-restricted-paths` zone per domain |
+| `modules/*/data → another module's data/` | the other module's mapper is an internal detail; a `domain/` import or a caller-passed parameter beats coupling two private layers | `import/no-restricted-paths` zone per domain (same-module `data/` removal is not caught — see above) |
 | any layer other than `data/ → lib/supabase/database.types.ts` | raw columns must not leak outside the mapper, or a rename ripples through components | same, restricted to `data/` |
 | `shared/ → modules/` | `shared/` would stop being a leaf and start a cycle | same |
 | `shared/, modules/ → app/` | `app/` is the composition root; anything under it is a leaf-ward violation | same |
@@ -357,7 +370,9 @@ A screen holds only its narrowed rows by the time it renders, so guarding wrongl
 4. **empty** — a real fact about a reachable school.
 5. **no-results** — the client island's filtered-to-nothing state, which is not a snapshot fact at all.
 
-`…/t/[tenantCode]/(sections)/batch-cards/page.tsx` destructures the two statuses into booleans and returns the sync-failed callout before the `NoTenantAccessState` before the `EmptyState`; `…/t/[tenantCode]/dashboard/page.tsx`'s `guardState` runs denied → `syncFailed && batchCount === 0` → `noTenantAccess` → empty. The report route guards both snapshots it holds: `syncFailed` is `batches.status === 'sync-failed' || roster.status === 'sync-failed'`, so a failed roster still raises the banner even when the batch list loaded.
+`…/t/[tenantCode]/(sections)/batch-cards/page.tsx` destructures the two statuses into booleans and, inside its zero-row branch, returns the sync-failed callout **before** the `NoTenantAccessState` **before** the `EmptyState`; `…/t/[tenantCode]/dashboard/page.tsx`'s `guardState` runs denied → `syncFailed && batchCount === 0` → `noTenantAccess` → empty. `(sections)/billing/page.tsx` holds the same shape (`sync-failed` with zero rows, then the access state). The report route guards both snapshots it holds: `syncFailed` is `batches.status === 'sync-failed' || roster.status === 'sync-failed'`, so a failed roster still raises the banner even when the banner's own copy only mentions batch data.
+
+The ordering is a convention, not a type constraint: nothing stops a screen writing the `EmptyState` first, and a reviewer is the only thing that catches it. Because the access check is `after` the failure check, a caller who both has no school and hit a query error is told the read failed — which is why `withTenantAccess` never rewrites a non-`ok` snapshot (next section).
 
 ### Verify before display
 
@@ -379,27 +394,30 @@ The `CreateUserFormState` in `app/(dashboard)/users/new/actions.ts` wraps the sa
 
 ### The import write path, in full
 
-`importLearnersCsv` in `modules/import-export/data/learnerImport.ts` (line 124 opens it) is the one shipped mutation, and it is the fetch → map → derive pattern run backwards: **fetch** the existing teaching rows, **reconcile** them in `domain/`, then **write** explicitly. An import has nothing to render at all, so it is also where the `unconfigured` state changes meaning: not "render an empty state" but "disable the importer rather than pretend the import ran". The file's header says so.
+`importLearnersCsv` in `modules/import-export/data/learnerImport.ts` (line 175 opens it) is the one shipped mutation, and it is the fetch → map → derive pattern run backwards: **fetch** the existing teaching rows, **reconcile** them in `domain/`, then **write** explicitly. An import has nothing to render at all, so it is also where the `unconfigured` state changes meaning: not "render an empty state" but "disable the importer rather than pretend the import ran". The file's header says so — and nothing in `app/` calls it yet: `ImportCsvModal` is a "not available yet" overlay with no upload or sample picker, so `shared/mocks/` is not standing in for it either.
 
-In order (lines 125–169):
+In order (lines 176–217):
 
 1. `unconfigured` first, then the `parseLearnerCsv` / `validateRows` gates, so a bad file never reaches the network. A file spanning more than one batch is rejected here too.
 2. `fetchBatchTenant` re-reads the batch's `tenant_id` through an RLS-scoped `select`, so inserted rows can only target a tenant the caller could already read.
 3. `fetchExistingLearners` reads `id, uli` for the batch; `reconcileWithExisting` (a `Map` on `uli`) splits the validated rows into inserts and updates by `existingId`.
-4. Inserts go in one statement; updates are issued one row at a time because supabase-js has no "many rows, many values" update.
-5. `ok` reports `inserted`/`updated` counts plus the rejected rows as `skipped[]` — a partially valid file still imports, and the per-row reasons survive.
+4. `insertLearners` puts all unmatched learners in one statement, then upserts each one's `learner_details` on `learner_id` (skipped when the file filled no details, so a names-only CSV never touches that table).
+5. `updateLearners` issues one `learners` update plus one details upsert per matched row — supabase-js has no "many rows, many values" update.
+6. `summariseWrites` (pure, and unit-tested) decides the status: `ok` when neither step errored, `sync-failed` when nothing was saved, `partial` otherwise, with the real counts carried forward so a half-applied file reports exactly how much landed.
 
-Every mutation is built from a narrow, fixed identity set — `learner_no`, the four name columns, `assessment_result` — and then spread over by `...row.details`. The domain parser is what makes that safe: `LearnerDetails` is a `Partial` keyed by `learners` column name, populated only from non-blank T2MIS cells, so the detail spread can never carry a key the file did not fill. That is the "namespace CSV must not blank earlier detail" guard, and it is why the parser lowercases and rewrites the sheet's headers into column keys (`DETAIL_COLUMNS`, dates normalised to ISO, sex normalised to Male/Female) instead of the write layer guessing.
+Every mutation is built from a narrow, fixed identity set — `learner_no`, the four name columns, `assessment_result` — and the detail columns reach `learner_details` only. The domain parser is what makes that safe: `details` is a `Partial` keyed by `learner_details` column name, populated only from non-blank T2MIS cells, so the detail write can never carry a key the file did not fill. That is the "names-only re-import must not blank earlier detail" guard, and it is why the parser lowercases and rewrites the sheet's headers into column keys (`DETAIL_COLUMNS`, dates normalised to ISO, sex normalised to Male/Female) instead of the write layer guessing.
 
-Two invariants matter more than the mechanics. **ULI is the only reconciliation key**, not `learner_no`, which is unique only per batch and is not guaranteed to appear in a source report; a row whose `uli` repeats *inside the same file* is rejected in validation so the unique index is never what fails. And the update spreads only `row.details`, so re-importing a names-only file cannot blank the contact, address or employment detail an earlier T2MIS import recorded.
+Two invariants matter more than the mechanics. **ULI is the only reconciliation key**, not `learner_no`, which is unique only per batch and is not guaranteed to appear in a source report; a row whose `uli` repeats *inside the same file* is rejected in validation so the unique index is never what fails.
 
-Raw Postgres messages are accepted on this path: `sync-failed` carries table, column and constraint names, and the header records a `TODO` to map them to user copy at the action boundary (RULES rule 6). An update loop stops at the first failing row and returns it, so a partially applied file reports a failure even though some rows already landed — the counters are not carried into `sync-failed`. Nothing in `app/` calls `importLearnersCsv` yet.
+There is no transaction and no rollback: the two tables are written in separate requests, and a failure stops the step (an insert failure skips the update step entirely) while the counts already saved are preserved. Re-importing the same file is safe because rows match on ULI and details upsert per learner.
+
+Raw Postgres messages are accepted on this path: `sync-failed` and `partial` carry table, column and constraint names, and the header records a `TODO` to map them to user copy at the action boundary (RULES rule 6) — work that has to happen before a UI calls this, which is part of why the modal says nothing is wired yet.
 
 ## The enum bridge
 
-Every database `Row` field that a domain type names differently is translated in the mapper through a **total (non-`Partial`) map**, so a new DB enum variant fails compilation until its UI treatment is settled (RULES rule 18). `DB_TO_UI_STAGE` in `batches.ts` is the canonical example: `training`/`assessment`/`billing` → `train`/`assess`/`bill`, `entre` is UI-only with no DB column, and `completed`/`blocked` map to `null` because `deriveLifecycle` treats them as special cases rather than a pipeline position.
+Every database `Row` field that a domain type names differently is translated in the mapper through a **total (non-`Partial`) map**, so a new DB enum variant fails compilation until its UI treatment is settled (RULES rule 18). The property to preserve is totality, not the map itself: the compiler, not a runtime lookup, is what forces the decision. `DB_TO_UI_STAGE` in `batches.ts` is the canonical example — `training`/`assessment`/`billing` → `train`/`assess`/`bill`, `entre` UI-only with no DB column, `completed`/`blocked` → `null` because `deriveLifecycle` treats them as special cases rather than a pipeline position.
 
-The convention repeats wherever a closed enum crosses the seam — the role pair in tenancy both ways, `ACTION_TO_TONE` in activity, `ASSESSMENT_RESULT_TO_UI` in learners. The deliberate exception is `DOCUMENT_ICONS` in `documents.ts`: a `Partial` map with a generic fallback, because `document_key` is per-program configured data rather than a closed enum.
+`ASSESSMENT_RESULT_TO_UI` in `learners.ts` is where the forcing function earns its keep: `Record<DbAssessmentResult, string>` makes each new `assessment_result` variant a compile error until someone decides whether it reads `''` or a word. The deliberate exception is `DOCUMENT_ICONS` in `documents.ts`: a `Partial` map with a generic fallback, because `document_key` is per-program configured data rather than a closed enum.
 
 ## ULI is a key by value, not by row
 
@@ -426,8 +444,8 @@ Three things make this file the reference rather than an example: the state unio
 The learner roster is its own contract in the same module, `modules/batches/data/learners.ts`, and its later additions changed where screen data comes from: the report's scholars are no longer assembled from `Batch` fields a component reads; they are `ScholarRow`s only this file maps (`Batch` gained `scholars_list` / `t2mis` to carry them).
 
 - `getBatchLearnersSnapshot(batchId)` fetches one batch's roster ordered `last_name, first_name, id`. The ordering is not cosmetic — `seq` is a 1-based position with no column behind it, so an unstable tiebreak would reshuffle `seq` between identical queries. It returns every learner regardless of `is_active`, leaving dropout policy to callers.
-- `getTenantRosterSnapshot(tenantId)` is the school-wide form the report uses. It pages the `learners` table 1000 rows at a time (the API caps a response and would otherwise shorten a large export in silence), and takes a **separate** second query for the qualification and T2MIS batch facts so that an unapplied column blanks only those cells — and only when the error is a "not migrated" code (`42703`, `PGRST200`, `PGRST204`); any other failure fails the snapshot, because blank cells would be indistinguishable from "not recorded". It then maps with `todayInManila()`, not a UTC date, since a date computed in UTC is a day behind in the schools' timezone until 08:00.
-- `mapTenantRoster` groups ordered rows under `batch_code` and `attachRoster` hangs each batch's `scholars` and `t2mis` onto the matching `Batch` from the batch snapshot, keyed by the same value `mapBatchRow` puts in `Batch.id`. The `Batch.scholars` count still comes from the batch row; the scholar data now comes from the roster.
+- `getTenantRosterSnapshot(tenantId)` is the school-wide form the report uses. It pages the `learners` table 1000 rows at a time in `fetchRosterRows` (the API caps a response and would otherwise shorten a large export in silence), and takes a **separate** second `batches` query for the `tenant_qualifications` and training-calendar facts so the qualification embed stays out of the learner rows. It then maps with `todayInManila()`, not a UTC date, since a date computed in UTC is a day behind in the schools' timezone until 08:00. A not-yet-migrated error code (`42703`, `PGRST200`, `PGRST204`) is **not** handled specially here any more — either query's error returns `sync-failed`, so a missing column fails the snapshot rather than blanking cells that would be indistinguishable from "not recorded". The roster is keyed by `batch_code`, not `id`: `mapTenantRoster` first checks `row.batches` and skips a learner whose batch embed is null, then groups under `batch_code` and fills `t2mis` from the facts rows matching that code.
+- `attachRoster` hangs each batch's `scholars_list` and `t2mis` onto the matching `Batch` from the batch snapshot, **keyed by `Batch.id`** — the same value `mapBatchRow` puts there (the human `batch_code`, e.g. `BAT-2`). A batch with no roster entry passes through untouched. The `Batch.scholars` count still comes from the batch row; the scholar data now comes from the roster. That key choice is load-bearing: because stats group by `batch_code` while `attachRoster` looks up by `Batch.id`, a batch code that ever stopped being equal to `Batch.id` would silently attach nothing.
 
 Both mappers share `mapLearnerRow`'s two conventions: a null column and a not-yet-migrated column both read `''` through `orEmpty` (the report renders blank rather than failing), and `age` is computed by `ageOn(dob, asOf)` from `modules/import-export/domain/t2mis` — a cross-module `domain/` import — against an `asOf` the caller supplies so the mapper stays pure. `employmentStatus`, the post-training outcome, is not a T2MIS terminal-report column and stays `''` with a `TODO(contract)`.
 
@@ -438,14 +456,19 @@ The split is deliberate and the delivery route (`app/(dashboard)/t/[tenantCode]/
 `tests/unit/batches.test.ts` exercises the reference implementation end to end. Its value lies in the assertions, not the coverage number:
 
 - `mapBatchRow` gets a fully populated fixture and asserts each field, including that snake_case columns become camelCase and enum strings become UI lifecycle entries.
-- `selectBatchesForDisplay` is asserted to return `[]` for `unconfigured`, `sync-failed`, and `no-tenant-access`, and to return the rows for `ok` — including an `ok` snapshot with zero rows, which stays authoritative.
+- A separate block asserts that an unavailable value is `null`, never a fabricated zero — the same rule the failure table below states.
+- `selectBatchesForDisplay` is asserted to return `[]` for `unconfigured` and `sync-failed`, and to return the rows for `ok` — including an `ok` snapshot with zero rows, which stays authoritative. (`no-tenant-access` is not exercised here; `tenant-access.test.ts` covers the fold that produces it, not the adapter.)
 - The `ok` path is asserted not to touch mock data.
+
+No test currently pins the guard *order*, which is why the failure table's first two rows are real risk rather than hypothetical.
 
 `tests/unit/documents.test.ts`, `tests/unit/doc-compliance.test.ts`, `tests/unit/doc-blockers.test.ts` and `tests/unit/evidence-path.test.ts` cover the document rules. `tests/unit/evidence-path.test.ts` asserts that a path containing a separator in any segment is rejected, and that the tenant segment is checked first.
 
+`tests/unit/dashboard-domain.test.ts` is the domain-tier counterpart: it drives `deriveDashboardMetrics`, `attentionItems`, `sessionProgress` and `schoolSummaries`/`crossSchoolExceptions` from fixed as-of dates, so the "anything without a source is `null`" rule and the active-population rule are pinned without a database.
+
 `tests/unit/tenant-access.test.ts` pins the fold's two silent failure modes directly: `deriveTenantAccess` must read `not-found` as `none` but `sync-failed`/`unconfigured` as `unknown`, and `withTenantAccess` must leave a real failure untouched.
 
-`tests/unit/learner-import.test.ts` is the write-side counterpart and tests the `domain/` half only: CSV quoting, header aliasing, the empty and missing-column gates, a blank assessment result defaulting to `pending`, rejection of a missing name / malformed ULI / duplicate ULI in the file, and `reconcileWithExisting` marking a ULI match as an update while leaving the rest as inserts. The Supabase-facing half of `importLearnersCsv` has no test yet.
+`tests/unit/learner-import.test.ts` is the write-side counterpart and tests the `domain/` half plus the pure summariser: CSV quoting, header aliasing, the empty and missing-column gates, a blank assessment result defaulting to `pending`, rejection of a missing name / malformed ULI / duplicate ULI in the file, `reconcileWithExisting` marking a ULI match as an update while leaving the rest as inserts, and `summariseWrites` choosing `ok` / `partial` / `sync-failed` from the saved counts. The Supabase-facing query-and-write flow of `importLearnersCsv` has no test yet.
 
 Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the current suite is pure function-in/function-out against fixtures.
 
@@ -455,8 +478,8 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 
 1. Add the type to `shared/types.ts`.
 2. Create `modules/<domain>/data/<entity>.ts` following the batches reference: `unconfigured` first, `try/catch` around the client and query, raw error retained, mapper exported, `select*ForDisplay` returning `[]` for non-`ok`.
-3. Add a member to the snapshot union only if it is genuinely distinct in kind (`not-found`, `validation-failed`), and omit `no-tenant-access` where the data is not tenant-scoped.
-4. Write the unit tests against a fixture typed with `Parameters<typeof map…>[0]`.
+3. Add a member to the snapshot union only if it is genuinely distinct in kind (`not-found`, `validation-failed`), and omit `no-tenant-access` where the data is not tenant-scoped; keep any freshness pair on `ok` only.
+4. Write the unit tests against a fixture typed with `Parameters<typeof map…>[0]`, and guard the failure-before-empty ordering in each consuming route.
 
 **A new enum column:** add a total map in the mapper, and let the compiler drive every call site.
 
@@ -474,16 +497,19 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 | `unknown` access rendered as `none` | "you have no school" when the check merely failed | `unknown` untouched |
 | throwing from a data function | digest-only error, nothing to render | union instead of throw |
 | raw error string printed | SQL text and table names in the UI | `error` retained, fixed copy shown; import carries a `TODO` to map it at the action |
-| a fake row on `unconfigured` | UI that looks live but is not | no fixtures anywhere |
+| a fake row on `unconfigured` | UI that looks live but is not | no snapshot branch returns fixtures |
 | a `Partial` enum map | new DB variant silently `undefined` | total maps, compile error |
 | a raw column read in a component | rename ripples past the mapper | `database.types.ts` restricted to `data/` |
 | reconciling on `learner_no` | same person re-imported as a second row; pairing lost when the source report omits it | reconcile on `uli` only, reject in-file duplicates |
-| an update built from every column | a names-only re-import blanks earlier T2MIS detail | spread only `row.details` into the update |
+| an update built from every column | a names-only re-import blanks earlier T2MIS detail | detail columns go to `learner_details` only, as an upsert of the filled keys |
+| treating a failed write as one transaction | silent partial state on a mid-file failure | `partial` carries the real counts and the error |
 | relying on the partial ULI index as an upsert target | `on conflict` never fires; duplicate rows per batch | reconcile in JS, index as backstop only |
+| trusting the `data/`-privacy zone for same-module imports | a `data/` → sibling `data/` import lints clean | treat the zone as cross-module only; `domain/` is the public surface |
 
 ## Related
 
 - [Data model and RLS](/openwiki/architecture/data-model-and-rls.md) — the schema, the `learners_tenant_batch_uli_key` index and `learner_identities` in full, the RLS functions the snapshot states depend on, and the `database.types.ts` regeneration contract (RULES rule 20).
 - [Architecture overview](/openwiki/architecture/overview.md) — where these layers sit in a request.
 - [`RULES.md`](/RULES.md) §1–§3 — the boundary and data-layer rules and their enforcement levels quoted above.
-- [`RULES.md`](/RULES.md) §4 (rules 21–26) — the design-system rules a `ui/` layer is held to.
+- [`RULES.md`](/RULES.md) §4 (rules 21–26) — the UI rules a `ui/` layer is held to.
+RULES.md`](/RULES.md) §4 (rules 21–26) — the design-system rules a `ui/` layer is held to.
