@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b614a90a2cab3435a17501e1e166d4ba270e2fae9f55f3cb4a3e0e582942ba48",
+  "pageVersion": "sha256:6b0f57dfd92a5a54d2149a3934ec666218758b286ebe5b2c307b21ad1936ca8e",
   "claims": [
     {
       "id": "claim_b261aa00374b4985868752f47201bd09",
@@ -120,7 +120,7 @@
     },
     {
       "id": "claim_8fdac81955a645b4ba6c2b7b053b96e9",
-      "statement": "Two type families stay deliberately separate: lib/supabase/database.types.ts (raw rows — Row/Insert/Update per table, seven Postgres enums, RPC signatures, Views empty) and hand-written shared/types.ts (UI domain types, with Batch as a hub referencing shapes from six other domains). The mappers in module data/ layers are the only seam between them; module-scoped non-cross-domain types (Profile) live in that module's domain/ and reuse shared types rather than inventing a second vocabulary, so components never see a snake_case column or a raw enum value.",
+      "statement": "Two type families stay deliberately separate: lib/supabase/database.types.ts (raw hand-carried rows — Row/Insert/Update per table, seven Postgres enums, RPC signatures, every Relationships stubbed to []) and hand-written shared/types.ts (UI domain types, with Batch as a hub referencing shapes from six other domains and ScholarRow shaped as the T2MIS terminal-report row, fed from learner_details, rather than a second learner entity). The mappers in module data/ layers are the only seam between them; module-scoped non-cross-domain types (Profile) live in that module's domain/ and reuse shared types rather than inventing a second vocabulary, so components never see a snake_case column or a raw enum value.",
       "evidence": [
         {
           "resource": "repo://CLAUDE.md#L61-L61",
@@ -131,16 +131,20 @@
           "version": "repo-lines-v1:sha256:48ee058603cc4eee34a3816d8c963739ce7e5a6a9d8f82ba39ea7e597ad62673:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTFmNzk0MGUwNjE2ZDJmY2JhYTkxYmMzYWFmNWZjZjg3YjNmNzU5MGMyNGY4YmZlOGUxZGE2ZGE0MWMyYjFlNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNjNTU2ZWZjODIxYjExNzgwNzY3ZGUyMzgzN2E2ODYxMzhmMWU3NGVhMzEwOWJmNjdlZmRlZGMxZmI5NzBiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTMxMjc5NDA5OTc5MTI1Mzk2YTM1YWExZDUzNTQyNWI1YWI5ZDMzZDVkZjg3OGM1MTE1ODhkNDI4YWMyYjEzZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjMzYmEwMzM5Yzc5YTNjYzhlYzJjYTUxNzA3N2MzMTFjMzMzN2MwYTAwMzZiZWMwYmU5MWU5NjJlZTEyMzFmMiJ9"
         },
         {
-          "resource": "repo://lib/supabase/database.types.ts#L25-L58",
-          "version": "repo-lines-v1:sha256:e836e0cd6000f5cfaa8cc6ecafd91fdb732ac3e4e83417e017b9ee170a24d31b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MDIyYWY2YzgzYjlkYmM2ZjgyMWUzNmQ5ZmFmMTBmODU5MzVmMDY0MWRkNzA3YWIzZjhkODFiMTkwYjhiYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4Mjc1OGIwMDQ0Y2NlNjc1Mjc0MjM0N2RmZDhmYzE1OTg4ZmRiNzM3YTcxOTdmMWVkYjM3NDkxNDdmZTFiNzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyOWM3NGMxOGM4OTc1OWJjMjk3YTljYjUzMzBkNGZlZGRiMzc5MDk2MmEyODYyOTgxZGJlNDZmYjhmMGJkOTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkN2JkZDM5OWY0OTg4MjRlYzFiMTgzMWJhOTI0YWE5MzdmYWY0Y2QyNmU3YjgxNzJjMzhmMDE1NzI3ODE3M2QifQ"
+          "resource": "repo://lib/supabase/database.types.ts#L24-L35",
+          "version": "repo-lines-v1:sha256:9246d951313516f009a55b7d4ee39151b1ad6bc6c6521378477e03b3b906c5f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyZmNhYzg1YzllNTMxZTY2YjRkMDhmYWI1N2U3YjgyMjAwMTJkMDc0MGZhYjBhMTVhNGUwM2M0Y2FmYWJiMDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNjJhNTg0YjNiODllMzJjMmMzYTBjMjkzYzVjOWY0NmM2YWRiNTQ3OTk3NjZiYmU2N2U0OTFhODFhMmM5NzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2OTZjZWJhNDliNGIxOTQ2NzkwNzhjNDhlYjk0OTFhZDgzODNjNmFlZjUyZjViYzY1YzZjNTM0OGQ2ZGQzOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1ZDZiZWJiNmI2MTg3NzA5OTcwODk3ZjY3YzU5MGU2NDA1OWZmMWI1NzMwYmY0YzU1YjUwNjcyODQzYmQxYTcifQ"
         },
         {
-          "resource": "repo://modules/tenancy/domain/profile.ts#L1-L18",
-          "version": "repo-lines-v1:sha256:157b335bd47c24a98029f93322531f0a5a0cd152da8b7649c774be35d1eaa45b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0NTc0NmQyZWM4ZTdiZjEyNTIwMGFlOGQxMDZlY2I3MTQ5YjkxMzM0ZTJjOWYxM2I4NzM0ZjExNjJkM2QwMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliOTBjZWUzYWUwODdiZmI0NTA3MjRiMzNhNGYwZjk5Yjg3OWM5YzkwNzNlZGUyYTFmOWMxODQyYmQyMTAzM2QifQ"
+          "resource": "repo://modules/batches/data/learners.ts#L66-L111",
+          "version": "repo-lines-v1:sha256:5823d428bff8369bfec213017b17a48d521caa293fa1c5c71dc68ddfb89c9b3a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MTQ5NmU0ZThiYTA0NmUzNzkyYjQ0M2ZhNGEzYWRlZDFmZjg1YjEzNWNhOWM1YTQzMzZmMTRlZjljM2Y0NjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5YzRlNmU0M2MxZjI5Zjg0ZjQ3ZDIzNTQyMjFmZTk0ODVjYzM0MTkzMzY0MzVjMDZiYmE5NjMxNjIzMjBkOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
         },
         {
-          "resource": "repo://shared/types.ts",
-          "version": "repo-file-v1:sha256:f923f09f5ca1eee6ef73621f56dc6d299bf28f08ba736f0a3f4055c52844f243"
+          "resource": "repo://modules/tenancy/domain/profile.ts#L1-L7",
+          "version": "repo-lines-v1:sha256:f4696e393f32f60db7ba1192c458042254fe9f9a2977bf143deb32ce20490b2c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTQ1NzQ2ZDJlYzhlN2JmMTI1MjAwYWU4ZDEwNmVjYjcxNDliOTEzMzRlMmM5ZjEzYjg3MzRmMTE2MmQzZDAxOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDZlMmFiZjkxOGM0YjEyNDU0Mzc5ZGJiNjE4OWM2NjNkNmYwYzRkNmUwZTczYzMzOGY4MDJjMDFjNGNiM2FmNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmMzMTllNTI2NmQ4YzU1ODE0NjVmMmNkODkyYjViYjI1ZjEwZjQyOTU2NjY0NjM2MGNlNTI0ZDVhNGNiMzU2ZCJ9"
+        },
+        {
+          "resource": "repo://shared/types.ts#L121-L175",
+          "version": "repo-lines-v1:sha256:660678c45a386a7899754adb8b860e0546ff627a165d563f1f9970e7ff50e457:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2YjllYWU1ZWJmMzUxMzA5MzRkMWMwNzk0ODEzZTA3NmZmZWJmODY3MDA0NTJkNWY5M2U5ZDk3MDExOTAzNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI0YjZkMjhhYjE0NGYwOGYxNjcxNTRmYWNmMGZmMWE1MjRmNjA0YzllYWU1YzYxYTNiN2YxYmEzMzdkOTZkMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3NWRlOTEwNWZkNzdkOWQ0Zjc0NWU1N2ViYjcwZDQ3MDAxNmZiY2U5Y2JlY2Q1Mzc2NTU2OWUxMGJiOGNjODkifQ"
         }
       ]
     },
@@ -164,15 +168,15 @@
     },
     {
       "id": "claim_09218565fdf5415cb7690be1e642ba3e",
-      "statement": "mapBatchRow is pure (no I/O), exported for unit tests, and marks schema gaps with TODO(contract) defaults so the UI shape stays valid — e.g. trainingDays/notes/remark stand in as fixed defaults — while billingDeadline now reads the real billing_deadline column with a `?? null` guard so an absent column cannot slip past downstream `!== null` checks, and the compatibility aliases currentDay/totalDays are never rendered as a 'Day X of Y' claim.",
+      "statement": "mapBatchRow is pure (no I/O), exported for unit tests, and marks schema gaps with TODO(contract) defaults so the UI shape stays valid — trainingDays/duration/notes and the compatibility aliases currentDay/totalDays stand in as fixed or nullable-derivable defaults — while billingDeadline now reads the real billing_deadline column with a `?? null` guard so an absent column cannot slip past downstream `!== null` checks, and the aliases are never rendered as a 'Day X of Y' claim.",
       "evidence": [
         {
-          "resource": "repo://modules/batches/data/batches.ts#L227-L286",
-          "version": "repo-lines-v1:sha256:d5c8ecb5e010fb0f3d450a5f346e082abed90a03ae2190881989af5254a65fdd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YmEyYjU5OTY3MzJlNzEzOTBkM2UwY2M1YjliZmRmZTU4YWUzZDZkMzgzY2VhYTMyNzRiMzc1OTY1NWRlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkOTU3ZWQ3ZDcxMGJlYWQ4YjY4NTJlM2EyMTI1MjQwMzVhNjljMDAxZjE3ZDg5NWFjNmQxOTc4MTJkNjRmYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjZjM0YWZiOTVmMGYxNGFjMjlkZDAwNjg1MWY4ZmMyMDQ3NzM3YTE4M2ExMjA3MjU5YTMzZjBlZGM3YTUyZWQifQ"
+          "resource": "repo://modules/batches/data/batches.ts#L227-L288",
+          "version": "repo-lines-v1:sha256:eba34829c750c9ae90c75af84c4068c673e2583caedad9ea714675a7205ce3c4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YmEyYjU5OTY3MzJlNzEzOTBkM2UwY2M1YjliZmRmZTU4YWUzZDZkMzgzY2VhYTMyNzRiMzc1OTY1NWRlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkOTU3ZWQ3ZDcxMGJlYWQ4YjY4NTJlM2EyMTI1MjQwMzVhNjljMDAxZjE3ZDg5NWFjNmQxOTc4MTJkNjRmYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjZjM0YWZiOTVmMGYxNGFjMjlkZDAwNjg1MWY4ZmMyMDQ3NzM3YTE4M2ExMjA3MjU5YTMzZjBlZGM3YTUyZWQifQ"
         },
         {
           "resource": "repo://tests/unit/batches.test.ts#L218-L245",
-          "version": "repo-lines-v1:sha256:5f6b908778a5d5480277c0c9607c58cf31de59d13775401ad5a5c2c6e6500181:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkMDc2OGQ5ZGE4YmY0NjM2YmQwMWUxY2RjZDE4NGQ1OTdhMWRjOWM2NjNkOTk5MzMxNDY4YTBhMzhjZmJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlOTM2YmFjMmFkZmMwMDFkZjNlMWJhZGM1NjkyMmIxMWQ5ZDU0MDdiODEzNWE0NTUwZDRlNTc1OTY5NTEyYzgifQ"
+          "version": "repo-lines-v1:sha256:a70a45d92721af494481c89fba46535cf1ef5d4ae5b635fcf895f1889ce8dc25:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4ZGY3NjVkNDdiNTc0NDEyYTlmYTNjOThjZWY3MTVlMjdhYTYzMGY1OGM1ZDZlZDE2ZWExMTE5MDM1MWUxMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjNjA0MDc3NTBmMDM0NzliYWNiYzMzODI2MjNlZWEwZDcxMTMyYTZlMjJhYmIxODYzOGI3MDIwMDZmMTA0YTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmMTllNzk3OGQxZWU4MzdiMTQyZjJlZTVkY2Q1MWEwOTQ5YjA0Y2Y0YWUyMjMyYTI5MzJiMmQ4MmEyZDNmZjQifQ"
         }
       ]
     },
@@ -216,7 +220,7 @@
         },
         {
           "resource": "repo://modules/import-export/data/learnerImport.ts#L117-L131",
-          "version": "repo-lines-v1:sha256:8bdc9bc4dc85f83a6b00ba74c74ba6f4b7a750eb2571123fd7a759d21f2e58ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNjE1YzY5M2FhZjU2MmUzOWUyODdmZDBhMDI2NTkxNjIwMDBkODA3MDE3NzE1Y2IwYzNhNGJlMzhmNGJkODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ODZkNjk2ZGJmOTQ3MWQ1MDdiNzFhOTZlOWNhMGZiMjM5MzgyYWZkMjc1NmVhZjIyMzlmNDA5ZDc5MmZiMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEifQ"
+          "version": "repo-lines-v1:sha256:9fd236daeb0e7cbef26c4744a4a205f038ffc32615b42947f944cb7acc42e65d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNjE1YzY5M2FhZjU2MmUzOWUyODdmZDBhMDI2NTkxNjIwMDBkODA3MDE3NzE1Y2IwYzNhNGJlMzhmNGJkODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ODZkNjk2ZGJmOTQ3MWQ1MDdiNzFhOTZlOWNhMGZiMjM5MzgyYWZkMjc1NmVhZjIyMzlmNDA5ZDc5MmZiMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEifQ"
         },
         {
           "resource": "repo://modules/tenancy/data/tenancy.ts#L101-L122",
@@ -344,7 +348,7 @@
     },
     {
       "id": "claim_d870c256903f449384fa646c4a559392",
-      "statement": "domain/ layers are pure business rules with no I/O (urgencyTier, deriveDashboardMetrics, withTenantAccess) and are unit-tested with fixed as-of dates. shared/ may not re-export module code: the logic that once lived behind the shared/mocks facade (urgency, billing readiness, dashboard metrics) sits in module domain/ layers now, and dashboard metrics lives in modules/batches/domain/metrics.ts because it must import modules/documents/domain/compliance.",
+      "statement": "domain/ layers are pure business rules with no I/O (urgencyTier, deriveDashboardMetrics, withTenantAccess) and are unit-tested with fixed as-of dates. shared/ may not re-export module code: the logic that once lived behind the shared/mocks facade (urgency, billing readiness, dashboard metrics) sits in module domain/ layers now, and dashboard metrics lives in modules/batches/domain/metrics.ts because it must import modules/documents/domain/compliance — importable only because domain/ may cross a module boundary and data/ may not.",
       "evidence": [
         {
           "resource": "repo://CLAUDE.md#L48-L48",
@@ -355,16 +359,16 @@
           "version": "repo-lines-v1:sha256:0705ae04fcc972c1f5cabc3f0c21b33abf724ebbed743fdcc3386f9f6a762e95:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZmNTVhYjNmNjM4YTZmZWQxZTU4Njk2MmQwMTFiNGQxYWMyMTk0OGMyMDgwMTZmNWIyZWM5MGRhZGE0YzA1YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzI2ODAxNDVlYzBjMDIxNmU5NTgxMzM4ZmEwYzUyYzMyOTdmY2Q0NThmOTY5MWQ2YjQ2YzgyNDljYWVjMTE5ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmIzMDY3MGQyN2Y4ODFlYTU4NTFlM2ZlNzY2ZTBiMzBhYWFhYjY5MDhhZTk4ZjdhNjVhNzg4NWQ3ZTk5MGVhZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTM0ZmRlY2U2MDg3MmZjNWI3YTcxNGYwM2MxMGIwZmQ5MTA4MjAwYjg1NzIyNzllOTE1MTBlNDVlZDkyMDljYSJ9"
         },
         {
-          "resource": "repo://modules/batches/domain/metrics.ts#L1-L18",
-          "version": "repo-lines-v1:sha256:3c8a911cde714cd5689ec7296c3182216cf08e2ee00e16357d4d9417b65ffd92:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NTkwNjMyMWZhN2EzMzVhMTNlNzI4ZThhNGExMTg1ZWZkZGEzYzM1ZTQ0YjU0NGNlYTliNmFmMjAyOWQ4YzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ2NWU5ZmExZWY4NGMyOWZjOGI0OGJjN2MxNGY5Yjk4NTc1ZjhlODI4YWEwMGUxZTBhNTBjNGVhMzVkM2FmNzUifQ"
+          "resource": "repo://modules/batches/domain/metrics.ts#L16-L19",
+          "version": "repo-lines-v1:sha256:9d927fa44e9e3bcfbf3933cc393fe1610c955eb3c03792661a17ae01a45a1ff4:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWQzYmUzNDIxZDYwM2M2NTdiOTkxODAwNTc0Y2Y2NTllMjAwODU4ZDJjYzRjZWIyZjY1NDdhOWY4NDQzY2QwOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjU1OTA2MzIxZmE3YTMzNWExM2U3MjhlOGE0YTExODVlZmRkYTNjMzVlNDRiNTQ0Y2VhOWI2YWYyMDI5ZDhjOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDc4MWNmM2Y5MjI1ODFkZTQ1MTNjYjM0NDhhMmU2MGVhODI1YzdhNGMyNTgwZmQyOTg1ZDc1YzAyZTNlNTU3MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDY1ZTlmYTFlZjg0YzI5ZmM4YjQ4YmM3YzE0ZjliOTg1NzVmOGU4MjhhYTAwZTFlMGE1MGM0ZWEzNWQzYWY3NSJ9"
         },
         {
           "resource": "repo://modules/batches/domain/urgency.ts#L1-L13",
           "version": "repo-lines-v1:sha256:d9bcba5b6b9da6910b4c50b67a66424b1192dbac60d780da3b74951f2546998d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyOTNhZWM2OThhY2Y5NGZlNTkxMDY0N2QyNTI4NzMwMGY5NWIyMzMxYWI1MTFjYzg2NzIyNjVjM2UyNDM1ZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4ZjA4NDc0ZjhlZGM2ZmZjYzA5ZTIwMWQ4OGExNDRjMDliYWViMmNmZWFkMjkzNDQzNjBlZDU4NjEzNDM1MzIifQ"
         },
         {
-          "resource": "repo://shared/README.md#L6-L6",
-          "version": "repo-lines-v1:sha256:9268bf5537bd88a91faa1d0d00622eabafb8532faf5653fcb3d7848773c0d0d7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTI2OGJmNTUzN2JkODhhOTFmYWExZDBkMDA2MjJlYWJhZmI4NTMyZmFmNTY1M2ZjYjNkNzg0ODc3M2MwZDBkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTI2OGJmNTUzN2JkODhhOTFmYWExZDBkMDA2MjJlYWJhZmI4NTMyZmFmNTY1M2ZjYjNkNzg0ODc3M2MwZDBkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTg5YmRiMjc3YmYyNzdhYjFlYTdiMTQzMGU2YTFiMTlkYTM4ZTU3NjNiOGFlMWY0YTQ2Y2FmOGI0M2QwMzNkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjhiNWMxNTQ1NGE0NmU4NWI3MDIwNzg2ZDE2M2U3Y2UzZmEyMTUwYmQ0OTExZWI5YzMxNTc5OTY4ZWQwY2MxZCJ9"
+          "resource": "repo://shared/README.md#L3-L3",
+          "version": "repo-lines-v1:sha256:4da61379037dc28d60457707ef21a2f9bed711945b08d590b4149f52640be574:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRhNjEzNzkwMzdkYzI4ZDYwNDU3NzA3ZWYyMWEyZjliZWQ3MTE5NDViMDhkNTkwYjQxNDlmNTI2NDBiZTU3NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRhNjEzNzkwMzdkYzI4ZDYwNDU3NzA3ZWYyMWEyZjliZWQ3MTE5NDViMDhkNTkwYjQxNDlmNTI2NDBiZTU3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWY1Y2Y1MTcyZmM2YTM3ZDQ1MGEyMDljNzk5YTJiYTIwYTMzMTExZTVjMjcxZjE5ZmQzYTFlZWU5OTllMDZhNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzkwMjEyYzkwNzJlNzJiYzlmM2I4OTgxOGM2YzBjNGM1YjMyZGFiM2NjY2IyMDBhNWQzZDA1N2FmNjE0YzliOSJ9"
         }
       ]
     },
@@ -385,8 +389,8 @@
           "version": "repo-lines-v1:sha256:ac28f6eb21716eea65937d0703bb37081bcbaf3dd3e1b9024fe976e5a1ee1514:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWMyOGY2ZWIyMTcxNmVlYTY1OTM3ZDA3MDNiYjM3MDgxYmNiYWYzZGQzZTFiOTAyNGZlOTc2ZTVhMWVlMTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWMyOGY2ZWIyMTcxNmVlYTY1OTM3ZDA3MDNiYjM3MDgxYmNiYWYzZGQzZTFiOTAyNGZlOTc2ZTVhMWVlMTUxNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzkwMjEyYzkwNzJlNzJiYzlmM2I4OTgxOGM2YzBjNGM1YjMyZGFiM2NjY2IyMDBhNWQzZDA1N2FmNjE0YzliOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjVhZDQwMDIzNGE4ZGE3MzAzN2U3NjgwZTBlNDZlMDgyOWMwMDhkYjJjMDdjODBkOGFiYTZhYjBkNjE1YjNkMiJ9"
         },
         {
-          "resource": "repo://shared/types.ts",
-          "version": "repo-file-v1:sha256:f923f09f5ca1eee6ef73621f56dc6d299bf28f08ba736f0a3f4055c52844f243"
+          "resource": "repo://shared/vocab.ts#L6-L8",
+          "version": "repo-lines-v1:sha256:ef00b92ffad7c4e75dc8f99f2f944a693bab2797f0b6891ed3c3491a8ae5d696:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWRlNzMwZTcyMzJlMzEwNWRiYjliZjdjZWZhZDRhMzI4MDNmMTViOWIwM2VhYmJhYmMyN2NlMjFlZTJlZjM4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmM5NzExNDUxNWI0ZTM2YTQzZDY0ODJjMzQ0MzVjMjBjYjU0YjFjNDk0ZGI2YzExZThhNmFjMzhmYjEyNjAxOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzUyOTcxMDU0ZDRjOTM5YmVmZmJmMzRjYzJhOTM1MmM1MWVkM2NiNDU3Y2M4MTEyMWU3Y2ZiZmVjNDhkNGNhMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDRhZWQ4MTM5MzdiN2Q4ODc2ODQ2ZTI1YzI1NjBkNTI4ODI4OTU3NDlmODg5YWE0N2FmZjQ1MjhlZWMzNzFhNyJ9"
         }
       ]
     },
@@ -466,7 +470,7 @@
         },
         {
           "resource": "repo://tests/unit/batches.test.ts#L1-L8",
-          "version": "repo-lines-v1:sha256:86a250ba476f3aec5bfcead1e6f4aeec81164aa4de55b41d5d21f3362f6c7317:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI4MTcwNTFmZmEzZTY4NDk5MDdhNzFjY2RlNTFkODczOWI2OWMwZWE0NzFhOTIxMjg3ZmExZTRhYjE2Nzc1MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFiZTEwMjgwZmM5NTM4ZTBmN2FhNDQ4ZDI1ODMzYTMwMzcxNjFhMGU5OTEyNWFjYTg1NDJkYWU1ODhmM2ViNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDVhMGEzMjdmNmYwMzllZDAzOGJlOWJlNzQxZGNmY2UzYjVjM2JiMjM4MjQ5ODkzYzAzM2JjNDc2OWQwNmEwMyJ9"
+          "version": "repo-lines-v1:sha256:7493e5e30de1237aa8c3a4c80fb7c4fb4ffb81e0b577a45968274d5be22131ee:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiODE3MDUxZmZhM2U2ODQ5OTA3YTcxY2NkZTUxZDg3MzliNjljMGVhNDcxYTkyMTI4N2ZhMWU0YWIxNjc3NTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxYmUxMDI4MGZjOTUzOGUwZjdhYTQ0OGQyNTgzM2EzMDM3MTYxYTBlOTkxMjVhY2E4NTQyZGFlNTg4ZjNlYjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1YTBhMzI3ZjZmMDM5ZWQwMzhiZTliZTc0MWRjZmNlM2I1YzNiYjIzODI0OTg5M2MwMzNiYzQ3NjlkMDZhMDMifQ"
         },
         {
           "resource": "repo://tests/unit/documents.test.ts#L1-L3",
@@ -526,22 +530,22 @@
     },
     {
       "id": "claim_adebe1200955471298b95837c3e4352f",
-      "statement": "lib/supabase/database.types.ts is currently hand-maintained rather than regenerated: its header records that the ADR-006 additions (platform_admins, qualifications, tenant_qualifications, six new tenants columns, the create_school / current_user_is_platform_admin RPCs) were written by hand from migration 20260906114735_add_school_registry_and_platform_admin.sql — now APPLIED (2026-09-06) — and checked field-by-field against generate_typescript_types run on the live project, with two deliberate divergences from the generator (create_school's nullable text parameters typed string | null; Args kept as Record<string, never>), and every table's Relationships is stubbed as [], which is what forces the as-casts (four long-standing TS2352s) on embedded-join rows in batches.ts, activity.ts, tenancy.ts and users.ts.",
+      "statement": "lib/supabase/database.types.ts is currently hand-maintained rather than regenerated: its header records the ADR-006 additions, batches.rqm_code and the T2MIS/learner_details shapes as written by hand from migrations that are now APPLIED and field-checked against generate_typescript_types, with two deliberate divergences from the generator (create_school's nullable text parameters typed string | null; Args kept as Record<string, never>), and every table's Relationships is stubbed as [] — which, per the header's own note, is the root of the long-standing TS2352 casts on embedded-join rows in activity.ts, batches.ts, tenancy.ts and users.ts, and would very likely be retired by adopting the generator's real Relationships arrays.",
       "evidence": [
         {
-          "resource": "repo://lib/supabase/database.types.ts#L1-L24",
-          "version": "repo-lines-v1:sha256:b561a01298b1406a8a1333fda3091229d9ddc9a588fea6f46ffc3ed1e579550d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhOTY1ZjE1ZGZhMDYzNmVlMTQwNjFkZGFiYWZlM2I5YzkwZmYwM2Q3MTE0OWJmMmQ5NDZiMDI4NDZmYWIxNDYifQ"
+          "resource": "repo://lib/supabase/database.types.ts#L1-L36",
+          "version": "repo-lines-v1:sha256:821fc6bab881d55b3478677f29b775a749bad6e4db04dc22de265f2866485982:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhOTY1ZjE1ZGZhMDYzNmVlMTQwNjFkZGFiYWZlM2I5YzkwZmYwM2Q3MTE0OWJmMmQ5NDZiMDI4NDZmYWIxNDYifQ"
         },
         {
           "resource": "repo://modules/activity/data/activity.ts#L131-L131",
           "version": "repo-lines-v1:sha256:2a063c1857c284d277f65ad48897e9cb615ff73518051e1f76d231eed50a98a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmEwNjNjMTg1N2MyODRkMjc3ZjY1YWQ0ODg5N2U5Y2I2MTVmZjczNTE4MDUxZTFmNzZkMjMxZWVkNTBhOThhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmEwNjNjMTg1N2MyODRkMjc3ZjY1YWQ0ODg5N2U5Y2I2MTVmZjczNTE4MDUxZTFmNzZkMjMxZWVkNTBhOThhNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmY0OWNjYzUwYjA2N2IwYzlmMjZhYjllOWVmZDI0YWM1YTNlNTI3MGYyODM5YjliYzFmMzBlNGZkMjI5MTViMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjllNjgxYjM2OTUxYTcwMDEwNWVlNDcxN2FiOGQ4YzUyMzYxMTM5YzgyYTVkMzQ5NDI1ZDUxZDUwNmQzNjExMCJ9"
         },
         {
-          "resource": "repo://modules/batches/data/batches.ts#L347-L347",
+          "resource": "repo://modules/batches/data/batches.ts#L349-L349",
           "version": "repo-lines-v1:sha256:06b5ada0fce2b992796fb21a897b69ab1ed0c0fa84c7ec516fde5bf66f94f169:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDZiNWFkYTBmY2UyYjk5Mjc5NmZiMjFhODk3YjY5YWIxZWQwYzBmYTg0YzdlYzUxNmZkZTViZjY2Zjk0ZjE2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDZiNWFkYTBmY2UyYjk5Mjc5NmZiMjFhODk3YjY5YWIxZWQwYzBmYTg0YzdlYzUxNmZkZTViZjY2Zjk0ZjE2OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWY2ZTZhNDA0ZTg5ODhjNmMwYTQwM2U0M2VlMjAzYTRjYmZlMWEwMzEwNzVkMDk1NDg3ZjZiMjg3ZWU1OWJmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTVmODQ5MmVjNDUzNmRkMzliZjM0YjZjMDc5YTBkOGY1MTM4ZWYwN2EwOWQwMmE1NDhhYzYyMTQ3NDg0ZWJiMCJ9"
         },
         {
-          "resource": "repo://modules/tenancy/data/tenancy.ts#L145-L145",
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L146-L146",
           "version": "repo-lines-v1:sha256:5a339548b6e54e79487841a432f2bdca9cd510f0e5d2a64614f6f7c5385721a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWEzMzk1NDhiNmU1NGU3OTQ4Nzg0MWE0MzJmMmJkY2E5Y2Q1MTBmMGU1ZDJhNjQ2MTRmNmY3YzUzODU3MjFhMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWEzMzk1NDhiNmU1NGU3OTQ4Nzg0MWE0MzJmMmJkY2E5Y2Q1MTBmMGU1ZDJhNjQ2MTRmNmY3YzUzODU3MjFhMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDBhY2M0NzNjMWFmZDc2MDkyZjY5NWQ1ODhmYzI5NzZiZjI2NTNlMzc1NDE3ZjU4ODhkNjgzOTg1MDIzMjFhYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTVkZDcwZjAzNGIyZmZhYmIwNjg1OTRmNjZlNWM3MTY0ZGRkZDIyYzM5Njk4NzBiMTM3ZTQ5ZjBiYWQyNDQxMiJ9"
         },
         {
@@ -556,7 +560,7 @@
       "evidence": [
         {
           "resource": "repo://app/(dashboard)/layout.tsx#L12-L57",
-          "version": "repo-lines-v1:sha256:a88966b14025b1b6c782ba2560900a2d27928d52b6077203a44e798546fc7220:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzMTc0ZDMxNWNhNTNhZDNjNjYxNTlkNGFkY2FlYmRhYzAwMTEwYzY5YzM4YzM4MTRiOTgxZWZmZWU5NzM3MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhOGQ3NzRkYTg1YWVhMDZhMzc2NzVjYzI4YjMyYWNkZDg1MjczYWMwNzliZWFjMTkxZTc3OGI3MWJjMGZlZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhMDBjNWVjOTZkMzRiYWI4ZjdiYzBiM2ZmMGNiMmZmMDc0YjJkODEwNzkwMWU1MTRlZWNlMmU5NmVjNjdmOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExNjZmZGIzMGFmMTlkYjM3ZjkyYzkzNDRiMTUxNzgwYzY5YTRmYTM1ZjNmZGFkMDU5ZGI3Njk0MjMxOTFlMDMifQ"
+          "version": "repo-lines-v1:sha256:ba64d7deefeb48394c1187712bee21060d205faf07d6bd569d152599ef00d9a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzMTc0ZDMxNWNhNTNhZDNjNjYxNTlkNGFkY2FlYmRhYzAwMTEwYzY5YzM4YzM4MTRiOTgxZWZmZWU5NzM3MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhOGQ3NzRkYTg1YWVhMDZhMzc2NzVjYzI4YjMyYWNkZDg1MjczYWMwNzliZWFjMTkxZTc3OGI3MWJjMGZlZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhMDBjNWVjOTZkMzRiYWI4ZjdiYzBiM2ZmMGNiMmZmMDc0YjJkODEwNzkwMWU1MTRlZWNlMmU5NmVjNjdmOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExNjZmZGIzMGFmMTlkYjM3ZjkyYzkzNDRiMTUxNzgwYzY5YTRmYTM1ZjNmZGFkMDU5ZGI3Njk0MjMxOTFlMDMifQ"
         },
         {
           "resource": "repo://app/(dashboard)/schools/new/actions.ts#L25-L27",
@@ -676,49 +680,53 @@
     },
     {
       "id": "claim_cb4f903f86d94dfda8b6d9c3f3ac0549",
-      "statement": "Dashboard metric derivation has a single live home: modules/batches/domain/metrics.ts's deriveDashboardMetrics is a pure function over a Batch[] the caller has already loaded, called by the school dashboard and scoped (sections) layout and reused by modules/batches/domain/overview.ts for the cross-school view; modules/batches/data/metrics.ts (TES-30, derive-only) no longer exists. Every number is computed from the inputs rather than hardcoded, and anything without a source is null.",
+      "statement": "Dashboard metric derivation has a single live home: modules/batches/domain/metrics.ts's deriveDashboardMetrics is a pure function over a Batch[] the caller has already loaded, called by the school dashboard route and by app/(dashboard)/trainer/page.tsx's metrics row, and reused per school by modules/batches/domain/overview.ts for the cross-school view; modules/batches/data/metrics.ts (TES-30, derive-only) no longer exists. Every number is computed from the inputs rather than hardcoded, counts only active (ongoing) batches, and anything without a source is null.",
       "evidence": [
         {
           "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L91-L91",
           "version": "repo-lines-v1:sha256:7c4572a86d39c74da4d17eaf495dac938e148fcb5720b891e4f15f800b01aa85:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M0NTcyYTg2ZDM5Yzc0ZGE0ZDE3ZWFmNDk1ZGFjOTM4ZTE0OGZjYjU3MjBiODkxZTRmMTVmODAwYjAxYWE4NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M0NTcyYTg2ZDM5Yzc0ZGE0ZDE3ZWFmNDk1ZGFjOTM4ZTE0OGZjYjU3MjBiODkxZTRmMTVmODAwYjAxYWE4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzExMzAzMDIwODJkZWNjMTdiYTQzOTU0ZDQwNDI3ZTQ0NDAzZWJmMzdmNzcxOTUwYmFlNmI0OTEyMmE1OTM3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWRhNzkyNTZlYzAyNmYyN2MwYmJhNDJhZDMwNWYyNzEwY2E4MDQ2YmY1MzIyMmEwMmE3MTIxODIxNTFmMGRiMCJ9"
         },
         {
-          "resource": "repo://modules/batches/domain/metrics.ts",
-          "version": "repo-file-v1:sha256:75f6ccd344fc2356be25c1a05a1845e13fcdafaf0aa2e2410f7abd7ac2c491e9"
+          "resource": "repo://app/(dashboard)/trainer/page.tsx#L16-L17",
+          "version": "repo-lines-v1:sha256:28fad7715e63fe93c05fdc7cd90f2f62752082f875878daba0d41b890bb2c2cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjhiNDYzY2VkMTQ4MjAxOWEzZmE4OWRjZmE1Y2I4YjEzNTYxMWViNzZkODE2YWEwNDVjZWU3MWZmNmY3MGVhYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGU1YWZmOGM1YmFiNjhjNmZkNmJhZTcwNWY5YzI4ODcxYzRhNTVkYTIwYTJlZmUzYzE5YzgxMDljZDc5MWI3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTU5MDgyNTk2Njc4MDQzNjU1NzI5NWMzZTdmZTZmY2IyZWE3OTljZjU0ZmQ5ZDY1OGFjNTg2YjNhMDliOGYxZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmFhNTMwMzcxZjQ4OGQ4NTU1YmJmNTYwNjllZjE3ZTc4OGVkZmQwMGQ0ZmQxODkzZTY5NzVmMzkxMGYxNmNlMCJ9"
         },
         {
-          "resource": "repo://modules/batches/domain/overview.ts",
-          "version": "repo-file-v1:sha256:b17877470dcaac74c748ff17f186bb56252be68de4646448f82a28658a1c53d6"
+          "resource": "repo://modules/batches/domain/metrics.ts#L21-L31",
+          "version": "repo-lines-v1:sha256:39cb167177118b404f7269964a036a3b23c435529059b5a7655a9dd04022293d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlNWNkNDlhYWUwNTI5YmU5Y2Y5MzA1NmUyZGNlZTI0MTdlODJjMjZkNWI3ZTgzZjIwMTJlMzAzN2FlYzQxZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyMTdkYWEyMmRmMTQ4MzAzMjM1YmUwYWVjMTc4OWM2ZmEwNTBmNzEzNWI2Y2Q5ZDRjMTczMzZiNjE5ZDk3NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyMjZhODRhNDQzNGZjZjBlZDEyODY1MGI0MWVlNjBhYTgyMmRiOWRkMDc5M2UzODBlZTUxODcyMjZkZmZlNjUifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/overview.ts#L41-L41",
+          "version": "repo-lines-v1:sha256:11d49dff38d5a1f31e00c20dc2d08115ece0815bc34a964622b3653e690f4b79:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFkNDlkZmYzOGQ1YTFmMzFlMDBjMjBkYzJkMDgxMTVlY2UwODE1YmMzNGE5NjQ2MjJiMzY1M2U2OTBmNGI3OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFkNDlkZmYzOGQ1YTFmMzFlMDBjMjBkYzJkMDgxMTVlY2UwODE1YmMzNGE5NjQ2MjJiMzY1M2U2OTBmNGI3OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTI0M2ExMDgwMjIwODVlZjliNjIwYWI1ZTlhNGYxMmZkOTM4ODc3OTZiNmZmZjE0Y2VlMzRlZGJiMjM0YjQ2MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDU1ZmZmYzc0OGM4MWU0ZTA1YjhiN2YzM2UzMjgwNThlMjNlN2UyZWIzMDIyN2ExYzExMWEwZDA0NzFmYmIwZCJ9"
         }
       ]
     },
     {
       "id": "claim_2039085c2b674cfdb8ccc1816145822a",
-      "statement": "The document-requirement catalog is always passed in as a parameter and callers pass [] today, because the live catalog (program_document_requirements) is scoped per scholarship program while Batch carries no resolvable program id — and the empty catalog is designed to degrade to 'unknown' (docCompliancePct null) and 'not ready' (billingGate's requiredTotal > 0), never to a fabricated pass. The dashboard goes further: deriveDashboardMetrics summarizes each batch's own embedded catalog rather than a program-level one.",
+      "statement": "The document-requirement catalog is always passed in as a parameter and the billing route still passes [] today, because the live catalog (program_document_requirements) is scoped per scholarship program while Batch carries no resolvable program id — and the empty catalog is designed to degrade to 'not ready', never to a fabricated pass (packets.ts's requirementsUnavailable guard, readiness.ts's requiredTotal > 0 guard). The dashboard goes further: deriveDashboardMetrics summarizes each active batch's own embedded catalog via summarizeOwnCatalogCompliance, so an empty catalog yields docCompliancePct null rather than a percentage.",
       "evidence": [
         {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L121-L137",
-          "version": "repo-lines-v1:sha256:ca9bf676a2f869225b1fd0969c9ca10ca31bec05e5624c541aae9abb36bc44fa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZDk4MjJmMjcyOTEyYjEzNmI2Y2IzMTMwZGFhY2ZmZTBkNjVjZDMzNWY3YTU3NjNhMmI4N2QxZDgxNTdhMzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZTNkYjg4YTIyMWQxZjQ5MzA0MzlhMmY2NDRmNTg4NTI0ZTYzZGVmZTY4NWVmNDU4MGEzNzk3ZTJlMzA0MmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1OTg4YWUwMGQ4MjU2NjFhNWI2NjRmYTM4NmQ1MzY3MmE4YjhlMDg0MzFlNTE0MDU5ZmUzMzkwZTUyZmI0ZmQifQ"
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L125-L132",
+          "version": "repo-lines-v1:sha256:3cb223ff555a5cd4bbbe715c14c7d31de29ae4b8e9fe87d614a5c46cbc89f2ad:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGY5YzBjODBlOWQzY2MxNzBlNDM3MzJjMjdiYWFlY2JkODNmMGRjM2Q2ODFlMjlmMjliMzc1NmQxMmMxNmM4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjYwZGY1OTNiNjdlNDAwYWNkMDExYTM4YWExYTljMDYwYzIwNjI4ZWUwYjg1YWYwODJkZWE1YjcxMjlkMjA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmJhY2Y1OGMyMmIwZjBmMjJjMDZjZTA5ZWMxMjZhNjUxM2Y3MDgwNWM2OWYwNGE5YWI5ODA4ZmZhY2U5YjUzOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjNjZThmMDU4NzgxZGU0MjUwMDhiMjA3YzU3Nzk5NTEwYTliMjAyN2RjZGI5MWRiZjQwYmNkZWY0MzY5MWU1ZCJ9"
         },
         {
           "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L91-L91",
           "version": "repo-lines-v1:sha256:7c4572a86d39c74da4d17eaf495dac938e148fcb5720b891e4f15f800b01aa85:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M0NTcyYTg2ZDM5Yzc0ZGE0ZDE3ZWFmNDk1ZGFjOTM4ZTE0OGZjYjU3MjBiODkxZTRmMTVmODAwYjAxYWE4NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M0NTcyYTg2ZDM5Yzc0ZGE0ZDE3ZWFmNDk1ZGFjOTM4ZTE0OGZjYjU3MjBiODkxZTRmMTVmODAwYjAxYWE4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzExMzAzMDIwODJkZWNjMTdiYTQzOTU0ZDQwNDI3ZTQ0NDAzZWJmMzdmNzcxOTUwYmFlNmI0OTEyMmE1OTM3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWRhNzkyNTZlYzAyNmYyN2MwYmJhNDJhZDMwNWYyNzEwY2E4MDQ2YmY1MzIyMmEwMmE3MTIxODIxNTFmMGRiMCJ9"
         },
         {
-          "resource": "repo://modules/batches/domain/metrics.ts#L11-L18",
-          "version": "repo-lines-v1:sha256:d49fd5a8b37ca8246ba802ffa75d759b3d8dd4a473f9ada1235f0e1237115ae0:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI0MWExZjQ0ZjZjYmVhYWRkMWJhMzQyYTlmMjBjZmQ2ZjZkYzAyYTM5OGJiMmYyM2NlYmNiYzcyZGE5N2ViMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjU1OTA2MzIxZmE3YTMzNWExM2U3MjhlOGE0YTExODVlZmRkYTNjMzVlNDRiNTQ0Y2VhOWI2YWYyMDI5ZDhjOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRlNWI3Y2U3NmM3MWVlZDkxYTQwNDVmNjIyNTJkMmY0YWRhODI1NjFmODVmNDFlYWVjOTUyNmY1M2RkNjk5YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDY1ZTlmYTFlZjg0YzI5ZmM4YjQ4YmM3YzE0ZjliOTg1NzVmOGU4MjhhYTAwZTFlMGE1MGM0ZWEzNWQzYWY3NSJ9"
+          "resource": "repo://modules/batches/domain/metrics.ts#L42-L45",
+          "version": "repo-lines-v1:sha256:d68facd05a3314c2bea3a8a7c69e30c867172e8837fb0fca38f0894b9087405e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzIzZGVmMmUzODIyMDZiNGMyZTk1MTkxNzMyZDdmZmE3ZDI0NDlhOTU0NjU5YWUwY2Q2Nzc1Y2QwMGUxMWVkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTExM2YwM2FkZjM3OTg2M2I3NTZiOTU5ODcxNjk2YmY4ZjE2YTk2OGI3ZDZiNDlhZTQ1NDI4YmI4MmYxMzY1OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODlkMTQ2ODEzNzkzZTUzYjkwZmQyMzRhMTJiZTc3MGRlOWE5ODBmNDJmYzc0ODgxNmI2NWU2NmEzMWE5YzhkNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI2NzQzNjY2MGQ0NTk5NWMwMDlkYjE2MGVlODk5YzEzNzMwYTJiNDEyZTIyNjg0ZjkwNzllMjc5NmJlODk4ZiJ9"
         },
         {
-          "resource": "repo://modules/billing/data/billing.ts#L44-L59",
-          "version": "repo-lines-v1:sha256:1628a0e51ca1e0861e57722e7e00902361c578274d6e4fc02b3fedd5900910ca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2MjIyNTBhYjE5OThmYzE3NDIzMWNkNTFiOTQzODEyMGZjY2FkZjE2MTcxN2FjY2UzYzJlNWEwMGYyMjExYjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5N2MwNGE4Y2E2YmQ2NTY1OThkYzdiNjRmZDBkMzk4ZTM4ZDE5MGJmYjBhYmQ3ZGY2OTU0NWUxOTM0NWIyYmMifQ"
+          "resource": "repo://modules/billing/domain/readiness.ts#L62-L62",
+          "version": "repo-lines-v1:sha256:6d6806f1b1b97ff853dfdd0cb71589febea56b66d50512b6c82a1cbb5abc5c00:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmQ2ODA2ZjFiMWI5N2ZmODUzZGZkZDBjYjcxNTg5ZmViZWE1NmI2NmQ1MDUxMmI2YzgyYTFjYmI1YWJjNWMwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmQ2ODA2ZjFiMWI5N2ZmODUzZGZkZDBjYjcxNTg5ZmViZWE1NmI2NmQ1MDUxMmI2YzgyYTFjYmI1YWJjNWMwMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjNjY2M3YmQwZjg5ZDQ5NzFkY2NjMWJhNTIwNmI3NWVhYTE2NzRiODE3NjIwYzBlMTljZTY2YTY3Yzk4OTQ0YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODAxY2VkYzc5NDYwOWY1NzUzMTVhZWVmNzFiZTRiMzVhODk4NTk4ODI3OGM2NzNlMDg3M2Q0YWNhZDRjNmI3YSJ9"
         },
         {
-          "resource": "repo://modules/documents/data/documents.ts#L148-L167",
-          "version": "repo-lines-v1:sha256:3b999afe84cb0642ebb034f2da6e8ed10fa93fa267ee079211e761226672c176:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NGQ0N2JmNmQzMGQ4OTgyYTIzMjIwYTlmY2FhMmUxZDk3Y2FlYjVmMDZlYjk5NWNjOTMyNzEzYTI1MmEyYmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxOWVjYzA2MTA2NmZmZDk4ZTVmYzBmNGUwYTMzMGUyZDFmNmJiNDI4YzNlODhmYjE3ZjBhNDE0Mzk3NDliMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzNmQ4MWVkMjc3YjM4ZWQ4YjUzMDE3MjFhNjM2NDA4MjRiNDE4MjYxYjA1ZWE1NGM4YjcwNjEyYzEwMWU3Y2YifQ"
+          "resource": "repo://modules/documents/domain/compliance.ts#L135-L158",
+          "version": "repo-lines-v1:sha256:3c6c7b67868260fc0989e628b42e372f1f908ec1b578159027adb9c7b65aa994:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1YWYxOTJhNzM3NDhkYmJhMDczNjY4NmE3YTA1ODUyNWMwMDFjY2Q5ODIyMDdkOGEzZDBmYjQwOTFiN2YxOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxZjY0ZWM1OTdkZjgyMjU2MzY1MzQzY2IxZmM3NmUwODRmMzg2OWU2ODIxMTUxMmE3MGNmMjA5OTBmMzY1ZjUifQ"
         },
         {
           "resource": "repo://shared/types.ts#L269-L275",
-          "version": "repo-lines-v1:sha256:db9bb19a1729ad823e4fd6b6ea521a16f3320fadc30889493f8ffa04da49392c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWY5MGRlZjMzZTEyYTdkZTU2NDU2NDEzNWEyNzkwYTdhNzYwMzNkOTI2ZWVkZTUxZmY5MmRjYjY0MTdmYWFjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzFjNGI5MGZiY2YxMmRhYWQxOTMyZTEwN2QxN2VlNmRhZThmZTM5ZjExNDY2NTUxYmM0MmUzNWRmZmI4ZDk3ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWUwZDcyMTVkMDg0OGExZmYyMzEwMTEyYmZmZDA0NTQwN2NjZjFlZTkzNzYyOTI2Y2JkN2ViMDJhN2EwMjM0NCJ9"
+          "version": "repo-lines-v1:sha256:e51b8ded92de14d976c9827bfc07371b15a42fcedfcdbd001f8b27749a9780e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmMxMzY0NjM3MWZiZTJjZDM3N2Q4ZGI0ZjU1ZTYyZDM0YjI2MzFmOTU4OTY4YjZlYTMzYWRiNDdiNDM2NTM4ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWU3MTE4NTU5M2M5NWJhNGQ4MzNlMzg5ZmEyOWM1MGRjMzMzOGEzZWNlYmZlZTVkMTZlMzBmOTk5OGRjMTEwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2EyOGFmMmQzNjUwNDhhZmU1MmNjMmQyZjIyZTYwYjM0NTBkZmFjNjc1OWNkZDYwMWJhMzYzNjE5ZGRmMTliYyJ9"
         }
       ]
     },
@@ -732,7 +740,7 @@
         },
         {
           "resource": "repo://modules/import-export/data/learnerImport.ts#L117-L131",
-          "version": "repo-lines-v1:sha256:8bdc9bc4dc85f83a6b00ba74c74ba6f4b7a750eb2571123fd7a759d21f2e58ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNjE1YzY5M2FhZjU2MmUzOWUyODdmZDBhMDI2NTkxNjIwMDBkODA3MDE3NzE1Y2IwYzNhNGJlMzhmNGJkODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ODZkNjk2ZGJmOTQ3MWQ1MDdiNzFhOTZlOWNhMGZiMjM5MzgyYWZkMjc1NmVhZjIyMzlmNDA5ZDc5MmZiMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEifQ"
+          "version": "repo-lines-v1:sha256:9fd236daeb0e7cbef26c4744a4a205f038ffc32615b42947f944cb7acc42e65d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNjE1YzY5M2FhZjU2MmUzOWUyODdmZDBhMDI2NTkxNjIwMDBkODA3MDE3NzE1Y2IwYzNhNGJlMzhmNGJkODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ODZkNjk2ZGJmOTQ3MWQ1MDdiNzFhOTZlOWNhMGZiMjM5MzgyYWZkMjc1NmVhZjIyMzlmNDA5ZDc5MmZiMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEifQ"
         },
         {
           "resource": "repo://modules/tenancy/data/users.ts#L227-L272",
@@ -947,10 +955,386 @@
           "version": "repo-lines-v1:sha256:66902b5af85b99abb1db464fd6b44945061fabc7bb08acfdf5857636c83c4cc6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVmZjdiYWI4YTdkMjY5MjUyNDdjZmFhZThmZWZkZmIwNDM3MThlN2U1YWE1ZjgxY2JjYjRhMTRjNDIxNTMyNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1YWZiMTAxZTk0NWMwYTMzYjI3NGE3ODA1ODk1MjBlOGE5OWFiYjQwMGE3ODI0NWM3YmVmYzI2MTZiZThlM2EifQ"
         }
       ]
+    },
+    {
+      "id": "claim_333889f88d1e4d10ad675ff1f6451fb2",
+      "statement": "learners stays tenant-scoped, so a ULI unique by value is not a ULI unique by row: the same person at two schools is two tenant-scoped rows carrying the same uli, learner_identities (uli primary key, RLS-enabled with no policy and no grant, deliberately unpopulated) is only the planned cross-tenant seam, and 20261111120000 adds the narrower partial unique index learners_tenant_batch_uli_key on (tenant_id, batch_id, uli) where uli is not null — one learner once per batch — alongside the canonical (tenant_id, batch_id, learner_no) uniqueness.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L169-L169",
+          "version": "repo-lines-v1:sha256:6a99616c6d9f24c17294dc73d09f2eb6c1e0ded16432999df24ee7a646b8dc4b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmE5OTYxNmM2ZDlmMjRjMTcyOTRkYzczZDA5ZjJlYjZjMWUwZGVkMTY0MzI5OTlkZjI0ZWU3YTY0NmI4ZGM0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmE5OTYxNmM2ZDlmMjRjMTcyOTRkYzczZDA5ZjJlYjZjMWUwZGVkMTY0MzI5OTlkZjI0ZWU3YTY0NmI4ZGM0YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTE0NWFlOGU4YzQ5NzgxYWEzNGMwZWEwNzUwMDM3YjAxZjlmNzBiNWZmYTU2N2EzZjkwMWUyODk5ZmNmNDgwMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjg2NTFiOGVkY2YwNTNjOTcxYmIwYWZmODZkYmM2MmZkMGQzYzVkYmZkMWYzYjE3NzAxZDFkYWM0YjZlMGRjNCJ9"
+        },
+        {
+          "resource": "repo://docs/TRD.md#L263-L263",
+          "version": "repo-lines-v1:sha256:a49461b0ebd1a9f587a4d171b1092c415ec714edab4a8d79e8717e05a3e716a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQ5NDYxYjBlYmQxYTlmNTg3YTRkMTcxYjEwOTJjNDE1ZWM3MTRlZGFiNGE4ZDc5ZTg3MTdlMDVhM2U3MTZhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQ5NDYxYjBlYmQxYTlmNTg3YTRkMTcxYjEwOTJjNDE1ZWM3MTRlZGFiNGE4ZDc5ZTg3MTdlMDVhM2U3MTZhOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjBjYzJkODdlODBhNjZhNjVlMThmZDEzZGE5NzRhYTk0YTA0N2YwOThmMjRhYWU2MGVlNmQzYWFlYjAzMjgxYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTlhOWUwZmMzZjlkNDRlNGYxY2FkMzc2YTU3ZDYwZjA4YWZlY2FmNDQyNzU2YTBhYmY3YTVlZGEyYWZjMGJiYyJ9"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-001-billing-and-domain-model.md#L176-L176",
+          "version": "repo-lines-v1:sha256:6525942bd0c71d4a7105f7fdbe1ac2c2572ee53ecfaadb5a5d21de1837b743f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjUyNTk0MmJkMGM3MWQ0YTcxMDVmN2ZkYmUxYWMyYzI1NzJlZTUzZWNmYWFkYjVhNWQyMWRlMTgzN2I3NDNmNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjUyNTk0MmJkMGM3MWQ0YTcxMDVmN2ZkYmUxYWMyYzI1NzJlZTUzZWNmYWFkYjVhNWQyMWRlMTgzN2I3NDNmNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmExZTdhMWMwZDAxOGUwNzliNGRlMDljZjdmMTcxNzQzMTVmZDlkOWQ3NGU1MTZlZDMxM2NhMjM2MWZhZWE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGI4ZjlmODIxYmJhYzAyYjI5MmQwN2JhN2E1NGNkNTVkZTdiOWMzMjAxYTJlYjljNWY1MDc1YzFmYWExZjJlYiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L162-L169",
+          "version": "repo-lines-v1:sha256:e3ac9aa0b568e446a8d4be3338d234d9c5d2f7daf06a1458e2acbf6d5b49d9ab:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRjNjAzNzZjYjJmZDE5YjhmZjkzMmZmZWE0MjE2OGMwMWNkMzUyY2ZiZDhhMDhhYmU4MmQxMTRmYjBhOGU5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTYwYTVjOWY0YmI5MDljNzk1NGI3MWRlZGVmYTg5N2FlN2QwN2ZkZGNkZWZlNGY1MzllNTBiYzU2YjQwNGUzMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjZlZmRkN2ZkOWFlZGZkYTBlYTUyYzg2ZGVkOGMxYjk5N2MyMTcyODU2YTA3Y2Q3MDc0ODM4MTQ1YmRjMGJlZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmEzNDA2YzNjNDRiZjYxZTE0YjZmNWYxYWFkZjkyMWVlMWJmMTNiNmRlYjRjYWRiMTcyNWE0N2E2ZDkzYzM1NiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L80-L87",
+          "version": "repo-lines-v1:sha256:f232d505d663e73e36b727f8c7fe458c52a3651320e23936f764240fb385ada6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGRhY2ZkYzgzZDlhNTE5ZGQyNGNhN2IwYThlZTM0NWJkZjBjYjY0YjI3NzE0MzlkOTNkNjA1OWMxZDBjYWRhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QzMWQ1ZmZmZDY2NTc0YTcwYzVhZGIzODYxOWVlZTRiYWU0MWU1Njg3YWYzNTE3ZmM1ZWUxYzYxNTI5MDA5ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzYxZWY0MWU1NWY2ZTI2ZWQyZTUxNDgxZTgwNzhjOGNmY2Y5MmRmMGYxMGU1NGJhYzMyYmE3MjlmZjhkMzBlMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_052dacbad9e94ce69d665d96e88baebc",
+      "statement": "The roster's mutation refusal happens in write paths, not in schema constraints: reconcileWithExisting matches only inside one batch, so a ULI held on a row of another batch in the same school inserts instead of colliding, and validateRows rejects a ULI repeated within the file (Duplicate ULI) before any write, so the partial index is never the thing that fails.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L12-L16",
+          "version": "repo-lines-v1:sha256:017751d8b3ccd3c0bcaf1c48821ed2af71390d73e10678db70c30e72c2d23b07:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjBmZDJjMDEyOTFjYzk1YzY2NWE4ZGYyNjQwYTcyZmIxZTAzMjA0YTk1NmVmNjk3MGYyM2NkYTJkOTI0YzMzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWI1NGY0YWU5NTFjMjUwMjFjMGVjZmUzZDg0OGEyNDc0NzQ5MDk1ZTNhODMxOTRlMWYwZGYwMzRiMjcwMzA2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTI0MDcyZjMwNGM4NTM5OWM5YzE4MjFhYzUzNjdiZGQxMDA2MTE0YjgzYzVjZTExOGQxZTg0YzgyOTg1YTljYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJmMDU2MDk1YmM5NWViMmMzNTEyZWI3NTJlOTBlMmJjNGEzZTBmODNiZWE1MDAwMzc1ZTI2ZWI5ZWQyYWYxMSJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L228-L278",
+          "version": "repo-lines-v1:sha256:c0ccd59f8193449c0e439b9c4866bd65422d4a9b469ca0c4fbd751eb0d2a1ea4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiNTA4Nzg2YjI1MGEwYjQyY2MwZThkNTZiM2I2MDAxMDNhM2YyNmU3NGQxY2U3MzNmMGVmNjhkMDhlODczOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzZjQ3ZDQ2MThlNzVmOWM2N2I2NzUxNGYzOGNiZDRhNjdjZDE3YzEyMzVlNzFlYmQ5ZmNlOTU0N2E0OTc5YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/learner-import.test.ts#L99-L117",
+          "version": "repo-lines-v1:sha256:fa7c3c11f5d021228555a6fe7903b010e4ffff0d9573b89fc1d491f98259ff30:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzZWRmOWEyNjkyNDRhNTU4NDA3ODczZDUxMTU3ZDU5MjIzYjg1MWQ2Yjk0MmZlZDc0NzY0Y2QzOWE4ZDhlZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjA5YjE2ZjYwNDVlYTcxM2RkNGUyYjkyYjE0ODViNjAzZjdlNGVhYzJlZTc3ZGUyYjNkZGU1ZGUxOThiNGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f2df1c54dd33403d8fe5e6eafeedfa46",
+      "statement": "Because the index (tenant_id, batch_id, uli) is partial, it is not a legal on-conflict target for a supabase-js upsert; the import therefore fetches the batch's existing (id, uli) rows, reconciles them in domain/ code, then issues one bulk insert plus one update per matched row (supabase-js has no many-rows/many-values update), and writes on update only the columns the CSV actually filled (…row.details, a Partial keyed by learners column) so re-importing a names-only file cannot blank contact, address or employment detail an earlier T2MIS import recorded.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L147-L166",
+          "version": "repo-lines-v1:sha256:6d628b7ef7dee91007ec1de3efbc05f22fe4788db127c07a4bb4a6e02202ff00:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMGRmMDE0OWUxYWMwZmJlYTMxYTczZmVkMjgyYTFmYzA3MGJiODc5MGNlZjIwN2U0ZWE2MWE0MGQwNjk0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhMGIwZjFkNTMyMWJlNzUyYjhlMWJlMzNhZDNmOGU4OTY5ODhiZDM5OTkxZWZjMmRlMDk2OGNjNzNiYTg0MGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NGZmZTBkYWE5NDZkMzhmYmIxZWQ1YjU5YjVhOWQxNjdjZmQ1ZmU2YTVmMzAyZGZiMTExMWE5NjdhNjNmNjEifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L96-L117",
+          "version": "repo-lines-v1:sha256:d4ce3e5c70bc8bd88664ab7f171e637f775a2f954775728757b5d49782c35f93:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5MGFiMzM0MDZjMGRhODQwMzc4NDk5YWIzYjI0MzAwMWFiZmM2MWYwZDU4ODEzN2U0ZTI4ZjhmMzNmMGYzODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlNDE5NmM4YTkxN2Y0MTg4MzFkNzRhYzk0OGIyN2M0ZDcxODkzMTc0MjkxZTdjOTY4ZGIzY2FlMGIyN2RhMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllNjhjMjg4YTQwY2FkOWRmYzljNTNkZTViMzVmZmYzYTg4NzNhNjZjOGQyMTZmY2Y0ODZmZmUwNzk1YzRkMjAifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L36-L64",
+          "version": "repo-lines-v1:sha256:2ff996c3eb0a9b59a842f76ac8f7899de529b264bf5adf66c4b3f6357135dd37:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNTk2ZTZiNDZlNGJhOTI0MzEyMzZjNzIyYWJhZjU2OTI5YWVlZmRlMGU0Zjc2MTc2MTcxNWQ0MTNkMDBkNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3NDhiOGUxOTQzYWRmNzMzM2ExYzFkYWZlYTE1Mjk5ZjY5NTViMTJiNjQ0NWQ2NTNhZWM2NTdkNjU3MjkwNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjM2YwMjEwNzYyOThiOThhODdkZTJkNGM3MDMyMDAzYWFmZTEwYTJlNDVlNGNiOGIyNTI1NjQxZTQ2YWIzY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjMjcwYmU1ZjM5MGRjODIwYzQ3MTc5NTBmOTg2NTBlNzM5ODlkYjk5NDkzZjE3ZTdlZjA2Mzc2YjEwNGJjNTIifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L14-L16",
+          "version": "repo-lines-v1:sha256:7665003a9712c1d7a002c150607de72f849bea15b77bfd2d70c4a91972dbd823:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTViMjZkNzY0OGIyOGJkZDk2ZDJiNmFlMDMwYmIzMzExZWZmNjEwMzA0YzUwOGVhOTE3MTE4NDg3YTc1ODY1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWQ1YTliOTBiYjA0MjYzODA2MjA3ZTM3ZDI3NmU4NmQzZTNlN2I0NjNiMTEwMjE4Y2E4ODlkZDVlMzFiYTcxYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjM3OGRhYWE3OTdmMTM3YTYzYjBhODM3OTYwZTE5YmJmM2E4ODkwNGI1ZjJiNTc3MTUxZDRlZTNiOWIwODkxYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e9c254ad4e1149b99e5fd915a998b6cf",
+      "statement": "The import write path takes its tenant from the record rather than the caller: fetchBatchTenant re-reads the batch's tenant_id through an RLS-scoped select, so inserted rows can only target a tenant the caller already had read access to, and every failure (unreadable batch, failed reconciliation read, insert or update error, thrown client) returns sync-failed carrying the raw Postgres message — table, column and constraint names — with the header recording a TODO to map that to user copy at the action boundary (RULES rule 6).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L35-L35",
+          "version": "repo-lines-v1:sha256:7ad8eb6cdeec1944cd9d24f2fd4624de3b36e4e714d5e076f7fd9d7d8657de8a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2FkOGViNmNkZWVjMTk0NGNkOWQyNGYyZmQ0NjI0ZGUzYjM2ZTRlNzE0ZDVlMDc2ZjdmZDlkN2Q4NjU3ZGU4YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2FkOGViNmNkZWVjMTk0NGNkOWQyNGYyZmQ0NjI0ZGUzYjM2ZTRlNzE0ZDVlMDc2ZjdmZDlkN2Q4NjU3ZGU4YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjc3MDUzMzBjNDIwMzVkZGQ1YzU0Y2IzMTJmMDg1OTNhZjdjZDc0ZDI0ZjA5ZmQ5MDQ3NTcxZjQ4NDEzMDdiYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGRmYWQ5OWQyODdkOTUwMzA2MGM1NzMxY2RjNWMxY2JhMzkxMjg1NDNkYzcyYWRkYWZlMzBmOGNiNGZlZmY4MyJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L119-L131",
+          "version": "repo-lines-v1:sha256:76e97672a167a1cb9b8319d31d2ba38ff94b9465a4f98f55bfdfb7783d50ed04:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4OTI2M2NlNDg0ZTcwNmMwMjg3NjJmYzUwNDc3NWIyMWE3NjRhZTNlOTU1NDM1ZDFiODVlY2U3Yzg3NjRjNmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1Mjg0MTkzOTc0Y2JlYWUyMmEwYjRjNjk4ZWJkODNiZDkxYmUxMDg0NDM1M2JiNzAyMjIxMzAyMmJlZDAzNDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5ZjFiZmNiZGUyMzdhMTIxNDEyMDUyNDRhOWNhNDAzM2I4OGVkYzAwNTlmNmQ1YzAzM2U0MTcxMmRhYTEyMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1NGZhNjllZGY1ZTJkODk3NmVlN2NjZDk1Y2VhYmQ3NDA0NmZiNDIxMmI4YzM1MGM5MmQ4NmU5ODBjNmZmMjMifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L16-L21",
+          "version": "repo-lines-v1:sha256:c51a29067e8408113e78105feb7b9d52552bc7893b4313c93395981b0000c3e9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWI1NGY0YWU5NTFjMjUwMjFjMGVjZmUzZDg0OGEyNDc0NzQ5MDk1ZTNhODMxOTRlMWYwZGYwMzRiMjcwMzA2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzYyMDFjOTY0N2ZiNTIzZTg3MWQ4MmUyMmFhMmY3MmVkOTk2NmJjZjQ1ZTk1ZTQxYzZjMTliYzdkZGZmMzI0ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWNlZDc1NmYwY2VlYTZhNmQ5ZjE5MGE5NDljZmMxMjU2NjMwYjRhZDc1ODI3ZDVhZTM3ZmJjM2Y5YzIzODM4YiJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L56-L70",
+          "version": "repo-lines-v1:sha256:a013d7e35f18e568ff5749ff64c3de0c2fa7b6782fe602efde3ac337b3e6da95:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwODVhNDBjZmY3MjFhNjc5ZmJmMmNhNTFjYmY3Y2UxYzYzOTczOTg0YzQ1YTE4MDE1MjRmMWRjZGE2NmQ1ZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlNWIyZmJiOGM2NTMzZWM3MGI1MjYxZjlmNWZhODZjMTE3N2M1Nzk5MWQxMGRjN2E0NWY4YWY5MjdmZTQ1OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlN2M4ODJmNTk2NmZiZDhlMWViMmM4YjIyMWE0N2I4MTBmYWM2ZGI1ZjBhOWI5NWNiMzI3ZTA1N2FjNGNkNzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_324ba301f8c941f9a9d14c1d6c76267a",
+      "statement": "The roster read is paged in a dedicated fetchRosterRows helper — 1000 rows at a time, ordered last_name/first_name/id, stopping on a short page — because the API caps a response and would otherwise silently shorten a large school's export. The qualification/T2MIS facts come from a separate batches query, and any error from either read now fails the snapshot outright: the file no longer special-cases not-migrated codes (42703/PGRST200/PGRST204), on the stated ground that blank qualification cells would be indistinguishable from 'not recorded'. mapTenantRoster skips a row whose batch embed is null, groups the rest under batch_code, and fills t2mis from facts rows with the same batch_code; attachRoster then joins onto Batch.id, which mapBatchRow sets to the human batch_code, and a batch with no roster entry passes through unchanged.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L234-L234",
+          "version": "repo-lines-v1:sha256:63d199041104673384651d19b4754cf3c110870a55048b9e1da62b7b3af2d346:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjNkMTk5MDQxMTA0NjczMzg0NjUxZDE5YjQ3NTRjZjNjMTEwODcwYTU1MDQ4YjllMWRhNjJiN2IzYWYyZDM0NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjNkMTk5MDQxMTA0NjczMzg0NjUxZDE5YjQ3NTRjZjNjMTEwODcwYTU1MDQ4YjllMWRhNjJiN2IzYWYyZDM0NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmZkODZiYjQxNDY5ZTYyYzg0N2Q3MmE1MjQ1YzRiOGI3MjM5MmYwNGZhMDViZmQ4MDg3MjVkMTJmMzk3NmE3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTc2NDhjMmEyYjY1YjJlYmE1ZjQyODJhNWJkOTBmMWZjMjdiMDk1NTJkZTU2OTE3YjliYzQzODI3Mjk5NTY4MCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L194-L228",
+          "version": "repo-lines-v1:sha256:6851c62b2b5b4745302ee4b19afb11b3a2934cfc93babc10faf0e9ce11e25561:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1NWI0YzYzNDhiZjA0YjJmMzg1NTY2OTIxMTZlNGNiMmUxNjJhY2Q0ODJlOTlmNWI2ZDUwZjdmMTlkMWRkYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiM2M3YjQ5N2NkMjQ2MWIzOTkwZjdjMTA1YzZmZGMzZjAxNmE0MmU3MTcxNThhZDVhMzMzOTI1MTJmMjJiYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwMTZkM2E4ZTkwODJmYjU0NWFjMzUzMDBkMGJhM2VmMjNhYTRmYjA5NmNlNWMzMmNjNDgzNDM1MzcwMThmZWYifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L232-L255",
+          "version": "repo-lines-v1:sha256:3e6703a6de4ec03e4e800fe5a0b24120dde42b77a3a2c323f2c8e5938a78126b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1MmZlOWZkNjYyNTAzYTc0MTYyYzNkZTY0YzRlNDU4MjU0NDY2ZWE3ZjUyMDU1OTEwN2U5MDMwNzhlYjU5N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwMTZkM2E4ZTkwODJmYjU0NWFjMzUzMDBkMGJhM2VmMjNhYTRmYjA5NmNlNWMzMmNjNDgzNDM1MzcwMThmZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZTkwYzBlZTNmNjMwNmY3OWVhZWZlZGRkNmRkODA1YmQ2YmVjZDc5MzhkMzA3Y2E5NDYyYWY3ZDE5ZjVmZTUifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L275-L283",
+          "version": "repo-lines-v1:sha256:95f574579c3ddd3189c122aa0d4941489203f265a72bfe0ce59dd4c87dc86107:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzAwNWUwYjU2NDRhYTFkYjIzZmNmMjExNjRlZDg4OGM0MzFhMzcyMGE3ZTM0MGNhMzc2YjFjMTAxN2NkYTBhMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjgwNTVkMzkzNzIwMDY5OTY1NGI4YzhjNjQ0OTc3N2NhZTg3ZWZjMjYzMWZkYTZkYTUyZTliZGU0YmE3ZjRhNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzBiNzFlZjE0NjhlNjg3MTlmZTYwOTM3MjQ0OGY0ZmYyNTFmMWNjNmY0OWE3Yjk1Zjk0Yjg5OGRmMjc2ZmMyOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_39f87354ccec4c70aeaa210116156ea5",
+      "statement": "The roster is kept out of the batch snapshot because it carries contact, address and employment columns, and the report route is the surface that must therefore be trainer-denied: it redirects a trainer on resolveTrustedRole (profiles.role only, never the ?role= preview override) before either fetch, and folds both snapshots into one syncFailed condition so a failed roster still raises the banner even though the banner copy only mentions batch data.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L40-L73",
+          "version": "repo-lines-v1:sha256:d5736829b6dff3d553d11045f5abadfe83882dfcc4f146de32649249be6dd11d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZmYxZTkyNDFjN2RjY2QyYWQzMzMxOTA5YTNjMmM4NThjNGI1ZDE4NmM2NDAwN2U5MDUxMzRhODYyMGQ0OWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhYzgwMDAxNzU2Yjg5NjUyOTY4NDhlYTljZjBhNTVjOTI0NWE1NWQ2MWEwOGM1MWM0NDc0MzI1NTc2ZWJjYTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyZDM4NzRjOTIxNjA3OWExNDlmODIyMGEyYzI0OTc5NTlkNDM0NjYxYTE4ZDhlNWZhNDFkM2RhNDQ3OWIxM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0Y2NkZTM1ZWFkMjZlOTNiYTA2ODE2ZDU2MTk2Y2NkOWQxYWJlZjUwODVkYmNkMDA0OGM4Yzc2MGJkODYxMGIifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L257-L263",
+          "version": "repo-lines-v1:sha256:68477929242e310420da3eaeb99027ea50d86b0bc74a08ad5d8482eb6955fabe:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjRjYzhjYmRmZjRhMTQ0Y2M5ZmQwMDU1M2MzOGQ3NTBkYzVhMjFiMjI0MzliODQ4MDVhNzZjY2ViOTBmMjZmZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZThiOGU0NTUyNTEyMWYzMDI2NzQ5MjdjMGMzMmM0MTY2N2FkNWJlNjVhNzQ4M2VkZjM3MTRhNTQ4ZjQ2MjJkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmNhOGI2NTBmMmQ4OWRlN2RlMzVmMjUwMTg4YTBjNjYwZjlmNzRkMjMxMmI3ODY3MDE2N2M5ZWQ3Yjk1Mzk0NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_817de5e491f34559820dcf6fbf1f4f3b",
+      "statement": "Guard ordering composes the status union with the role gate rather than flattening both to \"zero rows\": /t/<code>/batch-cards returns the sync-failed callout before NoTenantAccessState before EmptyState, the dashboard's guardState runs denied → syncFailed && batchCount === 0 → noTenantAccess → empty, and the report route resolves its hard trainer redirect before either snapshot is consulted.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L28-L59",
+          "version": "repo-lines-v1:sha256:a00c09d15ccb5d3d23813c5fa3279f769c1f5cb3a878ecc8b4c5d5235a78469c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1Y2NmZjkyNjQ0MTkzY2ZkYWM2M2M3NzA2ZmNkYTI4MGM3NjExY2M4Y2M5ZGM2YWY0MThjZWExZTFkNDM4YzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5ZTlmOTI0N2NiYWNkMTkwMTRiOTY0ZmRmMTI1OTYyY2QxNzY4OGNjZDg3ODAwNGIzZTk0YmNiYjA1MTliNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhYTFkNjc2N2U4ZDE1NjQwMDY3YmZjYTA1MTE4NDE2ZDgxMmY4OTljOGU4MWEwY2NjODY1ODllYWQxMDJhZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L51-L57",
+          "version": "repo-lines-v1:sha256:b0960832ce06bf7d299475c24655add3fbb9edde9012eda21df441c7f8fdc6d2:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDRjYzQ4NmI0ZjUxMGY4ZGRhMGYzOTU1MmM0NTVmMDc3NTdmNTU4NmJhMzk1NDg2Y2QxMGQ2OTNkNDZkN2JlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzI2MjUxZTgwOWFiMjQzM2E5N2U0NmZjZDllOGE5YWI5ZDYyNWI0Zjc4YzY4OThmNzU3NWU1YTJkOGIzZGVmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzcwZTM5MjdlNjc0YTc4YmYxMjUyZjExOTYzNDQ1YWVjNzQ3MWM1NjZhZjgwYzc1NTAzYzdiMjQzNTk3ZTkzOCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx",
+          "version": "repo-file-v1:sha256:ecd691c91259716fb01e9b62f02dd441d0320ba9a2e45fdbdfa21f6a7ba582d0"
+        }
+      ]
+    },
+    {
+      "id": "claim_75ffcfda1ce4410a91478ebf8705a744",
+      "statement": "The two roster snapshots (LearnersSnapshot, TenantRosterSnapshot) carry no freshness pair: rows are ordered by name and updated_at is not selected back, so the \"Data as of\" stamp has to come from the batch snapshot alone.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L110-L115",
+          "version": "repo-lines-v1:sha256:558a18a23a81d23bbeab4841b67c6174b4fd22d7731ee545326f2db57b2bdc86:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQ0ZWU3YjY2MzE3NzIwOTFiMjBhMDFmN2Y4ZjFmMTY3OWU2MjU0NjM5YTNjZTA1MDU5MWNmOWVjOGM0Zjc5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDcxOTQ2ODRjNTU4YzI4OGZhOTZjMzgzZGM0MmM1NDA0MGIzMGI0NWFkMGM5YTBmMWVhN2ExZGQ0MDdkMWE4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Q1ZTc2NmMwNTM2Y2Q1YWQyYzZmMzBkZmNlOTAzNTRlYTBkMmZhN2UxODkzYzQ2ZTE5YjNhNTUxNDhhOGFmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjQyYWVmNDAzNzZjYmI5MmZiY2Q0OWU1MjZhNGM0ZGVlY2M5YWQ4N2M3MTI5MmU4OGM2MDUyYzlhNTk1MGU5NiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L132-L141",
+          "version": "repo-lines-v1:sha256:446e49c2698146d57f7df12649bfe54505a20f40145d81cb594fef37db57c029:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzYThmMzFhZjAyYTE1OGE1MDQ3NWJiMjYxNzM2M2NkNjc3MzQ1NDRiZTIzYTczYTFjOWQxZWEwNWFjMTc5YTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ODkwNDlkOWFkYWFmMzNmYmIwMjMwM2VlMmFmMjExMWI2MmJhNzM4NmEzMjg3NDE5NDlmMTE4ZWM5YzAwYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NGZmZTBkYWE5NDZkMzhmYmIxZWQ1YjU5YjVhOWQxNjdjZmQ1ZmU2YTVmMzAyZGZiMTExMWE5NjdhNjNmNjEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L174-L177",
+          "version": "repo-lines-v1:sha256:3b04b4f8c8dd3ae81171fb6ee43f94185a5e25dbdaaa966adb25cad58145059d:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODUxNWU5OGY3ZWUyY2E0MTljY2IwYzk2YTJiNDI5NjdjMGYzMmI5YzliZGRiYWFmOWZkZmI2NmM4YzRiYTM2MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDcxOTQ2ODRjNTU4YzI4OGZhOTZjMzgzZGM0MmM1NDA0MGIzMGI0NWFkMGM5YTBmMWVhN2ExZGQ0MDdkMWE4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDhjYmQ1ZDY1MjA2NDBkZjUyMWY1NDMyM2JlZGEwMDNmMzA5MjRlMTFkYzRkZjdlZGFjOWM0NzBmMzYwMjRlNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTUyNzJmMmUwYzVkMjdhZmZjYjAzZmU1NTUwZGMyOTg3OTNmZDE3MzhjZGQ3NmRiNjM2MGU1NGM3NzBjMGRiMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4a468eef3ba94f0b8c83fca7eb9f488e",
+      "statement": "mapLearnerRow holds two mapper conventions worth generalizing: a null column and a not-yet-migrated column both read '' through orEmpty so the report renders blank rather than failing, and age is computed by ageOn(dob, asOf) imported from modules/import-export/domain/t2mis — a cross-module domain/ import — against a caller-supplied asOf so the mapper stays pure; the post-training employmentStatus has no column and stays '' behind a TODO(contract).",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L46-L47",
+          "version": "repo-lines-v1:sha256:52b0f5497db43f5d019bd5e05a651d418227c5d49ccb531f20e2e829bb7ba28a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNjMzE0NjFhNjkzNTQyYzM2M2RjMDQ1Zjk0ZGJlNGNiMTE4MjUwNmNmODU1ZTRhOGZlYjBjZDZlZGE3ZmNlZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWM0ZGNkZjA2MzQzNzZhNzgyMTE4M2ZlNTQwYmUzNGEzNjEzZjA1NjA2MjQ1ZjgzM2Q1ZTE0YWYxNzI1YWNiOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmEzYzZhYzc0NzhjNGEwZjg5OTVjYzRhOGM5ZWE2NGE2ZjUyYTQ1MzViZjc0MGRiMGY1OGIwMDcwYjAzNDdjOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjQ2MWUxM2I5OGIxYzJkY2RlOGMzNjQ4OWQ3NGQ5MTQ2MmFjMjBmNzMyODIwYTE3ODkyZDQwNDk0YjQzMDIzZSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L66-L111",
+          "version": "repo-lines-v1:sha256:5823d428bff8369bfec213017b17a48d521caa293fa1c5c71dc68ddfb89c9b3a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MTQ5NmU0ZThiYTA0NmUzNzkyYjQ0M2ZhNGEzYWRlZDFmZjg1YjEzNWNhOWM1YTQzMzZmMTRlZjljM2Y0NjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5YzRlNmU0M2MxZjI5Zjg0ZjQ3ZDIzNTQyMjFmZTk0ODVjYzM0MTkzMzY0MzVjMDZiYmE5NjMxNjIzMjBkOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2c4087087df14eb5af54a556de8710ea",
+      "statement": "database.types.ts's stubbed Relationships is what forces the as-unknown row casts on embedded joins — six of them across activity.ts, batches.ts, learners.ts (the roster page and the facts query) and tenancy.ts/users.ts — and the casts are contained because every one lives in a data/ layer; the file header records adopting the generator's real Relationships as the way to retire them.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L30-L35",
+          "version": "repo-lines-v1:sha256:833013106a14893d706ff1aa403b43e71e26c26505fe7b5a0d4c2d69e95762b1:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRjMTMzOGQ1ZjkxZDE2MWU1MTY3MTIwNTJjY2Y5ZTIxMjMxNDY2OGU1Y2ZlZDkzYjJmNWM4ZWZmMmUwNGFjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE2MmE1ODRiM2I4OWUzMmMyYzNhMGMyOTNjNWM5ZjQ2YzZhZGI1NDc5OTc2NmJiZTY3ZTQ5MWE4MWEyYzk3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODRjOGNjODhiMjRlMWRlMzkzNzY3ZDZjMmUzNmYzOTZhM2NiMzkwNDA5Y2ViMjM3YWQ1NGQ4ODdkMTEyODBhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjVkNmJlYmI2YjYxODc3MDk5NzA4OTdmNjdjNTkwZTY0MDU5ZmYxYjU3MzBiZjRjNTViNTA2NzI4NDNiZDFhNyJ9"
+        },
+        {
+          "resource": "repo://modules/activity/data/activity.ts#L131-L131",
+          "version": "repo-lines-v1:sha256:2a063c1857c284d277f65ad48897e9cb615ff73518051e1f76d231eed50a98a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmEwNjNjMTg1N2MyODRkMjc3ZjY1YWQ0ODg5N2U5Y2I2MTVmZjczNTE4MDUxZTFmNzZkMjMxZWVkNTBhOThhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmEwNjNjMTg1N2MyODRkMjc3ZjY1YWQ0ODg5N2U5Y2I2MTVmZjczNTE4MDUxZTFmNzZkMjMxZWVkNTBhOThhNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmY0OWNjYzUwYjA2N2IwYzlmMjZhYjllOWVmZDI0YWM1YTNlNTI3MGYyODM5YjliYzFmMzBlNGZkMjI5MTViMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjllNjgxYjM2OTUxYTcwMDEwNWVlNDcxN2FiOGQ4YzUyMzYxMTM5YzgyYTVkMzQ5NDI1ZDUxZDUwNmQzNjExMCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L349-L349",
+          "version": "repo-lines-v1:sha256:06b5ada0fce2b992796fb21a897b69ab1ed0c0fa84c7ec516fde5bf66f94f169:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDZiNWFkYTBmY2UyYjk5Mjc5NmZiMjFhODk3YjY5YWIxZWQwYzBmYTg0YzdlYzUxNmZkZTViZjY2Zjk0ZjE2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDZiNWFkYTBmY2UyYjk5Mjc5NmZiMjFhODk3YjY5YWIxZWQwYzBmYTg0YzdlYzUxNmZkZTViZjY2Zjk0ZjE2OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWY2ZTZhNDA0ZTg5ODhjNmMwYTQwM2U0M2VlMjAzYTRjYmZlMWEwMzEwNzVkMDk1NDg3ZjZiMjg3ZWU1OWJmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTVmODQ5MmVjNDUzNmRkMzliZjM0YjZjMDc5YTBkOGY1MTM4ZWYwN2EwOWQwMmE1NDhhYzYyMTQ3NDg0ZWJiMCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L250-L250",
+          "version": "repo-lines-v1:sha256:cb296dad3f97b82b00940d4d4fc9dc204a5e74591a025643e3781cb670fe2be0:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2IyOTZkYWQzZjk3YjgyYjAwOTQwZDRkNGZjOWRjMjA0YTVlNzQ1OTFhMDI1NjQzZTM3ODFjYjY3MGZlMmJlMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2IyOTZkYWQzZjk3YjgyYjAwOTQwZDRkNGZjOWRjMjA0YTVlNzQ1OTFhMDI1NjQzZTM3ODFjYjY3MGZlMmJlMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q5YWNmNTRlYWRiNTQ0ZmZkNTM3NjA4MjMwM2JmMWJmYmVkMjZjNjY4Y2M2NjY0MDI0NzVjZjJkYTJmMzYxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWNjY2RiY2VmOTM4OWQzMTNmZTkxMTZiNGYzODJmYzQ5ODAyNGVmODZmMzFjZmU1MDJmYWM3YmU3ODU1YmEyOSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L287-L287",
+          "version": "repo-lines-v1:sha256:35250b765eb26eeca8d8b55a20d5032139482463f6f59ba812f65c1cacb06f24:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzUyNTBiNzY1ZWIyNmVlY2E4ZDhiNTVhMjBkNTAzMjEzOTQ4MjQ2M2Y2ZjU5YmE4MTJmNjVjMWNhY2IwNmYyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzUyNTBiNzY1ZWIyNmVlY2E4ZDhiNTVhMjBkNTAzMjEzOTQ4MjQ2M2Y2ZjU5YmE4MTJmNjVjMWNhY2IwNmYyNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzBiNzFlZjE0NjhlNjg3MTlmZTYwOTM3MjQ0OGY0ZmYyNTFmMWNjNmY0OWE3Yjk1Zjk0Yjg5OGRmMjc2ZmMyOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmYyMzEwZGFkN2EwNjU2YTNjYzQxM2NhMzlkOTFkOTE3NGU0MTI1M2FjYjIwYTMwNmM0MjY4YTVlMzQ2MzYyMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a710d7694fec43d58e9f8d80dd435836",
+      "statement": "The import's domain half is unit-tested but its Supabase half is not: tests/unit/learner-import.test.ts covers CSV quoting, header aliasing, the empty and missing-column gates, a blank assessment result defaulting to pending, missing-name / malformed-ULI / duplicate-ULI rejection, reconcileWithExisting marking a match as an update, and summariseWrites choosing ok/partial/sync-failed from the saved counts — while importLearnersCsv's query-and-write flow has no test.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L160-L168",
+          "version": "repo-lines-v1:sha256:0c8587831122c876bd1daf1d18da21d7d57b2811369ec1684de6cdf15e34f579:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzMwYTdiNWEyNzIwMzVlM2I0YzhlY2NkMDc4ZTkxY2IwZWMwYTY3NTJmZWY3YWQ2ZTBiOWY3M2Q3NDVmMDgyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjU2YWMzNDQzOTY2MTgwYjU3ZjU2OGMxNDI4NjU4ZTdiMDJkZTVkMDYwZmVmNGJiNWE5OGJiMmM2N2ZjZDBjYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWU2OGMyODhhNDBjYWQ5ZGZjOWM1M2RlNWIzNWZmZjNhODg3M2E2NmM4ZDIxNmZjZjQ4NmZmZTA3OTVjNGQyMCJ9"
+        },
+        {
+          "resource": "repo://tests/unit/learner-import.test.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:e648d212aed244ec18e104f8ae5413a27fd09680ecd40b07ea5b1fa624457f56:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwOGU0NjkxYmE2NTMxNDg4YmZlMTMzOTYzZTJjYzI1OTkzMGI0MWYwZjU1YWI1ZTVjZWEyYWQ2MTFkODQxODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlNmYyMzg5YjIwMTdjYTBiNWIzNTBjYThhZDAwOGExMTBhNDk5YjVjM2MwNjBlYTlkNzkzNDAyYTI3NTZiYTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0ZWExMDIwMTNhMjk5OGQxZmFkM2FkZTYyMzRmYTQwMzEzMmRmMDBhYWIwYWZlOGQ3ZTU3ZmUyYTE4Zjc0M2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ec6e8cde744f437085c9d8ab6ad9078c",
+      "statement": "The tenant-access verdict reaching withTenantAccess is derived by one of two helpers: tenantAccessOf(profile) in modules/tenancy/domain/access.ts, used by a page that already holds a resolved scope, or deriveTenantAccess(profileSnapshot) in modules/tenancy/data/tenancy.ts, used by a route holding a profile snapshot, which maps not-found to 'none' but a failed or unconfigured read to 'unknown'.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L59-L64",
+          "version": "repo-lines-v1:sha256:9058f8f9eccc9363db154eb6243b7b74ccc6d0476791e1e6dd0571e36f0d42a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTJhMDA0ZDM5MmQwNzQxYjQ5Yjk5ZDUzMzhhYTc1NTRjODFmZmU2MTRhYmU5NTAwMzhiMzEwNjNjYzc4NDQ3OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzE2ZGI0OGJkMjhhZjdlNGRlZDQxNzBhMjgxOTNmOWM3NTBmOTdiNjczOWViMWFiZmRkMzg5YzhlNjJmMzNhZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2FhNjAzNGE2MjJjZmY2MDU3NTUxM2I1ZTE1OGRlODAyZjhlMGRiMTk4ODJkYTc1ZjJkMDNjNGQxYmU3NDQ2MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDA4YzVmZWFkOTc1MTkyMDI0ZTRkMjkxMTFkYzRlNmM1Yzc3ZTNmYmRjNTcyOTZhMjVhNWM2NjMxNGVkMTg4OSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L156-L177",
+          "version": "repo-lines-v1:sha256:a5fbab9a076764287c3605677c562786030cab0f5f2a99c236d756d289a90163:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhMDFmNjAwZmQ1ZmMyZTdlZmJmYzE4ZGMwN2FiZDAyZTE3ZjFiYzE1NmZiYTgwNDA1ZjIyMDYyYThjODRjNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L33-L57",
+          "version": "repo-lines-v1:sha256:3330ef169a1f2175c2eb8a988424e7094c63d4b3b073ef7ec0b5e714d8a41418:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZGFhNTY3ODQ1ZjA3ZGJjMzFlMjljZGExOWE4ZGI4NDU4ZDczZTM3OWU1MmM2YjhmYzBlMjAwNzA0N2ViYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDhmNjE4ODM0MWVhYjBkYWM4NTFhNTY5ZWVlMWE3NDdjMDkzMGIwMjVmNDcyZWViNjA2ZjFmODVlODRiZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4YWMzZGEyOWY5ZjgyODI2MWNmOGY5ODQ0MzcwYmQ5MmU0ZTkxNjE0ZmQ4MDczMGM0ODQxYmJmOGE1MTU3ZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5631a24cf8c442debdb5dc330f910186",
+      "statement": "A learner CSV spanning more than one batch is rejected in the import's validation phase (validation-failed, 'Import one batch at a time') before any Supabase client is created, so the single-batch scope both the reconciliation read and the insert rely on is established before any network call.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L124-L145",
+          "version": "repo-lines-v1:sha256:9fd236daeb0e7cbef26c4744a4a205f038ffc32615b42947f944cb7acc42e65d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNjE1YzY5M2FhZjU2MmUzOWUyODdmZDBhMDI2NTkxNjIwMDBkODA3MDE3NzE1Y2IwYzNhNGJlMzhmNGJkODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ODZkNjk2ZGJmOTQ3MWQ1MDdiNzFhOTZlOWNhMGZiMjM5MzgyYWZkMjc1NmVhZjIyMzlmNDA5ZDc5MmZiMTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0f735454feec45fc8a9d272dff27960c",
+      "statement": "getBatchesSnapshot is wrapped in React cache() and its docblock says the layout and each nested page call it independently in one request; the same request-scoped caching covers the two contracts a single request reaches twice — getProfileSnapshot (layout nav row, Sidebar user card, school switcher) and getPlatformAdminSnapshot (layout's boolean isPlatformAdmin() helper plus the schools/new page and its Server Action, which call it directly because they need status-level detail). cache() scopes sharing to the request, so a later navigation re-queries.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L23-L40",
+          "version": "repo-lines-v1:sha256:02f2ad418801cb4a2ecf3eaf24ff02a61357fbdc2a09e1d1b438c23e73ef764a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwMjYzY2QxMjY3MjM0MGFlMGJjMzYwNjRlNWIxZTkyZDVkMGQwZTM3OWJmZDNiZWM0MjY5M2VhMzgwNGJlMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhOWU5MDY1ZjY3ZDlmNTRlN2ZlMTk2ZTJlMjJkMDZmMDI2OGY2ZDFiNzM5YjRhNGJkNWYyNjRmODYzN2Y0MDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNTJhNWI2MGZjZDQ2MDNkYmRiMDdhNThjNWI5NjkzYzZkN2U4M2I2NzQ1MTJmMzdhMjdhZGQ1NDJkMTE1YTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2NzkwNzVjN2EwNjVhOGQ2MDFjYWVkODE0MjkxZGQxN2Q2NGM3ZDM1MDExYjcxYjk1MTY4MTU3MTc4MzBiNTMifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/schools/new/actions.ts#L77-L77",
+          "version": "repo-lines-v1:sha256:87d3bf315d56cbeca4eaa72b63d2cc69d16a072c59ee27683930e3e506950865:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODdkM2JmMzE1ZDU2Y2JlY2E0ZWFhNzJiNjNkMmNjNjlkMTZhMDcyYzU5ZWUyNzY4MzkzMGUzZTUwNjk1MDg2NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODdkM2JmMzE1ZDU2Y2JlY2E0ZWFhNzJiNjNkMmNjNjlkMTZhMDcyYzU5ZWUyNzY4MzkzMGUzZTUwNjk1MDg2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDU3ZDVlNTlhZTIwZDE5NGQ4NzA3OWVmMjc1ZjdmZDc4ZjcxNjJlNjAwYjhlNWNmYjUwNzAxMTU2ODM0NGYyYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDIzNjNlNzRlMDY1NTM3YjVkOWE4MjFmMDdkMDEzYTYwNWJkMDk1NTNhMjZlOTIxMzY3M2MwMTQ3ZDA2MTRmOCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L100-L100",
+          "version": "repo-lines-v1:sha256:87d3bf315d56cbeca4eaa72b63d2cc69d16a072c59ee27683930e3e506950865:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODdkM2JmMzE1ZDU2Y2JlY2E0ZWFhNzJiNjNkMmNjNjlkMTZhMDcyYzU5ZWUyNzY4MzkzMGUzZTUwNjk1MDg2NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODdkM2JmMzE1ZDU2Y2JlY2E0ZWFhNzJiNjNkMmNjNjlkMTZhMDcyYzU5ZWUyNzY4MzkzMGUzZTUwNjk1MDg2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWRiM2U3Y2QwYzNhNjIzMDQ3NjY4MTYxZDEwNGU5OWQ4NjIwOWNhM2U3NzU0YTI1YjExOWE0OTA3ODc4MDQyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTQzMjQ2NjE3YjhjMjNjYzMzZWZlMThhMDk1NzJmMDM5Y2U3OGViYjI0MzM2NGUyZTM3YzQyMzI0NGY2N2RhYiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L322-L328",
+          "version": "repo-lines-v1:sha256:e902b38ddb2f1df3ce675effb3fd1c058d5d187374215618371b97452fc179e9:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZiMWNhZjcwNDIyY2M3MzM5OTA2NTFjMmQzNWM0NzIxMWE4ZjIyMmQzYmU3NGQ0NzM1OGI4NzlkNzAwNTRiNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDk0ZmMwYzE3M2QxZWMzZmM1MDFkN2RmYTkyODU1MDFjNTI3Y2ZiNDcxMjU4M2RhM2NjMzYxODA1NjZiNGJlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQyY2E4MDRjNDhhYzQ2Y2FkN2ZiNGFlZjAzMmI4NzhjYzg2OTU0YzgxNjYwMGI1OTU2OTdkOWFhYmI4OGViMSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/platform.ts#L33-L68",
+          "version": "repo-lines-v1:sha256:c3b6c3331fbee577fcbf1e4c0a6737df105f745ac9286973ba8f30bc02269d77:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMjY2NTc1NzNkZDdkMWM3ZWVjZmIyMDViNWM1NGQ3Mjg0MGQyNTk0MzdlNWUxZDZhNmMzMjU4YzBmOTE1YjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e1e891986a3743379fc2d409e2dfc34d",
+      "statement": "tests/unit/tenant-access.test.ts pins the fold's two silent failure modes: deriveTenantAccess must read a missing profile row as 'none' but a failed or unconfigured read as 'unknown', and withTenantAccess must rewrite only an ok snapshot, leaving a real failure untouched.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L160-L177",
+          "version": "repo-lines-v1:sha256:cde1b1360bdc58428041c2d8d6aafd832fe553383e25b8285d3121471b9248a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0YjNlM2VkZjY5MTFiNzdhODUxOWNlYmU2NjgzMjU4Nzk1OWM0OGY1ZTk4ZTZhM2E3NjFmNDRmNjIzMDM5MzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwODYzYjIyY2U2MGZlZDJlZWNkMjg4YWNiZDliMWQxNDliZDAwZWZkY2E4ZWE5NzJhZmRhYzlmMWYxN2IwZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L41-L57",
+          "version": "repo-lines-v1:sha256:6279c9bc1ed2f84718af50fa847b4803f240c30bd98c555c4247e4ddfd81163d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDhmNjE4ODM0MWVhYjBkYWM4NTFhNTY5ZWVlMWE3NDdjMDkzMGIwMjVmNDcyZWViNjA2ZjFmODVlODRiZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1YzlkMjJlMzZhMTA3MzljODI0NDU5YzZkYWYyYTBkMjU4Y2JiNzlkNWIxMWUyNzBjMGE1ZTQxZTMzZDRiYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L1-L11",
+          "version": "repo-lines-v1:sha256:2c583e90dc65e21752e8db5b58b3f88e1303fea800bef239176610ff8b809b81:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5OWQ5ZTgzOTk0OWYyODM0NWNkNWRiNjlhMjRiZjk1NTg5OGMxMmVlOWIwYjQ3NGRiYTY3OTg0ODdkNjMxMjkifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L59-L97",
+          "version": "repo-lines-v1:sha256:4398bdf049b3cbb2667e96d10a4564545bfdab9cd8455bce7ea364bbe8dee936:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTRhOGIxM2NkZmNmNzEyNjU4ZjIxNmNjYmVlYWUyOTQzZmRlYjAwZjFjNzY3NmQwMWY5NjI3ZDk4MGQxMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6c6be2b46f144a1186ff17d833916c52",
+      "statement": "The per-module data/-privacy zone is written as `target: ./modules/!(${d})/**`, which a module's own data/ file matches, so same-module data/ → data/ imports (e.g. batches.ts importing learners.ts) lint clean and the documented 'another module's data/ is private' rule is effectively a cross-module rule only — the lint zone does not enforce same-module layering, and a reviewer is the guard.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L38-L44",
+          "version": "repo-lines-v1:sha256:303316133cc2c24d30f2b04dd7ba50bf5dbe0a67dc08dea17e4d59839bdbc9cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY4ZTE1NWFhNjIzNWI0Zjg4ZWQ1MjYwYjVhZjI0MDZlMTZlMTI4Y2E4NTk0NjhjMDQwZDcxYjk3NTRmYzZkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I1N2RlYmE4YzlhZmMyY2JiZmM0ZTExNWMzMzk3ZDJlZmIzMzBmYzhiNDIyMmNjODcxZmUxYzlhNTAwNjNhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDYwODU1NTU1YjM3ODBiYzMzOTA4NWZmOWQ3NDI2MzAwNDFmNDJhOGVjZjc1MWI4M2IzNDg4M2YwNGFkNWIxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ2ODU4YjBiNzMxMTgxY2IzNTk1N2VlYWIwOTc3ZWE1YzA2YjIzMDJjNWJjNTI0YmMzN2RiMWRhODE4YTBkOCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:84d3b6f81e709f1a4035b7b7ab6cd302c168f61963d33d4d087b5c11dace415e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyNTM5NzRjYzZlY2FjYThkODEyY2JiNDY5NGEzNmIyZmRiZTlmY2I4YWNiNmFkMzE5ODI4ODlhODEwYzBhMTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyOGMwNTgyNjMzN2Y4ZGM1NDA5ZGJjNjNjNjkzMjcxYTcxM2Y0MWU2ZjliNDlhOTBjOTIwZDY3M2NiZTk4YTQifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:60c79e0ac2ecc73eb142192c3eb5a2bc242af0ee9e62bd3814be23c2aee8f195:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZDhlZTMxOGUxYTI3NzJhODgzZGYzODk4MzNjODY1M2NmY2VjMDdkYjZkMGMxNzI0MGEzN2IzYTg5MzdjYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ2MWU4MDgzYmMzOWJmOTE0NWI2NzA3YjA4N2RkMDBjYjgwNGIzOTRlMGJiYmVhNjg2NThiNzRhMzdiZjcxOGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_062c62beca3545a2a5367f8870f84463",
+      "statement": "The mandated guard order is a convention with no type-level enforcement: each consuming route collapses non-ok statuses into booleans and, inside its zero-row branch, returns the sync-failed callout before NoTenantAccessState before EmptyState (batch-cards, billing, report, dashboard's guardState), so a mis-order is caught only in review — and no unit test pins the order, which is why it heads the failure table.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L35-L54",
+          "version": "repo-lines-v1:sha256:7104fa062d6bf123d2a711ba9258c79b301b8e9223107f5e33da1c03cde83292:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxMmZkOWZiODA3YmFmNTg3ZjkzNjk5MGY4YzU0OGNiNjExOWE1OTg2MWJmMjczMzNhMzI1OGEzYjFlMmFmNGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjhjMTA4NWY5NWExYWZhYmU1ZDE1MmFkNThkYjlkYzI2MzM2YzEyMThlMmI4NDBhZTdhZDgyNmEwZDU3NDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhZTMwYzhlN2NmYzNmYTNhNjY3ZDA5ODU0NmYyNTkwNGM1NjRiYmJiMTE5ZTA5ZjVmYWM2YjZhNjFjMjJjNzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MjkwMmU4MzY5MzNjYWIyYWI4YzM1YTBhZWE1ZTQxYzg2YzAyZjQyNmJmZGMzZjVhNTJjYmU2ODEyNWVmYmQifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L103-L105",
+          "version": "repo-lines-v1:sha256:9504d0fd4a5b6c91789b42333ec983ffac7e4286daa54f63787cee3c5978f76f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGVmYzNjNTE1YTI3MDQ4MmFkNDIwNDQyNDM3YThlMGU4OGM1YzczY2JjYTA5NmMzNmYxZjY5NDllNmFiYzg3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjFhOTI3NjhiZmQ1MGI4NmFkZTIzNWVlYjQzM2Q3Mzg2NDI0YzM3OTEzY2M1NGI4NjAwNDAxM2M3MmRkYjc5NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGMwYTQ1M2RjODA4N2Q4ZTVjN2NkMDYwN2FlMTEwZDhlZGYyZWVmODVmMTYxMTU4OWNkZjE3NTU1NDU3ZDRkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjZiMTgwNjM0MTVkYmYzNTVlY2NhMjc1M2U3NWNmNGQ5ODdlMDI0ZWI3NjEzMTUyNzlkZTY0ZDI5YmIxZmM4ZCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L140-L170",
+          "version": "repo-lines-v1:sha256:7b5b8c8ca405858edbcb4725e7775fc79dabdf41ec148c4ddbaba7eb35e19af9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NzNmZDQ5ZjIzZDdiZTNhNDVjOTJkZmYwM2NiNWMzNzA3MzgzNTMxNjI5MmFhNjc3YTBhYTdjMTUxNjU0NjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmOGYzMDMwY2UwMzY3NzM2YjIxOGQ5YTJiNDQxYzVjZmQ3MmQ2ZDU0ZTE2NDRmOGEwMzU0NjFhNWJmZTc5ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyZmE0Mjk1MDIxYmVhYTcyYmQxNjI3MzYxMmY2ODJmYjMwZDNjOGE2MTAwNjAwYjI3YzJkZjE5ZmI1NDY4MTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c177cded400042aabc1bd6fdae442451",
+      "statement": "The learner import distinguishes a third failure shape: LearnerImportSnapshot carries `partial` alongside ok, validation-failed, sync-failed and unconfigured, and the pure summariseWrites picks it whenever some rows were saved but a step errored, because the two tables are written in separate requests with no rollback. Detail columns go to learner_details as a per-row upsert of only the filled keys, so a names-only re-import cannot blank earlier T2MIS detail.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L136-L158",
+          "version": "repo-lines-v1:sha256:10eb63e2f1dd17b43676374a24822d207087d87e724bee2a0318a36d0bfef8c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2M2NlYWJhN2RkNjljZTI3M2E5NGUwN2MxYzM4YmExNWFkYWVkZTVhMWFjOTUwNTY1MWMyODA1YmU1Mzg1NzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1NmFjMzQ0Mzk2NjE4MGI1N2Y1NjhjMTQyODY1OGU3YjAyZGU1ZDA2MGZlZjRiYjVhOThiYjJjNjdmY2QwY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzN2JkYmVkY2IzN2MwZWE0YmNmMDAyMDMxYjYxZDJhZjZmYjdjNGI3OTJkZjY0YmNmYjA5NDJkZTdhNjcyOWEifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L160-L168",
+          "version": "repo-lines-v1:sha256:0c8587831122c876bd1daf1d18da21d7d57b2811369ec1684de6cdf15e34f579:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzMwYTdiNWEyNzIwMzVlM2I0YzhlY2NkMDc4ZTkxY2IwZWMwYTY3NTJmZWY3YWQ2ZTBiOWY3M2Q3NDVmMDgyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjU2YWMzNDQzOTY2MTgwYjU3ZjU2OGMxNDI4NjU4ZTdiMDJkZTVkMDYwZmVmNGJiNWE5OGJiMmM2N2ZjZDBjYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWU2OGMyODhhNDBjYWQ5ZGZjOWM1M2RlNWIzNWZmZjNhODg3M2E2NmM4ZDIxNmZjZjQ4NmZmZTA3OTVjNGQyMCJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L45-L57",
+          "version": "repo-lines-v1:sha256:a5db3356960b2077d5f88939b83f9588694c8037e1432d8d30b5401fee1199a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2ExNmJkMmI2NGU4MDdmYWE4ZjcyOTI0YzE4NzRjYjkzNmU5ZmQxOGY5ZDMxOTM2ZDM1OTEzOTdhNTM4MTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwY2MxOTk4NDFiNjYzODJkOTMyZDA0ZWM2ODlkMTY0YWVhMDc3M2VhOGI5ZDU2ZTk4OTQyZWY2NzA1YTA3OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlNWIyZmJiOGM2NTMzZWM3MGI1MjYxZjlmNWZhODZjMTE3N2M1Nzk5MWQxMGRjN2E0NWY4YWY5MjdmZTQ1OWUifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L77-L93",
+          "version": "repo-lines-v1:sha256:5cfd19eb483ebd41bf75e8943fcd67bdb66713148a8ba86df1f6809f980c9e5e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NjE4NTJjMzljNmYzMTYyYTNiZmIzYTY3YTJhODRiNmY5ODEzOTA1MGE1NDQ2OWYzY2ViYmU0Nzk1OGUxMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZDNlNzkwNThmN2M1NjVlM2I2MGZmMjZhZDk0ZTRhOWEyY2Q4NWNhYTc1MTQxMjI0YTA5NWI0NDE2YmVmNGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_71d5a9ebb73645beab0b6d3eac4d92ce",
+      "statement": "Nothing in app/ calls importLearnersCsv yet: ImportCsvModal is a deliberate 'not available yet' overlay holding no sample files or fake results, so the import contract is shipped code with no live caller and shared/mocks/ does not stand in for it.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L18-L20",
+          "version": "repo-lines-v1:sha256:9bed7d9c814fe667b28a82e4346ac33b054dbe9ca746b2710a23c1642a57716d:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2RjZTYwYThhNjRiYjczY2I1YzA1YmYyM2U5NzE3MTRhY2U5OTE3ZWZlODg0MWVmYjJlZjc5MDc1OGMxZTEyNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzZiYTQzZGVmMWVhNjRhMDRhZTUxNmJjYjEzYTBlNDcxZjNlYWIyODdhMmI5OTY2NWQ0OTEzYjViMDA4ODkxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTJjNDliZGQ1ZGQ2NTM4YzM5MTNlNTA4NzI4ZGRmZjE0N2YxYjI0YjVlZGE1NTY1YjI1MmQwOTViNDExMTc3ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2ViYjhiNjZjOTRjYzVhYTUzMmFkNTA2MzUxMzQ3MGYzZDM1NGJhN2I4ZDE5NzYxNGU0ZmY5YmEzMzYwZTA0ZiJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/ui/ImportCsvModal.tsx#L1-L10",
+          "version": "repo-lines-v1:sha256:9209b1438ffd7c249f4329cdbb517a222879434af3809d3de40756bfd265f211:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmMzdkYjFiOGRiM2ZiZWEzNmE1ZDJhNmZmZDVmMzM5M2E1M2VmMDUwNDdlMGI1ZTZlMTRhNDM0ZTQwNmZkZmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllMjdmY2RlODBjMWZiMWMyYTA5YzMxYjNmOTFhM2FjMDNkNGEwNDdiZTMyZmFiNmFkMjBhZjhjMWY5NjEwNWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_daafb78787e24847a105d8887b78243b",
+      "statement": "tests/unit/batches.test.ts does not exercise selectBatchesForDisplay's no-tenant-access case: that block asserts only the ok-with-zero-rows, ok, unconfigured and sync-failed inputs, so the adapter's fourth branch is covered by no test (tenant-access.test.ts pins the fold that produces the status, not the adapter).",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L201-L222",
+          "version": "repo-lines-v1:sha256:d99011328c4976ff0b94b07a0f3e1bbcd4db3bc39736f1d0738df34826f9549c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNTQxNDRiMjkyNDAwZWQyZWRiMDhlOTc0OGE4ZGI5NThiYTYwOTczYzAyNTU3MDJiNjJmNmE3YmI1MWU0YWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwNjdhNWI5YjBmNTA4NmM4NmExZDBiMzhiM2YxYmMwNmE4ZTlkOTQ5M2M3NGRkMjkyNTE4NDYwNzFmNDIyN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiYTM4YjkzZTlkMmYzODlmZjViOGNjNGUyZDIwNDkyYmFmMTdmYWZjYmQzYzkyMTA4NzRlMGRmYTIwYWM4YTIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L13-L17",
+          "version": "repo-lines-v1:sha256:2927d9dac5f9ba421a4a46e3e246a166743ba5a8dcefec3c8a313a3aaf7aa892:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjYwM2E2NGE3OTNhYzVkYTQxZmJlN2JiODNhMzY4M2JlZjNjNzU1NTc1NDA3Y2U4YjVhOGYyMzljMzEwMTk2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzljNWQ1MDVjNjQ3Yjg0YjNjMjA3NWQ2NzI5ZjAwMGY0ODI1NGU0ZWM4YjJkOGFmYmUzMjA0Y2I3OTZmZGRiOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzdiNzZmM2YzNDhjZjMyMjNkODM3YzI2ZmI4ZjA1M2EwZDg5MjQ3MGNiYzhhNzNjYjRjZTVhMDRjOTUzNTMzOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjI1NmEwYmMzZmRkMmQwNDM3ZDA2YjIzNjliOTIxODM4NmU3ZGMyMGRjZTIxZjRkNjA4NDAzOWUwNGZiOTI0MiJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-10-26T00:51:40.902Z"
+    "at": "2026-11-16T02:29:16.800Z"
   }
 }

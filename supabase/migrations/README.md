@@ -102,3 +102,25 @@ filename matches the version actually recorded. All ten of its policies plus
 Also unaccounted for: `public.tenants` carries a policy
 `"Tenants selectable by Clerk user"` that no migration in this directory
 defines. It omits the `is_active` check its reviewed counterpart enforces.
+
+## State as of 2026-11-11
+
+`list_migrations` returns nine versions; `list_tables` and a catalog query run in
+the SQL editor confirmed the objects below by name.
+
+| File | Recorded | Objects present |
+| --- | --- | --- |
+| `20261111120000_add_t2mis_terminal_report_fields` | ✅ | ✅ |
+| `20261024110000_add_dashboard_operational_fields` | ❌ | partly checked |
+
+The T2MIS migration was **not applied in one run**. Its columns, the
+`learner_details` table and the foreign keys were found already live with no
+ledger row; the policies, trigger, grant and indexes were then (re)created by
+hand with an idempotent script, verified (2 policies, 3 indexes, 1 trigger, 2
+unique constraints), and the version inserted into
+`supabase_migrations.schema_migrations` by hand. The file itself uses plain
+`add constraint` and is not re-runnable.
+
+`20261024110000` is still drift: `batches.billing_deadline` is live but the
+version is unrecorded and the rest of that file has not been checked. Verify its
+objects before recording it; a `db push` would try to re-run it.

@@ -188,7 +188,9 @@ a `batches` row, which keeps P3's boundary (a platform admin has no write path i
 tables) intact. Nothing sets the link yet — no screen writes it and existing batches
 are not backfilled, because matching free-text titles to registry rows would be a guess.
 
-The same migration adds the learner demographic, training and employment columns of the T2MIS
-terminal report to `learners` (tenant-scoped, existing RLS), not to the global
-`learner_identities`, which stays unused per ADR-001. The layout is
+The same migration adds the learner demographic, training and employment fields of the T2MIS
+terminal report as a one-to-one `learner_details` table. They are not on `learners`, because a
+trainer can read `learners` rows for their own batches and RLS filters rows, not columns; the
+details table's read policy admits only admin, coordinator and viewer. They are not on the global
+`learner_identities` either, which stays unused per ADR-001. The layout is
 `modules/import-export/domain/t2mis.ts`.
