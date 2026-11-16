@@ -107,9 +107,6 @@ sources:
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
 generated: { by: "openwiki/0.5.0", at: "2026-11-15T02:16:31.147Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-15T02:16:31.147Z
 ---
 
 # Quickstart and Change Routing
