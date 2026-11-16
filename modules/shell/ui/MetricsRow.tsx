@@ -7,25 +7,19 @@
  */
 
 import { KpiSummary, type KpiLinks } from '@/modules/batches/ui/KpiSummary';
-import type { DashboardMetrics } from '@/shared/types';
+import type { TrainerDashboardMetrics } from '@/shared/types';
 
 export function MetricsRow({
   metrics,
   links,
-  hideBilling = false,
 }: {
-  metrics: DashboardMetrics;
+  /** Trainer summary: carries no billing figures (RULES.md rule 5). */
+  metrics: TrainerDashboardMetrics;
   links: KpiLinks;
-  /**
-   * Trainer-facing routes must omit billing figures server-side, not via CSS
-   * (CLAUDE.md role rules). The layout — not this component — decides when
-   * that applies; see `app/(dashboard)/trainer/page.tsx`.
-   */
-  hideBilling?: boolean;
 }) {
   return (
     <div className="shell-kpis">
-      <KpiSummary metrics={metrics} links={links} hideBilling={hideBilling} />
+      <KpiSummary metrics={metrics} links={links} />
     </div>
   );
 }

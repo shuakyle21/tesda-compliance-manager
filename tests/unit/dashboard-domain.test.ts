@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { attentionItems, BILLING_DUE_WINDOW_DAYS } from '@/modules/batches/domain/attention';
-import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
+import { deriveDashboardMetrics, deriveTrainerMetrics } from '@/modules/batches/domain/metrics';
 import { crossSchoolExceptions, schoolSummaries } from '@/modules/batches/domain/overview';
 import { describeSessionProgress, sessionProgress } from '@/modules/batches/domain/progress';
 import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from '@/modules/batches/domain/urgency';
@@ -114,6 +114,18 @@ describe('attentionItems', () => {
     ], { syncFailed: true });
     expect(items.map((i) => i.kind)).toEqual(['sync-failed', 'billing-overdue', 'billing-overdue', 'billing-due']);
     expect(items.slice(1, 3).map((i) => ('batchId' in i ? i.batchId : ''))).toEqual(['LATER', 'LATE']);
+  });
+});
+
+describe('deriveTrainerMetrics', () => {
+  it('carries no billing figures at runtime, only the non-billing ones', () => {
+    const batches = [dated(-4, { id: 'OVERDUE', scholars: 12 }), batch({ id: 'UNDATED' })];
+    const metrics = deriveTrainerMetrics(batches);
+    for (const key of ['nextBilling', 'openBillingObligations', 'billingDeadlinesMissing', 'overdueBilling']) {
+      expect(metrics).not.toHaveProperty(key);
+    }
+    expect(JSON.stringify(metrics)).not.toContain('2026-11-01');
+    expect(metrics.activeBatches).toBe(deriveDashboardMetrics(batches).activeBatches);
   });
 });
 

@@ -140,8 +140,8 @@ export interface SidebarProps {
    * role model until TES-34 — see layout.tsx's TRAINER OMISSION note). Mirrors
    * the design's `ROLES[role].ops`: trainer gets Settings only, every other
    * (assumed-coordinator) route gets both. Import CSV is an office-only
-   * operation — a trainer must not see it, the same boundary `hideBilling`
-   * already enforces for the metrics row.
+   * operation — a trainer must not see it, the same boundary
+   * `deriveTrainerMetrics` enforces for the metrics row.
    */
   isTrainerRoute?: boolean;
   /**

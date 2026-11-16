@@ -59,13 +59,20 @@ export const resolveRouteScope = cache(async (code: string): Promise<RouteScope>
  * Deliberately not `notFound()`: layouts and pages render in parallel, so a
  * thrown 404 could race the layout's friendlier state. Security does not rest
  * on this either way — without a scope there is no tenant id to query with.
+ *
+ * Trainers are sent to `/trainer` here, before any office page fetches: these
+ * screens hand full batch records (billing deadline, BSRS) to client
+ * components, which RULES.md rule 5 forbids for a trainer. Checked in the page
+ * path, not the layout, because a layout does not re-run on every navigation.
  */
 export async function requireScope(
   params: Promise<{ tenantCode: string }>,
 ): Promise<{ scope: TenantScope; profile: Profile } | null> {
   const { tenantCode } = await params;
   const resolved = await resolveRouteScope(tenantCode);
-  return resolved.status === 'ok' ? { scope: resolved.scope, profile: resolved.profile } : null;
+  if (resolved.status !== 'ok') return null;
+  if (resolved.profile.role === 'trainer') redirect('/trainer');
+  return { scope: resolved.scope, profile: resolved.profile };
 }
 
 export type DefaultScopeOutcome = { status: 'no-tenant-access' } | { status: 'unknown' };

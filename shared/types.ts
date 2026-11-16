@@ -336,3 +336,12 @@ export interface DashboardMetrics {
   /** Critical requirement slots with no record — untracked, excluded from the percentage. */
   docUntracked: number;
 }
+
+/** The billing figures of the KPI summary — office roles only. */
+export type BillingMetrics = Pick<
+  DashboardMetrics,
+  'nextBilling' | 'openBillingObligations' | 'billingDeadlinesMissing' | 'overdueBilling'
+>;
+
+/** The KPI summary a trainer may receive: no billing figures (RULES.md rule 5). */
+export type TrainerDashboardMetrics = Omit<DashboardMetrics, keyof BillingMetrics>;
