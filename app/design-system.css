@@ -460,9 +460,13 @@ body { min-height: 100vh; margin: 0; }
   font-size: 13px; font-weight: 500;
   cursor: pointer; border: 1px solid transparent;
   white-space: nowrap;
-  transition: background var(--dur-base) var(--ease-standard),
-              border-color var(--dur-base) var(--ease-standard),
+  /* Leaving a hover is quicker than entering it; the hover rule sets the way in. */
+  transition: background var(--dur-fast) var(--ease-standard),
+              border-color var(--dur-fast) var(--ease-standard),
               transform var(--dur-fast) var(--ease-standard);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) { transition-duration: var(--dur-base), var(--dur-base), var(--dur-fast); }
 }
 .btn svg { width: 14px; height: 14px; }
 /* Every variant confirms the press, not only primary. */
@@ -549,8 +553,8 @@ body { min-height: 100vh; margin: 0; }
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition: box-shadow var(--dur-base) var(--ease-standard),
-              background var(--dur-base) var(--ease-standard),
+  transition: box-shadow var(--dur-fast) var(--ease-standard),
+              background var(--dur-fast) var(--ease-standard),
               transform var(--dur-fast) var(--ease-standard);
 }
 .batch-card.billing-ready {
@@ -579,8 +583,9 @@ body { min-height: 100vh; margin: 0; }
 }
 .batch-card.clickable:active { transform: scale(0.99); }
 @media (hover: hover) and (pointer: fine) {
-  .batch-card:hover { background: var(--color-surface-raised); box-shadow: var(--shadow-md); }
-  .batch-card.billing-ready:hover { box-shadow: 0 0 0 3px var(--color-green-lt), var(--shadow-md); }
+  /* Only a card that opens something lifts: a lift promises a click. */
+  .batch-card.clickable:hover { background: var(--color-surface-raised); box-shadow: var(--shadow-md); transition-duration: var(--dur-base), var(--dur-base), var(--dur-fast); }
+  .batch-card.clickable.billing-ready:hover { box-shadow: 0 0 0 3px var(--color-green-lt), var(--shadow-md); }
 }
 
 /* ----- Animations ------------------------------------------- */
@@ -818,12 +823,12 @@ body { min-height: 100vh; margin: 0; }
 @media (max-width: 440px) { .dash-kpi-grid { grid-template-columns: 1fr; } }
 .shell-kpis { margin-bottom: 20px; }
 .metric-card-link {
-  transition: box-shadow var(--dur-base) var(--ease-standard),
+  transition: box-shadow var(--dur-fast) var(--ease-standard),
               transform var(--dur-fast) var(--ease-standard);
 }
 .metric-card-link:active { transform: scale(0.98); }
 @media (hover: hover) and (pointer: fine) {
-  .metric-card-link:hover { box-shadow: var(--shadow-md) !important; }
+  .metric-card-link:hover { box-shadow: var(--shadow-md) !important; transition-duration: var(--dur-base), var(--dur-fast); }
 }
 
 /* Dashboard breaks out wider to use available space */
@@ -2115,7 +2120,7 @@ h2.dash-panel-title { margin: 0; }
   display: block;
   height: 100%;
   background: var(--color-green);
-  transition: width 600ms var(--ease-spring);
+  transition: width 600ms var(--ease-standard);
 }
 .completeness-bar.warning > span { background: var(--color-amber); }
 .completeness-bar.critical > span { background: var(--color-red); }
