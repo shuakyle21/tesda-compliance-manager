@@ -10,7 +10,7 @@
  * through the matrix and the preview via local override state. Client Component.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
@@ -19,7 +19,8 @@ import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
 import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
 import { displayBatchId } from '@/modules/batches/domain/rqm';
-import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
+import { formatDate } from '@/shared/dates';
+import type { Batch, DocRecord, DocumentRequirement, UserRole } from '@/shared/types';
 
 const STATUS_LABEL: Record<string, string> = {
   verified: 'Verified', submitted: 'Submitted', pending: 'Pending', missing: 'Missing', na: 'N/A',
@@ -29,9 +30,6 @@ const STATUS_LABEL: Record<string, string> = {
 // `.doc-status.na` treatment — deliberately not "Missing", which asserts a
 // document is absent when in fact nothing was ever required or recorded here.
 const UNTRACKED_LABEL = 'Not tracked';
-
-// Single demo identity — an admin (proprietor) who can verify documents.
-const CURRENT_USER = 'Pia Buenaventura';
 
 /** Cell icon per doc status; 'missing' and 'na' both read as file-off. */
 const CELL_STATUS_ICON: Record<string, IconName> = {
@@ -46,20 +44,20 @@ function cellIcon(doc: DocRecord | null, status: string): IconName {
   return doc ? CELL_STATUS_ICON[status] : 'info-circle';
 }
 
-function cellTitle(doc: DocRecord | null, status: string, isWriter: boolean): string {
+function cellTitle(doc: DocRecord | null, status: string): string {
   if (!doc) return 'This batch does not track this document. Its programme requirement catalog has no entry for it.';
-  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${doc.updated} · ${doc.source}`;
-  return isWriter ? 'Click to attach' : 'Document not yet provided';
+  if (doc.updated) return `${STATUS_LABEL[status]} · updated ${formatDate(doc.updated) ?? '—'} · ${doc.source ?? '—'}`;
+  return 'Document not yet provided';
 }
 
 type CompletenessTier = 'untracked' | 'on-track' | 'warning' | 'critical';
 
-type CompletenessSummary = {
-  ok: number;
+type CompletenessSummary = { ok: number;
   total: number;
   untracked: number;
   pct: number | null;
   missing: number;
+  awaiting: number;
   tier: CompletenessTier;
 };
 
@@ -78,13 +76,15 @@ function completenessPctLabel(pct: number | null): string {
 }
 
 function completenessSubLabel(c: CompletenessSummary): string {
-  return c.pct === null ? 'no critical docs tracked' : `${c.ok}/${c.total} critical`;
+  return c.pct === null ? 'No required documents tracked' : `${c.ok} of ${c.total} required verified`;
 }
 
 export function DocumentsView({
   batches,
   documentRequirements,
   syncFailed,
+  currentUserName,
+  role,
 }: {
   batches: Batch[];
   // The matrix columns: every requirement any shown batch's program asks for
@@ -93,14 +93,19 @@ export function DocumentsView({
   // unavailable" state (ADR-004 "unknown"), never a fabricated figure.
   documentRequirements: DocumentRequirement[];
   syncFailed: boolean;
+  // The signed-in person's display name from the server; null when their profile has none.
+  currentUserName: string | null;
+  // Server-resolved office role (see the route). Gates write and verify controls;
+  // the database enforces the same rules through RLS.
+  role: UserRole;
 }) {
   // Verification overrides keyed `${batchId}:${docKey}`.
   const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
   const [toast, setToast] = useState<ToastData | null>(null);
 
-  const isWriter = true; // admin/coordinator
-  const canVerify = true; // admin
+  const isWriter = role === 'admin' || role === 'coordinator';
+  const canVerify = role === 'admin';
 
   /**
    * The record for a cell, or `null` when this batch does not track the
@@ -120,7 +125,7 @@ export function DocumentsView({
     return ov ? { ...base, ...ov } : base;
   }, [overrides]);
 
-  const completeness = useMemo(() => batches.map((b) => {
+  const completeness = useMemo(() => batches.map((b): CompletenessSummary => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
     // batch tracks none of them, so the card reads "—" rather than 0%. Scored
     // against this batch's own program catalog: the matrix columns are a
@@ -131,9 +136,11 @@ export function DocumentsView({
     const ok = tracked.filter((d) => d.status === 'verified').length;
     const pct = tracked.length ? Math.round((ok / tracked.length) * 100) : null;
     const missing = tracked.filter((d) => d.status === 'missing').length;
+    // Submitted or pending: on file but not yet verified, so neither done nor missing.
+    const awaiting = tracked.filter((d) => d.status === 'submitted' || d.status === 'pending').length;
     const untracked = crit.length - tracked.length;
     const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
-    return { ok, total: tracked.length, untracked, pct, missing, tier };
+    return { ok, total: tracked.length, untracked, pct, missing, awaiting, tier };
   }), [batches, docOf]);
 
   if (!batches.length) {
@@ -179,13 +186,22 @@ export function DocumentsView({
   };
 
   const handleVerify = (file: PreviewFile) => {
-    const today = 'May 31';
+    // Only admins verify. The button is hidden for everyone else; this guard covers the handler too.
+    if (!canVerify) return;
+    // Verification records carry the verifier's name, so refuse rather than attribute to nobody.
+    if (!currentUserName) {
+      setToast({ title: 'Name not set', message: 'Add your name in My Account before verifying documents.' });
+      return;
+    }
+    const verifierName = currentUserName;
+    // Same ISO shape as the DB's `verified_at`, so live and just-verified rows format alike.
+    const verifiedDate = new Date().toISOString();
     setOverrides((prev) => ({
       ...prev,
-      [file.batchId + ':' + file.docKey]: { status: 'verified', verifiedBy: CURRENT_USER, verifiedDate: today, updated: today, source: file.source || 'Uploaded file' },
+      [file.batchId + ':' + file.docKey]: { status: 'verified', verifiedBy: verifierName, verifiedDate, updated: verifiedDate, source: file.source || 'Uploaded file' },
     }));
-    setPreview((fp) => (fp ? { ...fp, status: 'verified', verifiedBy: CURRENT_USER, verifiedDate: today, updated: today } : fp));
-    setToast({ title: 'Document verified', message: `${file.name} accepted by ${CURRENT_USER}.` });
+    setPreview((fp) => (fp ? { ...fp, status: 'verified', verifiedBy: verifierName, verifiedDate, updated: verifiedDate } : fp));
+    setToast({ title: 'Document verified', message: `${file.name} accepted by ${verifierName}.` });
   };
   const handleRequestChanges = (file: PreviewFile) => {
     setToast({ title: 'Changes requested', message: `${file.name} returned to the uploader to re-submit.` });
@@ -222,23 +238,30 @@ export function DocumentsView({
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)' }}>
                   {completenessPctLabel(c.pct)}
                 </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
+                <span style={{ fontSize: 11.5, color: 'var(--color-text-secondary)' }}>
                   {completenessSubLabel(c)}
                 </span>
               </div>
               <div className={'completeness-bar ' + completenessBarClassName(c.tier)}>
                 <span style={{ width: (c.pct ?? 0) + '%' }} />
               </div>
-              {c.missing > 0 && (
-                <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-red-dk)' }}>
-                  <Icon name="alert-triangle" size={11} />{c.missing} missing
-                </div>
-              )}
-              {c.untracked > 0 && (
-                <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-                  <Icon name="info-circle" size={11} />{c.untracked} not tracked
-                </div>
-              )}
+              {/* The bar's color never stands alone: each state is also said in words. */}
+              <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: '4px 14px', fontSize: 11.5 }}>
+                {c.pct === 100 && (
+                  <CardNote icon="check" color="var(--color-green-dk)">
+                    {c.untracked > 0 ? 'All tracked required documents verified' : 'All required documents verified'}
+                  </CardNote>
+                )}
+                {c.missing > 0 && (
+                  <CardNote icon="alert-triangle" color="var(--color-red-dk)">{c.missing} missing</CardNote>
+                )}
+                {c.awaiting > 0 && (
+                  <CardNote icon="clock" color="var(--color-text-secondary)">{c.awaiting} awaiting verification</CardNote>
+                )}
+                {c.untracked > 0 && (
+                  <CardNote icon="info-circle" color="var(--color-text-muted)">{c.untracked} not tracked</CardNote>
+                )}
+              </div>
             </div>
           );
         })}
@@ -250,18 +273,18 @@ export function DocumentsView({
           {batches.map((b) => (
             <div key={b.id} style={{ justifyContent: 'space-between' }}>
               <span>{displayBatchId(b)}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', textTransform: 'none', letterSpacing: 0, fontSize: 10, color: 'var(--color-text-muted)' }}>{b.program}</span>
+              <span style={{ textTransform: 'none', letterSpacing: 0, fontSize: 10, color: 'var(--color-text-muted)' }}>{b.program}</span>
             </div>
           ))}
         </div>
 
         {documentRequirements.map((req) => (
           <div key={req.key} className="doc-row" style={gridStyle}>
-            <div className={'cell label-cell' + (req.critical ? ' critical' : '')}>
+            <div className="cell label-cell">
               <Icon name={req.icon as never} size={14} style={{ color: 'var(--color-text-muted)' }} />
               <span style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{req.label}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 1 }}>
+                <div style={{ fontSize: 10, color: 'var(--color-text-muted)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 1 }}>
                   {req.critical ? 'Required' : 'Optional'} · stage {req.stage}
                 </div>
               </span>
@@ -276,13 +299,14 @@ export function DocumentsView({
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
                     disabled={!doc}
-                    title={cellTitle(doc, s, isWriter)}
+                    title={cellTitle(doc, s)}
                   >
                     <Icon name={cellIcon(doc, s)} size={11} />
                     {doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}
                   </button>
-                  {doc?.updated && (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{doc.updated}</span>
+                  {/* No date beside "Missing": it reads as the day something arrived. */}
+                  {doc?.updated && s !== 'missing' && (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{formatDate(doc.updated)}</span>
                   )}
                 </div>
               );
@@ -295,7 +319,7 @@ export function DocumentsView({
         <FilePreviewModal
           file={preview}
           canVerify={canVerify}
-          adminName={CURRENT_USER}
+          adminName={currentUserName}
           onVerify={handleVerify}
           onRequestChanges={handleRequestChanges}
           onClose={() => setPreview(null)}
@@ -321,6 +345,14 @@ function Header() {
       <h1>Documents</h1>
       <span className="subline">TESDA Circular 014-2026 · critical docs gate billing</span>
     </div>
+  );
+}
+
+function CardNote({ icon, color, children }: { icon: IconName; color: string; children: ReactNode }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color }}>
+      <Icon name={icon} size={12} />{children}
+    </span>
   );
 }
 
