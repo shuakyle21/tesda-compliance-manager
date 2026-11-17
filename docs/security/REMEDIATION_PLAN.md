@@ -1,6 +1,7 @@
 # Remediation Plan
 
-Status: **proposed, waiting for approval.** No fix has been written. No migration exists yet.
+Status: item 1.1 was approved on 2026-11-17 and is written and tested locally, **not applied**.
+Every other item is proposed and waits for approval.
 
 Finding IDs refer to `FINDINGS.md`. The plan was drafted from the auditors' proposals and
 reviewed by the security architect (Opus), who changed or rejected some of them (see section 7).

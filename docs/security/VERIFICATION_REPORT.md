@@ -1,7 +1,7 @@
 # Verification Report
 
-Status on 2026-11-17: **no fix has been implemented, so no fix has been verified.**
-This file records what evidence exists now and what will be filled in during Phases 7 and 8.
+Status on 2026-11-17: **one fix (item 1.1, findings F-01 and F-02) is written and verified on a
+local test database. It is not applied to the hosted project.** Every other finding is open.
 
 ## 1. Evidence for the findings (Phases 3 and 4)
 
@@ -42,8 +42,8 @@ the diff with the finding.
 
 | ID | Severity | Fix item | Fix status | Test evidence | Independent check | Result |
 |---|---|---|---|---|---|---|
-| F-01 | Critical | 1.1 | Not started | none | none | Open |
-| F-02 | High | 1.1 | Not started | none | none | Open |
+| F-01 | Critical | 1.1 | Written, not applied | 89 of 89 cases pass with the migration, 42 fail without it | Haiku verifier: pass with notes, both notes then fixed | Verified locally, open on the hosted project |
+| F-02 | High | 1.1 | Written, not applied | same test file | same check | Verified locally, open on the hosted project |
 | F-03 | High | 3.1 | Not started | none | none | Open |
 | F-04 | High | 1.4, 2.1 | Not started | none | none | Open |
 | F-05 | High | 1.5, 2.3 | Not started | none | none | Open |
@@ -72,6 +72,45 @@ the diff with the finding.
 | F-26 | Low | Wave 4 | Not started | none | none | Open |
 | F-29 | Low | 3.2, Wave 4 | Not started | none | none | Open |
 
-## 5. Final assessment (Phase 8)
+## 5. Item 1.1 verification detail (F-01, F-02)
+
+Files: `supabase/migrations/20261117120000_harden_profile_and_membership_policies.sql`,
+`supabase/rollbacks/20261117120000_harden_profile_and_membership_policies.rollback.sql`,
+`supabase/tests/profile_membership_hardening.test.sql`.
+
+| Evidence | Result |
+|---|---|
+| Test file on a database with all 11 migrations | 89 cases, 89 pass. Re-run by the author, the verifier (first version, 86 cases) and the orchestrator |
+| Same test file on a database with only the 10 earlier migrations | 89 cases, 47 pass, 42 fail. Every security case fails, which shows the tests detect the problem |
+| Denied cases | Each asserts the kind of refusal, then checks as a privileged role that the rows are unchanged |
+| Rollback file | Restores the old policies and grants and removes the new objects. Checked by the verifier on a separate database |
+| `pnpm lint` | Pass |
+| `pnpm test` | 353 tests pass |
+| `pnpm exec tsc --noEmit` | One error in `app/(dashboard)/t/[tenantCode]/(sections)/documents/page.tsx`. It exists on `main` and is not part of this change |
+| Independent check | A Haiku agent that did not write the fix mapped each gap in F-01 and F-02 to the lines that close it |
+
+The verifier found two gaps. Both were fixed in a second commit and re-tested: platform admin
+seating now also requires an active, unassigned person, and the "denied" tests now check the
+data is unchanged.
+
+Limits of this evidence:
+
+- The tests ran on plain Postgres 16 with small stand-ins for Supabase's `auth` and `storage`
+  schemas. They have not run on a real local Supabase stack (`supabase db reset`). Do that
+  before applying.
+- The hosted database may differ from the migrations. Run the Wave 0 catalog queries first. If
+  the live policies have other names, the `drop policy if exists` lines will not remove them.
+
+What remains open after this fix:
+
+- A role is still global (F-03). The fix works around it: an admin can change a person's role
+  only when the admin belongs to every school that person belongs to.
+- Every school admin can still list people who have signed up but belong to no school yet.
+  This includes an admin who has no school. Plan item 3.7 narrows it to an exact-email lookup.
+- No one can add a person who already belongs to another school. Before the fix an admin could,
+  which was part of the problem. Per-school roles (3.1) are the proper way to bring that back.
+- Two requests are still needed to assign a user (F-29).
+
+## 6. Final assessment (Phase 8)
 
 Not written yet. It will list verified fixes, findings still open, and risks that remain.

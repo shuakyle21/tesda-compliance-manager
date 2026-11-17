@@ -11,9 +11,9 @@ Hypothesis IDs (T-01 and so on) come from `THREAT_MODEL.md`.
 | 2 | Threat model | Security architect (Opus) | Done, see authorship note in `THREAT_MODEL.md` |
 | 3 | Parallel micro-audits | 9 Haiku lanes + database architect | Done |
 | 4 | Consolidate findings, review critical and high | Orchestrator + Opus | Done |
-| 5 | Remediation plan, reviewed | Orchestrator + Opus | Done, **waiting for human approval** |
-| 6 | Implement approved fixes and regression tests | Sonnet | Not started |
-| 7 | Independent verification | Haiku, automated tools, Opus for open high risks | Not started |
+| 5 | Remediation plan, reviewed | Orchestrator + Opus | Done. Item 1.1 approved by the owner on 2026-11-17 |
+| 6 | Implement approved fixes and regression tests | Sonnet | Item 1.1 done. Other items not approved yet |
+| 7 | Independent verification | Haiku, automated tools, Opus for open high risks | Item 1.1 done |
 | 8 | Final assessment | Orchestrator | Not started |
 
 ## Phase 3 lanes

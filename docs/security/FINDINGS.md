@@ -2,7 +2,11 @@
 
 OWASP security audit of TVI-CAMS, 2026-11-17. Read-only review of the repository on `main`.
 
-**Counts:** 1 Critical, 6 High, 1 conditional High, 15 Medium, 6 Low. Nothing has been fixed yet.
+**Counts:** 1 Critical, 6 High, 1 conditional High, 15 Medium, 6 Low.
+
+**Fix status:** F-01 and F-02 have a migration that is written and verified on a local test
+database, but **not applied** to the hosted project. See `VERIFICATION_REPORT.md` section 5.
+Everything else is open.
 
 ## How to read this
 

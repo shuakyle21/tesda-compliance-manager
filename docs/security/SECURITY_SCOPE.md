@@ -1,7 +1,7 @@
 # Security Scope
 
 OWASP security audit of TVI-CAMS (TESDA Compliance Manager).
-Started 2026-11-17. Status: Phases 1 to 5 done. Phases 6 to 8 wait for approval.
+Started 2026-11-17. Status: Phases 1 to 5 done. Phases 6 and 7 done for item 1.1 only.
 
 This file says **what** is being audited, **who** audits it, and **what the audit must not do**.
 
