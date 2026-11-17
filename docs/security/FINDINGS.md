@@ -400,7 +400,9 @@ using (
 - **What is wrong:** no workflow runs lint, typecheck, tests or build before merge. Actions
   are pinned to tags that can move, not to commit ids. The `@claude` workflow has no check on
   who wrote the comment. The wiki workflow has write access and can open pull requests that
-  change agent instruction files and its own workflow. No Dependabot, CodeQL or CODEOWNERS.
+  change agent instruction files and its own workflow. No Dependabot config or CODEOWNERS.
+  CodeQL does run on pull requests (GitHub default setup, seen on PR #330); it is not
+  configured in the repo, so it is not a required check.
 - **Protected:** no untrusted text is placed into shell commands, and fork pull requests do
   not receive secrets.
 - **Severity:** Medium. **Confidence:** High. Branch protection cannot be seen from the repo.
@@ -475,7 +477,7 @@ using (
 | F-23 | A05 | Service-role module has no server-only guard | `lib/supabase/service.ts:16` | Nothing stops a future client component from importing it. Today only the webhook code does. | 1.12 | Build fails if a client file imports it |
 | F-25 | A05 | Function hygiene; hosted sign-up unknown | `canon:281-289` (`set_updated_at` has no `search_path`), `canon:346-350` (claim fallbacks) | Small hardening gaps. Whether Supabase's own sign-up is enabled on the hosted project cannot be seen (Potential). | 0.6, Wave 4 | Catalog query shows `search_path` set; sign-up off |
 | F-26 | A05 | Debug route, docs routes, preview overrides | `app/api/debug/auth-check/route.ts:25`, `app/api-docs/page.tsx:4-7`, `app/api/openapi.json/route.ts:5-11`, `?state=` and `?role=` on dashboard and billing pages | Debug route is guarded by `NODE_ENV` only. Docs need only a sign-in. Overrides change the UI only, since RLS still decides data. | Wave 4 | Production build returns 404 for the debug route |
-| F-29 | A04 | Role change is not atomic; co-trainers can write but not read | `modules/tenancy/data/users.ts:325-381`, `canon:408-428` vs `billing:416-440` | Role update and membership insert are two requests with a manual undo. `can_read_batch` was never widened for co-trainers. | 3.2, Wave 4 | One function does both; co-trainer can read their batch |
+| F-29 | A04 | Role change is not atomic; co-trainers can write but not read | `modules/tenancy/data/users.ts:325-381`, `canon:408-428` vs `billing:416-440` | Role update and membership insert are two requests with a manual undo. After the item 1.1 migration the undo can fail in one case: two admins of different schools assign the same new person at the same moment; the loser's membership insert is refused, but its role change already landed and its undo is no longer allowed (the person now belongs to the other school). The person then holds the loser's role in the winner's school. Rare, needs two admins acting at once, not attacker-driven. `can_read_batch` was never widened for co-trainers. | 3.2, Wave 4 | One function does both; co-trainer can read their batch |
 
 ---
 

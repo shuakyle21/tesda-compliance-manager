@@ -265,8 +265,11 @@ with check (
 -- membership, so this is their first school and `is_default = true` is
 -- correct (it is what the invitation path writes), and `false` also lands
 -- correctly because mapProfileRow falls back to the first membership. The
--- partial unique index in section 7 is what guarantees at most one default
--- per person, including under two admins adding the same person at once.
+-- partial unique index in section 7 keeps at most one DEFAULT per person, but
+-- only for is_default = true rows. It does not stop two admins adding the
+-- same person at once with is_default = false: both policy checks below see
+-- "no membership yet" on their own snapshot. The trigger in section 8
+-- serializes that case.
 drop policy if exists "Admins can grant tenant membership" on public.profile_tenant_memberships;
 create policy "Admins can grant tenant membership"
 on public.profile_tenant_memberships
@@ -394,3 +397,73 @@ begin
   end if;
 end;
 $$;
+
+-- ===========================================================================
+-- 8. Serialize first-membership inserts from API clients
+-- ===========================================================================
+--
+-- The two INSERT policies in section 5 require "the person has no membership
+-- yet". That check runs on the statement snapshot. Under READ COMMITTED (what
+-- PostgREST uses), two admins of different schools can add the same
+-- unassigned person at the same moment, both see "no membership", and both
+-- succeed. With is_default = false the unique index in section 7 does not
+-- object. The person would then sit in two schools with one global role.
+--
+-- This trigger closes that gap. For direct client inserts only, it locks the
+-- person's profile row and then checks again for any OTHER membership. The
+-- lock makes the second transaction wait for the first to commit. The check
+-- runs as a separate statement, so under READ COMMITTED it takes a fresh
+-- snapshot and sees the first transaction's committed row. (Under REPEATABLE READ the second
+-- transaction would get a serialization error instead, which is also safe.)
+--
+-- It is an AFTER trigger on purpose. Row-level security checks run before
+-- AFTER triggers, so an insert the policies already refuse never reaches it:
+-- it takes no lock for them and cannot be used to probe who belongs to a
+-- school. (A BEFORE trigger would run ahead of the policies.)
+--
+-- It acts only for the `authenticated` role. service_role, the table owner
+-- and definer functions such as public.ensure_profile_tenant_membership have
+-- their own rules, and several memberships per person are legitimate there.
+-- ensure_profile_tenant_membership locks the same profile row, so every path
+-- shares one serialization point.
+--
+-- The role is read from the `role` setting, not current_user, because inside
+-- a SECURITY DEFINER function current_user is the function owner. PostgREST
+-- sets this setting with SET LOCAL ROLE for every request.
+--
+-- It never blocks a legitimate client insert: after this migration every
+-- INSERT policy for `authenticated` already requires the person to have no
+-- membership.
+create or replace function app_private.serialize_first_membership()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if coalesce(current_setting('role', true), '') <> 'authenticated' then
+    return null;
+  end if;
+
+  perform 1 from public.profiles p where p.id = new.profile_id for update;
+
+  if exists (
+    select 1
+    from public.profile_tenant_memberships m
+    where m.profile_id = new.profile_id
+      and m.id <> new.id
+  ) then
+    raise exception 'This person already belongs to a school.'
+      using errcode = '42501';
+  end if;
+
+  return null;
+end;
+$$;
+
+revoke execute on function app_private.serialize_first_membership() from public, anon, authenticated;
+
+drop trigger if exists profile_tenant_memberships_serialize_first on public.profile_tenant_memberships;
+create trigger profile_tenant_memberships_serialize_first
+after insert on public.profile_tenant_memberships
+for each row execute function app_private.serialize_first_membership();

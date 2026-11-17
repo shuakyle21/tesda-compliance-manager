@@ -111,6 +111,31 @@ What remains open after this fix:
   which was part of the problem. Per-school roles (3.1) are the proper way to bring that back.
 - Two requests are still needed to assign a user (F-29).
 
+### 5.1 Follow-up: concurrent first-membership race
+
+A code review found a race. Both membership INSERT policies check "the person has no
+membership yet" on the statement snapshot. Under READ COMMITTED, two admins of different
+schools adding the same unassigned person at once can both pass, and with `is_default = false`
+the unique index does not stop it. The person would end up in two schools with one global role.
+
+Fix: section 8 of the migration adds an AFTER INSERT row trigger on
+`public.profile_tenant_memberships`, `app_private.serialize_first_membership()`. For the
+`authenticated` role only, it locks the person's profile row, then checks (fresh snapshot) for
+any other membership and raises 42501 "This person already belongs to a school." if one exists.
+service_role, the table owner and definer functions are untouched. It is an AFTER trigger so
+that inserts the policies already refuse never reach it (no lock, no existence probe). The
+rollback file drops the trigger and function.
+
+| Evidence | Result |
+|---|---|
+| `profile_membership_hardening.test.sql` with the migration | 91 cases, 91 pass (two new cases: service_role second membership allowed; trigger refuses an assigned person even when a permissive test policy lets the insert through) |
+| Same file without the migration | 91 cases, 48 pass, 43 fail |
+| `profile_membership_concurrency.test.sh` with the trigger | Pass. Session A commits, session B fails with 42501, one membership exists |
+| Same script with the trigger dropped | Fail. Both sessions commit, two memberships exist |
+
+Limits: the concurrency test ran on plain Postgres 16 at READ COMMITTED. Under REPEATABLE READ
+the second transaction would get a serialization error instead, which is also safe.
+
 ## 6. Final assessment (Phase 8)
 
 Not written yet. It will list verified fixes, findings still open, and risks that remain.

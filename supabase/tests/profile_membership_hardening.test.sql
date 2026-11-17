@@ -398,6 +398,36 @@ begin
   perform pg_temp.check('ALLOW a second membership with is_default = false', r.err is null and r.affected = 1);
 end $$;
 
+-- Trigger in section 8: it acts for the authenticated role only.
+-- A service_role insert for an already-assigned person is allowed (the trigger
+-- does not act). For an authenticated admin the policies already refuse the
+-- same insert, so to reach the trigger on its own this block adds a
+-- deliberately permissive INSERT policy (inside the outer transaction, dropped
+-- again right after) that stands in for the race, where the policies pass on a
+-- stale snapshot. The trigger must then refuse with its own generic message.
+do $$
+declare
+  r record;
+begin
+  select * into r from pg_temp.run_as('service_role', 'user_test_service', format(
+    'insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
+    '33333333-3333-4333-8333-333333333333', 'bbbbbbbb-0000-4000-8000-000000000002'),
+    format('select exists (select 1 from public.profile_tenant_memberships where profile_id = %L and tenant_id = %L)',
+      'bbbbbbbb-0000-4000-8000-000000000002', '33333333-3333-4333-8333-333333333333'));
+  perform pg_temp.check('ALLOW service_role adds a second membership for an already-assigned person (trigger does not act)',
+    r.err is null and r.verified is true);
+
+  create policy tmp_trigger_probe on public.profile_tenant_memberships
+    for insert to authenticated with check (true);
+  select * into r from pg_temp.run_as('authenticated', 'user_test_admin_a', format(
+    'insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
+    '11111111-1111-4111-8111-111111111111', 'bbbbbbbb-0000-4000-8000-000000000002'),
+    'select pg_temp.state_unchanged()');
+  drop policy tmp_trigger_probe on public.profile_tenant_memberships;
+  perform pg_temp.check('DENY  trigger refuses a second membership for an assigned person even if the policies pass [42501, own message, data unchanged]',
+    r.err = '42501' and r.err_msg = 'This person already belongs to a school.' and r.verified is true);
+end $$;
+
 -- ===========================================================================
 -- G. service_role paths (Clerk webhook) keep working
 -- ===========================================================================

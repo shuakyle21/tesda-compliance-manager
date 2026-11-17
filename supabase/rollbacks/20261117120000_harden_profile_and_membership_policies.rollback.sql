@@ -112,7 +112,9 @@ using (
 revoke update (role, is_active, full_name) on public.profiles from authenticated;
 grant insert, update, delete on public.profiles to authenticated;
 
--- 4. Drop the trigger, the index and the helpers.
+-- 4. Drop the triggers, the index and the helpers.
+drop trigger if exists profile_tenant_memberships_serialize_first on public.profile_tenant_memberships;
+drop function if exists app_private.serialize_first_membership();
 drop trigger if exists profiles_guard_identity_columns on public.profiles;
 drop function if exists app_private.guard_profile_identity_columns();
 drop index if exists public.profile_tenant_memberships_one_default_per_profile;

@@ -135,7 +135,11 @@ The rules the new policies will express:
    a platform admin's profile. (The "every school" part is needed because roles are global.)
 3. The "after" check repeats rule 2.
 4. A school admin can **add a membership** only to their own school, only for an active,
-   non-platform-admin profile with no school, with `is_default = false`. One default per profile.
+   non-platform-admin profile with no school. One default per profile. `is_default` is not
+   restricted: the person has no other school, so `true` is correct for this first school.
+   (Changed from the first draft, which said `is_default = false`; the app writes `false`
+   until the migration is live, and both values land correctly.) Two admins adding the same
+   person at the same moment are serialized by a lock on the person, so only one succeeds.
 5. Platform admin seating gets the same "truly unassigned" test.
 
 What must keep working: `setTargetRole`, `restorePriorRole`, `grantMembership` and
@@ -173,7 +177,7 @@ old state is the Critical finding.
 | # | Decision | Closes |
 |---|---|---|
 | 3.1 | Per-school roles: move `role` to the membership row | F-03 |
-| 3.2 | One database function for "assign user to school with role", then remove direct writes | F-29, hardens F-01 and F-02 |
+| 3.2 | One database function for "assign user to school with role", then remove direct writes. Closes the concurrent-assignment role race left after item 1.1 (see F-29) | F-29, hardens F-01 and F-02 |
 | 3.3 | Move financial, NTP and deadline columns from `batches` to an office-only table, and build a separate trainer DTO | F-08 |
 | 3.4 | Archive batches instead of deleting them | F-10 |
 | 3.5 | Audit logging by database triggers (role, membership, verification, billing, deletes), plus logging of refused actions | F-12, F-11, F-24 |
@@ -187,7 +191,7 @@ old state is the Critical finding.
 - Upgrade `next`. Remove unused packages. Serve Swagger docs in development only. (F-19, F-26)
 - CI: lint, typecheck, test, build on every PR. Pin actions to commit ids. Author check on the
   `@claude` workflow. CODEOWNERS on migrations, workflows and agent instruction files.
-  Dependabot and CodeQL. (F-20)
+  Dependabot, and make the existing CodeQL check required. (F-20)
 - `.mcp.json` read-only. (F-21)
 - `set_updated_at` gets a `search_path`. `current_clerk_user_id` reads `sub` only. (F-25)
 - Remove the debug route. Disable `?state=` in production. (F-26)

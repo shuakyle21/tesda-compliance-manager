@@ -133,8 +133,9 @@ objects before recording it; a `db push` would try to re-run it.
 
 Security remediation item 1.1 (findings F-01, F-02): trusted helpers in
 `app_private`, column privileges on `public.profiles`, rewritten profile and
-membership policies, an identity-column trigger, and a one-default-per-profile
-index. Tested only on a throwaway local Postgres 16
+membership policies, an identity-column trigger, a one-default-per-profile
+index, and a first-membership serialization trigger
+(`app_private.serialize_first_membership`). Tested only on a throwaway local Postgres 16
 (`supabase/tests/README.md`). Its rollback is
 `supabase/rollbacks/20261117120000_harden_profile_and_membership_policies.rollback.sql`
 and is deliberately outside this directory so it is never auto-applied;

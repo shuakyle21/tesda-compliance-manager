@@ -107,7 +107,10 @@ and used as that agent's instructions. It was not recreated.
 ## 8. Rules of engagement
 
 - Read-only inspection of the repository until a fix plan is approved.
-- No SQL, migration, or branch operation against the live Supabase project.
+- No SQL, migration, or branch operation against the live Supabase project by any agent.
+  The read-only catalog and data checks in `REMEDIATION_PLAN.md` Wave 0 are run by the
+  owner, by hand, with the owner's own access. They are the owner's step, not an exception
+  for agents.
 - No secrets or credentials in any report.
 - No destructive operations. No testing against deployed URLs.
 - Human approval before any fix is written, and again before any migration is applied.

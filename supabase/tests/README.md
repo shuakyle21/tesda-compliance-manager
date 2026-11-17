@@ -34,8 +34,10 @@ psql "$(supabase status -o env | grep ^DB_URL | cut -d= -f2- | tr -d '"')" \
      plus `auth.uid()` and `auth.role()`;
    - `storage.buckets`, `storage.objects` (RLS enabled) and
      `storage.foldername(text)` (`string_to_array(name, '/')`);
-   - Supabase's default privileges:
-     `alter default privileges in schema public grant all on tables, sequences, functions to anon, authenticated, service_role`.
+   - Supabase's default privileges (one object class per statement):
+     `alter default privileges in schema public grant all on tables to anon, authenticated, service_role;`
+     `alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;`
+     `alter default privileges in schema public grant all on functions to anon, authenticated, service_role;`
 3. Apply every file in `supabase/migrations/` in filename order, stopping on
    the first error. Apply the hardening migration with `psql -1`.
 4. Run the test file as a superuser:
@@ -43,3 +45,25 @@ psql "$(supabase status -o env | grep ^DB_URL | cut -d= -f2- | tr -d '"')" \
 
 To prove the tests detect the vulnerability, run the same file against a
 database built WITHOUT `20261117120000`: the security cases must fail.
+
+## Concurrency test (first-membership trigger)
+
+`profile_membership_concurrency.test.sh` covers section 8 of the migration:
+two admins of different schools adding the same unassigned person at the same
+moment. One psql session cannot show that race, so the script opens two
+(session A holds its transaction open for 3 seconds, session B starts 1 second
+later), then checks that exactly one membership exists and that session B
+failed with SQLSTATE 42501.
+
+```
+PGHOST=<socket dir or host> PGPORT=<port> PGUSER=<superuser> \
+  supabase/tests/profile_membership_concurrency.test.sh <dbname>
+```
+
+The database needs every migration applied, including `20261117120000`. It
+must be throwaway: the script commits its own fixture rows (tenants `CONC_A`,
+`CONC_B` and three `*.example.test` profiles) and deletes them on exit. It
+exits non-zero on failure. To see it detect the problem, drop the trigger
+first (`drop trigger profile_tenant_memberships_serialize_first on
+public.profile_tenant_memberships;`): both inserts succeed and it reports two
+memberships.
