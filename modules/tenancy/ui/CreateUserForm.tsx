@@ -66,17 +66,21 @@ function bannerFor(state: CreateUserFormState): Banner | null {
       // has an account at a school this admin cannot see, because the profile
       // lookup is RLS-scoped and reports "not registered" for anyone outside
       // the caller's reach. The wording has to be true in both cases, so it
-      // does not send anyone to check an inbox that may hold nothing.
+      // does not send anyone to check an inbox that may hold nothing, and it
+      // does not say which school the account belongs to. Someone who already
+      // belongs to another school cannot be added by a school admin (roles are
+      // global, migration 20261117120000), so the next step is the platform
+      // operator.
       return {
         icon: 'alert-triangle',
         tone: '',
-        text: `${state.email} already has an account or a pending invitation, so nothing was sent. If they can't reach this school, an admin who already works with them can add it.`,
+        text: `${state.email} already has an account or a pending invitation, so nothing was sent. If they can't reach this school, contact the platform operator.`,
       };
     case 'denied':
       return {
         icon: 'alert-circle',
         tone: 'critical',
-        text: 'You do not have permission to add users. Only an admin for this school can.',
+        text: 'You cannot make this change. Only an admin for this school can add users, and some accounts can only be changed by the platform operator.',
       };
     case 'unconfigured':
       return {

@@ -7,7 +7,8 @@
  *
  * Every statement here goes through `createSupabaseServerClient()` — the
  * anon-key client carrying the caller's Clerk token — so Postgres RLS decides
- * what is allowed (policies in migration 20260904120000). The service-role
+ * what is allowed (policies in migrations 20260904120000, tightened by
+ * 20261117120000). The service-role
  * client is deliberately not used: it bypasses RLS and belongs only to the
  * Clerk webhook, which has no session to scope by.
  *
@@ -58,9 +59,11 @@ export function escapeLikePattern(value: string): string {
 
 /**
  * A person an admin can act on: already signed up with Clerk, so a `profiles`
- * row exists to assign. `tenantIds` are only the memberships the *caller* can
- * see (RLS scopes the join), which is enough to tell "already in this school"
- * from "not in it".
+ * row exists to assign. Under RLS (migration 20261117120000) that means either
+ * someone who shares a school with the caller, or someone who belongs to no
+ * school at all. `tenantIds` are only the memberships the *caller* can see
+ * (RLS scopes the join), which is enough to tell "already in this school" from
+ * "not in it".
  */
 export interface ExistingUser {
   profileId: string;
@@ -85,8 +88,12 @@ export type UserLookupSnapshot =
  *   - `not-registered` — no profile for that email; the caller should invite
  *                        instead. Not an error: it is the other half of the
  *                        flow.
- *   - `denied`         — RLS refused. Either the caller is not an admin or the
- *                        target profile is outside their visibility.
+ *   - `denied`         — RLS refused. Either the caller is not an admin, or the
+ *                        change is not theirs to make: roles are global, so a
+ *                        person who belongs to a school the caller does not
+ *                        belong to cannot be changed by this caller, and a
+ *                        person who already belongs to a school cannot be
+ *                        added to a second one here.
  *   - `sync-failed` / `unconfigured` — as everywhere else in the repo.
  */
 export type UserAssignmentSnapshot =
@@ -140,9 +147,13 @@ export function mapExistingUserRow(row: ProfileLookupRow): ExistingUser {
  * casing Clerk holds, which need not match what an admin types.
  *
  * A `not-registered` result is ambiguous by design and must stay that way in
- * the UI: it means "no row this caller can see", which covers both "nobody has
- * signed up with that address" and "they exist but belong to another school".
- * Distinguishing the two would leak the membership of other tenants.
+ * the UI: it means "no row this caller can see", which covers "nobody has
+ * signed up with that address", "they exist but belong only to another
+ * school", and "they are a platform admin" (policies in migration
+ * 20261117120000 hide all of those from a school admin). Distinguishing them
+ * would leak the membership of other tenants. The invitation path that follows
+ * ends in the equally ambiguous `duplicate` state when Clerk already holds an
+ * account for the address.
  */
 export async function findUserByEmail(email: string): Promise<UserLookupSnapshot> {
   if (!isSupabaseConfigured()) return { status: 'unconfigured' };
@@ -182,6 +193,10 @@ export async function findUserByEmail(email: string): Promise<UserLookupSnapshot
 
 /**
  * Puts a role back after a grant failed part-way through.
+ *
+ * Reachable only for a person the caller was allowed to change in the first
+ * place (unassigned, or every school of theirs is one the caller belongs to),
+ * so the same update policy still matches the row and the restore lands.
  *
  * Best effort by nature: there is no transaction to roll back, so this is a
  * second write that can itself fail. When it does, the state is what it would
@@ -284,22 +299,21 @@ async function grantMembership(
   const { error } = await supabase.from('profile_tenant_memberships').insert({
     profile_id: user.profileId,
     tenant_id: tenantId,
-    // Always false, never "true if this looks like their first school".
-    // `user.tenantIds` comes from an RLS-scoped join — the membership read
-    // policy is `can_access_tenant(tenant_id)` — so an admin of school A
-    // sees an empty list for someone who already belongs to school B. Using
-    // that emptiness would write a *second* default membership, and nothing
-    // in the schema forbids one: `mapProfileRow` then picks whichever
-    // `is_default` row comes back first, so where the person lands turns on
-    // row order. In a multi-tenant compliance tool that is a silent
-    // wrong-school landing.
+    // True, because the insert policy (migration 20261117120000) only lets
+    // an admin add a person who has no membership anywhere, as seen by a
+    // trusted database helper, not by this RLS-scoped client. So this is
+    // always the person's first school and the right default. The decision
+    // is not made from `user.tenantIds`: that list comes from an RLS-scoped
+    // join and shows only the caller's own schools, so an empty list there
+    // proves nothing.
     //
-    // Costs nothing: `mapProfileRow` falls back to `memberships[0]` when no
-    // membership is flagged, so a person with one school still lands in it.
-    // The only writer of `true` is the invitation path in
-    // `modules/auth/data/provisioning.ts`, where the profile is brand new
-    // and the service-role client can see that it genuinely has no others.
-    is_default: false,
+    // A partial unique index allows at most one default membership per
+    // person. If two admins add the same unassigned person to two different
+    // schools at the same moment, the second insert is rejected by that
+    // index instead of silently giving the person two schools. (The
+    // invitation path in `modules/auth/data/provisioning.ts` also writes
+    // `true`, for the same reason.)
+    is_default: true,
   });
 
   if (!error) return null;
@@ -307,13 +321,14 @@ async function grantMembership(
   // The role UPDATE already committed and PostgREST gives us no transaction
   // to roll it back with, so undo it explicitly: a grant that failed should
   // leave no trace of itself. This matters beyond tidiness — a half-applied
-  // promotion to `admin` can read and set roles on every unassigned profile
-  // (policies 1 and 2 of 20260904120000), so leaving the role behind widens
+  // promotion to `admin` can read and set roles on the pool of unassigned
+  // profiles (migration 20261117120000), so leaving the role behind widens
   // access the admin never finished granting.
   //
-  // Reachable only when the target has no memberships, so policy 2 still
-  // matches the row and this restore lands. Had they belonged to another
-  // school, the original UPDATE would already have been denied.
+  // The update policy still matches the row, because the person is unchanged
+  // since the first UPDATE: unassigned, or in schools the caller belongs to.
+  // Had they belonged to a school the caller does not, the original UPDATE
+  // would already have been denied.
   //
   // Best effort, not a transaction: if the restore fails we are exactly where
   // we would have been without it, and the log says so.
@@ -333,8 +348,8 @@ async function grantMembership(
  * inside a school at whatever role they happened to have.
  *
  * Stopping there would still not be free, which is why the INSERT failure path
- * restores the prior role rather than leaving it. Policies 1 and 2 of
- * migration 20260904120000 are keyed on `current_role() = 'admin'` and match
+ * restores the prior role rather than leaving it. The profile policies in
+ * migration 20261117120000 are keyed on `current_role() = 'admin'` and match
  * profiles belonging to *no* tenant, so a half-applied promotion to `admin`
  * can read — and set roles on — the pool of unassigned profiles, with no
  * membership required. The compensating UPDATE closes that window.
@@ -344,6 +359,11 @@ async function grantMembership(
  * would take a `SECURITY INVOKER` Postgres function so the table policies
  * still fire — the first `.rpc()` in this codebase, so it is a precedent to
  * set deliberately rather than in passing.
+ *
+ * Only `role` and `full_name` are written to `profiles` from here: the
+ * database lets the API role update just `role`, `is_active` and `full_name`
+ * (column privileges, migration 20261117120000), so `email` and the
+ * `clerk_user_id` login link cannot be changed through this client.
  *
  * An UPDATE blocked by RLS is not an error in PostgREST — the row simply does
  * not match the policy's `using` clause and zero rows come back. That is why
