@@ -299,21 +299,15 @@ async function grantMembership(
   const { error } = await supabase.from('profile_tenant_memberships').insert({
     profile_id: user.profileId,
     tenant_id: tenantId,
-    // True, because the insert policy (migration 20261117120000) only lets
-    // an admin add a person who has no membership anywhere, as seen by a
-    // trusted database helper, not by this RLS-scoped client. So this is
-    // always the person's first school and the right default. The decision
-    // is not made from `user.tenantIds`: that list comes from an RLS-scoped
-    // join and shows only the caller's own schools, so an empty list there
-    // proves nothing.
-    //
-    // A partial unique index allows at most one default membership per
-    // person. If two admins add the same unassigned person to two different
-    // schools at the same moment, the second insert is rejected by that
-    // index instead of silently giving the person two schools. (The
-    // invitation path in `modules/auth/data/provisioning.ts` also writes
-    // `true`, for the same reason.)
-    is_default: true,
+    // False is safe both before and after migration 20261117120000 is
+    // applied: `mapProfileRow` falls back to the first membership when none is
+    // flagged. Before the migration, `user.tenantIds` (an RLS-scoped join)
+    // cannot prove this is the person's first school, so `true` could write a
+    // second default. After it, the insert policy guarantees the person has no
+    // other school, so `true` would also be correct; switch to `true` once the
+    // migration is live to get the unique-index protection against two admins
+    // adding the same person at once.
+    is_default: false,
   });
 
   if (!error) return null;
