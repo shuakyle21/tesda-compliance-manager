@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { checkRqmCode, findRqmCodes, normalizeRqmCode } from '@/modules/batches/domain/rqm';
+import {
+  checkRqmCode,
+  findRqmCodes,
+  joinPdfTextItems,
+  normalizeRqmCode,
+  ntpReadOutcome,
+  takenRqmCodes,
+  type PdfTextPiece,
+} from '@/modules/batches/domain/rqm';
 import { setBatchRqmCode } from '@/modules/batches/data/batches';
 
 const { selectMock, isMock, eqMock } = vi.hoisted(() => ({
@@ -127,6 +135,11 @@ describe('findRqmCodes, hardening', () => {
   it('does not return a six-part value', () => {
     expect(findRqmCodes('RQM3-2026-CFSP-0000-0001-0002')).toEqual([]);
   });
+  it('does not return the five-part prefix of a six-part value with a spaced final separator', () => {
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001 - 0002')).toEqual([]);
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001 -0002')).toEqual([]);
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001-\n0002')).toEqual([]);
+  });
   it('finds a code split across a line break after a hyphen', () => {
     expect(findRqmCodes('row RQM3-2026-CFSP-0000-\n0001 Sample Province')).toEqual(['RQM3-2026-CFSP-0000-0001']);
   });
@@ -170,5 +183,110 @@ describe('setBatchRqmCode', () => {
     const result = await setBatchRqmCode(args);
     expect(result).toEqual({ status: 'sync-failed' });
     expect(JSON.stringify(result)).not.toContain('raw detail');
+  });
+});
+
+describe('ntpReadOutcome', () => {
+  const A = 'RQM3-2026-CFSP-0000-0001';
+  const B = 'RQM3-2026-CFSP-0000-0002';
+  const C = 'RQM3-2026-CFSP-0000-0003';
+  const read = (text: string) => ({ ok: true as const, text });
+
+  it('says so when the text holds no five-part code', () => {
+    expect(ntpReadOutcome(read('Request RQM3-2026-CFSP-12 only'), null)).toEqual({
+      kind: 'message',
+      message: 'No RQM code was found in this PDF. Type the code from the document.',
+    });
+  });
+  it('offers one code', () => {
+    expect(ntpReadOutcome(read(`1 ${A} Course`), null)).toEqual({ kind: 'options', options: [{ code: A, mark: null, disabled: false }] });
+  });
+  it('keeps several codes in document order', () => {
+    const out = ntpReadOutcome(read(`${B} x ${A} y ${C}`), null);
+    expect(out.kind === 'options' && out.options.map((o) => o.code)).toEqual([B, A, C]);
+  });
+  it('marks and disables a code taken by another batch', () => {
+    const out = ntpReadOutcome(read(`${A} ${B}`), null, [B]);
+    expect(out).toEqual({
+      kind: 'options',
+      options: [{ code: A, mark: null, disabled: false }, { code: B, mark: 'taken', disabled: true }],
+    });
+  });
+  it("marks this batch's current code without disabling it", () => {
+    const out = ntpReadOutcome(read(`${A} ${B}`), A, [A, B]);
+    expect(out).toEqual({
+      kind: 'options',
+      options: [{ code: A, mark: 'current', disabled: false }, { code: B, mark: 'taken', disabled: true }],
+    });
+  });
+  it.each([
+    ['no-text', 'This PDF has no readable text (it may be a scan). Type the code from the document.'],
+    ['unreadable', "This PDF couldn't be read. Type the code from the document."],
+    ['too-large', 'This file is too large to read.'],
+    ['not-pdf', 'Choose a PDF file.'],
+  ] as const)('maps %s to its message', (reason, message) => {
+    expect(ntpReadOutcome({ ok: false, reason }, null)).toEqual({ kind: 'message', message });
+  });
+});
+
+it('ntpReadOutcome carries truncated through, and only when set', () => {
+  const text = 'RQM3-2026-CFSP-0000-0001';
+  expect(ntpReadOutcome({ ok: true, text, truncated: true }, null)).toMatchObject({ kind: 'options', truncated: true });
+  expect(ntpReadOutcome({ ok: true, text: 'nothing', truncated: true }, null)).toMatchObject({ kind: 'message', truncated: true });
+  expect(ntpReadOutcome({ ok: true, text }, null)).not.toHaveProperty('truncated');
+});
+
+describe('joinPdfTextItems with findRqmCodes', () => {
+  // height 10: a gap over 2.5 is a cell break, a line offset over 5 is a new line.
+  const piece = (str: string, x: number, y = 100, over: Partial<PdfTextPiece> = {}): PdfTextPiece => ({
+    str,
+    x,
+    y,
+    width: str.length * 5,
+    height: 10,
+    hasEOL: false,
+    ...over,
+  });
+  const codes = (items: PdfTextPiece[]) => findRqmCodes(joinPdfTextItems(items));
+
+  it('rejoins a code split across adjacent items and keeps the next cell apart', () => {
+    const first = piece('RQM3-2026-CFSP-0000-00', 0);
+    const second = piece('01', first.x + first.width);
+    expect(codes([first, second, piece('Sample Province', second.x + second.width + 40)])).toEqual(['RQM3-2026-CFSP-0000-0001']);
+  });
+  it('rejoins a split inside a segment', () => {
+    const first = piece('RQM3-2026-CFSP-00', 0);
+    expect(codes([first, piece('00-0001', first.x + first.width)])).toEqual([CODE]);
+  });
+  it('rejoins one item per character', () => {
+    expect(codes([...CODE].map((ch, i) => piece(ch, i * 5)))).toEqual([CODE]);
+  });
+  it('does not glue a code to a distant cell', () => {
+    const code = piece(CODE, 0);
+    expect(codes([code, piece('Sample', code.x + code.width + 30)])).toEqual([CODE]);
+  });
+  it('reads two rows on different lines as two codes, in order', () => {
+    const second = 'RQM3-2026-CFSP-0000-0002';
+    expect(codes([piece(second, 0, 200), piece(CODE, 0, 180)])).toEqual([second, CODE]);
+  });
+  it('starts a new line after hasEOL even when y is equal', () => {
+    expect(joinPdfTextItems([piece('a', 0, 100, { hasEOL: true }), piece('b', 5)])).toBe('a\nb');
+  });
+  it('keeps a single space for whitespace items and treats overlap as adjacent', () => {
+    expect(joinPdfTextItems([piece('a', 0), piece(' ', 5), piece('', 6), piece('b', 10)])).toBe('a b');
+    expect(joinPdfTextItems([piece('a', 0), piece('b', 3)])).toBe('ab');
+  });
+});
+
+describe('takenRqmCodes', () => {
+  it("returns other batches' codes, skipping this batch, null and empty", () => {
+    const batches = [
+      { id: 'B1', rqmCode: 'RQM3-2026-CFSP-0000-0001' },
+      { id: 'B2', rqmCode: 'RQM3-2026-CFSP-0000-0002' },
+      { id: 'B3', rqmCode: null },
+      { id: 'B4', rqmCode: '' },
+    ];
+    expect(takenRqmCodes(batches, 'B1')).toEqual(['RQM3-2026-CFSP-0000-0002']);
+    expect(takenRqmCodes(batches, 'other')).toEqual(['RQM3-2026-CFSP-0000-0001', 'RQM3-2026-CFSP-0000-0002']);
   });
 });
