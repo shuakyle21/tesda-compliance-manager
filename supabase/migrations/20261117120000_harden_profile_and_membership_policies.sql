@@ -281,7 +281,12 @@ with check (
 );
 
 -- Platform admin seating: unchanged (never themselves, only into a school
--- with no members yet) plus: the person seated is not a platform admin.
+-- with no members yet) plus: the person seated is active, is not a platform
+-- admin, and has no membership anywhere, i.e. comes from the unassigned pool.
+-- That is the only pool the platform admin can read, and the only people the
+-- school-creation flow hands to a new school, so no real flow is narrowed.
+-- It stops the platform admin from attaching someone who already works at
+-- another school (their global role would then apply in the new school too).
 drop policy if exists "Platform admins can seat a tenant's first members" on public.profile_tenant_memberships;
 create policy "Platform admins can seat a tenant's first members"
 on public.profile_tenant_memberships
@@ -290,7 +295,9 @@ to authenticated
 with check (
   app_private.is_platform_admin()
   and profile_id <> app_private.current_profile_id()
+  and app_private.profile_is_active(profile_id)
   and not app_private.profile_is_platform_admin(profile_id)
+  and not app_private.profile_has_any_membership(profile_id)
   and not exists (
     select 1
     from public.profile_tenant_memberships existing

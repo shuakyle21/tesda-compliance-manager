@@ -44,33 +44,49 @@ end $$;
 
 -- Runs p_sql as an API role with the persona's JWT sub, in a sub-transaction
 -- that is always rolled back. Returns rows affected (or returned, for a
--- select), the SQLSTATE if it raised (null otherwise), and, when p_verify is
--- given, the boolean that statement returns AFTER p_sql ran (as superuser,
--- before the rollback).
+-- select); the SQLSTATE and message if it raised; and, when p_verify is given,
+-- the boolean that statement returns AFTER p_sql ran or failed, evaluated as
+-- the superuser before the rollback.
 create function pg_temp.run_as(
   p_role text, p_sub text, p_sql text, p_verify text default null,
-  out affected int, out err text, out verified boolean)
+  out affected int, out err text, out err_msg text, out verified boolean)
 language plpgsql as $$
 begin
   perform set_config('request.jwt.claims',
     json_build_object('sub', p_sub, 'role', p_role)::text, true);
   begin
     execute format('set local role %I', p_role);
-    execute p_sql;
-    get diagnostics affected = row_count;
+    begin
+      execute p_sql;
+      get diagnostics affected = row_count;
+    exception when others then
+      affected := -1;
+      err := sqlstate;
+      err_msg := sqlerrm;
+    end;
     reset role;
     if p_verify is not null then
       execute p_verify into verified;
     end if;
     raise exception 'rollback_sentinel';
   exception when others then
-    if sqlstate <> 'P0001' or sqlerrm <> 'rollback_sentinel' then
-      affected := -1;
-      err := sqlstate;
+    if sqlerrm <> 'rollback_sentinel' then
+      raise;
     end if;
   end;
   reset role;
   perform set_config('request.jwt.claims', '', true);
+end $$;
+
+create function pg_temp.state_unchanged() returns boolean
+language plpgsql as $$
+begin
+  return
+    (select coalesce(string_agg(x::text, ',' order by x::text), '') from public.profiles x)
+      = (select coalesce(string_agg(x::text, ',' order by x::text), '') from snap_profiles x)
+    and
+    (select coalesce(string_agg(x::text, ',' order by x::text), '') from public.profile_tenant_memberships x)
+      = (select coalesce(string_agg(x::text, ',' order by x::text), '') from snap_memberships x);
 end $$;
 
 -- Assertions built on run_as.
@@ -82,22 +98,33 @@ begin
   perform pg_temp.check('ALLOW ' || p_name, r.err is null and r.affected >= 1);
 end $$;
 
-create function pg_temp.deny(p_name text, p_sub text, p_sql text)
+-- A denial must be of the EXPECTED KIND and must leave the data untouched:
+--   deny_zero   the statement ran and affected 0 rows (row hidden by RLS USING)
+--   deny_rls    "new row violates row-level security policy" (42501, WITH CHECK)
+--   deny_perm   "permission denied ..." (42501, a column or table privilege)
+--   deny_unique unique violation (23505)
+create function pg_temp.deny_kind(p_kind text, p_name text, p_sub text, p_sql text)
 returns void language plpgsql as $$
-declare r record;
+declare
+  r record;
+  kind_ok boolean;
 begin
-  select * into r from pg_temp.run_as('authenticated', p_sub, p_sql);
-  perform pg_temp.check('DENY  ' || p_name, r.err is not null or r.affected = 0);
+  select * into r from pg_temp.run_as('authenticated', p_sub, p_sql, 'select pg_temp.state_unchanged()');
+  kind_ok := case p_kind
+    when 'zero'   then r.err is null and r.affected = 0
+    when 'rls'    then r.err = '42501' and r.err_msg like '%row-level security%'
+    when 'perm'   then r.err = '42501' and r.err_msg like 'permission denied%'
+    when 'unique' then r.err = '23505'
+  end;
+  perform pg_temp.check('DENY  ' || p_name || ' [' || p_kind || ', data unchanged]',
+    coalesce(kind_ok, false) and r.verified is true);
 end $$;
-
--- Must fail with "permission denied" (42501) specifically: a column privilege.
-create function pg_temp.deny_perm(p_name text, p_sub text, p_sql text)
-returns void language plpgsql as $$
-declare r record;
-begin
-  select * into r from pg_temp.run_as('authenticated', p_sub, p_sql);
-  perform pg_temp.check('DENY  ' || p_name || ' (permission denied)', r.err = '42501');
-end $$;
+create function pg_temp.deny_zero(p_name text, p_sub text, p_sql text) returns void
+language sql as $$ select pg_temp.deny_kind('zero', p_name, p_sub, p_sql) $$;
+create function pg_temp.deny_rls(p_name text, p_sub text, p_sql text) returns void
+language sql as $$ select pg_temp.deny_kind('rls', p_name, p_sub, p_sql) $$;
+create function pg_temp.deny_perm(p_name text, p_sub text, p_sql text) returns void
+language sql as $$ select pg_temp.deny_kind('perm', p_name, p_sub, p_sql) $$;
 
 -- The set of profile ids a persona can select must equal p_expected.
 create function pg_temp.sees_exactly(p_name text, p_sub text, p_expected uuid[])
@@ -149,6 +176,11 @@ insert into public.platform_admins (profile_id) values
   ('eeeeeeee-0000-4000-8000-000000000001'),
   ('eeeeeeee-0000-4000-8000-000000000002');
 
+-- Snapshot of the fixture state. Every denied statement must leave the
+-- profiles and memberships tables exactly as they were.
+create temp table snap_profiles as select * from public.profiles;
+create temp table snap_memberships as select * from public.profile_tenant_memberships;
+
 -- Short names for the test bodies.
 \set tA   '''11111111-1111-4111-8111-111111111111'''
 \set tB   '''22222222-2222-4222-8222-222222222222'''
@@ -173,17 +205,17 @@ select pg_temp.sees_exactly('admin A: own school, dual-school person and the una
     :pAdminA, :pCoordA, :pTrainerA, :pViewerA, :pDual, :pUnassigned]::uuid[]);
 select pg_temp.sees_exactly('admin B: own school, dual-school person only (no school A-only people, no pool of platform admins)',
   'user_test_admin_b', array[:pAdminB, :pViewerB, :pDual, :pUnassigned]::uuid[]);
-select pg_temp.deny('admin A cannot see admin B',
+select pg_temp.deny_zero('admin A cannot see admin B',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'bbbbbbbb-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot see a school-B-only profile',
+select pg_temp.deny_zero('admin A cannot see a school-B-only profile',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'bbbbbbbb-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot see the platform admin profile',
+select pg_temp.deny_zero('admin A cannot see the platform admin profile',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'eeeeeeee-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot see a second platform admin profile',
+select pg_temp.deny_zero('admin A cannot see a second platform admin profile',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'eeeeeeee-0000-4000-8000-000000000002'));
 select pg_temp.allow('admin A can see a truly unassigned active user',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'ffffffff-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot see an unassigned INACTIVE user',
+select pg_temp.deny_zero('admin A cannot see an unassigned INACTIVE user',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'ffffffff-0000-4000-8000-000000000002'));
 select pg_temp.allow('admin A can still see the person who is in both schools (shares school A)',
   'user_test_admin_a', format('select 1 from public.profiles where id = %L', 'dddddddd-0000-4000-8000-000000000001'));
@@ -191,19 +223,19 @@ select pg_temp.allow('admin A can still see the person who is in both schools (s
 -- ===========================================================================
 -- B. What admin A can CHANGE on profiles (F-01: write side)
 -- ===========================================================================
-select pg_temp.deny('admin A cannot update role on a school-B-only profile',
+select pg_temp.deny_zero('admin A cannot update role on a school-B-only profile',
   'user_test_admin_a', format('update public.profiles set role = %L where id = %L', 'admin', 'bbbbbbbb-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot update is_active on a school-B-only profile',
+select pg_temp.deny_zero('admin A cannot update is_active on a school-B-only profile',
   'user_test_admin_a', format('update public.profiles set is_active = false where id = %L', 'bbbbbbbb-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot update full_name on a school-B-only profile',
+select pg_temp.deny_zero('admin A cannot update full_name on a school-B-only profile',
   'user_test_admin_a', format('update public.profiles set full_name = %L where id = %L', 'Renamed', 'bbbbbbbb-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot update admin B',
+select pg_temp.deny_zero('admin A cannot update admin B',
   'user_test_admin_a', format('update public.profiles set role = %L where id = %L', 'viewer', 'bbbbbbbb-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin B cannot update admin A',
+select pg_temp.deny_zero('admin B cannot update admin A',
   'user_test_admin_b', format('update public.profiles set role = %L where id = %L', 'viewer', 'aaaaaaaa-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot update the platform admin role',
+select pg_temp.deny_zero('admin A cannot update the platform admin role',
   'user_test_admin_a', format('update public.profiles set role = %L where id = %L', 'admin', 'eeeeeeee-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot deactivate the platform admin',
+select pg_temp.deny_zero('admin A cannot deactivate the platform admin',
   'user_test_admin_a', format('update public.profiles set is_active = false where id = %L', 'eeeeeeee-0000-4000-8000-000000000001'));
 select pg_temp.deny_perm('admin A cannot update clerk_user_id on the platform admin',
   'user_test_admin_a', format('update public.profiles set clerk_user_id = %L where id = %L', 'user_test_attacker', 'eeeeeeee-0000-4000-8000-000000000001'));
@@ -223,14 +255,14 @@ select pg_temp.deny_perm('admin A cannot update email on an unassigned profile',
   'user_test_admin_a', format('update public.profiles set email = %L where id = %L', 'x@example.test', 'ffffffff-0000-4000-8000-000000000001'));
 select pg_temp.deny_perm('admin A cannot update id on any profile',
   'user_test_admin_a', format('update public.profiles set id = gen_random_uuid() where id = %L', 'aaaaaaaa-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot change the role of the person who is in both A and B',
+select pg_temp.deny_zero('admin A cannot change the role of the person who is in both A and B',
   'user_test_admin_a', format('update public.profiles set role = %L where id = %L', 'admin', 'dddddddd-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot change is_active of the person who is in both A and B',
+select pg_temp.deny_zero('admin A cannot change is_active of the person who is in both A and B',
   'user_test_admin_a', format('update public.profiles set is_active = false where id = %L', 'dddddddd-0000-4000-8000-000000000001'));
 select pg_temp.allow('admin A can set the role and name of a truly unassigned user (setTargetRole)',
   'user_test_admin_a', format('update public.profiles set role = %L, full_name = %L where id = %L returning id',
     'coordinator', 'Unassigned Person', 'ffffffff-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot update an unassigned INACTIVE user',
+select pg_temp.deny_zero('admin A cannot update an unassigned INACTIVE user',
   'user_test_admin_a', format('update public.profiles set role = %L where id = %L', 'admin', 'ffffffff-0000-4000-8000-000000000002'));
 select pg_temp.allow('admin A can still set the role of a same-school-only person (regression)',
   'user_test_admin_a', format('update public.profiles set role = %L where id = %L returning id', 'viewer', 'aaaaaaaa-0000-4000-8000-000000000002'));
@@ -246,34 +278,34 @@ select pg_temp.allow('admin A can add a truly unassigned active user to school A
 select pg_temp.allow('admin A can add a truly unassigned active user to school A (is_default = true, first school)',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
     '11111111-1111-4111-8111-111111111111', 'ffffffff-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot add a school-B-only member to school A',
+select pg_temp.deny_rls('admin A cannot add a school-B-only member to school A',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '11111111-1111-4111-8111-111111111111', 'bbbbbbbb-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot add admin B to school A',
+select pg_temp.deny_rls('admin A cannot add admin B to school A',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '11111111-1111-4111-8111-111111111111', 'bbbbbbbb-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot add the dual-school person (already in A and B) to school A',
+select pg_temp.deny_rls('admin A cannot add the dual-school person (already in A and B) to school A',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '11111111-1111-4111-8111-111111111111', 'dddddddd-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot add a school-A member to school B (the school they are missing)',
+select pg_temp.deny_rls('admin A cannot add a school-A member to school B (the school they are missing)',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '22222222-2222-4222-8222-222222222222', 'aaaaaaaa-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot add an unassigned user to school B (not their school)',
+select pg_temp.deny_rls('admin A cannot add an unassigned user to school B (not their school)',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '22222222-2222-4222-8222-222222222222', 'ffffffff-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot add an inactive unassigned profile to school A',
+select pg_temp.deny_rls('admin A cannot add an inactive unassigned profile to school A',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '11111111-1111-4111-8111-111111111111', 'ffffffff-0000-4000-8000-000000000002'));
-select pg_temp.deny('admin A cannot add the platform admin to school A',
+select pg_temp.deny_rls('admin A cannot add the platform admin to school A',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '11111111-1111-4111-8111-111111111111', 'eeeeeeee-0000-4000-8000-000000000001'));
-select pg_temp.deny('admin A cannot add the platform admin to school A (is_default = true)',
+select pg_temp.deny_rls('admin A cannot add the platform admin to school A (is_default = true)',
   'user_test_admin_a', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
     '11111111-1111-4111-8111-111111111111', 'eeeeeeee-0000-4000-8000-000000000001'));
 select pg_temp.allow('admin A can still remove a school-A membership (delete policy unchanged)',
   'user_test_admin_a', format('delete from public.profile_tenant_memberships where tenant_id = %L and profile_id = %L',
     '11111111-1111-4111-8111-111111111111', 'aaaaaaaa-0000-4000-8000-000000000004'));
-select pg_temp.deny('admin A cannot remove a school-B membership (delete policy unchanged)',
+select pg_temp.deny_zero('admin A cannot remove a school-B membership (delete policy unchanged)',
   'user_test_admin_a', format('delete from public.profile_tenant_memberships where tenant_id = %L and profile_id = %L',
     '22222222-2222-4222-8222-222222222222', 'bbbbbbbb-0000-4000-8000-000000000002'));
 
@@ -285,19 +317,19 @@ declare
   persona text;
 begin
   foreach persona in array array['user_test_coord_a', 'user_test_trainer_a', 'user_test_viewer_a'] loop
-    perform pg_temp.deny(persona || ' cannot see the unassigned pool',
+    perform pg_temp.deny_zero(persona || ' cannot see the unassigned pool',
       persona, format('select 1 from public.profiles where id = %L', 'ffffffff-0000-4000-8000-000000000001'));
-    perform pg_temp.deny(persona || ' cannot set the role of an unassigned user',
+    perform pg_temp.deny_zero(persona || ' cannot set the role of an unassigned user',
       persona, format('update public.profiles set role = %L where id = %L', 'admin', 'ffffffff-0000-4000-8000-000000000001'));
-    perform pg_temp.deny(persona || ' cannot update a same-school profile',
+    perform pg_temp.deny_zero(persona || ' cannot update a same-school profile',
       persona, format('update public.profiles set role = %L where id = %L', 'viewer', 'aaaaaaaa-0000-4000-8000-000000000004'));
-    perform pg_temp.deny(persona || ' cannot update their own role',
+    perform pg_temp.deny_zero(persona || ' cannot update their own role',
       persona, format('update public.profiles set role = %L where id = %L', 'admin',
         (select id from public.profiles where clerk_user_id = persona)));
-    perform pg_temp.deny(persona || ' cannot add a member to school A',
+    perform pg_temp.deny_rls(persona || ' cannot add a member to school A',
       persona, format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
         '11111111-1111-4111-8111-111111111111', 'ffffffff-0000-4000-8000-000000000001'));
-    perform pg_temp.deny(persona || ' cannot remove a membership',
+    perform pg_temp.deny_zero(persona || ' cannot remove a membership',
       persona, format('delete from public.profile_tenant_memberships where tenant_id = %L and profile_id = %L',
         '11111111-1111-4111-8111-111111111111', 'aaaaaaaa-0000-4000-8000-000000000004'));
   end loop;
@@ -318,21 +350,30 @@ select pg_temp.allow('platform admin can still read an unassigned active profile
   'user_test_platform', format('select 1 from public.profiles where id = %L', 'ffffffff-0000-4000-8000-000000000001'));
 select pg_temp.allow('platform admin can still read an unassigned inactive profile (unchanged)',
   'user_test_platform', format('select 1 from public.profiles where id = %L', 'ffffffff-0000-4000-8000-000000000002'));
-select pg_temp.deny('platform admin still cannot read a school member profile (unchanged)',
+select pg_temp.deny_zero('platform admin still cannot read a school member profile (unchanged)',
   'user_test_platform', format('select 1 from public.profiles where id = %L', 'bbbbbbbb-0000-4000-8000-000000000002'));
 select pg_temp.allow('platform admin can seat an unassigned user as first member of a brand-new empty school',
   'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
     '33333333-3333-4333-8333-333333333333', 'ffffffff-0000-4000-8000-000000000001'));
-select pg_temp.deny('platform admin cannot seat themselves',
+select pg_temp.deny_rls('platform admin cannot seat themselves',
   'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
     '33333333-3333-4333-8333-333333333333', 'eeeeeeee-0000-4000-8000-000000000001'));
-select pg_temp.deny('platform admin cannot seat another platform admin',
+select pg_temp.deny_rls('platform admin cannot seat another platform admin',
   'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
     '33333333-3333-4333-8333-333333333333', 'eeeeeeee-0000-4000-8000-000000000002'));
-select pg_temp.deny('platform admin cannot seat into a school that already has members (unchanged)',
+select pg_temp.deny_rls('platform admin cannot seat a person who already has a school (admin B) into an empty school',
+  'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
+    '33333333-3333-4333-8333-333333333333', 'bbbbbbbb-0000-4000-8000-000000000001'));
+select pg_temp.deny_rls('platform admin cannot seat a person who already has a school (dual-school person) into an empty school',
+  'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
+    '33333333-3333-4333-8333-333333333333', 'dddddddd-0000-4000-8000-000000000001'));
+select pg_temp.deny_rls('platform admin cannot seat an inactive person into an empty school',
+  'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
+    '33333333-3333-4333-8333-333333333333', 'ffffffff-0000-4000-8000-000000000002'));
+select pg_temp.deny_rls('platform admin cannot seat into a school that already has members (unchanged)',
   'user_test_platform', format('insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
     '11111111-1111-4111-8111-111111111111', 'ffffffff-0000-4000-8000-000000000001'));
-select pg_temp.deny('platform admin cannot edit profiles (unchanged)',
+select pg_temp.deny_zero('platform admin cannot edit profiles (unchanged)',
   'user_test_platform', format('update public.profiles set role = %L where id = %L', 'admin', 'ffffffff-0000-4000-8000-000000000001'));
 
 -- ===========================================================================
@@ -347,8 +388,10 @@ begin
   -- bypasses RLS: the index is a data rule, not a policy.
   select * into r from pg_temp.run_as('service_role', 'user_test_service', format(
     'insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, true)',
-    '33333333-3333-4333-8333-333333333333', 'dddddddd-0000-4000-8000-000000000001'));
-  perform pg_temp.check('DENY  a second is_default = true membership for one profile (unique violation)', r.err = '23505');
+    '33333333-3333-4333-8333-333333333333', 'dddddddd-0000-4000-8000-000000000001'),
+    'select pg_temp.state_unchanged()');
+  perform pg_temp.check('DENY  a second is_default = true membership for one profile [unique, data unchanged]',
+    r.err = '23505' and r.verified is true);
   select * into r from pg_temp.run_as('service_role', 'user_test_service', format(
     'insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default) values (%L, %L, false)',
     '33333333-3333-4333-8333-333333333333', 'dddddddd-0000-4000-8000-000000000001'));
@@ -407,6 +450,8 @@ declare
   r record;
   clerk_err text;
   id_err text;
+  clerk_msg text;
+  id_msg text;
 begin
   -- The sub-transaction below is rolled back (it undoes the grant), which also
   -- undoes any row written to `results` inside it, so the outcomes are kept in
@@ -417,17 +462,19 @@ begin
     select * into r from pg_temp.run_as('authenticated', 'user_test_admin_a', format(
       'update public.profiles set clerk_user_id = %L where id = %L', 'user_test_attacker', 'aaaaaaaa-0000-4000-8000-000000000002'));
     clerk_err := r.err;
+    clerk_msg := r.err_msg;
     select * into r from pg_temp.run_as('authenticated', 'user_test_admin_a', format(
       'update public.profiles set id = gen_random_uuid() where id = %L', 'aaaaaaaa-0000-4000-8000-000000000002'));
     id_err := r.err;
+    id_msg := r.err_msg;
     raise exception 'rollback_grant';
   exception when others then
     if sqlerrm <> 'rollback_grant' then raise; end if;
   end;
   perform pg_temp.check('DENY  clerk_user_id change is still blocked if table-wide UPDATE is re-granted (trigger backstop)',
-    clerk_err = '42501');
+    clerk_err = '42501' and clerk_msg like '%cannot be changed by this role%');
   perform pg_temp.check('DENY  id change is still blocked if table-wide UPDATE is re-granted (trigger backstop)',
-    id_err = '42501');
+    id_err = '42501' and id_msg like '%cannot be changed by this role%');
 end $$;
 
 -- ===========================================================================
