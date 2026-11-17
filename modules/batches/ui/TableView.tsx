@@ -22,7 +22,6 @@ import { filterBatches } from './filter';
 import { criticalRequirements, summarizeBatchDocCompliance, type DocComplianceSummary } from '@/modules/documents/domain/compliance';
 import { isBillingReady } from '@/modules/billing/domain/readiness';
 import { sessionProgress } from '@/modules/batches/domain/progress';
-import { pluralize } from '@/shared/text';
 import type { Batch, DocumentRequirement } from '@/shared/types';
 
 export function TableView({
@@ -52,7 +51,6 @@ export function TableView({
     <div>
       <div className="page-head">
         <h1>Table View</h1>
-        <span className="subline">{batches.length} {pluralize(batches.length)} · {batches.filter((b) => b.status === 'ongoing').length} active</span>
       </div>
 
       <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} />
@@ -68,7 +66,6 @@ export function TableView({
                 {filtered.length} {filtered.length === 1 ? 'batch' : 'batches'}
               </span>
             </div>
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--color-text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>2026 cycle</span>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', minWidth: 760, borderCollapse: 'collapse', tableLayout: 'fixed' }}>

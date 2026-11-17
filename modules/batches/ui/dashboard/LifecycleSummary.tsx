@@ -38,18 +38,14 @@ export function LifecycleSummary({ batches, batchHref, allHref }: {
         <p className="attention-empty">No active batches.</p>
       ) : (
         <ul className="lifecycle-rows">
-          {shown.map((batch) => {
-            const done = batch.lifecycle.filter((stage) => stage.status === 'done').length;
-            return (
-              <li key={batch.id} className="lifecycle-row">
-                <div className="lifecycle-row-head">
-                  <Link href={batchHref(batch.id)} className="lifecycle-batch"><BatchIdLabel batch={batch} /></Link>
-                  <span className="lifecycle-count">{done} of {batch.lifecycle.length} stages done</span>
-                </div>
-                <LifecyclePipeline steps={batch.lifecycle} />
-              </li>
-            );
-          })}
+          {shown.map((batch) => (
+            <li key={batch.id} className="lifecycle-row">
+              <div className="lifecycle-row-head">
+                <Link href={batchHref(batch.id)} className="lifecycle-batch"><BatchIdLabel batch={batch} /></Link>
+              </div>
+              <LifecyclePipeline steps={batch.lifecycle} />
+            </li>
+          ))}
         </ul>
       )}
       {hidden > 0 && (

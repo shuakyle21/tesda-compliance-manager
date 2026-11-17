@@ -58,9 +58,6 @@ export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabe
             </span>
             <div>
               <h3>Settings</h3>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--color-text-muted)', marginTop: 2 }}>
-                Workspace &amp; personal preferences
-              </div>
             </div>
           </div>
           <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
@@ -94,7 +91,6 @@ export function SettingsModal({ workspaceName, workspaceMeta, userName, userLabe
               <div className="settings-row">
                 <div style={{ minWidth: 0 }}>
                   <div className="settings-row-label">Compact density</div>
-                  <div className="settings-row-hint">Tighter rows and cards</div>
                 </div>
                 <span className="settings-row-control">
                   <Switch checked={compact} onChange={setCompact} label="Compact density" />

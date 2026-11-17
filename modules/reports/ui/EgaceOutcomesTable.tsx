@@ -27,7 +27,7 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
         <div>
           <h2 className="egace-table-title">EGACE Outcomes</h2>
           <span className="egace-table-sub">
-            {rows.length} {rows.length === 1 ? 'batch' : 'batches'} · TESDA TWSP &amp; CFSP{asOf ? ` · as of ${asOf}` : ''}
+            {rows.length} {rows.length === 1 ? 'batch' : 'batches'}{asOf ? ` · as of ${asOf}` : ''}
           </span>
         </div>
       </div>
