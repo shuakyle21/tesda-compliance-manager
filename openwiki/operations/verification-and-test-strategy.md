@@ -1,0 +1,163 @@
+---
+type: Operations Guide
+title: Verification Loop and Test Strategy
+description: The ordered tsc → lint → test loop and the rule each command defends, why Node 22 is load-bearing, how specs pin the clock instead of reading it, what the one Playwright spec actually proves, and the two gaps — no CI runs the loop and the real-Supabase RLS tests do not exist.
+tags: [testing, verification, vitest, playwright, lint, typecheck, ci, rls]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-17T04:33:34.390Z
+---
+
+# Verification Loop and Test Strategy
+
+`RULES.md` §9 is stale in the repository and this page does not repeat it. Rule 34 still says
+there is "no test runner yet" and that `pnpm test` is a placeholder; [`package.json`](/package.json)
+defines `pnpm test` as `vitest run` over 30 specs, and rules 7–10 are already enforced by
+`import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). Rule 35's substance —
+fixed as-of dates, no mocks for RLS — is live and is what this page documents. Treat rule 34 as
+describing an earlier state.
+
+## The loop, in order, and what each step defends
+
+Run all three before calling a change done. The order is cheapest-signal first, so an
+architecture breach is reported before a test wastes a minute proving it.
+
+1. **`pnpm exec tsc --noEmit`** — rule 18. `DB_TO_UI_STAGE` in `modules/batches/data/batches.ts`
+   is a *total* map, so a new DB enum variant fails compilation until someone chooses its UI
+   treatment. The typecheck is also the only thing standing behind every "typed against real
+   Supabase" claim in the data layer, since no test resolves a live schema. **There is deliberately
+   no npm script for it** ([`CLAUDE.md`](/CLAUDE.md) lists it as `pnpm exec`): typecheck is a step
+   in a sequence, not a product command, and a `typecheck` alias would read like a build.
+   `tsconfig.json` is `strict`, `noEmit`, and includes `**/*.mts`, so the Vitest config is checked
+   too.
+2. **`pnpm lint`** — rules 7–10. The `import/no-restricted-paths` zones put `app → modules → shared
+   → lib/supabase` in the linter: another module's `data/` is private, `shared/` may not import
+   `modules/` or `app/`, and `database.types.ts` is data-layer only. The same block is the only
+   automated defence of those rules, which is why the rule tags read `[lint]` and not `[review]`.
+   See [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md).
+   The config also carries a `complexity: ["warn", 15]` audit — a warn-only prompt, never a red.
+3. **`pnpm test`** — rules 19 and 35. `vitest run` over `tests/unit/**/*.test.ts` in a `node`
+   environment, aliasing `@/` so specs import application source directly
+   ([`vitest.config.mts`](/vitest.config.mts)). The suite is fixture-in/function-out: it covers
+   `domain/` layers, mappers, and the pure fast-fail halves of `data/` functions. Rule 19's
+   guard ordering is pinned where it lives — `tests/unit/tenant-access.test.ts` asserts that
+   `withTenantAccess` never overwrites a `sync-failed` or `unconfigured` snapshot with the tidier
+   `no-tenant-access` story, so a refactor to `status === 'ok' ? … : …` goes red instead of
+   silently swallowing the banner ([`tests/unit/tenant-access.test.ts`](/tests/unit/tenant-access.test.ts#L91-L97)).
+
+`pnpm build` is the fourth thing worth running and is not a test: it is the only check that the
+App Router component is caught by compilation as Next renders it, which `tsc` alone does
+not cover for Server Components.
+
+## Node 22 is a startup requirement, not a style preference
+
+`engines` pins `>=22` and [`.nvmrc`](/.nvmrc) holds `22`. Use that version; `nvm use` in the
+repo root reads the file.
+
+The mechanism matters because the failure is unrecognisable. Vitest 4's bundler, rolldown, calls
+`util.styleText` with an **array** argument while formatting its startup output. On Node 21 or
+older `styleText` accepts only a string, so the call throws `ERR_INVALID_ARG_VALUE` **before a
+single test file loads**. What reaches the terminal is a bundler trace from inside rolldown, with
+no test counts and no failing spec — read as a test failure, it sends you looking at the spec you
+just edited. If `pnpm test` dies with no summary at all, check `node -v` first.
+
+## Pinning the clock: fixed as-of dates
+
+A domain rule that compares a deadline to *now* reads the real clock if the spec lets it, so the
+spec turns red on an unrelated Tuesday and green again on Wednesday. Rule 35 forbids that, and
+the shape to copy is [`tests/unit/dashboard-domain.test.ts`](/tests/unit/dashboard-domain.test.ts#L9-L43):
+it says outright that `daysToBilling` is precomputed by the mapper, then builds every case from a
+`dated(days)` helper with `daysToBilling` baked in — `-5` for overdue, `BILLING_DUE_WINDOW_DAYS + 1`
+for just past the window. No clock is read anywhere in that file.
+
+The mapper is the one place a real clock *is* read (`daysUntil` calls `Date.now()` downstream), so
+the spec that exercises it freezes time instead of accepting it:
+[`tests/unit/batches.test.ts`](/tests/unit/batches.test.ts#L145-L159) calls
+`vi.setSystemTime(new Date('2026-06-01T00:00:00.000Z'))` in `beforeEach` — with no
+`vi.useFakeTimers()`, which throws without fake timers already installed — and restores with
+`vi.useRealTimers()` in `afterEach`. Its assertion is a day count (`19`) derived from two fixed
+calendar dates, never from "about 19 days from whenever".
+
+Two habits follow. **Prefer the domain shape to the timer shape**: if a function can take the
+as-of date as input, fixtures become literals with no setup to forget. **Pin holiday and
+boundary dates, not today's**: `tests/unit/status-render.test.ts` asserts `-313` renders
+`313D OVERDUE` and `0` renders `TODAY` — calendar truths that stay true.
+
+## What the unit suite does and does not prove
+
+It proves pure logic and the *decision* a function makes. It does not prove the database.
+`tests/unit/supabase-server.test.ts` mocks `createClient` and Clerk's `auth` outright and says so
+in its header: it is a test of how [`lib/supabase/server.ts`](/lib/supabase/server.ts) chooses to
+call them — the `accessToken` callback receives no template argument, a missing token throws
+`NO_CLERK_TOKEN_MESSAGE` instead of degrading to `anon` — "not an integration test against real
+Supabase/Clerk". The same holds for `auth-provisioning` (service client mocked), `sign-in-verification`
+(Clerk widgets mocked), and `sidebar` (React hooks mocked). Read a green mock test as "this branch
+is written correctly", never as "the chain works".
+
+Some `data/` functions are only partly covered, and the uncovered half is exactly the I/O half: the
+write-path flow of `importLearnersCsv` has no test at all, while its `domain/` half and its pure
+`summariseWrites` do. Where a suite looks thin, check whether the missing coverage is I/O before
+assuming regression.
+
+## The one e2e spec, and the permission it needs
+
+`pnpm test:e2e` runs Playwright with one spec. [`playwright.config.ts`](/playwright.config.ts)
+starts the app itself through `webServer: { command: 'pnpm dev' }` and reuses a server already on
+`PORT` outside CI, so it boots a real Next dev server, not a mock. `global.setup.ts` runs as a
+prior project and calls `clerkSetup()` once to obtain a Clerk Testing Token; the spec calls
+`setupClerkTestingToken({ page })` to get past bot detection.
+
+[`e2e/auth.spec.ts`](/e2e/auth.spec.ts) does one thing: `page.goto('/dashboard')`, then
+`waitForURL(/\/sign-in/)`. **What it proves is the gate's location.**
+`proxy.ts` only copies the pathname into an `x-pathname` header; the redirect comes from
+`requireAuthenticatedUser()` as the first statement of
+[`app/(dashboard)/layout.tsx`](/app/(dashboard)/layout.tsx#L12-L13). A move back to
+middleware gating — or a route group accidentally placed outside `(dashboard)` — is exactly what
+this catches, and it is rule 1's standing proof. It is *not* a journey suite: no signed-in role
+variant, no upload, no modal focus trap.
+
+It needs Supabase env plus a Clerk **test** instance, so it is permission-gated: establish the
+environment with the operator before running it. [`.env.example`](/.env.example) documents the
+`pk_test_*`/`sk_test_*` pair and `E2E_CLERK_USER_EMAIL`. **Never point it at production Clerk
+keys** — the global setup registers real testing tokens, and dev-instance user IDs do not exist in
+the production instance ([ADR-005](/docs/adr/ADR-005-demo-account-tenant-scoping.md)).
+
+## Two gaps to know before trusting green
+
+**Nothing in CI runs the loop.** `.github/workflows/` holds `claude-code-review`, `claude`,
+`openwiki-update`, `qodana` and `stale`. None invokes `tsc`, `vitest`, `eslint` or `next build`;
+`claude-code-review` runs the `code-review` plugin and never installs or runs the suite. Green is
+a **local, self-imposed gate** and no branch protection asks for it, so a change can merge with
+the loop never run. Log a red test's exact command and output in the PR rather than asserting it
+passed.
+
+**RLS has no automated coverage.** Rule 35 requires real-Supabase RLS and tenant-isolation tests
+with **no mocks** — two tenants, two users, prove user A cannot read tenant B. `docs/IMPLEMENTATION_PLAN.md`
+reserves `tests/integration/` and `tests/security/` for them, but neither directory exists, so every
+authorization claim in the wiki currently rests on reading migrations. Two consequences:
+
+- Any test that does call the hosted project walks through rule 36: no statement against live
+  Supabase without explicit permission. Set the environment up first and ask — see
+  [Live Supabase and Migrations](/openwiki/operations/live-supabase-and-migrations.md), where
+  missing variables make an RLS test fail in a way that reads like a policy bug.
+- Because there is no staging and one hosted project, the tests that would prove the security
+  boundary are the ones with the highest setup cost and the most to lose. That is the honest
+  reason the gap persists — see [Tenant Isolation and RLS](/openwiki/architecture/tenant-isolation-and-rls.md).
+
+## Writing a spec that will hold
+
+- **Assert the behaviour, not the call.** `tenant-scope.test.ts` mocks `@/modules/auth/data/auth`
+  with an **admin** role in metadata specifically so that a `resolveTrustedRole` which quietly
+  consulted Clerk would fail.
+- **Pin the silent failure first.** Rule 19's guard-order bug produces a page, not an error. The
+  test that matters asserts the banner survives, not that the page renders.
+- **Write the header comment for the next reader.** Several specs open with the failure mode they
+  exist to prevent; keep it, and update it when the reason changes.
+- **Prefer a literal fixture over a builder that reads the clock.** If a builder must, `dated(days)`
+  in `dashboard-domain.test.ts` is the shape to copy.
+
+## Where to go next
+
+Rules 7–10 in detail: [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md).
+Rule 19's guard ordering and honest empty states: [Error Snapshots and Honest Empty States](/openwiki/concepts/error-snapshots-and-honest-empty-states.md).
+Rule 36 and the hosted project: [Live Supabase and Migrations](/openwiki/operations/live-supabase-and-migrations.md).

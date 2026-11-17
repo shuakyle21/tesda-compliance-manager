@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1375a9ff2575bf1fa4739a9c67690f8c3226a50d2a65ed915b7902ec1509c7ce",
+  "claims": [
+    {
+      "id": "claim_22a949120d3740e686590c9a89a48a6c",
+      "statement": "`app/api/webhooks/clerk/route.ts` has no session to check because Clerk is the caller, so it authenticates the request by verifying the body signature with Clerk's `verifyWebhook()` against `CLERK_WEBHOOK_SIGNING_SECRET` and answers 400 on failure; no `proxy.ts` exclusion is necessary because the middleware matcher already covers `/api(.*)` and only stamps `x-pathname`.",
+      "evidence": [
+        {
+          "resource": "repo://app/api/webhooks/clerk/route.ts#L8-L26",
+          "version": "repo-lines-v1:sha256:9a015db57e3bb0f19b955fffeb69e934b2f8a5a829e52246eb78dab2fe8b4bca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjNmUwZTcwOWU3YzU1MjFjODM5NmEyYzg0Yjk3OWE0NDQyNzlhNTlmMDdkODBiMzdlYjVhOWJlMzQ4ZjgwMzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExMzZkYWM3YzMyNDAwMWE3N2ZkODNkZDI1ZWEyYjYwMTU3NjkyMDc2MTBiODg0ZGQyMDI4OGNiNDU2NmY0YjcifQ"
+        },
+        {
+          "resource": "repo://proxy.ts#L10-L16",
+          "version": "repo-lines-v1:sha256:e057ebff65b2b132e5bd2ce1e9d322ae27c7a7ec01e486043a5ac05f48e673b9:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzhmZjc3N2Y0YzIyMGNhMjZhZDJjZTM2ZDllYzg1NjViYWVmMmU2Y2JlZDRmNmRjOWU0Mzg0OTMxZDhhMDY4YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWExZDFhNjMzOTAyMjljNzk4MzQ3ZTgzYTA0MDU0NDFjOTQwMDAzNTI4NGFkMTY4YzFiZjZjZGYxZDcwYTM3MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDY3YmZmYTAyOWE2MGNkNzQ5YzQyNDJmOWJiNTJhYmI2MWE0YTkwZTFjNjMwNWQxZjRiODM2ZDY3ZmZmNmVkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c12cf183ba24c128a77734f94cbd289",
+      "statement": "`requireAuthenticatedUser()` lives in `modules/auth/data/auth.ts` — a `data/` layer that is private to its module — so only `app/` may call it, and the only two callers are the `(dashboard)` layout's first statement and `app/api-docs/page.tsx`, which sits outside the route group; a route outside `(dashboard)` stays unauthenticated until it adds its own call.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L12-L13",
+          "version": "repo-lines-v1:sha256:03a2a7eb120ac2eb659e2270c1c55ce88c159ad78399bcc67c3ed3760240e099:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjMxNzRkMzE1Y2E1M2FkM2M2NjE1OWQ0YWRjYWViZGFjMDAxMTBjNjljMzhjMzgxNGI5ODFlZmZlZTk3MzcxNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWM3NWFiZTk1NWQzMGM5NWZlZGZlNzM2YTc1NzBjZTdlMmJkMTliN2VlNzYxZjA4ODBjMjcxMzIwZGI5N2NiNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWEwMGM1ZWM5NmQzNGJhYjhmN2JjMGIzZmYwY2IyZmYwNzRiMmQ4MTA3OTAxZTUxNGVlY2UyZTk2ZWM2N2Y4ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjA4MTBkNGY3ZTljODY5ZmUxOTVjZjMzNjhjMjBiNjY5ZjMyN2RiYzgzZDIwMzcwZWJjMTYxMzdmZjQ5NTcwMiJ9"
+        },
+        {
+          "resource": "repo://app/api-docs/page.tsx#L5-L5",
+          "version": "repo-lines-v1:sha256:6e1dff89777e029ad270af8d6c9df9ff192a587ada284d3856b1417a3ffac44f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmUxZGZmODk3NzdlMDI5YWQyNzBhZjhkNmM5ZGY5ZmYxOTJhNTg3YWRhMjg0ZDM4NTZiMTQxN2EzZmZhYzQ0ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmUxZGZmODk3NzdlMDI5YWQyNzBhZjhkNmM5ZGY5ZmYxOTJhNTg3YWRhMjg0ZDM4NTZiMTQxN2EzZmZhYzQ0ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDE3ZjE1YjcxNGQyOWUyM2ExYzBjNTA5MDcxYjhiOWE3MDVjYjY2ZDA0YzY1YzI3ZmEyODI4NTM5MDUxNTdhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDEzNDU1NWI5NGY3NzQzNDFiYzkyNzMwNjZlOTZhYTcwMWI2ZThiNzM5Mzc2YmNkOWZiMTJmMzlhOTQ5YWJlYiJ9"
+        },
+        {
+          "resource": "repo://eslint.config.mjs#L38-L44",
+          "version": "repo-lines-v1:sha256:303316133cc2c24d30f2b04dd7ba50bf5dbe0a67dc08dea17e4d59839bdbc9cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY4ZTE1NWFhNjIzNWI0Zjg4ZWQ1MjYwYjVhZjI0MDZlMTZlMTI4Y2E4NTk0NjhjMDQwZDcxYjk3NTRmYzZkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I1N2RlYmE4YzlhZmMyY2JiZmM0ZTExNWMzMzk3ZDJlZmIzMzBmYzhiNDIyMmNjODcxZmUxYzlhNTAwNjNhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDYwODU1NTU1YjM3ODBiYzMzOTA4NWZmOWQ3NDI2MzAwNDFmNDJhOGVjZjc1MWI4M2IzNDg4M2YwNGFkNWIxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ2ODU4YjBiNzMxMTgxY2IzNTk1N2VlYWIwOTc3ZWE1YzA2YjIzMDJjNWJjNTI0YmMzN2RiMWRhODE4YTBkOCJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/auth.ts#L18-L22",
+          "version": "repo-lines-v1:sha256:6dd0b8f3c373549355647376410cb511684c807ee101e010f9cf6bf7fc16ce39:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJlNzQyZWViMDAyZTliY2M1ZDc4ODQ5OTAzYzBmNWI0ZTE1N2NlYjdhODg1MDgxYmRmYjM0MGY2NDYzMTkxNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzVhYzY2NWNkYWQ4ZTIzZTYwZDEwYzk4MWI3MmQ4MTBiNmYyYTk2MWY3ODc3N2NlNzlmZTZiZWZlM2VlYWM4ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_45f9afcc5db94bf2b20613f403917d29",
+      "statement": "A signed-in user with no `profiles` row has no role: `getAuthUserId()` still returns an id and an inactive profile still resolves for the layout, but `current_profile_id()` returns NULL so every RLS predicate fails and reads return zero rows — which is why deactivation is not a sign-out and why a fresh sign-up reads as an empty dashboard.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/data/auth.ts#L9-L22",
+          "version": "repo-lines-v1:sha256:0d361974614b714bdbd4abd28c58a4267882c244543f019216c8c4bf4d7c9b6d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhMjIzYzdmY2E5ZjFiYmMxY2IwNTcwOTU0ZWFkODVhYjA3MTM4YzgyYTI1ZGFhOTVmNjAwY2U1NjM1M2MyMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ODQzMGQ2ZjFiOTdiZjMzZWY4ZTcyNDRlNzlkMGQzMWMzMDA0ZGI2YTA1OWIyZjBhZDNiZWFjODg1NGRkNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql",
+          "version": "repo-file-v1:sha256:ac47eea2061988a695bdf7e4e09fbce960c19f14158cf711679f8520294fa12d"
+        }
+      ]
+    },
+    {
+      "id": "claim_06f83a1f3491408d8cc3f4ffb379833e",
+      "statement": "`user.updated` routes back through `upsertProfileFromClerkUser`, whose existing-profile path re-attempts the invitation membership insert; without it a membership insert that failed on `user.created` would be permanent because the webhook still answered 200 and Clerk never retried.",
+      "evidence": [
+        {
+          "resource": "repo://app/api/webhooks/clerk/route.ts#L28-L49",
+          "version": "repo-lines-v1:sha256:617ff80b3a755ee1177647af4ad450e53abc682a3674961c0de79d57bf8f09fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhNzlkYTQyZjBkMzIwOWMyMzY3YjNlNTQ1YmE3MDBjNTAzYTYzZTRmMTRhZDgzZWZmYzdlZmNiMTRiNGY3YWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhMWE0NTQ4MDExZGQ4ODI0NmYwZjI2NWQxNGQxNzI1ZmJlMzJjMjdkY2EwNGJiZGM0NDY0ODc5OGI2MzQ1MjAifQ"
+        },
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L73-L88",
+          "version": "repo-lines-v1:sha256:387036ea826e2a9d78b107bdcad82e400d4e0eb3883ad7b17756160125695d15:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjZDI4MGY3NDg4ZjBiY2Q1ZDQ0MTg1ZTQ3MjUxYzc4OWYyM2FjMmNlMTBiYWZlNzExN2ZjNjIyNjc3Y2ZhODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzODVlYmMwNTEyZDEzMTNmNGEyNmZiM2NjOWY1ZjIxYjZjMjUxZWVkMjJjODFmZTM1Y2MxMDRhYTZlYzcwYTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkMzViNTJjZjRiZWU5ZjI3MmUyMmIyYmY2N2ZlMjM4MzlhNTZjMmI4YWRhMzYxZTMwMjBiMzVlYmMxNzE2OWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d59c40ec5d104d408c44311ef36e1627",
+      "statement": "Provisioning runs only on the service-role client because no Clerk session exists for `user.created`/`user.deleted`, making the Clerk webhook route the sole sanctioned `service_role` path (rule 3); a throw becomes a 500 so Clerk retries, and any future caller outside that route would be running with RLS bypassed.",
+      "evidence": [
+        {
+          "resource": "repo://app/api/webhooks/clerk/route.ts#L46-L49",
+          "version": "repo-lines-v1:sha256:01a361b0e7db0501059030afcf2056c9a45fbf195b61a5117232980cf84d3763:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDhkYjc0NjA4MTgyY2I3Y2E0ZDlmYmE0OWEzOTQ5OWE3ZjM5MDdiNGVhMDMzYjE0OTJhZDVjZjBiZWVlZWNlZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjg3NTUyZWMzMzcxMmZjY2UxODJjYzVlY2ViODBmMDg0YWZhYzA1Njg0MWYxMjNiYjZmODNjMjViMjgyNTAxMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWExYTQ1NDgwMTFkZDg4MjQ2ZjBmMjY1ZDE0ZDE3MjVmYmUzMmMyN2RjYTA0YmJkYzQ0NjQ4Nzk4YjYzNDUyMCJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:437db66e6f0eea9a6c5a7e323be041615efdcf694d23fcf8ae6d6eec77dcb708:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzZGI3YmI1OGY1MmE1YjZhNmEwY2M1NDM0NTllNmYyMzMyMGRjZWQ3ZTM5NmI5MWI0ZWI0NWIyMjhkZWYwNmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1ZTcxOGE0NWVlMWNiMDUwMzYwNWY3MDI5MjM1YjYwZTYwOWFiNzk5M2UxZTQ1YTNkODU1MjFmYjY0NTA4Y2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_befb8d42937545848223107727fe030e",
+      "statement": "`app/sign-up/[[...sign-up]]/page.tsx` has no screen of its own: it redirects to `/sign-in?sign_up=1`, which opens the `SignUpModal` island from the sign-in card; the modal deliberately does not activate the new session because an administrator must still assign school and role.",
+      "evidence": [
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L47-L47",
+          "version": "repo-lines-v1:sha256:272e2523ecc257522f015ef0bc157582cfd7ba708ea8a7446c9a72e9ac556555:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjcyZTI1MjNlY2MyNTc1MjJmMDE1ZWYwYmMxNTc1ODJjZmQ3YmE3MDhlYThhNzQ0NmM5YTcyZTlhYzU1NjU1NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjcyZTI1MjNlY2MyNTc1MjJmMDE1ZWYwYmMxNTc1ODJjZmQ3YmE3MDhlYThhNzQ0NmM5YTcyZTlhYzU1NjU1NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODMzYmZkNGNiYzZlZDdlZGVmYzc3YjIwNDlmZDNiMjQxOTBlMWMwNzdhYTVjZmFiNDUyYmI3YmMzMjM5ZDhjYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMwMjg5OWY0NGRjOGQ3YzU4MWFlNTQ1NTUwZDEzNDE2NDc1NzFmNzAzNTQ2N2MzYzk5N2QwZjUxMDc3YmFiZiJ9"
+        },
+        {
+          "resource": "repo://app/sign-up/%5B%5B...sign-up%5D%5D/page.tsx",
+          "version": "repo-file-v1:sha256:af8044d85350c8bf12db08faa8b0be77c8433a1d361beea4330c96a6e3198424"
+        },
+        {
+          "resource": "repo://modules/auth/ui/SignUpModal.tsx#L16-L22",
+          "version": "repo-lines-v1:sha256:5b8ecd3f8a0cc390cf3e495c693e263e45b9fd02e85a9c164263fc6b2eeff52d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTE3NzdmYzY0MTBmZmE0ZGRlOGEwZDUzOTI5YzlmNTE0ZWU3YzUzZjJjYTAzYmRlNzhkMzIxZTI4MTY5NzBmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjE4OWEzZWRmNGE2ODYwYmIwN2M2NjU0MDM5OTJmNzIwNGZlNzRkMjVmYTY3Mjg5NmJmYzhhODM2ODgyNzY1OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDVjYmQ3YmRkMzRhYjEwNDRjM2M5MDA1MzgwYmI3ZDZmYzE4YTliZTQxNjA1YzE2ZWQyNjJiMzQ4YzJkODFmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzIwNjgzNjQ1Y2YwMTg1MjhkZjUxY2FjNDE3OGY5MGIwMjdlNTgzNWEwN2Y1MzIyYWYyOGM1NGI3ZWRlMjgxMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6c58a22185b94707a70c9ee141494d01",
+      "statement": "`sanitizeRedirectUrl` closes the open-redirect failure — signing in against the real app and then being handed to an attacker's site — by rejecting every form the browser resolves off-site: an absolute URL, a protocol-relative `//host`, a backslash after the leading slash, and a `javascript:`/`data:` scheme; the sanitized value is both the signed-in destination and the `redirectUrl` given to Clerk's OAuth start, so there is one place to get it right.",
+      "evidence": [
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L100-L100",
+          "version": "repo-lines-v1:sha256:fba19c43f2288e0e17bdbe8f1aacb84c88a53ee122adf4af7bffa7fa0e1acc7f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmJhMTljNDNmMjI4OGUwZTE3YmRiZThmMWFhY2I4NGM4OGE1M2VlMTIyYWRmNGFmN2JmZmE3ZmEwZTFhY2M3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmJhMTljNDNmMjI4OGUwZTE3YmRiZThmMWFhY2I4NGM4OGE1M2VlMTIyYWRmNGFmN2JmZmE3ZmEwZTFhY2M3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODNhNmM3YjU2ZWUxOWNlYzJkNGM4MzE5MGE0ODA0NWI5NTA1YzI2ODJmOGU1NDkwMGRiNGVlN2NiOTA4ZDQ5MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDFmZWZjOWY2MTAwM2NlZTgwY2EwODU5ODJmMGI3M2M2ZmMxZWU1NTkxYTYxYTg0NmE5NDE3ZDI1MGZhZjE0YiJ9"
+        },
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L39-L42",
+          "version": "repo-lines-v1:sha256:b925c0feef7e1e77f24424b4670fe9a6e46ae4d22ba6b1159d57f91a040508f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNlNDQ3MTU2OTE3YzljNjYyZTRiZWQ1NmQ4NDQyOTRmMjI1NTgzNDI1ZTZkY2NhMGNmZTE2ZjEwOGQxNDZiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDcwMGI5ZDdiNGZlMDA5YWZiNmFkZmFlZTc1ODcxYmZlZGZhM2Q2ZDJhZTExMGZhMmE0ZmVkYmJmZDUxOGUxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTM3MDY5NWUyNmUxNDFkMmRjNjVjOWE0NDZlNDcxZmU4YzFmZDVjYzQ5MzJlY2MxYzY2Y2Y2OGNkMWYyMjg5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODJmNTc0NGRmZDY1ZTZiNzA3NWE2M2EwMzY2ZjMyMmJjNDNjZjQ0ZjYyMjA4N2RkNWU5ZTlkNmQ5OGFkMDkxMyJ9"
+        },
+        {
+          "resource": "repo://modules/auth/domain/redirectUrl.ts#L12-L24",
+          "version": "repo-lines-v1:sha256:3ab1682226c5059164c64b64731cbbc4e834050e115e345fa56cebd54feb16f1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmY2NhZjVlZTdiYzE0MzFlZmQ5YjBkYzBhMWRlMWQ1NzFlNmUxZjdlM2Y4ZTY0ZTRkMGQyNGNjYzhkMWZjZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMzY5ZDcwMjk0ZTgzNjRlNjliYmZhN2VkNTdmMDI5MTc3NTI0NGRmMjQxZGFlYWM3ODVlZDFmZmZhMzc0OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/redirect-url.test.ts",
+          "version": "repo-file-v1:sha256:e3a03c2e79cc4d9b167dffa8f14e36793e0086f5d729fbd232e8df6188450cdb"
+        }
+      ]
+    },
+    {
+      "id": "claim_f10888b95ea24b0c82f72916673363a8",
+      "statement": "`session_exists` — Clerk's 400 when a sign-in is started while the browser already holds a session — is handled by `isSessionExistsError` scanning `errors[]` for that code and returning false for a bare `Error`, `null` or an empty array; the sign-in card checks it at six handlers (password, MFA, device verification, Google SSO, account create, submit) and each calls `continueExistingSession()` instead of showing an error, so a user who is in fact signed in is never blocked by a red card.",
+      "evidence": [
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L99-L228",
+          "version": "repo-lines-v1:sha256:324ee9fac9ea30748133bad99905896c5d7d00bf3525995fbb7021643b92d117:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjNTRjMTM3YTJmZDRjYTMzYjU5OTE4MGQ4Y2M3YjY3MzEwZWQxMzNmNDRiMDJkYTkyNjg2NjE0YzIyODdlMzM5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3NjExODljZWViNWFjNWI5OWRhZmY2YThjNTY4NTA5NzU2MDM3OWVmYjMzZGJlZGVkZGQzNzUyYjk2NmIyYTVjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlZTEwZjliNWU0MjhhZjAxZjUzOTJiY2Y3OGQ0MGI3NmIxZTRlYWQxYzA1OWM3NDk2ZTY3ZjY4MTQ1NmRkOTk0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyMGQxNTBjYmY1Mjc5ZmM5NjU5ZmVmMzljMWIyNTQzYWViMmQ1Mzc2NmI5NTA5N2Q2ZTcxZmVmOGVhYjJhNmUwIn0"
+        },
+        {
+          "resource": "repo://modules/auth/domain/sessionExists.ts#L9-L12",
+          "version": "repo-lines-v1:sha256:0dde28b5d8fc345be4a32d2bd7cb4e59927f8551ddf1d4cf0599fe0ad763781c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWViZGIxNTRmNTgyNThjZThkZWMzODVhNGE2NmJiYjk2MjE3NzJlZmE5OWQ2NTIwODAzMWIwZjA1MmMxNWNkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjhhMzVkMDVhNDg3MjJlOWY2ZGE3NTI1Y2JkNTdiNmQxNTVhNDM5MjI0MGJhZDQxNmY3YjZlOTMzMjZmZmFmNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/session-exists.test.ts",
+          "version": "repo-file-v1:sha256:9379a90ff525e4116f99695a66c82ceb8e12d2b62ccb9495ef9fa8411ad6b6d1"
+        }
+      ]
+    },
+    {
+      "id": "claim_d4e0fbd774ce4d129aacd17b286bdf66",
+      "statement": "`startGoogleSignIn` must await a `reset()` before calling `sso()` whenever `signIn.status` is non-null, because `sso()` silently declines to start an attempt when it sees a stale status and surfaces no error; the unit test models `status` as a mutable field cleared only when the delayed `reset()` resolves, so an un-awaited reset fails the test the way it failed in production.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/domain/oauthSignIn.ts#L20-L39",
+          "version": "repo-lines-v1:sha256:f998d9ffba2990ac582d47f254f5d09acf9b99a819d409f1b54da37602be0d95:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNWZiMGEyYjBiOTQ1ODM1MThjZDdkZTMzNmM5OTg0M2UxZDJmOTRmNmJlMjI1YTI5MzVjMzQyMTAyYzRiMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/oauth-sign-in.test.ts#L8-L50",
+          "version": "repo-lines-v1:sha256:a08462d924ef40243eb6c81fb48ccdb483abea7f66e19fb595609b9c0e0a3772:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhMTJjMzYyYzExYTFlNDIzNjk4ZjJiZmVlZWMwZmY5OTI2OWQ0OTc2MzhiZWVlNjU4NDllM2NhNWMwOGFhNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxNzEwNjE1MDUzNWZjMGEyMmJjYzZkOWE3NzZjZTRhN2M5MzVmNzdiZDQzNDY4Y2EyODZiNWQ0NGRmYjM3NzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc0b5b8548ac437599ff36c5fefd506e",
+      "statement": "The invitation membership split narrows the never-re-grant invariant rather than holding it whole: `upsertProfileFromClerkUser` calls `ensureTenantMembership` on the update path too, so a membership is written only when the profile holds none — a grant can never add a second school or move someone an admin has already placed, while an admin authoring a grant onto an existing tenantless user through Clerk's Backend API is applied at the next delivery.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L44-L105",
+          "version": "repo-lines-v1:sha256:bfc5908d809fe1be993fee05624831e9c3e3388faf3646f1b9e5a6f870cb7824:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0MmYxNjZmNTc0YWI5NWQ0N2NhODhiNTVmMTNmZThhMGYyY2E3NWFlOTZjYjYyZWUxYjVlNTU2ZGM1ZTBkMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2Y2JiZjNlYmEzZjcyNDI3YTQ3OGRhNzc4ZDliMjRiYmY0ZjJjMzBhNjA2ODUzNDAxNTQ4M2YwZTJiZDRkMGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwZTNmZDYyYjA0ZDI0NzU4NTI3MDhmNWI2YWY4ZTkzMjk4YTJkOWU0MGI1NDEyZGUyY2Y1YmM3YjA1MjQ5NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bd71255124a146f1b24d3b8c16db4853",
+      "statement": "`app/api/openapi.json/route.ts` uses `getAuthUserId()` and answers 401 instead of redirecting, the softer variant of the gate reserved for machine callers; swapping it into a Server Component would let the tree render before the gate resolves.",
+      "evidence": [
+        {
+          "resource": "repo://app/api/openapi.json/route.ts#L3-L6",
+          "version": "repo-lines-v1:sha256:84cf0fd69cb969be06bce1cf900a48321e0989c66fd4a9817342848774d62a71:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGE3MjJlMGVhYTg3ODVkYmViNTJjZDZjMDkzMmEyNDgwMjdjODM5NzYzMDE5ZjBhZjdjZjg5MjEwNzdmYWIwNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzFkZjZlMDc1MWZjZTU3MTRiMzIxZGEzZjk4MzdlYmEyY2ZmNzFiNWViMmEzYjM4ZjY5MWQ4YzQ5MWQ0MzM0YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWQ4ZDJhYTY0NjA4Mjg1MmY1OTg1NjY2MTI2MzRmYTQ3ZmY4MmJkZjc4ZjNiZWM4ZGUzMmY2OTg3MmMwMTQ2NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGViYmIwY2EyZmQ0NmVjNzNjNDliY2QwMDNiNWQ0OTlkZjNlMDUxZWUwMDZlMTJlMTJjMDZmNTkwZDIwYjgzZCJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/auth.ts#L13-L22",
+          "version": "repo-lines-v1:sha256:8f35d99660388c5598bef6d511673aa6c39401bcc5d1b3d63ece6fa7fa2847d6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmYWYwYTY5ODRlODYyODgwNmNiNWMxYjI5ZDNkODk4OGFhOGMyMzJhNjdkNDkzMmVjZGJlOWE0YzFlNDJjM2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyNDEyYTAyMjBkN2QzMzgzZGZmOTM2OTllNWVkZWJlZGNlZjBlOGQ1NzgzMzEwN2M1NjMyMzE2MDY0M2IzY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-11-17T04:33:34.390Z"
+  }
+}
