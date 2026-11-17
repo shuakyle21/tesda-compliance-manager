@@ -135,6 +135,11 @@ describe('findRqmCodes, hardening', () => {
   it('does not return a six-part value', () => {
     expect(findRqmCodes('RQM3-2026-CFSP-0000-0001-0002')).toEqual([]);
   });
+  it('does not return the five-part prefix of a six-part value with a spaced final separator', () => {
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001 - 0002')).toEqual([]);
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001 -0002')).toEqual([]);
+    expect(findRqmCodes('RQM3-2026-CFSP-0000-0001-\n0002')).toEqual([]);
+  });
   it('finds a code split across a line break after a hyphen', () => {
     expect(findRqmCodes('row RQM3-2026-CFSP-0000-\n0001 Sample Province')).toEqual(['RQM3-2026-CFSP-0000-0001']);
   });

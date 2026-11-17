@@ -81,7 +81,7 @@ export function checkRqmCode(
 export function findRqmCodes(text: string): string[] {
   const H = String.raw`\s*-\s*`;
   const pattern = new RegExp(
-    String.raw`(?<![A-Z0-9-])RQM\d+${H}\d{4}${H}[A-Z]+${H}\d+${H}\d+(?![A-Z0-9]|-\d)`,
+    String.raw`(?<![A-Z0-9-])RQM\d+${H}\d{4}${H}[A-Z]+${H}\d+${H}\d+(?![A-Z0-9]|\s*-\s*\d)`,
     'g',
   );
   const matches = foldCode(text).matchAll(pattern);
