@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# CodeRabbit config for TVI-CAMS. Invariants are in RULES.md; this file only
+# points the reviewer at them and controls what the bot may do to a branch.
+
+language: en-US
+
+reviews:
+  # "chill" = fewer, higher-signal comments. Options: quiet | chill | assertive.
+  profile: chill
+
+  # Comment only; never block merging with a "changes requested" review.
+  request_changes_workflow: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # Files the reviewer should skip: generated, lockfile, or ported design handoff
+  # (RULES.md section 6 - these directories are never edited by hand).
+  path_filters:
+    - "!pnpm-lock.yaml"
+    - "!lib/supabase/database.types.ts"
+    - "!assets/**"
+    - "!preview/**"
+    - "!screenshots/**"
+    - "!ui_kits/**"
+    - "!uploads/**"
+    - "!FIGMA FILES/**"
+    - "!diagrams/**"
+    - "!.design-sync/**"
+    - "!.next/**"
+
+  # Extra guidance, applied only to files matching the glob.
+  path_instructions:
+    - path: "supabase/migrations/**"
+      instructions: >
+        RLS is the security boundary. Every tenant-owned table needs RLS enabled,
+        policies with both USING and WITH CHECK, and tenant-binding foreign keys.
+        Migrations are additive; never edit the canonical schema migration in place.
+        Flag any SECURITY DEFINER function callable by anon.
+    - path: "modules/*/data/**"
+      instructions: >
+        Follow fetch -> map -> derive. Only data/ layers may import
+        lib/supabase/database.types.ts. Never filter by tenant in JS (RLS scopes
+        rows). Return discriminated snapshots; never leak raw Supabase/SQL errors,
+        table names or internal IDs to the UI. Trainer-facing DTOs must omit
+        billing, NTP lag, BSRS and financial fields server-side.
+    - path: "modules/*/domain/**"
+      instructions: >
+        Pure business rules, no I/O. Changes should come with unit tests that use
+        fixed as-of dates.
+    - path: "{app,modules,shared}/**/*.tsx"
+      instructions: >
+        Design system is non-negotiable: no emoji, Tabler line icons, semantic
+        color tokens only, status shown by text plus icon (never color alone).
+        UI copy must never imply official TESDA approval or submission.
+
+  # What the bot may do on request. Each is triggered by a person (a checkbox or
+  # an @coderabbitai comment); none runs on its own. Off = the option disappears.
+  finishing_touches:
+    autofix:
+      enabled: true
+    unit_tests:
+      enabled: false
+    simplify:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+    fix_ci:
+      enabled: false
+
+chat:
+  auto_reply: true
