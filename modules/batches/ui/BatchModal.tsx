@@ -94,7 +94,6 @@ function BatchEntreSection({ entre }: { entre: LifecycleStage }) {
         <div className="nm-entre-card" style={{ background: 'var(--color-entre-lt)', borderColor: 'var(--color-entre)' }}>
           <div className="nm-entre-cap" style={{ color: 'var(--color-entre)' }}>Schedule</div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 600, color: 'var(--color-entre-dk)' }}>{entre.date || 'TBD'}</div>
-          <div style={{ fontSize: 11, color: 'var(--color-entre)', marginTop: 3, opacity: 0.85 }}>Immediately after training</div>
         </div>
         <div className="nm-entre-card">
           <div className="nm-entre-cap">Duration</div>

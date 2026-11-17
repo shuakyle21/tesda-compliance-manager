@@ -13,11 +13,9 @@ import { useMemo, useState } from 'react';
 import { BatchCard } from '@/modules/batches/ui/BatchCard';
 import { BatchModal, type RqmEdit } from '@/modules/batches/ui/BatchModal';
 import { takenRqmCodes } from '@/modules/batches/domain/rqm';
-import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { FiltersRow } from './FiltersRow';
 import { filterBatches } from './filter';
-import { pluralize } from '@/shared/text';
 import type { Batch } from '@/shared/types';
 
 /**
@@ -38,7 +36,7 @@ export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; lo
     <div>
       <div className="page-head">
         <h1>Batch Cards</h1>
-        <span className="subline">{batches.length} {pluralize(batches.length)} · {batches.filter((b) => b.status === 'ongoing').length} active</span>
+        {loadedAt && <span className="subline">Data as of {loadedAt}</span>}
       </div>
 
       <FiltersRow query={query} onQuery={setQuery} program={program} onProgram={setProgram} />
@@ -47,9 +45,6 @@ export function CardsView({ batches, loadedAt, rqmEdit }: { batches: Batch[]; lo
         <EmptyState heading="No batches match" sub="Try clearing the search or program filter." />
       ) : (
         <div className="batch-stack">
-          <InfoCallout variant="info">
-            {filtered.length} batch {pluralize(filtered.length, 'record', 'records')}{loadedAt ? ` loaded ${loadedAt}` : ''}. Sorted by earliest billing deadline first; batches with no deadline recorded come last, by training end date.
-          </InfoCallout>
           {filtered.map((b) => (
             <BatchCard key={b.id} batch={b} onClick={() => setOpenId(b.id)} />
           ))}

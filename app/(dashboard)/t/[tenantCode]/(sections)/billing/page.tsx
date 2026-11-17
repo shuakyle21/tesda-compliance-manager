@@ -110,8 +110,8 @@ export default async function BillingPage({ params: routeParams, searchParams }:
         </div>
         <EmptyState
           iconName="refresh"
-          heading="Couldn't reach Supabase"
-          sub="Billing data isn't available right now. Try again in a moment."
+          heading="Billing data couldn't be loaded"
+          sub="Try again in a moment."
           action={<Link href={scopedPath(scope.code, 'billing')} className="btn primary" style={{ marginTop: 12 }}>Retry</Link>}
         />
       </div>
