@@ -259,7 +259,15 @@ with check (
 -- School admin adds a person to their own school. The person must be active,
 -- not a platform admin, and have no membership anywhere yet. Anyone who
 -- already belongs to a school is out of reach until per-school roles exist
--- (F-03); the platform admin seats cross-school cases.
+-- (F-03). No app path adds a second school after this migration: the
+-- platform-admin seating policy below has the same "no school yet" test.
+-- A second school is a service-role step done by the platform operator.
+--
+-- Why "no school anywhere" and not "not already in MY school": roles are
+-- global. If school A could add a member of school B, that person's role
+-- (chosen by B) would apply in A, and B's admin would lose the right to edit
+-- them, because the update policy needs every school of the person to be
+-- the caller's. School A could lock B out of managing B's own staff.
 --
 -- is_default is NOT restricted. The target is guaranteed to have no other
 -- membership, so this is their first school and `is_default = true` is
