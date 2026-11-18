@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:4fb35ee6c4a972c6a3e81d3d73f2444b2285c35f1b4ccd59269c417f98276490",
+  "pageVersion": "sha256:64970ccb8350d97717dc693609fa0c50d7754569256a8d06ca060dbed7cbf3a5",
   "claims": [
     {
       "id": "claim_7e8daf7605864d5c808732ab13c33bfb",
@@ -162,11 +162,11 @@
     },
     {
       "id": "claim_ae4fd2ab645d4da0a470d0550c06da90",
-      "statement": "The matrix screen's column set is `requirementCatalogOf(batches)` — the union of every shown program's catalog, display only — while completeness is scored per batch against its own `criticalRequirements`; with no catalog at all the view renders one 'requirements unavailable' state instead of a grid of empty rows.",
+      "statement": "The matrix screen's column set is `requirementCatalogOf(batches)` — the union of every shown program's catalog, display only — while completeness is scored per batch against its own `criticalRequirements`; with no catalog at all the view renders one 'requirements unavailable' state instead of a grid of empty rows. The route derives those columns from the already tenant-access-folded batch snapshot, so a no-tenant-access read renders `NoTenantAccessState` before any grid exists.",
       "evidence": [
         {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx#L28-L33",
-          "version": "repo-lines-v1:sha256:0121b25653d28cff95f35c5deadb69031523f310cbca8e4addba195f9180567c:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGY1ZWVkZjRkZWQxNTg2MzhhY2JhYTNjNTlkYjdiZGRhYzk2NTQyYzIwNGVkZThhNjRhYTEzNTlhZGQ4MjkxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjBiYTlkZjMwYzUwOTgwMjdlZWYyY2FiZGUzYzczY2U2ZTViYzQ0OWM5YzJiYmQyZDQ5MmJhYjY1OThkZWM0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjAzNzE3ZTRjMzUwZTNlZTVhNTEyM2NjN2U3ODliMDc1MTFjZmRmYmYwNmYxMTBkYjMzNjA3YmI3MWM3ZDVlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmM3NmVjODkwZWRhMGZlOTliNjk3ODA5YzlhNDNlNTdjOWU1MDI5NDY2YWZjNTNmNmQ4ZmQ1YzRmMTBiMmJlNCJ9"
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx#L24-L44",
+          "version": "repo-lines-v1:sha256:9ee6f6932a8512bd2d2de97edac8cca879528a6d48981f86dcd81beb00265a9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1Y2NmZjkyNjQ0MTkzY2ZkYWM2M2M3NzA2ZmNkYTI4MGM3NjExY2M4Y2M5ZGM2YWY0MThjZWExZTFkNDM4YzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwYzY0MGI4ODJmZmEwYzhlMGZhZGY5ZjliMmFhOTNmMTAzMWUzOGRhMzAzODZkYzA4MjY3NGM0MzVkNTczZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5MThiZDYzYjUxMDVjMGU2YmU1NDhjMzc0ZmNmMWQ0MzgxYWZlM2U0YzkxOWIzOGNhOTg0YWI5NDY1ODBjMzgifQ"
         },
         {
           "resource": "repo://modules/documents/domain/compliance.ts#L160-L184",
@@ -314,11 +314,15 @@
     },
     {
       "id": "claim_348352a2261c46ee9931b90a82061d96",
-      "statement": "There is no DELETE policy on the canonical migration's bucket; `20260910120000` adds one gated on `can_manage_tenant`, deliberately tighter than the `can_access_tenant` used by the read and upload policies.",
+      "statement": "The canonical migration's evidence policies are select/insert/update only; `20260910120000` adds a DELETE policy gated on `can_manage_tenant`, deliberately tighter than the `can_access_tenant` used by the read and upload policies. `evidence.ts` still exposes no `deleteEvidence`.",
       "evidence": [
         {
-          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L861-L872",
-          "version": "repo-lines-v1:sha256:eb1a996f26b19b901f9c5508a4f48e3d1414b6270a2a3d65230f86432167c568:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMWFiYTkwNDQxNDMwZmY4NzI5MTFkMzVjMTcyYmU5ZGE1ZTExNWM3YWQxZjA2ZDYxMDEzNGRkZmU1N2IzNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5NmY4YWFmZDg2Y2Y3ZmZmMjQ0MmI3MDhhMWVjYTQwNjQxNTBlMmViNDhkMzRkOTk4YmQ5ODU1YjA0ZDdhZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://modules/documents/data/evidence.ts#L30-L37",
+          "version": "repo-lines-v1:sha256:a8de0fe0ea1bcd86f8d8472f98b09d4fd45aa416a5058220367d6bda9d2a0a63:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjk5ZWFjY2IwNjYxNWUxZGEzOTNhZjFkNjgzMjZjNTM1NDM0Mjc3M2I2MzVkNWQ5NTFhZTMyODQzMzU0MjkzZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTBlNTJlYzYwY2Q2ZjViMjRlYTk5ODllZDdlM2RmYzc5NTk3N2Y2MzFlYWM3ZGM3NmE1ZjRmYzkyNzMzOTk2MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmJjNzVkZThhMDM1NjE1Mzc2ZmIyMDQwODA4NDQwYTc2ZjAyMGU0MTk5MDYxNTUyNzdlNWRiZDFhZWE2MDNmMiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L843-L872",
+          "version": "repo-lines-v1:sha256:a1df5d842e521eea7014fa0d438f4bb0dec1046f2ee1d0ade2d379c8aaac459c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MGJlOWUyMGMyNDFhOTgxYWJmZDNhODFkMDFhZjQyYzQ5OTQ2NzgxYjZjMjc5NGNkMjE0NTU1ZDNkZDllNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNzYwOWZjYWEyZGM5YmM1NzY2ZWZiOTlkMmE0MzhlMjE3MzMxZTQ5NmZkNjk0MjI1Y2Q2ZDk3ZDNiODViMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L601-L621",
@@ -342,7 +346,7 @@
     },
     {
       "id": "claim_7462459f265349168b27e4c501c098dc",
-      "statement": "The evidence code is ungated ahead of the UI: `buildEvidencePath`, `uploadEvidence` and `getSignedEvidenceUrl` have no callers, so `FilePreviewModal` treats any non-null `file.url` as a real file and renders a simulated page, while `mapDocumentRow` sets `url` to the bare `storage_path` object key.",
+      "statement": "The evidence code is ungated ahead of the UI: `buildEvidencePath`, `uploadEvidence` and `getSignedEvidenceUrl` have no callers, so `FilePreviewModal` treats any non-null `file.url` as a real file, invents a `name.pdf` and renders a simulated page, while `mapDocumentRow` sets `url` to the bare `storage_path` object key (or the external URL).",
       "evidence": [
         {
           "resource": "repo://modules/documents/data/documents.ts#L84-L95",
@@ -375,10 +379,50 @@
           "version": "repo-lines-v1:sha256:5a35f8d7d4764dcb6bbff2f89e504117a4f1c0b0f9bfa17ced4d964663d94789:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxOWVjYzA2MTA2NmZmZDk4ZTVmYzBmNGUwYTMzMGUyZDFmNmJiNDI4YzNlODhmYjE3ZjBhNDE0Mzk3NDliMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhZTcwNzlkYjM3Yzk1YjU4YTViNGQ3YWFkODIyOWY0NmFiZDFjM2QxODllYzVjY2E1M2MxYzYyNGEyOTRlN2QifQ"
         }
       ]
+    },
+    {
+      "id": "claim_2696cd9b2ea94a74ad4ede12edb897a4",
+      "statement": "The evidence path must be derived from tenant/batch/document identity rather than accepted from the client: the browser contributes only the file name, ids are anchored UUID regexes because they are interpolated into the object key before Postgres casts them, and the `document_key` guard keeps the `documents_batch_id_document_key_key` upsert key unambiguous once a file name is appended.",
+      "evidence": [
+        {
+          "resource": "repo://modules/documents/data/evidence.ts#L126-L158",
+          "version": "repo-lines-v1:sha256:da884b43cd0224fcec91bf70c4e05f6fc784fb337763d905e84c5a875420215c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1MzRjZWViODA1MDRiMmE5MjRmZTVjNTk0Y2MyZmYwMWM0MTkxYjkwOWY3MGUwYzQyZDVkNjFlOWUyMzg2ZTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiODQxMzA5MDNjYTRmMTZhMzg0NzczODUxMzhjMDNlNzNlNDUyZTIyN2RkZjZlZDhmOThkMTkxOWMxMjE0MDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyMTczOGEyZDQ2NzEyYzZjNjQxZDQ3MWQ2N2QwOWMxOGZlNjk3OTkwMzY2ZWNkZTNjODE0M2Q1ZjNlMmUyNDEifQ"
+        },
+        {
+          "resource": "repo://modules/documents/domain/evidencePath.ts#L101-L166",
+          "version": "repo-lines-v1:sha256:a5eb00064429bbbe0a2644164b3a1c59cb801c7a1727c72a4d09aad6ed27e515:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4NjE3ZGE0MjBlNWUwYzliZTAzMDlkNjY1ZTNlYWM3MWM1NTM4OGQyMWI3YmZiMDMxOWZlODEwNjA2MDgwNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YTM5MDcyZDBiYWZlY2JkOTZlOTAzNTlhOTcwYTdiMjgyOGEyMmMyMDYwYzA2MmZlMWNmNTEzMGE1ZjdhZTkifQ"
+        },
+        {
+          "resource": "repo://modules/documents/domain/evidencePath.ts#L91-L99",
+          "version": "repo-lines-v1:sha256:8201cbd723ac3eee4ddc3655d34708b0cf9169047028c9178b69fab9edbdf699:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzJlNzU4ZTY4MWYyOGM1ZjNkZWI4ZDhiMTg0YWE1ZDFmNTg4OGIwNDQxMTMzYTY5NDFmZGI5MzFmNWJjYjM1NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTM5Mjk0ZmQ5OGFmNDAxNmZkZDdjNDBmMTZkMTdlNmJhYjVlY2I1ZDY2NGY0ZWVkODk0NzdlMGIwODQzZmE0OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGRhNjc0MWIwZmZiMDk2NjMzZjQxZmVkOGUzZTc4M2E5ZGJiY2Y1YTU2YmNhYjljZGVkYTBlOTUwMDkxZjJlYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_147e0e8b064048209a01c1eedd8ec48f",
+      "statement": "The four document/evidence test files cover only the pure domain helpers, the duplicated mappers and the path builder; the Storage I/O half of `evidence.ts` is mocked or uncovered, so a green suite is not proof of the bucket round trip.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/doc-blockers.test.ts#L14-L22",
+          "version": "repo-lines-v1:sha256:88901f9bd9814c5a6e19f1e427e17b2c40e1ee1755bea2938c694d0266e560db:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmZmYmJlNDdlMTgwZmEwNWZjZmE3NjdlNWFjNmFiMWEwMzg3MTJlZThmNzlkOTdkNDExZDVkMThmZThhZjU3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTViYmZmZmY0NGUxODVhZWRlZmYxZWRjNWIwY2U2NjBmZjRiNTA2OTNjYzk4YzQwY2I4ZmEyOTYzMGY5MWQwNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWY3OGMzNmQxOGMwNjUwYjk3ZDU4ZmY5NjA1NDM4ZjE0NzY5YTZkNDU5NDVhYmY3YzY5ZDFmZTY2YmNiNzNmMCJ9"
+        },
+        {
+          "resource": "repo://tests/unit/doc-compliance.test.ts#L9-L21",
+          "version": "repo-lines-v1:sha256:d738c6710fbd70f238df7f3a2f14634108f99989b58e8849068be784c5e36f61:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwOGU0NjkxYmE2NTMxNDg4YmZlMTMzOTYzZTJjYzI1OTkzMGI0MWYwZjU1YWI1ZTVjZWEyYWQ2MTFkODQxODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmZmJiZTQ3ZTE4MGZhMDVmY2ZhNzY3ZTVhYzZhYjFhMDM4NzEyZWU4Zjc5ZDk3ZDQxMWQ1ZDE4ZmU4YWY1N2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2ZTNmMDFkNjJhYmJhMWVlYzdhNDgxZGIzOTYxOGMzZDk3N2VmNzViY2RlZDAxNjk1MDYyZDUxMGJmZjkxYTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlNjYzY2ZiNzQ1OGQ0MDg3YmRjNDFkZWI3NmFmNmMyODNjY2M2YjBlNWQ4ODlmZGIxMjA3OWIzNzE5ZWY0NjIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/documents.test.ts#L1-L6",
+          "version": "repo-lines-v1:sha256:960608112428243a529562c9dd1fea8c7974235b3412c17a22a31d50dc902b5a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODk0OWRhNDkxMTczMzlmNmVkMGQ3NzZiYjg3MWRjMjY1OGNmOGQ5OTk5Zjc2Y2EzMjk5Yzk4MWE2OTZkNjE1MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDc0MzI5MDBjYjc0ODYzYjlmYjAxNTZjN2YxYmY5ZTAyNDAwNzFiZmRiZjZmZWRlZmM3OGZjNmVkMTdlY2Q5NSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/evidence-path.test.ts#L12-L20",
+          "version": "repo-lines-v1:sha256:1fc12ae40d38bc1fda209586173e8d16f770932346fda25e56b7399f3073e367:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTMwMjRjYWY1NjEwYjNiOWQ3NDFiZDY4MzZiMTljYWM2NGY4Y2JkMzYxZjJmNDQ5MzdmY2M0NDY2ODBkNzZiOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDczZmQwMzMyYzdlOTk0MTQxNTYwMzU5MzcwOWQ0NGUyMGRmNTA1OWY5ZDZiNWFiMGFhMmY1MjE2NTNmYWE4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjMzZWVlODM1N2QwN2FjZDdiMGRjYTNjYjkyNjU4OGE2ODZjZGFlNWJlNmMwNmM4MjBiZDVkZWQwZGFiYzZmNSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-18T03:56:44.398Z"
   }
 }

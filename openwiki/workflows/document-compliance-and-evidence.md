@@ -1,202 +1,276 @@
 ---
 type: workflow
-title: "Workflow: Measuring Document Compliance vs. Gating on It"
-description: The path from a program requirement catalog to a rendered compliance figure or a closed billing gate — where untracked keys are excluded, where they fail closed, and how an evidence upload moves a document up the status ladder.
-tags: [documents, compliance, evidence, adr-004, billing-gate, workflow]
+title: "Workflow: Requirement Catalog → Blocker or Verified Evidence"
+description: The chain from a program requirement catalog to a counted blocker, a closed gate, or an uploaded-and-signed evidence object — the missing → pending → submitted → verified order, ADR-004's untracked third class, which surface shows which number, and where the footprint changes.
+tags: [documents, compliance, evidence, adr-004, lifecycle, workflow]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
+    at: 2026-11-18T03:56:44.398Z
+sources:
+  - id: openwiki-source-9c4f624af786337110d6df8a
+    resource: repo://docs/adr/ADR-004-untracked-document-semantics.md
+  - id: openwiki-source-2fda883e9b76745f69f487f7
+    resource: repo://eslint.config.mjs
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
+  - id: openwiki-source-9244ced37838980939ffbdc8
+    resource: repo://modules/batches/domain/alerts.ts
+  - id: openwiki-source-6af3f09918cb46eabe775144
+    resource: repo://modules/batches/domain/metrics.ts
+  - id: openwiki-source-2cad937ecfecf0d996572e65
+    resource: repo://modules/batches/ui/KpiSummary.tsx
+  - id: openwiki-source-9a24e697708df788c06f44e3
+    resource: repo://modules/billing/data/billing.ts
+  - id: openwiki-source-24135802ec9b42acc8123951
+    resource: repo://modules/billing/domain/packets.ts
+  - id: openwiki-source-59b33492a169d8eadf1c8ad1
+    resource: repo://modules/billing/domain/readiness.ts
+  - id: openwiki-source-fed00d96acb205744511b2bb
+    resource: repo://modules/documents/data/documents.ts
+  - id: openwiki-source-05b5b2c042bb4f3b47496b1f
+    resource: repo://modules/documents/data/evidence.ts
+  - id: openwiki-source-764eda3eb972fdc48c5584a5
+    resource: repo://modules/documents/domain/compliance.ts
+  - id: openwiki-source-be3f0a5796d4e999957e9c91
+    resource: repo://modules/documents/domain/evidencePath.ts
+  - id: openwiki-source-525a243a36a2c3f766101dd7
+    resource: repo://modules/documents/README.md
+  - id: openwiki-source-fddaa3a3b7b0306dccc1c813
+    resource: repo://modules/documents/ui/DocumentsView.tsx
+  - id: openwiki-source-03656dd9cbbc89345a506c19
+    resource: repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql
+  - id: openwiki-source-9db8826ef803807be7854211
+    resource: repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql
+  - id: openwiki-source-2020074c6fdeab02aae020b7
+    resource: repo://tests/unit/batches.test.ts
+  - id: openwiki-source-892600aba8a4baaca4ccc7a9
+    resource: repo://tests/unit/doc-blockers.test.ts
+  - id: openwiki-source-dcc0272e0da8a35716ea3b26
+    resource: repo://tests/unit/doc-compliance.test.ts
+  - id: openwiki-source-4029f22d57710f525e978978
+    resource: repo://tests/unit/evidence-path.test.ts
+generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
 ---
 
-# Workflow: Measuring Document Compliance vs. Gating on It
+# Workflow: Requirement Catalog → Blocker or Verified Evidence
 
-A requirement catalog arrives from `program_document_requirements`, resolves into a `documents` map
-on each batch, and then splits into two ends that never agree on purpose. One end **measures** — a KPI,
-a matrix completeness card, an alert count. The other **gates** — billing readiness, packet blockers,
-the blocking strip. The interesting part of both is the key that is *not* in the map: an untracked
-requirement, which is neither verified nor missing.
+A `program_document_requirements` catalog resolves into a `documents` map on each batch and then runs
+through one state order — `missing` → `pending` → `submitted` → `verified` — plus a fifth, off-ladder
+answer for a key the batch never carried. Four of those five states are `DocStatus` values mirroring the
+DB `document_status` enum ([canonical migration](/supabase/migrations/20260528160300_create_tenant_scoped_schema.sql));
+the fifth, ADR-004's **untracked**, is represented as *absence* and has no enum member
+([D5](/docs/adr/ADR-004-untracked-document-semantics.md)).
 
-`modules/documents/domain/compliance.ts` is the single arbitrating module
-([ADR-004](/openwiki/modules/documents-and-evidence.md) D6). It is public across modules because
-`domain/` is (`eslint.config.mjs` makes only `data/` private — RULES.md rule 8), so every counting
-surface can import it. **Indexing `batch.documents[key]` directly outside a `data/` layer is the
-pattern the ADR exists to remove**, and grep confirms no `.tsx` in `modules/` does it any more.
+The workflow is therefore an *order*, not a table shape. Two things break it silently: a transition that
+jumps a state, and code that folds untracked into `'missing'`. Either one moves a blocker count with no
+type error, no test failure outside the domain specs, and no visible trace on screen.
 
-## How a key gets a record — and how one stays absent
-
-Both producers of `Batch.documents` backfill first, overlay second:
-
-- `mapDocumentsMap` in `modules/batches/data/batches.ts` writes every key of the embedded program's
-  `program_document_requirements` to `MISSING_DOC`, then overwrites with real rows.
-- `mapDocumentRows` in `modules/documents/data/documents.ts` does the same against the catalog handed
-  in by `getBatchDocumentsSnapshot(batchId, requirements)`.
-
-So "no submitted row" is settled at the data layer ([D1](/openwiki/modules/documents-and-evidence.md)),
-not by each caller. A key **still** absent after the backfill was never in *that batch's* catalog, and
-only the domain layer gets to interpret it. Two ways that survives in practice:
-
-- **Partial catalogs.** Callers pass a different catalog than the batch carries — the matrix passes
-  `requirementCatalogOf(batches)`, the union across every shown program, so a Program A requirement is
-  untracked on a Program B column by construction; `deriveDashboardMetrics` reads each active batch's
-  own catalog instead.
-- **No catalog at all.** Every caller of `DocumentsView`/`TableView`/`AlertsPanel`/
-  `DocumentStatusDonut` still passes an empty `documentRequirements` because no page has a program id
-  to fetch one with (`modules/documents/README.md`). An empty map is therefore the *current normal
-  state*, not an edge case.
-
-Both branches from one lookup are decided in `docRecordFor(batch, key)`, which returns the record or
-`null`. The branches then diverge deliberately: measurement declines to judge, gating fails closed (D2
-vs D4, `tests/unit/doc-blockers.test.ts` pins a "gate and measurement disagree" case so a refactor
-cannot quietly align them).
+`modules/documents/domain/compliance.ts` is the only module allowed to interpret a key
+([D6](/docs/adr/ADR-004-untracked-document-semantics.md), RULES.md rule 8); `domain/` is public across
+modules because `eslint.config.mjs` restricts only `data/`, which is why every counting and gating surface
+can import it and none indexes `batch.documents[key]` anymore. Both halves of this page's
+domain are pure (RULES.md rule 14) — no clock, no network — and that is load-bearing: the fixed-date
+specs cannot pin a branch that reads either.
 
 ```mermaid
-flowchart TD
-    A["caller asks about requirement key"] --> B["docRecordFor(batch, key)"]
-    B -- "record present" --> C{"record.status"}
-    C -- "verified, submitted" --> D["on file"]
-    C -- "pending, missing" --> E["blocking"]
-    D --> M1["measurement: counted in verified/submitted under a tracked denominator"]
-    E --> M2["measurement: counted as missing or pending under a tracked denominator"]
-    D --> G1["gate: isDocOnFile true, satisfied"]
-    E --> G2["gate: isDocOnFile false, blocker listed, packet stays draft"]
-    B -- "null → untracked" --> X["measurement: excluded from numerator AND denominator"]
-    B -- "null → untracked" --> Y["gate: not satisfied, never satisfied by default"]
+stateDiagram-v2
+    [*] --> missing: catalog backfill, no row
+    [*] --> untracked: key absent (outside the batch's catalog)
+    missing --> pending: record submitted for review
+    pending --> submitted: upload lands
+    submitted --> verified: admin accepts
+    verified --> submitted: verified record replaced
+    untracked --> missing: catalog catches up, then backfill
+    note right of untracked
+        Not a DocStatus. Counts as a blocker; leaves the denominator.
+    end note
 ```
 
-*`null` is the only split point: measurement steps aside, gating treats it as unmet.*
+*Advancing is a data change; the ladder itself is decided in one module. `verified` sits above every
+gate, so a regression to `submitted` costs a gate nothing (see below).*
 
-## Measurement: untracked leaves the denominator
+## Where the keys come from
 
-`summarizeDocCompliance(batches, requirements)` counts `untracked` separately and hands every
-percentage to `pct(part, whole)`, which returns `null` when `whole` is 0. So:
+Both producers of `Batch.documents` backfill first, overlay second: `mapDocumentsMap`
+(`modules/batches/data/batches.ts`) and `mapDocumentRows` (`modules/documents/data/documents.ts`) write
+`MISSING_DOC` for every key of the embedded program's catalog, then overwrite with real rows. "No
+submitted row" is settled at the data layer ([D1](/docs/adr/ADR-004-untracked-document-semantics.md)),
+not by each caller. Only a key still absent afterwards — one *this* batch's catalog never listed — reaches
+the domain layer, and only there becomes untracked.
 
-- One verified and one missing of four requirements → `verifiedPct: 50`, `onFilePct: 50`,
-  `untracked: 2`. The two untracked keys neither drag the figure down (as `missing` would) nor prop it
-  up (as the retired "absent ⇒ verified" rule did).
-- Nothing tracked → `tracked: 0`, `onFilePct: null`, `verifiedPct: null`. **Never `0`, never `100`** (D3).
+Two ways that survives in production:
 
-`summarizeOwnCatalogCompliance(batches)` wraps that per batch over `criticalRequirements(
-batch.documentRequirements)`. `criticalRequirements` — a filter on `req.critical`, i.e. the DB
-`is_required` flag — is also the tool that stops another program's requirement counting against a
-batch. `requirementCatalogOf` unions catalogs for display only; never score against the union.
+- **Partial catalogs.** `DocumentsView`'s columns are `requirementCatalogOf(batches)`, the union across
+  every shown program, so a Program A requirement is untracked on a Program B column by construction.
+  `deriveDashboardMetrics` instead reads each active batch's own catalog — see
+  [the module reference](/openwiki/modules/documents-and-evidence.md) for the split.
+- **Empty catalogs.** A batch whose program join is null, or whose program has no requirement rows, carries
+  one. The **billing route still passes `const documentRequirements: DocumentRequirement[] = []`**, because
+  `Batch` carries no program id to fetch a real one with.
 
-The `null` propagates as a **type**, not a convention: `DashboardMetrics.docCompliancePct` is
-`number | null` (`modules/batches/domain/metrics.ts`), so a forgetting consumer is a compile error.
-`KpiSummary` renders `'—'` with the sub-label "Not yet tracked", `SchoolsOverview` prints "Not tracked"
-instead of a figure, and `DocumentsView`'s completeness card computes its own `pct === null → '—'`
-over tracked records only (RULES.md rule 23: a metric with no source renders "—", never 0).
+The catalog is also *deployment* state, not a constant. `documents` ships with no unique key on
+`(batch_id, document_key)`; the dev seed adds `documents_batch_id_document_key_key` with a warning that a
+real upload path would otherwise duplicate rows silently.
 
-`docRecordFor(...)?.status === 'missing'` is the *other* legitimate measurement read: the dashboard
-attention list (`modules/batches/domain/attention.ts`) names only recorded-missing critical documents,
-never untracked ones. `tests/unit/dashboard-domain.test.ts` asserts exactly that exclusion.
+## The split point
 
-## Gating: untracked is not satisfied
+`docRecordFor(batch, key)` returns the record or `null`, and every branch hangs off that one return. The
+two directions are deliberately opposite and both fail safe: **measurement** drops `null` from numerator
+and denominator, so nothing tracked yields `null` from `pct()` ([D2, D3](/docs/adr/ADR-004-untracked-document-semantics.md));
+**gating** treats `null` as not satisfied, because a gate must never open on evidence nobody recorded
+([D4](/docs/adr/ADR-004-untracked-document-semantics.md)).
 
-`isDocOnFile(batch, key)` is `record !== null && ON_FILE_STATUSES.has(record.status)`, and
-`ON_FILE_STATUSES` is `{verified, submitted}` (ADR-001 §7.2.4 accepts the uploaded manual attendance
-sheet as billing evidence, so `submitted` clears a gate without being verified — **verification is not
-a release blocker**). Untracked short-circuits to `false`: a gate must never open on evidence nobody
-recorded.
+`tests/unit/doc-blockers.test.ts` pins the disagreement end to end: one verified requirement plus one
+untracked measures `onFilePct: 100` while `blockerCount` returns 1. "100% compliant and still blocked" is
+the correct answer, so aligning the two is the regression to watch.
 
-Downstream, untracked surfaces as a first-class, *non-satisfied* state rather than being flattened
-into `missing`:
+On the gate side, `isDocOnFile` is
+`record !== null && ON_FILE_STATUSES.has(record.status)` with `ON_FILE_STATUSES = {verified, submitted}`.
+`submitted` clears a gate without ever being verified (ADR-001 §7.2.4 accepts the uploaded manual
+attendance sheet as billing evidence), so **verification is not a release blocker** — a document that
+slips back down the ladder costs no gate anything.
+
+`blockerReasonFor` is the inverse and returns its own narrow vocabulary — `'untracked' | 'missing' |
+'pending'`, not a `DocStatus` subset, because `untracked` is a state no row can carry. `blockingDocuments`
+collects it, partitions criticals first with two filters rather than a comparator, and surfaces `count`
+and `criticalCount`; `blockingDocumentNames` maps to `label` because FR-06 AC-1 forbids rendering a key.
+
+## Which blocker surface is live
+
+- `blockingDocuments`, `blockerCount` and `blockingDocumentNames` have **no UI caller** — grep across
+  `modules/` finds only `compliance.ts` and the two specs. The intended consumer is the batch card's badge
+  next to the named strip, and it is currently unrendered.
+- The count that actually reaches a coordinator is the dashboard KPI's `docMissing`, sourced from
+  `deriveDashboardMetrics` → `summarizeOwnCatalogCompliance` → `summarizeBatchDocCompliance` and rendered
+  by `KpiSummary.documentStatus` as `"{docMissing} required missing"`. It counts **tracked-missing
+  criticals only** — an untracked requirement blocks in the strip model but is excluded from `docMissing`
+  and only totals separately in `docUntracked`. So the screen under-reports blocking by exactly the
+  untracked count. The KPI's value is honest when nothing is tracked (`'—'` plus "Not yet tracked"), but
+  the `sub` line beside it is computed anyway, so a zero reads as "0 required missing" over a set that may
+  be wholly untracked.
+- The dashboard's document panel renders only the *tracked* picture: `DocumentStatusDonut` prints
+  `summary.onFilePct` in the ring centre, returns `null` when nothing is tracked, and carries the untracked
+  figure only in its metadata line — so it and the KPI above it can disagree about which number is "it".
+- `SchoolsOverview` and `TableView` already do the RULES.md rule 23 thing: `'Not tracked'` text and `'—'`
+  with an info icon plus an untracked `title`, never a zero.
+- `batchAlerts` fires the missing-critical-docs row only when `tracked > 0 && missing > 0`, so untracked
+  keys raise nothing and a catalog-less batch is silent for documents.
+
+None of these agree on a unit. If the strip is wired, the KPI should adopt it rather than keep growing a
+parallel count.
+
+## Gating destinations
+
+An untracked or non-on-file requirement travels to four gates, each of which keeps it closed:
 
 | Gate | Read | Untracked outcome |
 | --- | --- | --- |
 | `deriveDocReadiness` (`billing/data/billing.ts`) | `isDocOnFile` over critical `aou/ntp/tip/train` | denominator keeps the slot, `verified` does not move, `billingGate` stays shut |
 | `buildPacket` (`billing/domain/packets.ts`) | `docRecordFor` for `status`, `isDocOnFile` for `satisfied` | `PacketDoc.status === 'untracked'` (the one `DocStatus \| 'untracked'` projection, D5), `satisfied: false`, labelled in the blocker sentence, `state` forced to `draft` |
-| `blockingDocuments` / `blockerCount` (`compliance.ts`) | `blockerReasonFor` | `reason: 'untracked'`, counted, criticals sorted first |
-| `batchAlerts` (`batches/domain/alerts.ts`) | `summarizeBatchDocCompliance(b, criticalDocs)` | untracked excluded from `missing`, row fires only once `tracked > 0` |
+| `blockingDocuments` / `blockerCount` | `blockerReasonFor` | `reason: 'untracked'`, counted, criticals first |
+| `batchAlerts` | `summarizeBatchDocCompliance` | excluded from `missing`; row fires only once `tracked > 0` |
 
-`buildPacket` also guards the empty catalog separately: `requirements.length === 0` is
-"catalog unavailable", not "nothing required", because an unevaluated checklist must never read as
-satisfied — the same `requiredTotal > 0` guard `billingGate` uses. The gate halves are documented on
-[/openwiki/modules/billing.md] and walked end to end in
-[/openwiki/workflows/billing-packet-and-statement.md].
+Both billing halves guard the empty catalog separately — `deriveDocReadiness`'s full-set denominator
+never satisfies `billingGate`'s `requiredTotal > 0` check, and `buildPacket` emits "catalog unavailable"
+rather than counting zero blockers — because an unevaluated checklist must not read as satisfied. Gate
+walk-through lives in [/openwiki/modules/billing.md].
+
+## Evidence: path, upload, signed read
+
+Evidence is what moves a requirement up the ladder. It is written and it is unexercised: no component
+imports `uploadEvidence`, `getSignedEvidenceUrl` or `validateEvidenceFile`.
+
+1. **Path** (`domain/evidencePath.ts`). `buildEvidencePath` composes
+   `{tenant_id}/{batch_id}/{document_key}/{filename}` and validates tenant id, batch id, key, filename —
+   in that order, so the outermost problem is the one reported, and tenant/batch are anchors while only
+   `filename` is user-shaped. The bucket's policies authorize every operation with
+   `app_private.can_access_tenant((storage.foldername(name))[1]::uuid)`, so segment 1 *is* the tenant
+   check and a filename containing `/` relocates the object into a folder whose first segment is no
+   longer the caller's tenant. `validateEvidenceFile` enforces `EVIDENCE_MAX_BYTES` (52 428 800, the
+   bucket's own `file_size_limit`) inclusively and a narrow MIME allowlist, size before type. Every entry
+   point returns a discriminated result, because FR-06 needs *invalid type*, *upload rejected* and *upload
+   failed* to stay distinguishable.
+2. **Upload** (`data/evidence.ts`). `uploadEvidence` returns `unconfigured` when Supabase is unset
+   (`isSupabaseConfigured` — a server env check, so client-side calls would always short-circuit),
+   validates file then path so a bad request costs no round trip, then writes with `upsert: false`,
+   leaving the prior object an auditor may cite intact. Failures split into `rejected` (bytes never
+   sent) and `sync-failed`.
+3. **Read**. The bucket is private (`public = false`); reads are signed URLs only,
+   `getSignedEvidenceUrl` defaulting to 300 s. `storage_path` is unconstrained `text`, so the stored key
+   is re-parsed through the builder and the trailing segments rejoined with `/` rather than trusting
+   segment 4 — a key with extra segments then fails `isSafeFilename` instead of signing a shorter path
+   than the one validated.
+4. **Granting verify.** Today `DocumentsView.handleVerify` writes only a local override. Nothing sets
+   `verified_by`: the admin's display name is captured by the handler and dies with the component.
+
+Nothing here is covered by a test, and both functions sit behind auth toggles that are still unset
+(issue #122), where every call fails with an RLS denial indistinguishable from a code defect.
+
+Bucket policy shape for future work: select/insert/update for any member of segment 1; a DELETE policy
+added by `20260910120000` gated on the tighter `can_manage_tenant`, since reading and uploading are
+ordinary trainer work and destroying evidence is not. `evidence.ts` still exposes no `deleteEvidence`.
+
+## What changes where
+
+| Action | Leaves a mark in |
+| --- | --- |
+| Add a requirement to a program catalog | `program_document_requirements`; the next `getBatchesSnapshot` backfills the new key `'missing'` on every batch of that program |
+| First upload for a `(batch, key)` | `storage.objects` under the tenant prefix, and `documents` — status `submitted`, `storage_path`, `submitted_by`, `submitted_at` |
+| Admin verify | `documents.status = 'verified'`, `verified_by`, `verified_at` |
+| Client-only click of "Verify document" | component `overrides` keyed `batchId:key`; until reload — and, because `submitted` already clears `isDocOnFile`, a lost verification costs no gate anything |
+| "Request changes" | a toast only — no write |
+
+Verified attribution is not entirely absent: `mapDocumentRow` populates `verifiedBy` / `verifiedDate`
+and `FilePreviewModal` prints them, so a DB-verified row attributes correctly; only the in-session
+verification is unattributed. The real gap is that four of these five rows are unreachable from the UI —
+the upload is still an "Attach document" toast, so nothing writes `storage_path`, `submitted_by` or a
+status.
 
 ## Failure modes, plainly
 
-- **An unguarded `documents[key].status` throws.** Before ADR-004, `TableView` and `DocumentsView`
-  crashed with a `TypeError` on any batch whose catalog lacked a mock-catalog key — the ADR's own
-  review found these were the two sites that did not "fail safe". The fix is that consumers call
-  `docRecordFor` and narrow to `null`, never `undefined`. A new counting surface that indexes the map
-  directly reintroduces the crash for every batch with a partial catalog.
-- **An all-absent set prints 0%.** The pre-ADR donut skipped absent keys but still printed `0%` for a
-  set with nothing tracked, and the dashboard needed a local `docsTracked` patch to show "—" over the
-  old "absent ⇒ verified" counter (which read as a cleared checklist). The replacement is one `null`,
-  produced by `pct`, and the patch is gone.
-- **A gate opens on evidence nobody has seen.** Mapping untracked onto `submitted` "fixes" the closed
-  gate by asserting a document that was never recorded; a batch with no catalog would then generate a
-  packet. Keep it as its own state and keep it unsatisfied.
-- **A wrong catalog makes one program's documents count against another.** Scoring a union instead of
-  `batch.documentRequirements` marks a Program B batch missing for Program A's requirements;
-  `AlertsPanel`'s pre-ADR guard ("is *any* document tracked") was the narrow version of the same
-  mistake — a batch tracking one non-critical document and no critical ones slipped through, which is
-  why the guard is now `tracked > 0` on the *critical* summary.
-- **Trusting the map's shape.** `Batch.documents` is `Record<string, DocRecord>` per
-  `shared/types.ts`, but the type says nothing about which keys are present; only the domain layer's
-  `null` return carries that.
-
-## The evidence ladder
-
-Evidence is what moves a requirement from `pending`/`missing` toward `verified`. The ladder has three
-rungs, and the top one is a permission, not an automatic consequence of an upload.
-
-**1. Path validation** (`modules/documents/domain/evidencePath.ts`). `buildEvidencePath` composes
-`{tenant_id}/{batch_id}/{document_key}/{filename}` and validates tenant id, batch id, document key,
-filename — in that order, so the outermost problem is reported. This is a security boundary: the
-`compliance-evidence` bucket's policies authorize every operation with
-`app_private.can_access_tenant((storage.foldername(name))[1]::uuid)`, so **segment 1 is the tenant
-check** and a filename containing `/` relocates the object into a folder whose first segment is no
-longer the caller's tenant. `tests/unit/evidence-path.test.ts` is mostly separator-injection coverage.
-`validateEvidenceFile` enforces `EVIDENCE_MAX_BYTES` (52 428 800 — matching the bucket's own
-`file_size_limit`) and a narrow MIME allowlist, size before type. Every entry point returns a
-discriminated result instead of throwing, because FR-06 needs *invalid type*, *upload rejected* and
-*upload failed* to stay three distinguishable states; `EVIDENCE_REJECTION_COPY` holds the copy and
-leaks no identifier.
-
-**2. Upload** (`modules/documents/data/evidence.ts`). `uploadEvidence` returns `unconfigured` when
-Supabase is unset, validates file then path, then writes with `upsert: false` so a re-submission
-creates a new object and leaves the prior one, which an auditor may already cite, intact. Failures
-split into `rejected` (bytes never sent) and `sync-failed` (Storage refused or threw). Reads are
-signed URLs only — the bucket is private (`public = false`) and `getSignedEvidenceUrl` defaults to a
-300 s TTL. Nothing calls either function yet: `DocumentsView`'s upload control is still an
-"Attach document" toast, and `mapDocumentRow` sets `doc.url` to the bare `storage_path` key, so the
-round trip is written but unexercised.
-
-**3. The status ladder.** `DocStatus` mirrors the DB `document_status` enum and is assigned straight
-off the row by `mapDocumentRow`: `missing` (backfilled when no row exists) → `pending` → `submitted`
-(an upload, now `on file` for every gate) → `verified`. Verification is an **admin-only** action with
-no store yet: `DocumentsView.handleVerify` writes an override keyed `batchId:key` into local state as
-`{status: 'verified', verifiedBy, verifiedDate}` and refuses when the profile has no display name, so
-a record is never attributed to nobody. Because the panel's `verifiedBy` and `verifiedDate` come from
-the same local override, the verification rung survives until reload and no further — and since
-`submitted` already clears `isDocOnFile`, a stale verification blocks nothing.
-
-Bucket policy shape that constrains future work: select/insert/update for any member of segment 1; a
-DELETE policy added by `20260910120000_add_adr001_billing_domain.sql` gated on the tighter
-`can_manage_tenant`, because reading and uploading are ordinary trainer work and destroying evidence
-is not. `evidence.ts` still exposes no `deleteEvidence`. `storage_path` is unconstrained `text`, so
-`getSignedEvidenceUrl` re-parses the stored key through `buildEvidencePath` and rejoins the trailing
-segments with `/` rather than trusting segment 4.
+- **Folding untracked into `'missing'`.** Denominators shift, `batchAlerts` starts firing on catalogs
+  nobody recorded, and every gate stays closed for the wrong reason.
+- **Printing `0` or `100` over an untracked set.** The old donut skipped absent keys but still printed
+  `0%`, and the old "absent ⇒ verified" counter read as a cleared checklist. Note the mirror image: one
+  verified requirement on an otherwise unrecorded batch is a legitimate `100` alongside a blocker count
+  of 1.
+- **Indexing `batch.documents[key]` directly.** Pre-ADR this threw a `TypeError` in `TableView` and
+  `DocumentsView` on any batch whose catalog lacked a mock-catalog key; a new counting surface that
+  indexes the map reintroduces it for every partial catalog.
+- **A clock or a network read inside `compliance.ts` or `evidencePath.ts`.** Both specs are fixed-date;
+  a `Date.now()`-derived branch escapes them. (`DocumentsView` legitimately calls `new Date()` — it is a
+  component, not the domain.)
+- **`upsert: true` on upload, or a trust-the-client key.** Loses the cited object, or lets segment 1
+  stop being the tenant.
+- **Letting an upload imply a status.** `uploadEvidence` returns only `{path}`; it writes `storage.objects`
+  and nothing in `documents`, so "there is an object" and "the requirement is `submitted`" are decided in
+  two places. Deriving one from the other inside the domain layer would put Storage I/O in front of every
+  compliance figure.
 
 ## Where to change what
 
-- **A new counting surface** routes through `docRecordFor` / `summarizeBatchDocCompliance` /
-  `isDocOnFile`; a new *gate* uses `isDocOnFile` so it fails closed.
-- **A new measurement copy state** must handle `null` before any number; `DashboardMetrics` gives the
-  compiler the reminder.
-- **A new evidence surface** calls `validateEvidenceFile` and `buildEvidencePath` on both sides, then
-  `uploadEvidence`; never compose a key by hand.
-- **The rule itself** lives only in `compliance.ts` — a per-site re-decision is a regression, not a
-  local choice.
+- **A new counting surface** calls `docRecordFor` / `summarizeBatchDocCompliance` and handles `null`
+  before any number.
+- **Actually rendering the blocker strip** is the open job: wire `blockingDocuments` (or `blockerCount`
+  for a badge) into the batch card, passing `criticalRequirements(batch.documentRequirements)`, and
+  render `label`s, never keys.
+- **Wiring `/billing`'s catalog** comes next after that: it still passes `[]`, so `buildPacket` says
+  "catalog unavailable" and `billingGate` stays shut on every batch. Both degrade correctly, neither is
+  useful yet.
+- **A new verification write path** must set `verified_by` / `verified_at` so it replaces the local
+  override rather than joining it.
+- **A new evidence surface** validates file *and* path before send, then calls `uploadEvidence`, then
+  writes the returned path plus `status: 'submitted'` to the `(batch, key)` row; never composes a key by
+  hand.
+- **The rule itself** stays in `compliance.ts`; a per-site re-decision is a regression.
 
-Tests: `tests/unit/doc-compliance.test.ts` (D1–D4, `null`-not-zero, alert suppression),
+Pins: `tests/unit/doc-compliance.test.ts` (D1–D4, `null`-not-zero, alert suppression),
 `tests/unit/doc-blockers.test.ts` (untracked blocks; the deliberate disagreement),
-`tests/unit/evidence-path.test.ts`, `tests/unit/documents.test.ts`,
-`tests/unit/batches.test.ts` (backfill before overlay). RLS and the live upload round trip are
-unverified pending the Clerk/Supabase auth toggles (issue #122).
+`tests/unit/evidence-path.test.ts`, `tests/unit/documents.test.ts`, `tests/unit/batches.test.ts`
+(backfill before overlay). None touches the bucket round trip; RLS and the issue #122 toggles are
+unverified.
 
-Companions: module reference and screen behaviour on
-[/openwiki/modules/documents-and-evidence.md]; banner-before-empty guard ordering on
+Companions: module and screen reference on
+[/openwiki/modules/documents-and-evidence.md]; the audit/rename side of the same catalog on
+[/openwiki/modules/batches-and-lifecycle.md]; banner-before-empty guard ordering on
 [/openwiki/concepts/error-snapshots-and-honest-empty-states.md].

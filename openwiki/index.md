@@ -4,9 +4,11 @@ okf_version: "0.2"
 
 # Files
 
-- [Quickstart and Change Routing](quickstart.md) - First stop before changing TVI-CAMS: what the system is and where the official-systems copy boundary lies, the doc-reading order and the full ADR precedence chain, the invariants that gate every change and their enforcement levels, the exact verification loop, the pending-vs-applied schema trap, and a task → page routing table over the fixed four-page set.
+- [Quickstart — Task Routing, Invariants and the Verification Loop](quickstart.md) - Entry point before changing TVI-CAMS: which page owns a given task, the invariants that gate every change by rule number and enforcement level, the ordered typecheck → lint → test loop and what each step can and cannot prove, and the live-database permission gate.
 
 # Directories
 
 - [architecture](architecture/)
+- [modules](modules/)
+- [operations](operations/)
 - [workflows](workflows/)

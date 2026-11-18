@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:9b30ed2e1731580bb0703b1eee290114e11f907404ec62a3c2a37cd864adf7e2",
+  "pageVersion": "sha256:6d07e7bd60bd7ff243e8f97850ea8f96bea08babb87c865260d86f008f2fc986",
   "claims": [
     {
       "id": "claim_064644ff33bb49e58ae20d72de85efc0",
@@ -78,19 +78,23 @@
     },
     {
       "id": "claim_aa81bf86d43246bdbbc5489e920e9662",
-      "statement": "`AnalyticsView` charts \"Training progress by batch\" from `b.progressPct` and its elapsed/remaining bars from the zero-defaulted `currentDay`/`totalDays` aliases, and `BatchTimeline` fills the training phase from `progressPct` while printing `Day currentDay/totalDays` — so those surfaces chart a non-zero figure and a \"Day 0/0\" caption for batches with no attendance, while `batch.progressPct` stays non-nullable in `shared/types.ts` and the attendance fields beside it are nullable.",
+      "statement": "`AnalyticsView` charts \"Training progress by batch\" from `b.progressPct` and its elapsed/remaining bars from the zero-defaulted `currentDay`/`totalDays` aliases, and `BatchTimeline` fills the training phase from `progressPct` while printing `Day currentDay/totalDays`; `batch.progressPct` stays non-nullable in `shared/types.ts` while `completedSessions`/`totalSessions` beside it are nullable, and the mapper marks the `currentDay`/`totalDays` aliases as compatibility shims that must not be rendered as a \"Day X of Y\" claim.",
       "evidence": [
         {
           "resource": "repo://modules/analytics/ui/AnalyticsView.tsx#L32-L40",
           "version": "repo-lines-v1:sha256:71880d5fb229bbc63e7dcb67a43b19d0f5c833298fde9a9acbd851ae7489db9d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWVjZmYyMzUzYzIzMTg1YWQ4NDY4MzY0YjFhNjdiMDM1NjhlODVlZmU2MTBkNGQ4ZjM2MWRhNGVlYWUwZDA1ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWQ5ODM1NDk5ZTViYTkxZjg3MjY3Yzk1MmI3OGVhZWRkNmM0NjZmOTViNjg4MWIwN2I0NmNjYWVjMGNkZjE0NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjkzNDJhYTk3YTMwNWMzNjg2YWVlOTA0ZDFkNGE0NGRhNDBiMjI4ZDJlNTNmMDVkNmIwZTFmNmI4ZWYwNzg2ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODlkYjFjNGU2ZTAxNjZhOTNhMzE0Zjk4YTkyNmI1NTg0MWE4ZTE0OWVhOGEzN2YzNjZiMDBiNjE1ZjVhMWQwYyJ9"
         },
         {
+          "resource": "repo://modules/batches/data/batches.ts#L277-L283",
+          "version": "repo-lines-v1:sha256:099d340808e88552ae918d87cf31638da35a3b0c09e5721e1ca438e1d2abcf9a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTViZTljOGM3YzEwNTc4NTAzMzY0NjkzZDg3YTlkYWZjZTBmMGE1MTg5NzMxYzNhNmU0NmI3NTIyZGZiMTljZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDQ3NTQwN2UyNDY3YjNjMjNlN2YyMzdmYjNmOWEyZTE5OTU1MmU4ZDNlNDdjMTNmZDJlMjJhNjJkNTg3MWQ1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGNiODNjODI4OGEyNWU3Y2I2YTI4MDY5ZjcwNzRhZDRjN2NiZDE2MTRiMTQ0OTZiOTFjYzQxOGZmZTgyODRlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjA4MDI4ZDcwYTJjOGUxMGRiZmJiMDhmMjA5M2Y3YTY0NmZlNGFjOTc5YzA1OWNmMmIxOGI3NDFiNGQ0Mjg4NCJ9"
+        },
+        {
           "resource": "repo://modules/batches/ui/dashboard/BatchTimeline.tsx#L108-L111",
           "version": "repo-lines-v1:sha256:b7f13a9787e8187b048716282a6929a7ae869c4471c453dac00a621ab0ec6e7c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTNmZjg0MGE2YzA1NzQzZmI2YjQ2MzAwNjdlZTllNTRkYjExOTQzMzUyZjVkOTY4ZTFkNTYyNTE1ODcyYWYwNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzA4YzE5ZjJiOTUzZTYzZjVlNzA3ZmJiODJhZWM4NzIwNmQyMGNkNjVmZTc5NWQ4MzdlYjNmZGRmMmI3YzZmZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2JjMjQ3ZTQ5ZmMyZDFkZWVhYzc3OWM4ZWRiMTE4NDczM2U2MjM5MzEyOTFlMzdkNDRlNmUxMWFhNmRiNzU3ZiJ9"
         },
         {
-          "resource": "repo://shared/types.ts#L212-L219",
-          "version": "repo-lines-v1:sha256:ff3fe2e96e59e3c9c29555d233c1ce80c0c2be45530f850c4b99065a2467da83:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDg4MWI5NDY2NmMwZDIyY2Y4ZjliZGYxYTUzMTEwMzQ4NjljNGZkYjc5ZTZkYjNkYWM1NDg0ZDVlODRjZTgwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE4NTRiM2NkOWU5Y2RjOTNjMzlmYThjMDJhZGY0MWE2MDM2NzdmMjdhYjUwMmM3ODdkN2MwYjhjY2VjOTU5MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTRiMTBiN2RkODcyOGU3ZmVlZDlhN2FkM2NlODEwMDBlM2Y4MmViMzM1MGIzZDU2NjIzMTQzNTk3ZWJkZjllOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGEyZDU0ZWI4YTI4OTZiZmI3NGM3ZTNiZjkxYTg2NDRmZjhhNWNkNzlkNjgzNzI1YTZkMzUwYzZiNmMzYzM2MSJ9"
+          "resource": "repo://shared/types.ts#L219-L219",
+          "version": "repo-lines-v1:sha256:aa854b3cd9e9cdc93c39fa8c02adf41a603677f27ab502c787d7c0b8ccec9592:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE4NTRiM2NkOWU5Y2RjOTNjMzlmYThjMDJhZGY0MWE2MDM2NzdmMjdhYjUwMmM3ODdkN2MwYjhjY2VjOTU5MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE4NTRiM2NkOWU5Y2RjOTNjMzlmYThjMDJhZGY0MWE2MDM2NzdmMjdhYjUwMmM3ODdkN2MwYjhjY2VjOTU5MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2E0MjZhNWUzNmY5Mjc1M2JmYmNjYTJkN2JjODg5M2Q5YmUzYWUyNzJkYzhiYWEzN2Q0YzAwMDFjN2JhODcxZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGEyZDU0ZWI4YTI4OTZiZmI3NGM3ZTNiZjkxYTg2NDRmZjhhNWNkNzlkNjgzNzI1YTZkMzUwYzZiNmMzYzM2MSJ9"
         }
       ]
     },
@@ -296,15 +300,15 @@
     },
     {
       "id": "claim_73e6c164847f47938783f4f76f176967",
-      "statement": "`modules/attendance/domain/eligibility.ts` is planned in both the module README and `docs/IMPLEMENTATION_PLAN.md` and is unbuilt, so the eligibility layer a builder needs must be written from scratch rather than extended.",
+      "statement": "`modules/attendance/` contains only a README and no other file, so the planned `modules/attendance/domain/eligibility.ts` (and its `data/attendance.ts` sibling) must be written from scratch rather than extended from a partial eligibility layer.",
       "evidence": [
         {
-          "resource": "repo://docs/IMPLEMENTATION_PLAN.md#L396-L410",
-          "version": "repo-lines-v1:sha256:516936b46099a381d187a9d224a4df978c7417e7db4f9ee93e8699f6e6f3e98d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5ZGI0NTk5OWYwOTc4Mjg0YWVhZWNjZjMwZGFkNzAxZTQyNjI3YTQxYWU5YWI5YjBkOTYwM2I3ZDYyYjM1MTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwOGFkZjhlNTE4ZTM5ODE0ZTI4NWUzMGEwODczMTkzNTI1ZWRlMDVjZDMxMDkwYTQwOTJiYTAxN2NmYjY0NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NWFjNGIwMDFiYjg4NzlhZmNjNDBmZGEwYzVmNTE4MGY3MzEwOWM1NmIyYmFiZmQ0MGQxNWY3MDgyYWMzZjIifQ"
+          "resource": "repo://modules/attendance/README.md#L1-L8",
+          "version": "repo-lines-v1:sha256:2249b63a2fd7b919edd4defb8abc80ad7f275b5099015899bf24412bc0bd5e56:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGY3NzUxM2E2NTM4ZDUyYzI0M2Q1ZTYyMzlkNzdjNDZmYzc2OTViNjU3YWVmMWQ1NTM2MzU5NGI4ZTg0NDYwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjZhOGZhYzA0ZjkxMDAwODQ3NDU0NWQxMmIzMGZkY2RhYzZlMzdjMTZlYTIwNTBhNjM3NjYzNDBkMGViYzBkYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         },
         {
-          "resource": "repo://modules/attendance/README.md#L5-L8",
-          "version": "repo-lines-v1:sha256:c7e1c7ac7a2343f2b08e6dc123ebd0c83cdb1168e0fed43825374d61ab0742ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ0NzQzMGFkNTJjNzNjNzNhZmYwZDc0NzkyNzVkZjhlYmNjYzBlMWE2OGZmZWIyMGU4MTM4NzdlNDRlNGIxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjZhOGZhYzA0ZjkxMDAwODQ3NDU0NWQxMmIzMGZkY2RhYzZlMzdjMTZlYTIwNTBhNjM3NjYzNDBkMGViYzBkYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk1OTRhYTFlMTY4OTM2ZjRiNWM1NDE1ODJmNmU2NzY4ZDk4MDA3MzhjYmFjOTgxY2VlNzEyZjRmZDk1NDdjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+          "resource": "repo://modules/batches/data/batches.ts#L337-L337",
+          "version": "repo-lines-v1:sha256:757ea941ce81e8beff23e534444c7b73d3dbd012fcda011a39754addf0c85ba8:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzU3ZWE5NDFjZTgxZThiZWZmMjNlNTM0NDQ0YzdiNzNkM2RiZDAxMmZjZGEwMTFhMzk3NTRhZGRmMGM4NWJhOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzU3ZWE5NDFjZTgxZThiZWZmMjNlNTM0NDQ0YzdiNzNkM2RiZDAxMmZjZGEwMTFhMzk3NTRhZGRmMGM4NWJhOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjJiZTMyODU2ZDQzMDBmMzNlOTk3MWFkOTg5YjcxZjU0NjUyN2U4YWFhNmYwN2YzOWUwZTEyNzYyNTVlYTMwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTBkYzkyODI5ZmQ3YWVjNTRjNDI5MmVkYWNiZTVkMjFiNjg1Yzc4ZGI3MzBhZmNjZDNkMWY1NmM0MGNjNjI0NSJ9"
         }
       ]
     },
@@ -349,10 +353,126 @@
           "version": "repo-lines-v1:sha256:72d5f4c71633534fdec17f222158f37928f7ea9f1285b0c86532ffe64ac253a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjNGI3MGZlYWU5Mzc5MmI2ZDViNDU1YzVkYzEwYjVhYmUyZjg3ZjM2MzQ2ZjBmMzcyNjRiYWIzZWQ1ZmUyZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5NjU5M2QzZTA5MjBmYzk2MGMxMWExNWNmNjBhMWQ5YTNiNjljZWI2ZGQ1MjVjMzVjYzhiZjQ3NjIwZDhlOWUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_23b18c4b66ac4155b5377a5d80fb70a9",
+      "statement": "The two ADR-007 triggers are independent: the 3-consecutive-unexcused streak fires even while total absences remain under the percentage, so an evaluator must not short-circuit on \"under threshold\" and must report whichever trigger trips.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L50-L52",
+          "version": "repo-lines-v1:sha256:f1e4e3ac3d1385ffb03f4b7e796a3a76360b8115611703303187f4167f86dcab:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDUyYzQ4OGZhYmMyNDNlODg0N2Y2MThiOWQ0ODU3OWE1MGMyYzMwOTBhYTZkZWI4ODU3MWRjMTIzYzE5ODExNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmExZTdhMWMwZDAxOGUwNzliNGRlMDljZjdmMTcxNzQzMTVmZDlkOWQ3NGU1MTZlZDMxM2NhMjM2MWZhZWE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQ0MmM5ZGI0YzBkMmQ2NmNmYWQ2N2JjNWQ1ODhjZTMwNWVlZDA1Y2ViMmY0NjM4NGE3YzM1NzM1NTQwZGI3YiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L64-L69",
+          "version": "repo-lines-v1:sha256:7cad72a0604cdee08f44faac9a18b99c43600a83a0fc952e365d02bbba9cf4d9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDI5YWU5YWEzZTViZmExMGFiNWQ4OWUyYTQ4OTFkY2YxOWVkZjFkZGE5NmQ5MDRjNTliYjJhYjZmN2M3MDM4YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFjMzAwNTI5MzE4NmIxNTM2ZGI2NzRlMjA2ZDFmOWYzOTFiNjMxYzViMjBmN2MxOTdhODg4MWVhZmU4ZDRlNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDU5ZDlkNjA5MzY2NDRiY2YyYmYzOTVjZDczOTUzM2ZiMGE5OTU2YTAyYTJhMmI3Nzk4OTk3NWYwMDAxZDg2NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWQ5OWE0MTAzODFlNTY4ZTNkOTA3ZGFhZTQ0M2Y5ODNkMmYwNmM2YTgyZjc2ZmY4Yjg4ODhjZjI3ZDAyMTcxYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2e2e741aa34b44f6baa389612d205bb5",
+      "statement": "The percentage comparison is strict (`absences > floor(total_sessions × percent ÷ 100)`): exactly 20% of a batch's sessions is still eligible and the next absence disqualifies, so the threshold is not an inclusive cap.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L56-L63",
+          "version": "repo-lines-v1:sha256:7822d90c5f96970dec8c13ec4d63e64645342b1015eec425e1f5606e20fe20cd:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmVkNWY2ZjQyN2Q3MDEzYmU2MjEyMWMwNjFhZmUwYTUxYTgwYjM1MmQ3ZTkyOTIwMjdjNzNhZTRjOGE3ZWZkZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGE3NjFhOTk1YTFhZDU2MGUwN2M0MDAzMDM4M2QwMzRkMzNkMzc3NWFlZmY3N2NjNGQwOTE2ZjcyYzg0NGUyYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWQ0MmM5ZGI0YzBkMmQ2NmNmYWQ2N2JjNWQ1ODhjZTMwNWVlZDA1Y2ViMmY0NjM4NGE3YzM1NzM1NTQwZGI3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDAwYjMzNTRlNmJmMDQ4Y2E5MjQzMTI4MWRhOTBkMDQxNTc0ZWZkNzUyYTY0ODZhNzY5Y2JiMmU2NTk0YmJjNiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L57-L59",
+          "version": "repo-lines-v1:sha256:2724da1d744f434a9b3bdc74bb5a9d74f1d31202cecfbd46b231ce09484b3d16:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGZhNGJiOTM2NTlmMjU5ZDMwYzNkZjA3MjZiYjI4ZmM1YTdkNzUzZDg3NzczMGEzN2YxNzQ1MTUzZGYwYTdiMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY1MjZhNWFhMjE1Y2EyYjlhODI1MjIzYWY3NzYxZWU5YzRiMDEyZGJiMTQzNzZiNDRkNmE3ZWY4NGVmYTlmZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjBmMzZiZTYxN2ZlZWI5NzU1OTU4MTNhNzUxM2ZiYTYzMmY5MzRhZTY2M2I1ZjViYmVhYTIxY2M4N2Q1YmFmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTNkOTEzY2JhOTcwZTBlZDA1NzY1ZjYxM2EwYzAzM2RhNDY1YjU2OTk0YWI2YzY3ZThhZWYwYmJmYmFjNzY4YSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_40692969ae8c4523b21be9253298d996",
+      "statement": "`attendance_records.excused` affects only the consecutive-unexcused trigger: the percentage trigger counts absences whether excused or not, and `excused` is meaningful only on rows where `present = false`.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L51-L51",
+          "version": "repo-lines-v1:sha256:f717e135d12c0044f1424d1e3fd78a445ee1629aee45da767bca8c7412f3a1f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcxN2UxMzVkMTJjMDA0NGYxNDI0ZDFlM2ZkNzhhNDQ1ZWUxNjI5YWVlNDVkYTc2N2JjYThjNzQxMmYzYTFmMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcxN2UxMzVkMTJjMDA0NGYxNDI0ZDFlM2ZkNzhhNDQ1ZWUxNjI5YWVlNDVkYTc2N2JjYThjNzQxMmYzYTFmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI5ODg3NmI1NGI0MzlkOTkxYTA5MjQ2Y2U1MzYzNGVmYmUzYmRjNjkwMDFmZmNiZDkxOGU3YThiYmZjZjhkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWRjNTQ1YjJjNGEyODg3NDQzZTVkNzQzMjM1NzRkN2NiZGFlNzYyOGI4ZTJlYWNhMzY4MWJiN2MyMjhlNWZmNiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L34-L44",
+          "version": "repo-lines-v1:sha256:1ef920f86a7cfe89a7e3a6ea42618cb49f41814f596542db930f7aaf4549453b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzNWY5MGM4NGQ1YzY5NTVhN2FhNTU3YmZhMGM1MjE5M2UxNDBhYWM0ZDhmYjRiY2NlMzNhODQ2ZjA4ZDMxYzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExZDNhMzUzODc2ZDA3MWNmYTRkMjY4ZWViMjJjNzk5NjllYmY1YjI5M2ZkMWIxYzlmZThhY2JlYjI3OWMxYzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhZTU2NDgwZmY1ZWRhYjBhNzhlMDZmNTc1MWI3NWU4OWE0MWQ5MjY5YTRhZjBhNWI0ZjU3NTZkOTBlZjkyMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjNzdkODc0MTAwMGM0NTE1NmI0MWRjY2VjOTBkMDM2MzI5YjVkOWU5ZWE5ZTJhMDExZWQxZDRmMzJjNzY2OTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7274718dd4474e9384241cae0fa60c7e",
+      "statement": "Threshold precedence is the program default with a per-tenant override (`tenant ?? program`, null in both falling back to the program default), but no shipped code resolves either column, so the precedence is documented rather than implemented and needs confirmation.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L50-L50",
+          "version": "repo-lines-v1:sha256:9066475239c0118d2d6ab429769fc716cef0891c51c2527c1ece9c351b2747f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmExZTdhMWMwZDAxOGUwNzliNGRlMDljZjdmMTcxNzQzMTVmZDlkOWQ3NGU1MTZlZDMxM2NhMjM2MWZhZWE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjYwYzQ1YjQwYzFmZWRiZDFlNjliYTQ2ZDM5MGQ5NmQ0YjczOWExYjRkNmYyMDg1YjQwMDkxNTczNmQyNGFkNiJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L271-L281",
+          "version": "repo-lines-v1:sha256:d655f8879dff80bf2137bb7a11df4000cc9fbdcac08ebd6e40c0aac04d8c36d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmYTQyZTg4NDY4ZTVkNTMxY2NiMzcyODBhZWEzYjIzMzNkZmVhZjZhNDI4YzkwM2YxMzZjMjMzMzc5YTZiOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1Y2RlZjgwODVhZTc0YWI2MzZkNjQ1OWY1YzZkNWZiZmIwZGIyNjRmMWIwZDc1YmFjNTE5YzliM2Y2NzE3YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2MmRjNDUyNjJjNmE1NTdmMmE3OTYzZDQwYmMzOTViMjE0MzM5YjZkNWZhYjc0ODdkM2I0NWRiMzdhZTI2ZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlYjE4YTg0NGI3YmQxMjM0NTUwNjMwOTk0MTQxMWVhN2FlZDc3MWMxMGE0ODlkNDg3ODc5NGE3YzJmNjI0NTcifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L83-L91",
+          "version": "repo-lines-v1:sha256:b9d846c961eed570b8c80501e946f5e16174ae94b199402c1fe4541c7f3c9e91:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmE0ZmVlZWQ3ZTQzNjI2ZGE4MmE3ZTA5OGNiMjEyMDliYjAzOThjODM5NGQyNjQyZWNkN2I2ODI3Y2Q0Y2ZjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODk5NzI2ZGI4ODUxODkxYWNkYWMxMTFhYTYyN2U1OWI5OGFmYTliODljYjgxZTE2YTY0OTQ2ZTI1YTcyZTNmOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWQyMGMyYzQ3NjRjNjYxZmRmZDk1YjgyMDA4NTAwY2IyYjBmODViOTFlM2ZiOWVlMWM5NzhhYTZiMjNjY2I5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGNjMDlhYmEyNjM3YzBlMmMyZDJjMzMwYzJlYmQ1Mzk0NTNjYTk2YjIyYTNkMTVhMWI1ZTU0M2VhZGRjYTM0MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cc4f01153d7e492496ef660d5d16b76c",
+      "statement": "Billing readiness consumes the hand-typed `batch.progressPct` rather than attendance: `mapBatchRow` fills it from the stored `progress_percent` column with an `orZero` default, and `isBillingReady`/`billingGate` compare against that value, so the progress gate and the per-learner dropout signal read different sources.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L245-L245",
+          "version": "repo-lines-v1:sha256:e945e7c19965fc502bc724cc3aa1faa39774d53666cbebd69bb44351f03fc4c0:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTk0NWU3YzE5OTY1ZmM1MDJiYzcyNGNjM2FhMWZhYTM5Nzc0ZDUzNjY2Y2JlYmQ2OWJiNDQzNTFmMDNmYzRjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTk0NWU3YzE5OTY1ZmM1MDJiYzcyNGNjM2FhMWZhYTM5Nzc0ZDUzNjY2Y2JlYmQ2OWJiNDQzNTFmMDNmYzRjMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWRhNDJmYzdkODhmMGFlYWY0Mzc1YmM2YjRkN2VlMDFlYzFkYWIzZjdmNmY5ZWJiMTVlZjUxYTJiMDg2MTMzNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODI2NGFjMmMwZjBlYTAwNDkwNmU2YWM3MDc4ODljMGQ0NjVmMGZlN2U5ZTc3YjIxNTQyYzM4YzM0OWRkNDhlNyJ9"
+        },
+        {
+          "resource": "repo://modules/billing/domain/readiness.ts#L12-L25",
+          "version": "repo-lines-v1:sha256:da65fd4db465705cd7a3a83b5a7f2e6db51451d92e9ad11fe9639b12da0948e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4NzcxYWEwMmUzNDQ2ZDEwZGI0OGVlN2EyMmNmNzg5NGNlMzg2YThmZGUxZWQ1OWE5NjY3ZTIyZmMyYWYxNTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmNTA0ZDUwN2Q2MmQ0OTE5ZDRhZDlmZjQ4NDY3MmU2MzE3MDQ1MGJmOTUzMDA0OWRkOWI5ZTBlYzhhMDlkOWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0ZmU4NTk5MzJhZDRkYWQzOTkwM2FhYjk3NjZjZTIxNzAwODViNjYzMjBiNmJiNjdmZDQ0OWYyMTI2ZjZjNjUifQ"
+        },
+        {
+          "resource": "repo://modules/billing/domain/readiness.ts#L60-L69",
+          "version": "repo-lines-v1:sha256:dc0a6023e3536fecc6ee0e543879103326e5fd094fc2bcd1e45216c886f9543e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3YzUwMGY5Y2FmNmY3YzBmZGJkZTQ4OGYyZWE1ZDhiYTFjZWEwNjczZDdjNGRhMmI1ODJmNmQ4ZWRlMTM5ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1NTdhYzgyMWQ2ZGFjYTQ0Mjc3OWQxN2NlMWM4Y2M2ZjMxOWZkYzcwMmZhZmJmNDkzMDM5NWU4YjJjZTBlNDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiYzFhYzA5ZGE2YjgzODhlYzI4YzczMTQyYTEyMTYwMDcxODlkMDI5NzQ0MzQ5ZGZlYzI2YzRmNTYwNzlmYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a93ed2bf2d1b486eb0c026fc10351b1a",
+      "statement": "`getBatchLearnersSnapshot` returns every learner regardless of `is_active` and leaves the exclusion policy to the caller, which is the hook an eligibility signal would use to hide dropped scholars from a roster rather than a fetch-time filter.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L124-L148",
+          "version": "repo-lines-v1:sha256:e562570abaa17285ce5c62d6df699af1e74a1b3b77f8c81fa29a3e836cf80746:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ODkwNDlkOWFkYWFmMzNmYmIwMjMwM2VlMmFmMjExMWI2MmJhNzM4NmEzMjg3NDE5NDlmMTE4ZWM5YzAwYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxOWVjYzA2MTA2NmZmZDk4ZTVmYzBmNGUwYTMzMGUyZDFmNmJiNDI4YzNlODhmYjE3ZjBhNDE0Mzk3NDliMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NGZmZTBkYWE5NDZkMzhmYmIxZWQ1YjU5YjVhOWQxNjdjZmQ1ZmU2YTVmMzAyZGZiMTExMWE5NjdhNjNmNjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9e1b1354b30a4c7c9a9f48cecfc0608a",
+      "statement": "The attendance marking surface is a placeholder that only echoes `batchId` and states the later contract (verify the trainer is assigned before returning roster data or accepting writes), while the trainer dashboard is padding around a `MetricsRow` built from the batch snapshot with no attendance module import.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/trainer/classes/%5BbatchId%5D/attendance/page.tsx#L7-L28",
+          "version": "repo-lines-v1:sha256:e018823e416faecbb3fe01623fb59916bec5268a73272c2ff031025cdfb00f4b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNjZiYTE0ODAyNmQyODExYzVhNzBjNTY4NTU5Nzk5MDZhNjhmODY4ZmMzMmEyN2QyMDVmNzg1YjY4N2ZkMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4Y2FhNzllYjA3MjA1YTBmMTZmNzJkZGIxZGYwY2UwZjRjMjcwY2E4OWY2YjllZjZmYWY3MGE5NTc3MjE5YjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/trainer/page.tsx#L16-L28",
+          "version": "repo-lines-v1:sha256:17f5d33444a444a39785a2613a36ea6b3e65903ba6ad5046eeab318b9dd159b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwMGU5Nzg1ZmJkMWE1YzgxODkxNjU3MGViNGQxMDNiOTU1ZjQ0OTk1Yjg0ZTRjMWI2MzUzZDkxYjc4ZGM3NmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0NDliY2U4N2IwZmI0N2Q5ZDhjMzc0YTIzYzU4YmQ3MjRkMWUxODBhZWQ3MjdkMWM1NmZiMGU5OGM2ZGU1MDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9335d5203e2140fe8145cc53942e326d",
+      "statement": "The attendance and batch-progress logic that exists sits in `modules/batches/*` rather than the owning attendance module, so a builder moving it must respect import direction (rule 7), `data/` privacy (rule 8) and the no-business-logic-in-`app/` rule (rule 11).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L39-L52",
+          "version": "repo-lines-v1:sha256:553a11b87adf6b522d323d1e5e8669cb760f119443b4afd14c03cf29ba425e72:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjZWIyNDNmMDg3NTVmNzA1Y2ZlYTM3MjBhMjJiNzc3MDQyMzAyNmQzNWZhMzFiMmJmY2I0YWM2OGNhNWRjMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyNjFiYjBhZWQ0MDVhNDlkOTFkOTEwMTU2ZjA1MTIyOTFjOTUzZWYzODlmMzVhODlhMDU5MDVhNjdkNDY5YzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBkZmFkOTlkMjg3ZDk1MDMwNjBjNTczMWNkYzVjMWNiYTM5MTI4NTQzZGM3MmFkZGFmZTMwZjhjYjRmZWZmODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllOTZlNjFiMTBmN2ZiYzcwODA4OTY3YzdiNGNhNDIzMTcyODg4MTFlYzY1YWU1OGUyMDBkYTQ3OTgxY2FmMzIifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L110-L123",
+          "version": "repo-lines-v1:sha256:e8478dccba67d9ff6721e628e25a4d1b41c9b3c68216d9cbc2b0a8290d075f0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYThlMTNjYjJmY2E0MGFlZjNiNTA0NzUxZmRhZDMyZGMyNWQ3Mzg5ZGZkZGYxZGM3NjI2OWMxNWY1Nzk3OTIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-18T03:56:44.398Z"
   }
 }

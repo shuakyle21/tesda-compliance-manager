@@ -1,0 +1,4 @@
+# Files
+
+- [Live Supabase, the Migration Ledger and Applying a Change](live-supabase-and-migrations.md) - Operating the one hosted Supabase project with no staging — the rule 36 permission gate and how the refusal is wired, how to read the migration ledger and confirm objects by name, why a filename must match the recorded version, the two standing unapplied-file hazards, why dev seeds never become migrations, and the order in which a landed migration is reconciled into types.
+- [Verification Loop and Test Strategy](verification-and-test-strategy.md) - The ordered tsc → lint → test loop, what CI actually runs and what it still skips, why Node 22 is a startup requirement, how specs pin the clock instead of reading it, what the one permission-gated Playwright spec proves, and the boundary the suite never crosses — mocked I/O and a non-existent RLS suite.

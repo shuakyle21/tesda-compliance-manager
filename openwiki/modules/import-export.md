@@ -1,228 +1,253 @@
 ---
 type: module
-title: CSV Import and the T2MIS Layout
-description: The learner intake pipeline and the T2MIS header contract — the pure RFC 4180 parser, header/row validation, the single-batch rule, ULI-keyed reconciliation, the typechecked-only importLearnersCsv write path, and the overlay ImportCsvModal that states "not available yet" and nothing else. Also owns the 48-column T2MIS layout the report export consumes.
-tags: [import-export, csv, learner-intake, t2mis, reconciliation, write-path, validation, uli, fr-10]
+title: Learner Import and the CSV Reconcile Path
+description: The FR-10 learner CSV intake pipeline — the pure RFC 4180 parser boundary, row validation into a draft, ULI-keyed reconciliation against the batch's existing roster, the explicit insert/update write plan and its discriminated outcome — plus the honest status (an overlay UI that is not wired, and a write path no live database has run).
+tags: [import-export, csv, learner-intake, reconciliation, uli, write-path, validation, fr-10]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
+    at: 2026-11-18T03:56:44.398Z
+sources:
+  - id: openwiki-source-6c5e30490a0c4602d7931405
+    resource: repo://docs/adr/ADR-001-billing-and-domain-model.md
+  - id: openwiki-source-bac9ca9767a57004b7fbd175
+    resource: repo://lib/supabase/database.types.ts
+  - id: openwiki-source-ad910b8b276ad30bfcde3f16
+    resource: repo://modules/batches/data/learners.ts
+  - id: openwiki-source-927476d5ce1369bdfbff408b
+    resource: repo://modules/import-export/data/learnerImport.ts
+  - id: openwiki-source-1a10f8eecf05684edce45bb8
+    resource: repo://modules/import-export/domain/csv.ts
+  - id: openwiki-source-4bbff9da266e44025f34a633
+    resource: repo://modules/import-export/domain/learnerImport.ts
+  - id: openwiki-source-db11994fd3a6b99fac496ccf
+    resource: repo://modules/import-export/domain/t2mis.ts
+  - id: openwiki-source-58478215433a32dbc8ee2b3e
+    resource: repo://modules/import-export/README.md
+  - id: openwiki-source-96569cd493431d4555cdd1d9
+    resource: repo://modules/import-export/ui/ImportCsvModal.tsx
+  - id: openwiki-source-1b98d4470d88d5f67c6f9e45
+    resource: repo://modules/reports/ui/exportXlsx.ts
+  - id: openwiki-source-7cb0b5f9c6ed9ed4128872a0
+    resource: repo://modules/shell/ui/Sidebar.tsx
+  - id: openwiki-source-10f9f8c998debff047489862
+    resource: repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql
+  - id: openwiki-source-d779956f2a715b2e3f40cf22
+    resource: repo://tests/unit/learner-import.test.ts
+  - id: openwiki-source-0a5743f3b49f658216da5228
+    resource: repo://tests/unit/sidebar.test.ts
+  - id: openwiki-source-9643403557bfc8e75aa7f9e4
+    resource: repo://tests/unit/t2mis.test.ts
+generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
 ---
 
-# CSV Import and the T2MIS Layout
+# Learner Import and the CSV Reconcile Path
 
-This module is FR-10 and it holds two things that are only loosely related: the learner **intake**
-pipeline (parse → validate → reconcile → write) and the **T2MIS terminal-report layout** that the
-export in [reports and T2MIS export](/openwiki/modules/reports-and-t2mis-export.md) renders. The
-layout is here, the workbook writer is there; that page covers the writing, this one covers the
-header contract and the whole import side.
+This module is the intake half of FR-10: a file comes in, becomes a draft, is reconciled against
+what the batch already holds, and is applied. The `learners`/`learner_details` write path is its
+centre of gravity, and everything before it exists to make that write safe.
 
-Nothing in `app/` calls the write path. The one UI file in this module renders a fixed
-"not available yet" panel. So the honest status is: **a complete, unit-tested domain layer and a
-typechecked-only data layer, behind a door that opens onto nothing.**
+**Status, stated plainly.** Nothing in `app/` calls the write path, and no write has ever run
+against tenant data — the T2MIS columns the parser targets are typed and unit-tested, not
+exercised. `ui/ImportCsvModal.tsx` is the only UI file and it renders one fixed "isn't available
+yet" panel. So: **a finished, tested domain layer, a typechecked-only data layer, behind a door
+that opens onto nothing.** The T2MIS terminal-report *layout* also lives in this module's
+`domain/`; the workbook writer and its triggers are
+[reports and T2MIS export](/openwiki/modules/reports-and-t2mis-export.md)'s subject and are not
+restated here.
 
-## What the modal actually is
+## The UI half is unfinished
 
-`ui/ImportCsvModal.tsx` is a client overlay with exactly one prop, `onClose`. It owns an Escape
-listener and a click-away scrim, both calling `onClose`, and renders an `EmptyState` reading
-"Importing T2MIS or BSRS files isn't available yet." plus "Nothing can be uploaded or saved from this
-screen."
+`ImportCsvModal` takes exactly one prop, `onClose`, plus an Escape listener and a click-away scrim
+that both call it, and renders an `EmptyState`: "Importing T2MIS or BSRS files isn't available
+yet." There is no file input, no column list, no preview, no result summary, no `unconfigured`
+branch. Nothing in it can reach `importLearnersCsv`, and `tests/unit/sidebar.test.ts` pins that
+by asserting the component receives *only* `onClose` and raises no toast — the toast plumbing in
+`SidebarOverlays` exists but sits unused for this modal, unlike `SettingsModal`, which gets props
+and an `onSaved`.
 
-Concretely, it does **not** have a file input, a drag-and-drop zone, a sample-file picker, a column
-list, a preview table, a result summary or an `unconfigured` branch. The earlier "three-sample picker"
-memory is wrong — the element is just an icon, a heading and a sub-line. Nothing in it can reach
-`importLearnersCsv`, and `tests/unit/sidebar.test.ts` pins that by asserting the overlay receives
-*only* `onClose` and raises no toast (compare `SettingsModal`, which does get props and an `onSaved`
-toast). A modal with no result channel is why the toast plumbing in `SidebarOverlays` exists but sits
-unused on this branch.
-
-It *is* reachable in the app shell, via a path that does not mention it: `Sidebar.tsx` maps the
-Operations list (`{ label: 'Import records', op: 'import' }`) onto `NavRow`'s `onOp`, which sets
-`activeOp` and renders the modal. `resolveOperations` drops that row entirely on a trainer route
-(`o.op === 'settings'` filter), so **Import records is office-only and a trainer never opens the
-modal** — the same boundary the learner read policy draws. `grep ImportCsvModal app/` finds nothing;
-the caller is `modules/shell`, not a route.
+It is reachable, via a path that never names it: `Sidebar.tsx` maps the Operations list entry
+`{ label: 'Import records', op: 'import' }` onto `NavRow`'s `onOp`, which sets `activeOp` and
+renders the modal. `resolveOperations` filters that list to `o.op === 'settings'` on a trainer
+route, so **Import records is office-only** — the same boundary the learner read policy draws. The
+caller is `modules/shell`, not a route.
 
 ## The pipeline, in order
 
-`importLearnersCsv(batchId, csvText)` in `data/learnerImport.ts` is sequential and each stage can
-end it.
+`importLearnersCsv(batchId, csvText)` in `data/learnerImport.ts` is sequential; each stage can end
+it. The write plan is `reconcile → split → insert step → update step → summarise`.
 
-1. **`isSupabaseConfigured()` gate.** Returns `{ status: 'unconfigured' }` immediately. Unlike a read
-   snapshot, `unconfigured` here means *disable the importer* — there is nothing to render.
-2. **`parseLearnerCsv`.** Pure. Returns `empty`, `missing-columns`, `multiple-batches` or `ok`; the
-   first three become `validation-failed` before any network call.
-3. **`validateRows`.** Pure. Splits rows into writeable rows and `RowError`s. If *no* row survives,
-   `validation-failed` with one `Row N: <reason>` string per row; otherwise the rejects become
+1. **`isSupabaseConfigured()` gate** → `{ status: 'unconfigured' }`. Here `unconfigured` means
+   *disable the importer*; there is nothing to render.
+2. **`parseLearnerCsv`** — pure. `empty`, `missing-columns` and `multiple-batches` each become a
+   `validation-failed` with a distinct message before any network call.
+3. **`validateRows`** — pure. Surviving rows are the plan; rejects become `RowError`s. If *no* row
+   survives, `validation-failed` with one `Row N: <reason>` per row; otherwise the rejects become
    `skipped` and the import continues.
-4. **Read the batch's `tenant_id`** through `supabase.from('batches').select('id, tenant_id')`. The
-   tenant is read back off the batch rather than accepted as an argument, so a write can never target
-   a tenant the caller could not already read (rule 2).
-5. **Read existing `(id, uli)` for the batch**, reconcile in application code, then insert the
-   unmatched rows and their details, then update the matched ones one at a time.
-6. **`summariseWrites`** grades the outcome purely from saved counts: `ok` when both steps finished,
-   `sync-failed` when *nothing* saved, `partial` — with real counts and the raw error — in between.
+4. **Read the batch's `tenant_id`** off the `batches` row (an RLS-scoped select) rather than
+   accepting it as an argument, so a write can never target a tenant the caller could not already
+   read ([rule 2](/RULES.md)).
+5. **Read the batch's existing `(id, uli)`**, reconcile in application code, split into `toInsert`
+   (`existingId === null`) and `toUpdate`, insert unmatched rows and their details, then update the
+   matched rows one at a time.
+6. **`summariseWrites`** grades from saved counts alone: `ok` when both steps finish,
+   `sync-failed` when nothing saved, `partial` with real counts and the raw error in between.
 
-An insert failure skips the update step entirely (`inserted.error ? { saved: 0 } : await
-updateLearners(...)`), so a broken insert never leaves a half-updated roster.
+An insert failure skips the update step entirely (`inserted.error ? { saved: 0, error: null } :
+await updateLearners(...)`), so a broken insert never also half-applies updates. The returned
+`LearnerImportSnapshot` is a discriminated union: the caller switches on `status`, and only `ok`
+and `partial` carry counts, `skipped` and a per-row `rowNumber`/`uli`/`reason`.
 
-**Failure modes.** `learners` and `learner_details` are written in *separate requests*, so there is no
-transaction and no rollback: `partial` is a real, reachable, persistent state. The escape hatch is
-that re-importing the same file converges — rows match on ULI, details upsert on `learner_id`. Raw
-database text (table, column, constraint names) also escapes into `sync-failed` and `partial`; the
-file carries a `TODO` to map it at the action boundary, which [rule 6](/RULES.md) requires and nothing
-does yet.
+Steps 1–3 and 6 are pure functions, which is why so much of the pipeline is directly unit-tested.
+Everything from `createSupabaseServerClient()` inward is asserted only as types.
 
-## The CSV parser
+## The parser boundary, and what a malformed row does
 
-`domain/csv.ts` is a hand-rolled RFC 4180 scanner (character loop, quote state, `""` unescaped to `"`,
-`\r` swallowed, `\n` ends the row, trailing unterminated cell flushed). There is deliberately no CSV
-dependency. `domain/` is pure (rule 14), so the parser sits beside validation rather than in `data/`.
+`domain/csv.ts` is a hand-rolled RFC 4180 scanner: a character loop with a quote-state flag, `""`
+unescaped to `"`, `\r` swallowed, `\n` ending the row, a trailing unterminated cell flushed, and
+all-empty rows filtered out. It is deliberately dependency-free, and it lives in `domain/` because
+[rule 14](/RULES.md) keeps `domain/` pure — so the parser sits beside validation, not in `data/`.
 
-`rowsToRecords` then keys each row by trimmed, lowercased header. Two consequences matter: lookups are
-case-insensitive, and when the T2MIS sheet repeats "Municipality City" and "Province" for provider and
-learner, the **later — learner — cell wins** the record key. The provider cells are simply lost to this
-import, which is correct because an import targets a batch the user already chose.
+That boundary is why **the scanner must never be reimplemented with `split(',')`**: embedded
+commas, embedded newlines and doubled quotes inside a quoted cell all survive the character loop
+and would shred under a split. A name written `"Dela Cruz, Maria"` is the everyday case, not a
+contrived one.
 
-## Two accepted shapes, one narrow write
+`rowsToRecords` then keys each row by trimmed, lowercased header. Two consequences: column lookup
+is case-insensitive, and where the T2MIS sheet repeats "Municipality City" and "Province" for
+provider and learner, the **later — learner — cell wins** the record key; the provider cells are
+lost to this import, which is correct because an import targets a batch the user already chose.
 
-The parser takes the narrow roster CSV (`Last Name`, `First Name`, `ULI`, `Assessment Result`) *and* a
-T2MIS "terminal" sheet saved as CSV. That second shape is wider than the database write, and the
-split is deliberate:
+`validateRows` rejects a row at the **first** matching reason, in this fixed order: missing
+last/first name → `uli` outside `/^[A-Za-z0-9-]{8,20}$/` → any `problems` collected during parse →
+ULI already seen earlier in the file. Three details carry meaning:
 
-- **`learners` write** — a fixed, narrow identity set only: `learner_no`, the four name columns,
-  `assessment_result` (plus `uli`, `tenant_id`, `batch_id` on insert). It is built from an explicit
-  literal, not a spread, so no sheet column can leak in.
-- **`learner_details` write** — the 23 personal/training/employment cells named in `DETAIL_COLUMNS`,
-  typed as a `Partial` so only filled cells are carried. Provider and qualification columns
-  (Region, CTPR, Delivery Mode, …) are dropped entirely.
+- A **blank `Assessment Results` cell is `pending`; an unrecognised one is a problem.** Importing
+  `Competnt` as `pending` would quietly understate the batch, so it is refused instead.
+- `problems` holds the parse-stage discovery of unreadable content — an unreadable date, an
+  unrecognised sex, an unrecognised assessment result — collected into one semicolon-joined reason.
+- A **ULI duplicated inside the file** is rejected so the database index is never the failing
+  element; only the later occurrence loses.
 
-That narrowness is why the pipeline never touches the wider sheet's provider half, and why the export
-can be far broader than the import without the two needing the same column set. When a file fills no
-detail cell, `writeDetails` returns before the query and a names-only import never touches
-`learner_details` at all.
-
-Details land in `learner_details` rather than `learners` because RLS filters rows, not columns:
-`learners` is trainer-readable for the trainer's own batches, so birth dates, contact numbers and
-salary would otherwise be one API call from any assigned trainer ([rule 5](/RULES.md)). The import runs
-as an admin/coordinator, who holds the `can_manage_tenant` write policy on both tables. See
-[data model and RLS](/openwiki/architecture/data-model-and-rls.md) for the policy map.
-
-## Validation rules and their ordering
-
-`validateRows` rejects, per row, in this order: missing last/first name → `uli` outside
-`/^[A-Za-z0-9-]{8,20}$/` → any `problems` collected during parse → ULI already seen in this file. The
-pattern is a soft shape check, not the TESDA ULI algorithm; `problems` carries the parse-stage
-rejections (unreadable date, unrecognised sex, unrecognised assessment result). A row rejected for
-content is skipped and reported, not silently imported.
-
-Three choices carry meaning:
-
-- **A blank `Assessment Results` cell is `pending`; an unrecognised one is an error.** Importing
-  `Competnt` as `pending` would quietly understate the batch's results, so it is refused instead.
-- **Dates accept `MM/DD/YYYY`, ISO and bare Excel serials** (`parseT2misDate` in `domain/t2mis.ts`,
-  bounded to serials 20000–80000 so an age or count is not read as a date) and normalise to ISO. Sex
-  normalises to `Male`/`Female` through a small alias map — the one `learner_details` column with a
-  `check`.
-- **A ULI duplicated inside the file is rejected** so the database index is never the thing that
-  fails. The second occurrence loses.
-
-Rows rejected here become the `skipped` list in an otherwise-successful `ok`/`partial` result. Only a
-file where nothing survives is `validation-failed`.
+Rows rejected here become `skipped` in an otherwise-successful `ok`/`partial` result; only a file
+where nothing survives is `validation-failed`. The `uli` on a `SkippedRow` is whatever the cell
+held, so a garbage ULI still shows the operator which line to look at.
 
 ## One batch per file
 
-The import takes a `batchId` and files every row under it. A whole-school T2MIS export spanning
-several batches would therefore be mis-filed whole, so a file whose `training calendar code` — or,
-failing that, `qualification program title` — carries **more than one distinct value** is rejected
-outright as `multiple-batches`, with the offending values named. There is no per-row batch routing.
-Splitting the sheet is the operator's job.
+The import takes a `batchId` and files every row under it, with no per-row batch routing. A
+whole-school T2MIS export would therefore be mis-filed whole, so a file whose `training calendar
+code` — or, failing that, `qualification program title` — carries **more than one distinct value**
+is rejected as `multiple-batches`, naming the values. Splitting the sheet is the operator's job.
+(ADR-001 R2/R-S1 describe a richer single-file commit and a parse → enrich → commit wizard; what
+ships is the narrow single-batch form.)
+
+## Two accepted shapes, one narrow write
+
+The parser accepts both the narrow roster CSV (`Last Name`, `First Name`, `ULI`, `Assessment
+Result`) and a T2MIS "terminal" sheet saved as CSV. The second shape is far wider than the write,
+and the split is deliberate:
+
+- **`learners` write** — a fixed identity literal only, built explicitly rather than spread, so no
+  sheet column can leak in: `learner_no`, the four name columns, `assessment_result` (plus `uli`,
+  `tenant_id`, `batch_id` on insert). The update literal carries the same column set without the
+  keys.
+- **`learner_details` write** — the 23 personal/training/employment cells named in
+  `DETAIL_COLUMNS`, typed as a `Partial` so only filled cells are carried. Provider and
+  qualification columns (Region, CTPR, Delivery Mode, …) are dropped entirely.
+
+Because `DETAIL_COLUMNS` is a `Partial`, a names-only file never touches `learner_details` at all:
+`writeDetails` returns before the query when the details object is empty.
+
+Row fields are read into a draft (`ParsedLearnerRow`) and only mapped into insert/update shapes at
+the query site; the authorisation argument for the details table — RLS filters rows, not columns,
+so a trainer's `learners` read would otherwise expose birth dates and salaries — is
+[data model and RLS](/openwiki/architecture/data-model-and-rls.md)'s topic. Date and sex
+normalisation (`parseT2misDate`, a sex alias map, the deliberate absence of `CHECK` on coded
+values) belongs to the shared T2MIS layout and is covered on
+[reports and T2MIS export](/openwiki/modules/reports-and-t2mis-export.md).
 
 ## Why reconciliation is application-side on ULI
 
-`reconcileWithExisting` matches each valid row against the batch's existing learner ULIs and returns
+`reconcileWithExisting` matches each valid row against the batch's existing ULIs and returns
 `existingId: null` for inserts, an id for updates. It is a `Map` lookup, not a database upsert,
-because **no index exists that supabase-js `onConflict` could target**. `learners`' unique constraint
-is `(tenant_id, batch_id, learner_no)` — and `learner_no` is optional and absent from most source
-reports. Migration `20261111120000` adds `learners_tenant_batch_uli_key` on `(tenant_id, batch_id, uli)`,
-but it is **partial** (`where uli is not null`), which still excludes it as an `ON CONFLICT` target.
+because **no index exists that supabase-js `onConflict` could target**. `learners`' unique
+constraint is `(tenant_id, batch_id, learner_no)` — and `learner_no` is optional and absent from
+most source reports. Migration `20261111120000` adds `learners_tenant_batch_uli_key` on
+`(tenant_id, batch_id, uli)`, but it is **partial** (`where uli is not null`), which still
+disqualifies it as an `ON CONFLICT` target.
 
-Two invariants follow and must hold together: reconciliation is **inside one batch**, so the same ULI
-at another school inserts rather than colliding (ULI uniqueness is by value across tenant-scoped rows,
-not a shared row — ADR-001 Q1), and the in-file duplicate rejection above keeps the write from ever
-failing that partial index. ULI is also required per row for the same reason: a row without one can
-never be reconciled on a re-import.
+So ULI — the permanent learner key, ADR-001 Q1 — is what makes a re-import idempotent rather than
+duplicative. Three invariants have to hold together:
 
-`learner_details` *is* an upsert, with `onConflict: 'learner_id'` against its primary key, one object
-per call. A single-object upsert updates only the columns it carries, so a sparser re-import never
-blanks earlier details. The id for a freshly inserted learner is recovered from the insert's
-`.select('id, uli')` keyed by ULI, and a missing link is reported as "the learner was saved but its
-details could not be linked".
+- Reconciliation is **inside one batch**, so the same ULI at another school inserts rather than
+  colliding (ULI uniqueness is by value across tenant-scoped rows, not a shared row).
+- The **in-file duplicate rejection** keeps the write from ever tripping that partial index.
+- ULI is **required per row**: a row without one could never be reconciled on a re-import.
 
-## The T2MIS layout
+UNIQUE plus an in-memory seen-set is still check-then-act: two concurrent imports into one batch
+can both pass `reconcileWithExisting` and race into the index. Anything keyed off name, row order
+or `learner_no` instead reintroduces duplicates. Updating `learners` one call at a time is a
+deliberate scale deferral — supabase-js has no bulk per-row update — written for a single batch's
+roster.
 
-`domain/t2mis.ts` is the single ordered source of truth for the sheet: 48 `{ header, value }` columns,
-TESDA's strings verbatim — including the trailing space in `'Province '` and the two columns both
-called `Municipality City`, so do not tidy them. `T2MIS_HEADERS` is derived from it and
-`tests/unit/t2mis.test.ts` pins it against the file TESDA hands back, at 48 headers in order.
+**A matched row is updated, not skipped.** ADR-001 T2 says a re-import is an additive merge with
+"existing skipped, nothing ever deleted"; the shipped reconciler refreshes the matched row's
+identity and assessment columns instead. Since the update literal omits `uli`, `tenant_id` and
+`batch_id`, that set is fixed and nothing is ever removed (T2's "nothing deleted" holds literally).
 
-Because the layout is `domain/` and the writer is `modules/reports/domain/xlsx.ts` wrapped by
-`modules/reports/ui/exportXlsx.ts`, the export reaches it as a legal cross-module `domain/` import
-(rule 8) — a `data/`-to-`data/` import would have been blocked. `modules/batches/data/learners.ts`
-does the same for `ageOn`, so these helpers are a shared domain surface, not private to the import.
-The `isoToT2misDate` / `parseT2misDate` pair makes the two directions inverses, and a test round-trips
-an exported row back through `parseLearnerCsv` + `validateRows` to the same learner columns.
+## Failure modes and what they leave behind
 
-Producing the file is not a submission — TESDA SIS/T2MIS/BSRS stay authoritative (rule 27). The
-provider and qualification cells come from the export's own context, not this import: see
-[reports and T2MIS export](/openwiki/modules/reports-and-t2mis-export.md) for who fills them.
+`learners` and `learner_details` are written in **separate requests**, so there is no transaction
+and no rollback: `partial` is a real, reachable, persistent state. `writeDetails` runs per row
+after its learner row, and a details error stops the loop — rows already saved stay saved. The
+upsert's only real trick is that it is single-object: it updates just the columns it carries, so a
+sparser re-import never blanks earlier details. Raw database text (table, column, constraint names)
+escapes into `sync-failed` and `partial`; the file carries a `TODO` to map it at the action
+boundary, which [rule 6](/RULES.md) requires and nothing does yet.
 
-## The schema this depends on
+Reads are not separately guarded: a failed tenant read, a failed roster read and a thrown error
+all collapse to `sync-failed` with whatever message the driver or the `catch` produced. A batch the
+caller cannot see yields "Batch not found or not accessible." — a not-found and a not-permitted
+case are indistinguishable to the caller, which is the honest answer given RLS.
 
-Migration `20261111120000_add_t2mis_terminal_report_fields.sql` — new `learner_details` table, the
-partial ULI index, `tenants.congressional_district`, `batches.training_calendar_code` and
-`tenant_qualification_id` — is **APPLIED** (2026-11-11), and `lib/supabase/database.types.ts` was
-hand-written from it and checked against the live generator. Do not treat any of it as pending.
+Extension seams the code anticipates: per-row batch routing, mapped error copy, and (from the file
+header) being revisited if the pipeline ever takes multi-thousand-row files.
 
-Coded values (civil status, client classification, training status, employment classification) are
-plain `text` with **no `CHECK` on purpose**: TESDA's full value lists are not confirmed, and a wrong
-list would reject rows T2MIS itself accepts. Only `sex` is constrained, which is why the parser
-normalises it and flags anything else. Adding a `CHECK` here is a real behaviour change, not a
-tightening.
+## Scope boundary
 
-Details are also office-only on the read side, so a trainer-facing screen renders blank detail cells
-rather than partial data — see [verification and test strategy](/openwiki/operations/verification-and-test-strategy.md)
-for how the blank-vs-missing distinction is treated.
-
-## Scope boundary with the export
-
-This is an **internal working copy**, not an integration: `learners` + `learner_details` only. It does
-not create batches, link `tenant_qualifications`, write documents, evidence or `activity_log`, and it
-never deletes — "nothing ever deleted" is ADR-001 T2, and a re-import is an additive merge by ULI with
-no preview step (the PRD's mandatory preview is not built).
+This is an **internal working copy**, not an integration: `learners` + `learner_details` only. It
+does not create batches, link `tenant_qualifications`, write documents, evidence or `activity_log`,
+and it never deletes. There is no preview step, so the PRD's mandatory preview (ADR-001 T2) is not
+built, and none of the reconciliation logic — match on ULI, additive merge — runs before bytes hit
+the database.
 
 ## What is tested and what is not
 
-The whole `domain/` layer plus the one pure `data/` function (`summariseWrites`) is unit-tested across
-`tests/unit/learner-import.test.ts` and `tests/unit/t2mis.test.ts` — quoting, aliasing, the empty and
-missing-column gates, blank→`pending`, every rejection reason, the multi-batch refusal, the ULI match
-marking an update, and `ok`/`partial`/`sync-failed` from counts.
+`tests/unit/learner-import.test.ts` asserts the parser (plain, quoted-with-escaped-quotes, no
+trailing newline), header keying, `empty`, `missing-columns`, blank→`pending`, every row rejection
+reason, the second-occurrence duplicate rule, the ULI match marking an update, and
+`ok`/`partial`/`sync-failed` from counts. Note what the file *imports*: `parseCsvRows`,
+`rowsToRecords`, `parseLearnerCsv`, `validateRows`, `reconcileWithExisting` and the pure
+`summariseWrites` — nothing from the I/O half. **`importLearnersCsv` has never executed**: no
+Supabase env exists in this environment, and multi-batch rejection, which lives in
+`parseLearnerCsv`, is tested elsewhere.
 
-`importLearnersCsv` itself has **never executed against a live database**: no Supabase env exists in
-this environment. It is typechecked only. `tests/unit/sidebar.test.ts` renders the modal and pins the
-prop surface. You can tell the two apart by mechanism: every stage through `reconcileWithExisting` is
-pure and asserted directly; everything from `createSupabaseServerClient()` down is asserted only as
-types, which is why a policy, FK or constraint failure (a coordinator's write, say) would surface for
-the first time in production. Do not describe the write path as verified — it is not.
+A green suite therefore reads as "the rules work", not "import works". Every policy, FK or
+constraint failure would surface for the first time in production. Do not describe the write path
+as verified.
 
 ## Constraints on a change here
 
 - **Wire the modal before widening the write path.** The missing piece is a caller action: a file
-  input, bytes to text, `importLearnersCsv(batchId, text)`, an `unconfigured` disable, and a renderer
-  for the discriminated result. The batch to import into is not resolved anywhere today — the modal is
-  opened from a global sidebar with no batch context, so the wiring also has to choose one.
-- **Map the raw error text** to user copy at the action boundary (rule 6) before any human sees it.
-- **Keep hooks out of `domain/`** (rule 14) and keep `data/` the only Supabase layer (rule 10). New
-  columns must land in `learner_details` and the `DETAIL_COLUMNS` map, never on the fixed `learners`
-  literal, or a names-only re-import will start blanking data.
-- **Adding a column means a migration first**, then `database.types.ts`, then the parser map — and
-  the header test will pin any layout change.
+  input, bytes to text, `importLearnersCsv(batchId, text)`, an `unconfigured` disable, and a
+  renderer for the discriminated result. The batch is not resolved anywhere today — the modal opens
+  from a global sidebar with no batch context, so the wiring also has to choose one.
+- **Map the raw error text** to user copy at the action boundary (rule 6) before a human sees it.
+- **Keep hooks out of `domain/`** (rule 14) and keep `data/` the only Supabase layer
+  ([rule 10](/RULES.md)). New columns land in `learner_details` and `DETAIL_COLUMNS`, never on the
+  fixed `learners` literal, or a names-only re-import starts blanking data.
+- **Adding a column means a migration first**, then `lib/supabase/database.types.ts`, then the
+  parser map. The schema this depends on (migration `20261111120000`) is **APPLIED**; coded values
+  are plain `text` with no `CHECK` on purpose.
+- Finally, the obvious gap: **there is no test for the I/O half.** Anything added there should
+  bring one, or keep saying so here.

@@ -3,9 +3,6 @@ type: module
 title: Billing Engine and Packet Queue
 description: Billing as a document-generating engine — the pure rate reference, track and statement builders, the ADR-003 packet projection with derived due dates, and the threshold-signal versus compound-gate split that must stay separate.
 tags: [billing, packets, readiness-gate, statements, adr-001, adr-003, fr-09]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
 ---
 
 # Billing Engine and Packet Queue

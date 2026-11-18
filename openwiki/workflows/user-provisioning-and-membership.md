@@ -3,9 +3,6 @@ type: workflow
 title: "Workflow: From Invitation to Seated Member"
 description: The end-to-end path by which a person gains access — an admin-authored Clerk invitation carrying a namespaced role/school grant, the insert-only webhook insert that applies it, the RLS-gated seating of an existing user, the platform admin's first-member path, and deactivation on user.deleted.
 tags: [workflow, provisioning, invitation, membership, rls, platform-admin, deactivation, clerk]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
 ---
 
 # Workflow: From Invitation to Seated Member

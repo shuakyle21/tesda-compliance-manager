@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:c95db29689a1fa1076777a94971906e9899ff0f9c074d8b07fccb7af37828ed4",
+  "pageVersion": "sha256:2bfd13c281d8e56efaca9c47e2d16c51929bf1947ca3c7fa8bf2f04b7c9ddc38",
   "claims": [
     {
       "id": "claim_f8aa70f71bf344588d7e00824041e074",
@@ -98,7 +98,7 @@
         },
         {
           "resource": "repo://app/(dashboard)/tenant-scope.ts#L54-L69",
-          "version": "repo-lines-v1:sha256:5e499775b4ab2fdb1a295c1af472215699f7f6fab0da8636be1134773f4a27f9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+          "version": "repo-lines-v1:sha256:08f7bab475c99f532f56e280736120fb274be7c198f14f333332da2cce56cfa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
         }
       ]
     },
@@ -223,10 +223,106 @@
           "version": "repo-lines-v1:sha256:46f47978989d9efd72cdde828fc183350c539a3492cfc47e0ca04b1ee3e85125:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDU3MjVkZmI3MDY2NDdiMDJkNDkwNWQ3N2MxNjM2M2M5M2M4YmM0MzJiNGE3NDg4YmRiNTcyMzYxNDU4OGY4NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODI4YzUzNDI5MGI5ODJmNWMyYjYzNmEwMmZiMmYyOGNlMDZmYTdjOWUzNGVhMmU2NmE3MjZlNTU5MzRjYTM1YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGMzOTFkNTBiNTQ2ZTAzZWMyMzlkNjBmZWUxYWM5MDZjMmY1NWRiZDI3OTBlOTg1MTI0ZDZiMjViMTBhOTk1YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDBlOTI3NjY1OTY0OTBjZWUwMmFlMmJiNzM3MDBkYTViZjFjN2NkYTg2OWQ1OTBlOTg4MjZmZjdlYzljOTlkYSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_d13026757fba449f8a544538a7583686",
+      "statement": "`requireScope` performs the trainer redirect itself — after narrowing to the `ok` arm and `return`ing `null` on every other arm — by comparing `resolved.profile.role === 'trainer'` and calling `redirect('/trainer')`, so no office page starts its fetch for a trainer and rule 5's server-side omission holds structurally rather than per route.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L54-L76",
+          "version": "repo-lines-v1:sha256:08f7bab475c99f532f56e280736120fb274be7c198f14f333332da2cce56cfa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_86ab096ac59e4b53820b0a5650ad5425",
+      "statement": "The trainer gate is in the page path rather than the segment layout because a layout does not re-run on every client-side navigation, and it fires only after the `ok` narrowing so a trainer on a foreign school code gets the layout's 'School not available' state instead of a bounce to `/trainer`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L26-L28",
+          "version": "repo-lines-v1:sha256:f21e91c1f881159bd8f206252f0e8c14e2931c0bcb151dffde71aee095257119:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWEzZjc1MjA2NWQ3Zjg1MjM1ZTBmYmJmMWZjYzk3NzczNjk2NzAzZTdjMGYyMGI3OTQ2MTVkNjM4N2ZhNGFmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTE4ZWYyOWJkYmU5Y2MwY2QzODU0ODY0ODBiNjQzOTljZDkxNTg1OTVmNmJkMDc4ZjdjYjJkNmM2YTEwYzJiNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDRmYTNkM2ZmNzk5YzQxYTkwNWNhYmI4ZmRiM2VlY2M3ZTQ5YzAyNDdjNTM0ZTQ0MjEwMTdkNjJmZDUyZDEwOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmI4YzdmNjBjMmU5MWQxZWEwMThlMmIyYmJkNGVkMjhlNjU5MWFmZWJlNWFhYWEwMGFhZGNiNTZlZDViOTNlYSJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L63-L74",
+          "version": "repo-lines-v1:sha256:d3f0204419b3cb93c26425bc98d7ca23733ea46b8d3e7c1319f42bea7f990b7e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0YTYwMzEyM2MzOTY4YTczNTM1ZWU5YzBlNzg4NDVjYzZjOTAzMWZhNTBmM2NmM2FiNzc0NGM0MDVhYjliYzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxOTk4NWRlZGZiMWM1ZjIxNDU0ZDU4YzVlNzJiMDQxODlkYWVkZGM4MTY4ZDliOWQzNjNlNWU1MDNiNDU3OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjNTA5NmI2NzFlOTIxOTU5YjA5YTliNDFhNTVhZGJlYmEyYmU2ZDI3NmIwYTUyMGNiNGFhOGM3MWY2YmU3YTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1OTRlNDNiYjY5N2ZlYjU5NGVhMjZkOWUyNjUyYTBmZDFjYmY1NjU1OTU0MDA0OTUwNDgxYjZkZTU0Y2YxNWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_025a0fde273648cd93e6b84b35faf40d",
+      "statement": "Because `requireScope` already redirects trainers, the surviving `if (trustedRole === 'trainer') redirect('/trainer')` blocks in `billing/page.tsx`, `report/page.tsx` and the school dashboard are redundant second guards rather than the load-bearing gate.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L56-L59",
+          "version": "repo-lines-v1:sha256:01a139b94c806338f684674b9883bb52a3053f35acb0983650c16b72b9db0c15:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzI0YWQ0ZjE1ZGIyMjIyMThjZjhhY2VhODY4OWZlYjk5Mzk2YWI1MjI4MGYzZmI3YTllOWQ3NTI2YjQxZWMzNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGI3OWQxM2QwZTYwMDQ4MTM1MzM3OGYxYmFlODliYWQyNTAxY2NkZGViNjNiMTYzMTU1YjI3N2ViMzU0Y2U2MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjQyMmFlMWM2YzAxZTZiNWM5MzY1N2NmZjgxMzAxZTcxYmJlODc2NTljZTVkNTAzYmY2NjU5ZmRlOTA3NDVkNyJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L55-L58",
+          "version": "repo-lines-v1:sha256:01a139b94c806338f684674b9883bb52a3053f35acb0983650c16b72b9db0c15:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzI0YWQ0ZjE1ZGIyMjIyMThjZjhhY2VhODY4OWZlYjk5Mzk2YWI1MjI4MGYzZmI3YTllOWQ3NTI2YjQxZWMzNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGJmZTc5M2M4MDk1ZWFhMmNiMzAzYjE2ZjYyODZjOTFkNDRhYTdiY2FmMWZhMjg5ODNmODU3OTRiNzBjMDZiYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzcwZTM5MjdlNjc0YTc4YmYxMjUyZjExOTYzNDQ1YWVjNzQ3MWM1NjZhZjgwYzc1NTAzYzdiMjQzNTk3ZTkzOCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L74-L78",
+          "version": "repo-lines-v1:sha256:044c4a28b2d22a836bb64439980bc28099fd96aea76369d3e62dd7d5047a8385:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzMDhkNzY4ZjA1ZGViODAzODRlZTlkMWMyZWVjOTFlOGI5ODYxYTRhOGQ4MzIxYTQwMWRhYzA1NTk3OWUwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjhiYzAxNzM2ZGQ5YTE0NjI5YmM0NGI1YTFhMDY4MDI0ZDAwNDI0ODQ4MzE0Nzk2NmVlYTYwMDE3MzgyNjhjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWQxZDEzZjY2ZDhkN2Q4OWM5MTBlOWRjMzIwZWJhZDA1YTFkNzg1OWYyZTBjM2YxZmM0NTYzMWI1ZmVjZjA1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODZhZDM1OTZkNDAyNmM4MWQzMGI2NjRiMzY3NDlmZDgyNjBhZDVhNzkwMzhjN2M3MDEyNmJiNjA0NzNiNzVkNSJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L74-L74",
+          "version": "repo-lines-v1:sha256:819985dedfb1c5f21454d58c5e72b04189daeddc8168d9b9d363e5e503b45797:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODE5OTg1ZGVkZmIxYzVmMjE0NTRkNThjNWU3MmIwNDE4OWRhZWRkYzgxNjhkOWI5ZDM2M2U1ZTUwM2I0NTc5NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODE5OTg1ZGVkZmIxYzVmMjE0NTRkNThjNWU3MmIwNDE4OWRhZWRkYzgxNjhkOWI5ZDM2M2U1ZTUwM2I0NTc5NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE3MGYyMzg0ZjBiY2JmZGMxNmUzYzIzZTFhNGMwZWJmZjE0ZWRiOGIxZDY1NTQzM2E2MTc1ZjExYTNiZjQyMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDU5NGU0M2JiNjk3ZmViNTk0ZWEyNmQ5ZTI2NTJhMGZkMWNiZjU2NTU5NTQwMDQ5NTA0ODFiNmRlNTRjZjE1YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_31d75558a8e847c295c99d55a4c30fd3",
+      "statement": "The trainer gate survives a `?role=` override: a real trainer requesting `/t/<school>/billing?role=admin` is still redirected, because the redirect reads the database role while `?role=` only reaches `resolveRouteRole` → `toOfficeRole`/`resolveDisplayRole` on a page already rendering; gating the redirect on `resolveRouteRole` is what would break it.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L51-L67",
+          "version": "repo-lines-v1:sha256:d2b59051b94abdff51944c40ca7fd73ac0a1bf9cc89a009cc0b3b03955efa594:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWIyYWZmODFmZmZjZmYwZmIzNmFkZjJiZGI3Njk3ZTVkY2JhMDE4MzRkN2ExMGQ4ZjU2ZGQwZjliZWJmNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlMjhhMGIyMWMzYjNmZTVjYTU0NTYyMDFmOTYzYmRmNDM5NzQ2ZmMyMTA4YmYxNjllNDZlOTY2Y2ZiMTM3OTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhNWFmMTdmZDlmZDI0OWEwYjU3ZGRjMDcwZDBlMjVmYzU5MjRmM2M1ZjU0YTllZjQzOGYyMTU5ZThlOTI0NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MGUzOTI3ZTY3NGE3OGJmMTI1MmYxMTk2MzQ0NWFlYzc0NzFjNTY2YWY4MGM3NTUwM2M3YjI0MzU5N2U5MzgifQ"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L58-L65",
+          "version": "repo-lines-v1:sha256:fd0901918b559a178c1e4b8d48c4e1f7ce46549f63cb1313b756244492daa69e:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjNhNjkzYjYxZGYyNDYwMDY4YWY1ZTU5MDJhZWRlNjZiZGI2YTMzMGFjYWZlNTI1M2Y2NTZjMjc2OTZkNGU3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWFmN2M2N2UwNGMyOTcyODZmOTI4MmRhMGZlYTVkNGI0NjMxZmY2NTU5Y2FhM2U3MTZiNmZlY2IwN2U4YzNkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODViYzUzZGUxOTBkNjIwN2RkNzEzNDE3M2VkZDAxMzE5MzQ2YzQ3OGU5ZmNiOGI4NTY5NWZjYmQyZWU4YzYzZiJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L80-L82",
+          "version": "repo-lines-v1:sha256:861138139bef2470a343e4ca350c0fb2bd322abc7829e2ab1becd490b055966f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc4NWViZjE1ZmU0NTM2YWVjMGRjZWZmYTUzODc4MDE4YzI1Mjk1ZDk2ZWEzZjJmYzQxY2FjNjM2Y2Y5OGMxOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2MxNDgxOGFhMzg5OWNmMGI0MzZjOGRkZmNjOTJmNzJkMDBhMjI4MGI0OTc5ZThjODI0NWNmYmU0MTY0NmE1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmYyOThjZjFkYzA1MjE4NzJiNjg1ZDZjNzVhZWMwOTJlYzE1MTBiZDYzNzA1ZjkwOTg1ODVkZGUwZDljNzZjYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzc5MjllOTFlMGY5OWMzZTgyNWRlNjliNDM1ZmI2NDg0ZDFiMGExZGYyZjQ2NTYxYWJmMWEyOWYwNDE4OGI4OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_66c7c5d2951e49878ae1a105311333f9",
+      "statement": "`resolveDisplayRole` picks a presentation variant, preferring a recognised `?role=` office role and otherwise narrowing the trusted role, so `?role=trainer` cannot select a trainer variant; `tests/unit/display-role.test.ts` pins that alongside the least-privilege `viewer` fallback.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/data/role.ts#L67-L83",
+          "version": "repo-lines-v1:sha256:57ff49e61fc8b200f0a46b29aa94bd7807a4eb0403193804b9cdffa9c4f9709b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhNjFjNThiOGNjY2YyMmY2MDQzMzVhNzI2YTZjODdmY2NkZTE5OTA4NmUyY2NhYzk5Y2JiYzYyMDQyNzg1NDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjYjlkZThhMDZjYmIzNzZkODQ0NDEwNzUyZDAzZjQyM2FhOGYzZmE1MDhiOWVlN2E1MWI2OTM1N2NlYzQzNjIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/display-role.test.ts#L36-L58",
+          "version": "repo-lines-v1:sha256:d5fa39a7924ee2ba87c0361a47f49447d75d4c7f5ba8a05620b6e68a5a77958a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhNGJjZTZlOWMxNmM1ZmYyNTVhODI2MjExODg2ZmFiMjJjZTE3MmQ4NTU3ZTM0ZmY3ZmU2Y2Y4ZDQ0YzNlNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMzY2ZDNjNWFiNDE2YzM5NDEzMjMzNTZhNDQwNTc4NmJhZDBhNTNiYmU5YjBjNDJkZTUwOTI4Yjg5MDYwNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZTUzZWU3MWY2MWNlZWVkMjMzYjZkZjM3NGVlNmY5ZmUzZTFmYjhkNmNiNDA2ZmM5YjZhZTUzZWE1ZjY4OTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_69a8184e49d14251b2e8b98b6d0d1906",
+      "statement": "Screens holding a profile from `requireScope` fold `tenantAccessOf(profile)` into `withTenantAccess`, start with the `if (!resolved) return null` guard, and derive their render role from the trusted role (`toOfficeRole(await resolveTrustedRole(profile.role))`) with no second profile read — all eight pages under `/t/[tenantCode]` call `requireScope`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L27-L36",
+          "version": "repo-lines-v1:sha256:0c6e07e7d7a6ba6431c540267355d6c53508acbdcf4e29ac24456ef8ee3cfd7b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1MzA4ZDc2OGYwNWRlYjgwMzg0ZWU5ZDFjMmVlYzkxZThiOTg2MWE0YThkODMyMWE0MDFkYWMwNTU5NzllMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3OWZjYWZhNzcwNWVkY2RlZTk2M2Y5OTg0ZDFhNTAzYWIwYWJjMWNiN2ZjY2JlZTcxYTg2ZDJlMjBhNzgzYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNWM5ZjQyOWY1Zjk4NjlkNTU4MGFiN2M4YTZkM2Y0ZWI2ZWUyYjI1ZjZmMDhmMjI5MjczZjFiNTUyYWJlNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEyNjE0OWY2ZDM1ZjZkNjYyMmY0YzcyNDlmZWFiNmZkYTZkNTIxZjc3MzczNDhhZDQ3N2Y2MzNkMDYxOWI2OTQifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx#L17-L37",
+          "version": "repo-lines-v1:sha256:0103524951e51075fc381e9744e68e1632fabf6a5c0d703849bc25309b17c9cc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1MzA4ZDc2OGYwNWRlYjgwMzg0ZWU5ZDFjMmVlYzkxZThiOTg2MWE0YThkODMyMWE0MDFkYWMwNTU5NzllMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5ZDYwNTEyYjM0NTk5ODUxMTNiZmYyYzY1M2RlNjI5MTAyMDc3YjBjYWI1ZGQ4ODVmNWYyODM5ZTVjZWViYTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0NTcyYmQ1OWUxODU2MjA3ZDBhZTc1NzBjOWU5NmIyNTIxOGFlY2Y0NTQzYzEzZmUwMGVlOTYyYTQwMjEzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjNzZlYzg5MGVkYTBmZTk5YjY5NzgwOWM5YTQzZTU3YzllNTAyOTQ2NmFmYzUzZjZkOGZkNWM0ZjEwYjJiZTQifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L34-L35",
+          "version": "repo-lines-v1:sha256:6046e54b0d4a2a97ce34f8939981c261a854b1192651f129e8ded01d502f4f77:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQwMzM1ZWRhNTM1NzY5NDFkZWUzNGMxYzNkNDhlYmY1NDI5ZGFlZGM1NzhhZDQ2YmJiMThkOTgyOWM1ODcyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmJhM2JkNDIyMTgxOTY5ZGZjZDEzZTc3MjlhYTNkNDdjY2I2ZDQ1OGFkOGQ3NmJiNmIzNWRjNDUzMTFlMWY0NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTU2Y2MyNGNhMDhiZmY4ZGU5NThhZDRhZGFkZDA5YWEzYzVjZjVhZGU0YTU3ZjMwYTFjYzI0MTAzYmQzMWUzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDdjODM2ZGRlNTNkZmI3MWQyZGJmM2I0ZDJhMTVmMjc4YzA2MjQ0YzJkNjFjZWFmZDk4MTA0YzZlYTUxMDYzOSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-18T03:56:44.398Z"
   }
 }

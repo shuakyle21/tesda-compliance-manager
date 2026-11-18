@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:821d2054db0767a1c58bfd39235186e6ed427503a09b6e80d0853c8fd152d227",
+  "pageVersion": "sha256:97da79c6d3be7378e7fe79bf5f694608501d4f08c0b972294f2b37a4810af10b",
   "claims": [
     {
       "id": "claim_f05fdeb46da34086b89b610ff879ab14",
@@ -168,7 +168,7 @@
         },
         {
           "resource": "repo://app/(dashboard)/tenant-scope.ts#L54-L69",
-          "version": "repo-lines-v1:sha256:5e499775b4ab2fdb1a295c1af472215699f7f6fab0da8636be1134773f4a27f9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+          "version": "repo-lines-v1:sha256:08f7bab475c99f532f56e280736120fb274be7c198f14f333332da2cce56cfa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
         }
       ]
     },
@@ -381,10 +381,136 @@
           "version": "repo-lines-v1:sha256:15a4e1f06e00a3ec144a275936eb98f286191116db63089fc83588c77ba5fd52:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3MmRhZjE1YzAwYjgzMDI2ZTBkYWU2MWFhY2ZhYTZkMTc0YzQ4N2M5MWFlMmM2NmViYTE0ZTIyOGY5MWVkYzIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_90645e41060d46f49231920657305ee9",
+      "statement": "GET /api/openapi.json performs its own getAuthUserId() check and answers 401 without a session; POST /api/webhooks/clerk has no session check because Clerk signs the body and verifyWebhook rejects a bad signature with 400; GET /api/health is unauthenticated on purpose for probes; GET /api/debug/auth-check is deliberately dev-only (404 in production) because it returns the raw Supabase and token detail RULES rule 6 keeps out of the UI. A new /api route gets no upstream gate, so it must carry its own.",
+      "evidence": [
+        {
+          "resource": "repo://app/api/debug/auth-check/route.ts#L9-L27",
+          "version": "repo-lines-v1:sha256:92d4b73dd26377beb4ed32a90c619b017b82986e25df226e50993ba1d38e650c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmNjY3ZjhhODFmOTBhN2VmYWU0NmNkNTE1YTU5N2M4OTcwMGViZGI0NTEyNGRiMWZlM2Y0NjFlN2Y2NmI4ZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExODIwNjc4NWM1Yzk4YzQ3ZDJkN2MzYzBiNjNiMGRiM2MxMGU1NTI0ODJkZWIzNmU1ZWFmZmIzYzEzNzczMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmOWY2NzRmODgwMjZiNzhlODY3OTRmMWE5YTk4YTE0ZDI0MDgzN2Y3ODYzZjdlZjMxZTkyNTM2MTdlNDNiNzUifQ"
+        },
+        {
+          "resource": "repo://app/api/health/route.ts#L3-L5",
+          "version": "repo-lines-v1:sha256:3986eb2ff73c954cdd285d1a49261ba33d687b0ab83abcc24765933358139bb8:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTQ3YjA3MDQ1OWM5MmYxZmQ1ZTdmZGQxZTBiNzQxYjFhNDkzOTY0YmJhYjRhZjQ3NGE1OWQ3ODdlYTY0YjlmNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2QwNWJmNDU0NTc5NjQ4MGUwY2VhNGQ2ZDE3ZTBmYTZhODBkYTkwM2ZkOGNkMDZjMTk1OTQzYjg2MjViN2JkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://app/api/openapi.json/route.ts#L5-L11",
+          "version": "repo-lines-v1:sha256:34986ed3ee572e077e51e515f2ed8424f4fa690b7373e5fcb7ea18249a69dc81:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjg0YWFhMTdiOTJiNjY4MTY3ODc3OTQyMGNlYzJkNWRhN2YxMThjNmFjYjk2MTQyMDM5NmZkZWFiMGY0MTVhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDM1YzQ2Njk3Mzk1NzMxMTU1NDc0NTRkMzQ4ODFhYzFjMTEwODY4ODk2MzZlMGIwNTQ3ZTA2NDRkMDM2MjhlNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://app/api/webhooks/clerk/route.ts#L8-L26",
+          "version": "repo-lines-v1:sha256:9a015db57e3bb0f19b955fffeb69e934b2f8a5a829e52246eb78dab2fe8b4bca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjNmUwZTcwOWU3YzU1MjFjODM5NmEyYzg0Yjk3OWE0NDQyNzlhNTlmMDdkODBiMzdlYjVhOWJlMzQ4ZjgwMzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExMzZkYWM3YzMyNDAwMWE3N2ZkODNkZDI1ZWEyYjYwMTU3NjkyMDc2MTBiODg0ZGQyMDI4OGNiNDU2NmY0YjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b9af80ccc1247af8e406457b69c99ab",
+      "statement": "requireAuthenticatedUser() returns a string and never a nullable: callers get the Clerk id or the /sign-in redirect, so a page cannot continue with null. app/api-docs/page.tsx is the page outside the (dashboard) group that calls it itself.",
+      "evidence": [
+        {
+          "resource": "repo://app/api-docs/page.tsx#L4-L6",
+          "version": "repo-lines-v1:sha256:4e0272d908014bd0da175a5098d7ae48a516d869340141cb01124ff32ff497bb:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU2OWNkZGMyZDBlM2U3MzA5YWU3ZjJjODU2NTAyZDMyZWI0NjdhNjc5NmQ2ZTQ5Y2Y5ODJiZTEzYTYzZDYwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTk4NmY0OTQ3NTA2NGFlYTkwOTMyNTBlMTQ3NzI2YjQ2MWI5ZWYwNWNmZmEyMzNmYzA0NmRmOWVlMDhmODFhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGJlYjI0YWNiNWQ5YTdkMDBkNTRhNWRkYTZhNmJkY2FmMTM0MzYwZDU0NTI3NTM1Mzc3N2JkNzJjNDQxNjdjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/auth.ts#L18-L22",
+          "version": "repo-lines-v1:sha256:6dd0b8f3c373549355647376410cb511684c807ee101e010f9cf6bf7fc16ce39:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJlNzQyZWViMDAyZTliY2M1ZDc4ODQ5OTAzYzBmNWI0ZTE1N2NlYjdhODg1MDgxYmRmYjM0MGY2NDYzMTkxNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzVhYzY2NWNkYWQ4ZTIzZTYwZDEwYzk4MWI3MmQ4MTBiNmYyYTk2MWY3ODc3N2NlNzlmZTZiZWZlM2VlYWM4ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7555792add044ca59dc56483a320895c",
+      "statement": "The (dashboard) layout derives every nav input from trusted sources — resolveTrustedRole plus one getProfileSnapshot()/isPlatformAdmin() Promise.all — never resolveRouteRole, whose ?role= preview would let any caller conjure the admin-only row; isPlatformAdmin is a separate axis read from platform_admins via a security definer RPC because that table is unreadable through the anon client.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L18-L43",
+          "version": "repo-lines-v1:sha256:bfc7c529423dba02b29809ad3586a62e31dd1c6dd21c69b706b584f81fa824dd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlZDM2M2JhY2EwYmIwZTQ1YWE3Mzc5MzhjYWFmMWRjM2VmNWM0ODM2NTQ3YzYzNzU4MjBlMTZkOTE5NGE2MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZTVjOWJmOTYyNTBkYTc0MGQ2OTM4ZDBhNjY3OTY1OGJiZWJiMjUxM2FmNjViM2IxN2E4ZmY3MWJkZTcwMGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MDk5YTk5NjU4Mjc4YWQ3YzQ3NGNlODkxYzI5YzhhZWNhNGNlYWIyNWJkNTYzYmM4MDdmNWYxYzNjMmQxY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlY2U2ODAwZmE0NGYyZDI1MGRmMTUyM2I1ODNiYmE2ZDhiNmExMWE3Nzk4NjI5MWY4NDYxYTYyM2MyN2VhYTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3a884cc9cc449c78347ae3d9c531bb0",
+      "statement": "The (dashboard) layout renders no KPI row because a root layout does not re-render on client-side navigation, so a row there kept the previous school's numbers after a school switch; only the two dashboard pages render one.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L44-L47",
+          "version": "repo-lines-v1:sha256:b4c0894da663888b2c48dc4997923dfaf8b1b852bfdad6ab3315257b76363ed7:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZlNzM0ZjI5OWE2ZGVjNThjY2U5MzFjMTEyYTVhYTllNDYxNjJkY2Q5NTdlMzFiZTkxZDQwOTFhNDk2MThkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjk2ZDgxYjMzMjhiNGM4ZWRlZWJkYzlkN2E5YTAxMTY4NDNhYjUyMWJkOTYxNGQxZGZiNjczMWZlZDI1ODVhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzk3ZjRhOThkNDBmMTA5ZjE5YTFlZTM0YzAyOWQ5ZTBhZmYyOTQyN2I2ZmYyYjNjMDdiZGI2MGJmZjY4ZDVmNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDJjNTY1NTdkMGViYjhmMjc2M2ZkODVmZGI5YzE0ZjE5YzA4OGQyZTcxYmY1ZjRmMmZiOTM3NTg2ZDA4Y2IyMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d58c94a858b415a833e82eb31560bf9",
+      "statement": "requireScope redirects a trainer to /trainer once the scope resolves ok, before any page fetches, because these screens hand full batch DTOs to client components, which RULES rule 5 forbids; the check lives in the page path rather than the layout because a layout does not re-run on every navigation. The segment layout renders every non-ok arm because it is the only component in the segment guaranteed to run and to own a state instead of data.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L18-L49",
+          "version": "repo-lines-v1:sha256:4f0b5afe02c2df1ff3a0c04657221a1711dc3e341fd3512a3e21f84e6734d2f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwNzA4YjI2NDQ0NTkyYTVjNzFiNDk0MjJiMWNjZDYzZDQxMTA0ZmM5NDRlMWY2MGVkNjdiZjZjNzRiNTk3NmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkZTlmOGRlZTIzOGEzYjM0OTAxNTI4Yzc0MDdlMmMxOTk1MTRmYjE5NjU5ZGEzZWI3YWI0NDZkOTEzYzkxODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L54-L76",
+          "version": "repo-lines-v1:sha256:08f7bab475c99f532f56e280736120fb274be7c198f14f333332da2cce56cfa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d98dec6922f944aa9a3f5fecaa077ab1",
+      "statement": "Two routes outside the (dashboard) group are deliberately public and each authenticates its own caller: /sign-in and /sign-up must stay open or sign-in could not be reached. /sign-in composes the attacker-controlled redirect_url through sanitizeRedirectUrl, a pure function returning \"/\" unless the value is a genuine same-origin path; the traps it closes (absolute scheme, //evil.com, /\\evil.com, javascript:/data:) are all browser misresolutions, and tests/unit/redirect-url.test.ts pins each one.",
+      "evidence": [
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L39-L42",
+          "version": "repo-lines-v1:sha256:b925c0feef7e1e77f24424b4670fe9a6e46ae4d22ba6b1159d57f91a040508f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNlNDQ3MTU2OTE3YzljNjYyZTRiZWQ1NmQ4NDQyOTRmMjI1NTgzNDI1ZTZkY2NhMGNmZTE2ZjEwOGQxNDZiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDcwMGI5ZDdiNGZlMDA5YWZiNmFkZmFlZTc1ODcxYmZlZGZhM2Q2ZDJhZTExMGZhMmE0ZmVkYmJmZDUxOGUxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTM3MDY5NWUyNmUxNDFkMmRjNjVjOWE0NDZlNDcxZmU4YzFmZDVjYzQ5MzJlY2MxYzY2Y2Y2OGNkMWYyMjg5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODJmNTc0NGRmZDY1ZTZiNzA3NWE2M2EwMzY2ZjMyMmJjNDNjZjQ0ZjYyMjA4N2RkNWU5ZTlkNmQ5OGFkMDkxMyJ9"
+        },
+        {
+          "resource": "repo://modules/auth/domain/redirectUrl.ts#L12-L24",
+          "version": "repo-lines-v1:sha256:3ab1682226c5059164c64b64731cbbc4e834050e115e345fa56cebd54feb16f1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmY2NhZjVlZTdiYzE0MzFlZmQ5YjBkYzBhMWRlMWQ1NzFlNmUxZjdlM2Y4ZTY0ZTRkMGQyNGNjYzhkMWZjZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiMzY5ZDcwMjk0ZTgzNjRlNjliYmZhN2VkNTdmMDI5MTc3NTI0NGRmMjQxZGFlYWM3ODVlZDFmZmZhMzc0OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/redirect-url.test.ts#L20-L40",
+          "version": "repo-lines-v1:sha256:9a3807ba7ac6c7202781f4eaee82d7fcc81b70462fd701923dfca70c27e49d30:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViMGUzMjgwODA4OTU4YTVmNjFkNmJjNmIzZjU4OTU3OWM3Njc1NWU5MmViMzcxNjRjZWE4YWY3YmNlZDAzNWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3MTgxN2RlNGMyYjM3MDljOThjNDM0Zjk1NDJhZWM0Njg4MmM0ZmQyYTNmODAyYWVkMDkyNWZmMDAzMTVjYmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4MTdmYmI3M2M5MmIzNmQ1ZTQ4OTZmZjUxYzFiNThlZWMzMzBiYmU5NjFiYTA1ZmM2MjA1Zjg2N2VhMWJjZjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a17b57845cf840f4be88bd43d1b8e35b",
+      "statement": "redirectToDefaultScope re-appends every incoming search param value into URLSearchParams before redirecting back under /t/<default school>/<section>, so a deep link keeps its batch parameter; a stub that redirected with a bare path would instead drop the caller onto the section's default view.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L85-L99",
+          "version": "repo-lines-v1:sha256:e3f1b275936dd82506a54a849424a611423056d0a86914d71197dfea94f8bea6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMmUyZWU5MzFhMjEzYjFiNjI0ZTJhNmE3NzMyZTM1NThiMTg0ZTdhZDA3ZDA4ZjliNzdhNTY1NjYwZGY1YTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NGZkZmZhYmYwNzkwNTNjYWIzZWY4NzBhZTBmMDI0NDNkZDlhM2UxYmZjZTgzMTBjYmQ2OTQzY2VmNzBhNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzZmU1MWMxZmU0ZDdjOWI5YTcwMWZjZmU3MmExMTJhYzUwODZmMzQ4ZWQyOWIzZTUzODg2MmM3M2U4MjQzNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_adb5e1123e994aa5a1f64abb2fa751a0",
+      "statement": "/t/loading.tsx sits above the [tenantCode] layout on purpose: a loading file does not cover its own folder's layout and that layout awaits the school scope, so this skeleton is what shows during a school switch.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L25-L26",
+          "version": "repo-lines-v1:sha256:c3f719130a4e7e0cae7d69555b342fa1bfecdf4a6e37e2c37256eac2f912e88c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmI2NmU1NjQ1OWI4MWI3ZDE4YmIzNzY4MjNiYmJmODQ4ZGU4ZTE3OTA2Mjg5ZjRkYzcxYjVhYWI0NzJiZTAzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWEzZjc1MjA2NWQ3Zjg1MjM1ZTBmYmJmMWZjYzk3NzczNjk2NzAzZTdjMGYyMGI3OTQ2MTVkNjM4N2ZhNGFmNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWQ0MjlkNmU2MGUzMWI0MTkwMDVlMGYxOWMyOWM0YjhjYzk1ZDNkYjFiYThhMzYzMDMxZTdiZmJiNzNhMDRjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDJhNzBhZjQxMDlkMTgzZjkzM2ExN2E0MjhiN2ZlNDRlNGI0Zjg1ZmE0N2Q4MTU4MWJlNGNjODZmODJkNzM3MyJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/loading.tsx#L3-L7",
+          "version": "repo-lines-v1:sha256:f1ac4066af009adc6e5bb41ab30886c01513b183bb96d6e710ef2c13422b885f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVhY2VjMmI2ODE4MmY0NmU0ZTNlZGQ0MzNkODk3YjRjY2EzZmM5N2VlYmYyM2EzNTQ3NGY4ZTY4MzQ3ZDJmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzIyM2IxZGFhMjY1ZDg5Mjg5NjMwNjgxMzg5MDdkNjJhYTA3OGRkNGRmYzFlYzU1NmU3MTFlMWI5NjA0YTQ2ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_372c632b125c41dd98cd78f2ea3a0d56",
+      "statement": "tests/unit/session-exists.test.ts pins isSessionExistsError matching a session_exists code anywhere in errors[] and ignoring other codes and non-array throwals, the forwarding case the sign-in screen depends on.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/domain/sessionExists.ts#L9-L12",
+          "version": "repo-lines-v1:sha256:0dde28b5d8fc345be4a32d2bd7cb4e59927f8551ddf1d4cf0599fe0ad763781c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWViZGIxNTRmNTgyNThjZThkZWMzODVhNGE2NmJiYjk2MjE3NzJlZmE5OWQ2NTIwODAzMWIwZjA1MmMxNWNkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjhhMzVkMDVhNDg3MjJlOWY2ZGE3NTI1Y2JkNTdiNmQxNTVhNDM5MjI0MGJhZDQxNmY3YjZlOTMzMjZmZmFmNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/session-exists.test.ts#L4-L23",
+          "version": "repo-lines-v1:sha256:97a7255b814c619acd58caabfdafa094a72602b125a004ac38b4613a7c40531c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhYTJiMGE0OWRjY2M3ZTQyMGE2MjI1N2VlNDc5ZTI5ZGE1OGM0M2I4MDZiOTZkMjNmYzZiNDI4MDY4NmI0ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3ODU4Zjc2YTRjN2YwYjZlOTcwZjU3MTY2ZWM1ZmFiMzQxYTkyYzY5N2RlZjQ5OTA4YTdkMWQ1MWE5YjUzZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-18T03:56:44.398Z"
   }
 }
