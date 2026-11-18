@@ -4,6 +4,56 @@ The canonical schema is the single migration `supabase/migrations/20260528160300
 
 ## Implemented tables (base migration)
 
+```mermaid
+erDiagram
+  tenants ||--o{ profile_tenant_memberships : has
+  profiles ||--o{ profile_tenant_memberships : holds
+  tenants ||--o{ batches : owns
+  tenants ||--o| tenant_settings : configures
+  scholarship_programs ||--o{ batches : funds
+  scholarship_programs ||--o{ program_document_requirements : requires
+  scholarship_programs ||--o{ program_billing_rules : rules
+  scholarship_programs ||--o{ program_modules : defines
+  scholarship_programs ||--o{ scholarship_cost_schedule : prices
+  batches ||--o{ learners : enrolls
+  batches ||--o{ documents : evidences
+  batches ||--o{ batch_trainer_assignments : staffed_by
+  profiles ||--o{ batch_trainer_assignments : trains
+  learners ||--o{ attendance_records : attends
+  batches ||--o{ billing_records : bills
+  batches ||--o{ lamr_reports : reports
+  program_modules ||--o{ lamr_reports : per_module
+  lamr_reports ||--o{ lamr_outcomes : contains
+  lamr_outcomes ||--o{ lamr_activities : contains
+  lamr_activities ||--o{ lamr_entries : contains
+  tenants ||--o{ activity_log : audits
+  batches {
+    uuid id PK
+    uuid tenant_id FK
+    text batch_code "unique per tenant"
+    text rqm_code
+    lifecycle_stage stage
+    batch_status status
+    int total_sessions "snapshot"
+    int approved_slots
+  }
+  learners {
+    uuid id PK
+    uuid tenant_id FK
+    uuid batch_id FK
+    text uli "permanent key"
+    bool entrepreneurship_completed
+  }
+  attendance_records {
+    uuid learner_id FK
+    date attendance_date
+    bool present
+    bool excused
+  }
+```
+
+> Simplified: shows the main relationships only. The live schema also has `learner_details`, `learner_identities`, `qualifications`, `tenant_qualifications`, `trainer_credentials` and `platform_admins`.
+
 | Table | Purpose |
 | --- | --- |
 | `tenants` | Schools/TVIs (AKB, J3ED, NEN seeded) |

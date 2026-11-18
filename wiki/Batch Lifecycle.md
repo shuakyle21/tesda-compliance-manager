@@ -4,6 +4,27 @@ A batch progresses through internal lifecycle stages. The lifecycle is **interna
 
 ## Stages
 
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> aou
+  aou --> ntp: NTP received, RQM attached
+  ntp --> tip
+  tip --> training
+  training --> assessment
+  assessment --> billing
+  billing --> completed
+  completed --> [*]
+  aou --> blocked
+  ntp --> blocked
+  tip --> blocked
+  training --> blocked
+  assessment --> blocked
+  billing --> blocked
+  blocked --> aou: unblocked
+  note right of blocked: shown in the UI as pending
+```
+
 DB enum `lifecycle_stage`: `aou → ntp → tip → training → assessment → billing`, plus `completed` and `blocked`.
 
 | Stage | Meaning |

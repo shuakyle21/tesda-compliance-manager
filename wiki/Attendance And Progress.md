@@ -17,6 +17,18 @@ It is **not** time-elapsed and **not** manually typed. `total_sessions` = progra
 
 ## Eligibility (the single rule)
 
+```mermaid
+flowchart TD
+  S["scholar's recorded attendance rows, by date"] --> A{"absences > floor(total_sessions x 20%)?"}
+  A -->|yes| DROP["at-risk: dropout signal"]
+  A -->|no| C{"3 consecutive unexcused absences?"}
+  C -->|yes| DROP
+  C -->|no| OK["eligible"]
+  DROP --> M["registrar decides manually: learners.is_active = false"]
+```
+
+> **Superseded:** ADR-007 replaced the ≥5-absence rule below with the 20% / 3-consecutive rule shown in this diagram. Dropout is a computed signal, never an automatic write.
+
 A scholar with **≥ 5 absences is ineligible for allowance** — stored as `max_absences = 4` in program rules, tenant-overridable. No attendance-percentage rule exists; only the absence count. Evaluated **per scholar**; the same absence count also drives the TSF absence deduction (`absences × ₱160` on the final tranche).
 
 ## Urgency tiers (deadline engine)

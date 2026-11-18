@@ -4,6 +4,32 @@
 
 ## The auth chain
 
+```mermaid
+sequenceDiagram
+  autonumber
+  participant B as Browser
+  participant P as proxy.ts (Clerk middleware)
+  participant L as (dashboard)/layout.tsx
+  participant S as Server Component
+  participant C as lib/supabase/server.ts
+  participant DB as Postgres + RLS
+  B->>P: request /t/school/dashboard
+  P->>L: session context + x-pathname (no gating)
+  L->>L: requireAuthenticatedUser()
+  alt no session
+    L-->>B: redirect to /sign-in
+  end
+  L->>S: render route
+  S->>C: create anon-key client
+  C->>C: accessToken() returns Clerk session token
+  C->>DB: query with Bearer token
+  DB->>DB: app_private helpers read sub, check membership
+  DB-->>S: only rows the caller may see
+  S-->>B: role-scoped HTML / RSC payload
+```
+
+> Current wiring: Clerk's native third-party auth integration (`accessToken` callback). JWT templates were deprecated on 1 Apr 2025, so the `template: 'supabase'` step described below is historical.
+
 1. Clerk middleware (`proxy.ts`) protects everything except `/sign-in`, `/sign-up`.
 2. `lib/supabase/server.ts` gets a Clerk JWT via `getToken({ template: 'supabase' })` — a Clerk JWT template named **exactly `supabase`** must exist with the user id as `sub`. A missing template is a top operational failure mode.
 3. The JWT is attached as a bearer token on a supabase-js client created with the **anon key** — the **service-role key must never reach client code**.

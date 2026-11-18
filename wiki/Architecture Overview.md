@@ -2,19 +2,37 @@
 
 TVI-CAMS is a **single Next.js 16 App Router application** (React 19, TypeScript strict, Tailwind v4) that talks **directly to Supabase** (Postgres + Storage), with **Clerk** as the identity provider. There is no separate backend service; authorization is enforced in the database via Row Level Security ([[Auth And Tenancy]]).
 
-```text
-Browser (client islands: sidebar, modals, uploads)
-  ↓ HTML / RSC payload
-Next.js 16 App Router (Vercel)
-  - Server Components: fetch + role-scoped render
-  - Route Handlers / Server Actions: mutations
-  - Clerk middleware (route protection)
-  - lib/data/* contracts (fetch → map → derive)
-  ↓ Clerk JWT (template "supabase")        ↓ session
-Supabase Postgres + Storage                Clerk
-  - tenant-scoped schema, RLS (app_private.*)
-  - bucket compliance-evidence
+```mermaid
+flowchart TB
+  subgraph Client["Browser"]
+    CI["client islands: sidebar, modals, uploads"]
+  end
+  subgraph Next["Next.js 16 App Router on Vercel"]
+    PX["proxy.ts: Clerk middleware (context only)"]
+    LY["(dashboard)/layout.tsx: requireAuthenticatedUser()"]
+    RT["app/ routes: thin Server Components"]
+    MOD["modules/*: data, domain, ui"]
+    SA["Server Actions: mutations"]
+  end
+  CL["Clerk: identity"]
+  subgraph SB["Supabase"]
+    PG["Postgres + RLS (app_private helpers)"]
+    ST["Storage: compliance-evidence (private)"]
+  end
+  CI <-->|"HTML / RSC"| PX --> LY --> RT --> MOD
+  RT --> SA --> MOD
+  PX <-->|session| CL
+  MOD -->|"anon key + Clerk session token"| PG
+  MOD --> ST
 ```
+
+```mermaid
+flowchart LR
+  APP["app/"] --> MODS["modules/"] --> SH["shared/"] --> LIB["lib/supabase"]
+  APP -.->|"may fetch any module's data/"| MODS
+```
+
+> Import direction is ESLint-enforced. Code now lives in `modules/<domain>/{data,domain,ui}` (TES-68), not `lib/data/*` or `components/*` as the prose below still says.
 
 ## Key decisions
 

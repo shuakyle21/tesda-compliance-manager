@@ -33,6 +33,34 @@ The **absence deduction** (`absences × ₱160`) applies to the **final tranche 
 
 ## Readiness, generation log, and the "no ledger" rule
 
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> draft
+  draft --> ready: threshold reached AND tranche docs verified
+  ready --> generated: generate .docx (appends billing_records snapshot)
+  generated --> generated: re-generate after correction (new version)
+  generated --> submitted: user-asserted mark
+  submitted --> settled: user-asserted mark
+  settled --> [*]
+  note right of submitted: recorded by a person, not TESDA approval
+```
+
+```mermaid
+flowchart TD
+  A["attendance_records"] --> E{"per-scholar eligible? (ADR-007)"}
+  E -->|yes| T{"tranche threshold reached? 20 / 50 / 80%"}
+  E -->|no| X["excluded from allowance"]
+  T -->|no| DR["packet stays draft"]
+  T -->|yes| V{"all tranche docs verified?"}
+  V -->|no| DR
+  V -->|yes| RD["packet ready"]
+  CS["batch cost snapshot"] --> AMT["amount = rate x eligible scholars, capped by approved_slots"]
+  RD --> AMT --> GEN["generate from school template"]
+```
+
+> Packet states per ADR-003, which amends ADR-001 §4.
+
 - **Billing-ready** = threshold reached **AND** all that tranche's supporting documents verified ([[Document Checklist And Evidence]]).
 - Each generation appends a **versioned, append-only `billing_records` snapshot** — never overwritten. Attendance stays editable post-billing; correct → re-generate → new version (Y-hybrid).
 - **No envelope ledger / no over-billing guard** — the TESDA Provincial Office reconciles (NoLedger). `approved_slots` on the batch is the billable-pax cap ([[RQM And NTP Authorization]]).
