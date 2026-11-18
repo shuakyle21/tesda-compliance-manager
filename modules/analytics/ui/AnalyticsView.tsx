@@ -39,7 +39,10 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
     Remaining: Math.max(b.totalDays - b.currentDay, 0),
   }));
 
-  const ntpData = batches.map((b) => ({ name: displayBatchId(b), 'NTP lag (days)': b.ntpLag }));
+  // A batch with no recorded lag is left out — a null value draws a NaN bar.
+  const ntpData = batches
+    .filter((b) => b.ntpLag !== null && Number.isFinite(b.ntpLag))
+    .map((b) => ({ name: displayBatchId(b), 'NTP lag (days)': b.ntpLag as number }));
 
   // ADR-004: a batch that tracks none of the critical requirements is left out
   // of the ranking entirely — plotting it as 0% would read as a compliance
@@ -86,7 +89,11 @@ export function AnalyticsView({ batches }: { batches: Batch[] }) {
       <Col>
         <Card>
           <Title>NTP → Training start lag</Title>
-          <BarChart data={ntpData} index="name" categories={['NTP lag (days)']} colors={['amber']} className="mt-4 h-72" />
+          {ntpData.length ? (
+            <BarChart data={ntpData} index="name" categories={['NTP lag (days)']} colors={['amber']} className="mt-4 h-72" />
+          ) : (
+            <Text className="mt-4">NTP-to-start lag isn&apos;t recorded for any batch yet.</Text>
+          )}
         </Card>
       </Col>
       <Col>

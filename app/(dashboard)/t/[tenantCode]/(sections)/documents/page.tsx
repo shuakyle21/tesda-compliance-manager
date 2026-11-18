@@ -8,8 +8,8 @@ import { DocumentsView } from '@/modules/documents/ui/DocumentsView';
 import { NoTenantAccessState } from '@/shared/ui/NoTenantAccessState';
 import { tenantAccessOf, withTenantAccess } from '@/modules/tenancy/domain/access';
 import { requirementCatalogOf } from '@/modules/documents/domain/compliance';
+import { resolveTrustedRole } from '@/modules/auth/data/role';
 import { requireScope } from '../../../../tenant-scope';
-import { resolveTrustedRole, toOfficeRole } from '@/modules/auth/data/role';
 import type { Batch } from '@/shared/types';
 
 export default async function DocumentsPage({ params }: { params: Promise<{ tenantCode: string }> }) {
@@ -32,9 +32,6 @@ export default async function DocumentsPage({ params }: { params: Promise<{ tena
   // no catalog on any batch the matrix shows its "requirements unavailable"
   // state, never a fabricated compliance figure.
   const documentRequirements = requirementCatalogOf(batches);
-  // Trusted `profiles.role`, never `?role=`; least-privilege, so anything but
-  // admin/coordinator is read-only. Usability only — RLS refuses the write anyway.
-  const role = toOfficeRole(await resolveTrustedRole(profile.role));
 
   // The compliance matrix has no honest shape for someone attached to no
   // school: an all-blank grid reads as "your batches are missing every
@@ -43,13 +40,15 @@ export default async function DocumentsPage({ params }: { params: Promise<{ tena
     return <NoTenantAccessState subject="the document matrix" />;
   }
 
+  // Trusted role only (`profiles.role`); the PRD lets Admin or Coordinator verify documents.
+  const role = await resolveTrustedRole(profile.role);
+
   return (
     <DocumentsView
       batches={batches}
       documentRequirements={documentRequirements}
       syncFailed={snapshot.status === 'sync-failed'}
-      currentUserName={profile.fullName}
-      role={role}
+      canVerify={role === 'admin' || role === 'coordinator'}
     />
   );
 }
