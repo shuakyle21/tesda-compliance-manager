@@ -51,8 +51,10 @@ database built WITHOUT `20261117120000`: the security cases must fail.
 `profile_membership_concurrency.test.sh` covers section 8 of the migration:
 two admins of different schools adding the same unassigned person at the same
 moment. One psql session cannot show that race, so the script opens two
-(session A holds its transaction open for 3 seconds, session B starts 1 second
-later), then checks that exactly one membership exists and that session B
+and controls their order without timing guesses: session A inserts and then
+waits on a gate (an advisory lock a third session holds), the script starts
+session B and waits until B is seen blocked on A's lock, then opens the gate.
+Each wait gives up after 10 seconds with a clear FAIL. It then checks that exactly one membership exists and that session B
 failed with SQLSTATE 42501.
 
 ```

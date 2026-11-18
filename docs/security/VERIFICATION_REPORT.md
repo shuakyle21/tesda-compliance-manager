@@ -130,8 +130,11 @@ rollback file drops the trigger and function.
 |---|---|
 | `profile_membership_hardening.test.sql` with the migration | 91 cases, 91 pass (two new cases: service_role second membership allowed; trigger refuses an assigned person even when a permissive test policy lets the insert through) |
 | Same file without the migration | 91 cases, 48 pass, 43 fail |
-| `profile_membership_concurrency.test.sh` with the trigger | Pass. Session A commits, session B fails with 42501, one membership exists |
-| Same script with the trigger dropped | Fail. Both sessions commit, two memberships exist |
+| `profile_membership_concurrency.test.sh` with the trigger | Pass, 3 runs out of 3. Session B is seen waiting on session A's lock, A commits, B fails with 42501, one membership exists |
+| Same script with the trigger dropped | Fail. B never waits, both sessions commit, two memberships exist |
+
+The script orders the two sessions with a gate and a check on `pg_stat_activity`, not with
+fixed sleeps, so a slow machine cannot make it pass or fail by accident.
 
 Limits: the concurrency test ran on plain Postgres 16 at READ COMMITTED. Under REPEATABLE READ
 the second transaction would get a serialization error instead, which is also safe.

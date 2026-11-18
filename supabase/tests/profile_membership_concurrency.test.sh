@@ -3,8 +3,8 @@
 # 20261117120000_harden_profile_and_membership_policies.sql (section 8).
 #
 # Two admins of different schools add the same unassigned person at the same
-# time, each in a transaction held open for a few seconds. Exactly one must
-# win. The loser must fail with SQLSTATE 42501.
+# time. The script holds session A's transaction open with a gate and only
+# releases it once session B is seen waiting on A. Exactly one must win. The loser must fail with SQLSTATE 42501.
 #
 # A single psql session cannot show this race, so this runs two sessions.
 #
@@ -25,6 +25,8 @@ P_PERSON=ffffffff-0000-4000-8000-0000000000c3
 
 cleanup() {
   "${PSQL[@]}" <<SQL >/dev/null 2>&1
+select pg_terminate_backend(pid) from pg_stat_activity
+  where application_name in ('conc_gate', 'conc_a', 'conc_b');
 delete from public.profile_tenant_memberships where tenant_id in ('$T_A', '$T_B');
 delete from public.profiles where id in ('$P_ADMIN_A', '$P_ADMIN_B', '$P_PERSON');
 delete from public.tenants where id in ('$T_A', '$T_B');
@@ -46,24 +48,60 @@ insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default
   ('$T_B', '$P_ADMIN_B', true);
 SQL
 
-# One session: act as the admin, insert the person into the school, hold the
-# transaction open for $3 seconds, then commit.
-session() { # <sub> <tenant> <sleep seconds>
-  "${PSQL[@]}" -v VERBOSITY=verbose <<SQL
+# One session: act as the admin and insert the person into the school.
+# Session A then waits on a gate (an advisory lock held by a third session),
+# so its insert stays uncommitted until the script lets it go.
+session() { # <sub> <tenant> <app name> <gate: yes|no>
+  local gate=""
+  [ "$4" = yes ] && gate="select pg_advisory_xact_lock($GATE_KEY);"
+  PGAPPNAME=$3 "${PSQL[@]}" -v VERBOSITY=verbose <<SQL
 begin;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"$1","role":"authenticated"}', true);
 insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default)
   values ('$2', '$P_PERSON', false);
-select pg_sleep($3);
+reset role;
+$gate
 commit;
 SQL
 }
 
+# Wait (up to 10 s) until the session named $1 is in a wait whose
+# wait_event matches the SQL condition $2.
+wait_until_blocked() { # <app name> <condition on wait_event_type / wait_event>
+  for _ in $(seq 1 100); do
+    n=$("${PSQL[@]}" -c "select count(*) from pg_stat_activity where application_name = '$1' and $2")
+    [ "$n" = 1 ] && return 0
+    sleep 0.1
+  done
+  return 1
+}
+
+GATE_KEY=912345
 OUT_A=$(mktemp); OUT_B=$(mktemp)
-session user_conc_admin_a "$T_A" 3 >"$OUT_A" 2>&1 & PID_A=$!
-sleep 1
-session user_conc_admin_b "$T_B" 0 >"$OUT_B" 2>&1 & PID_B=$!
+fails=0
+check() { if [ "$2" = ok ]; then echo "PASS: $1"; else echo "FAIL: $1"; fails=$((fails+1)); fi; }
+
+# The gate: a session that holds the advisory lock until it is terminated.
+PGAPPNAME=conc_gate "${PSQL[@]}" -c "select pg_advisory_lock($GATE_KEY); select pg_sleep(60);" >/dev/null 2>&1 & PID_GATE=$!
+wait_until_blocked conc_gate "wait_event = 'PgSleep'" || { echo "FAIL: gate session did not start"; exit 2; }
+
+# A inserts, then parks on the gate with its insert uncommitted.
+session user_conc_admin_a "$T_A" conc_a yes >"$OUT_A" 2>&1 & PID_A=$!
+wait_until_blocked conc_a "wait_event = 'advisory'" || { echo "FAIL: session A did not reach the gate"; exit 2; }
+
+# B inserts while A is in flight. With the trigger, B must block on the
+# person's profile row lock that A holds.
+session user_conc_admin_b "$T_B" conc_b no >"$OUT_B" 2>&1 & PID_B=$!
+if wait_until_blocked conc_b "wait_event in ('transactionid', 'tuple')"; then
+  check "session B waited on session A's lock" ok
+else
+  check "session B waited on session A's lock (it never blocked)" bad
+fi
+
+# Open the gate: A commits, then B's trigger re-checks and sees A's row.
+"${PSQL[@]}" -c "select pg_terminate_backend(pid) from pg_stat_activity where application_name = 'conc_gate'" >/dev/null
+wait $PID_GATE 2>/dev/null
 wait $PID_A; RC_A=$?
 wait $PID_B; RC_B=$?
 
@@ -72,9 +110,6 @@ COUNT=$("${PSQL[@]}" -c "select count(*) from public.profile_tenant_memberships 
 echo "session A (school A): exit $RC_A"; sed 's/^/  /' "$OUT_A"
 echo "session B (school B): exit $RC_B"; sed 's/^/  /' "$OUT_B"
 echo "memberships for the person afterwards: $COUNT"
-
-fails=0
-check() { if [ "$2" = ok ]; then echo "PASS: $1"; else echo "FAIL: $1"; fails=$((fails+1)); fi; }
 
 [ "$COUNT" = 1 ] && check "exactly one membership exists" ok || check "exactly one membership exists (found $COUNT)" bad
 [ "$RC_A" = 0 ] && check "session A (first) succeeded" ok || check "session A (first) succeeded" bad
