@@ -1,0 +1,4 @@
+# Files
+
+- [Live Supabase and the Migration Runbook](supabase-and-migrations.md) - The loop for changing the one hosted Supabase project — rule 36's deny on everything that touches it (read-only selects included) and the introspection tools that stay allowed, the pre-push checklist that confirms objects by name and never by set comparison, why checked-in records are reconciled to the database and not the reverse, and the type-regeneration step left half-done.
+- [Verification Loop and Test Strategy](verification-and-test-strategy.md) - The ordered tsc → lint → test loop and the rule each command defends, why Node 22 is load-bearing, how specs pin the clock instead of reading it, what the one Playwright spec actually proves, and the two gaps — no CI runs the loop and the real-Supabase RLS tests do not exist.

@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:ac17d75da5462d7a1f341916617897d41a932e9062e717ed6f583bf23140dcdb",
+  "claims": [
+    {
+      "id": "claim_5d380d4e36b841ea8681616649f7c656",
+      "statement": "The batch pipeline is AOU → NTP → TIP → Training → Assessment → Billing (with the UI-only `entre` key), but the lifecycle is a display contract, not stored history: a mapper expands the single `current_stage` enum into done/active/pending so per-stage dates are blank until activity_log is joined.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L146-L193",
+          "version": "repo-lines-v1:sha256:30c462c954492cdfd9edfa20e121466c87703aeac9ad99127591de5c7bb74279:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiMGRmYWVhZDY3YmJiNGZlMDRiMzBjOTE3ZjQyODExODM1NzlkYThhYjliNDZlMjViYjJhY2Q1ZTY4YjZkMGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmY2E0NTk3YzEzNzRiNzQzZjZmYjFhNWI5YzBiZmUwYWI4OTdlMDBjODM3NzhiODNjN2FhZDRmODBlNGY1YzAifQ"
+        },
+        {
+          "resource": "repo://shared/types.ts#L12-L25",
+          "version": "repo-lines-v1:sha256:364647e9f0cc5e1bf07ef07455ff0497249a6318f3b8254eda236c61bf17cedb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0MTZlMWFjNWRkMWI0ODU4MDY2NGE4MDVlY2UxYWJlZTAzNjM3NGRlYjg3MGI5NWQwYjAwNjhkMTliZjcxZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwYjFiZTFmOGMzMDU3NmFhOGZlNTVhMDcyN2Q3ZTcxNmQwMDFiMDFkMGNhZDA4NGI5MDE1YWFkZTE2NjdmMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3MTFlZWU0MzllNjZkY2RiYzhhOTUxMWM4NzdlY2MyYTc5MjVhMmRjZjY4OTM2NWZmOWViNDM4YmRlNmE3MzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_25fb2ebc2bc24c48b99a608000a17e1d",
+      "statement": "Progress is attendance-derived: the mapper counts distinct attended dates and returns `completedSessions = null` unless both a snapshotted `total_sessions` and at least one attendance row exist, because PostgREST's empty embed `[]` means unrecorded rather than zero; `sessionProgress` propagates the null and the dashboard mean filters to tracked batches so an untracked portfolio reads null.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L105-L123",
+          "version": "repo-lines-v1:sha256:dcc69cafb77757871d2a9c4d6b688496256b11d89f72451ccefb33b13797de4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5NDBkM2UzNzc4NGZmM2RkM2E2NDU0NGEyNzU4ZWMwNmM5MDNjZDYyZGRhZmYyMDZhODdlNTJlNDNmMDU5OGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0MTM2MzdiYjJmYTViOGU5YzU2ZjlmY2U2MTBkNTc4ZDgxMmYyNTA5NDM1MTJlN2ViOWY5OWViOTE0ZjI2ZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYThlMTNjYjJmY2E0MGFlZjNiNTA0NzUxZmRhZDMyZGMyNWQ3Mzg5ZGZkZGYxZGM3NjI2OWMxNWY1Nzk3OTIifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L25-L31",
+          "version": "repo-lines-v1:sha256:b0780fcec77fe5f0921fa131351546502004f037cc5e6ed2100ed4ed3420fa60:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTAxNzIxYmEwNzNiMjAzNThjOWRjNWEwMmY4MWI2MGIxMWQ2M2IzODEyYjZkMTk5NmEzMmVhZTY5MGEyYWQwMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDAwNjA3ZmZmMjY1Y2IyMjhiZThjOGIzNGU3MDBjNTk4NmViZGMyNmNlN2MxMmQyNDNjOThiZTcyNzU5ZmI4MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTIyNmE4NGE0NDM0ZmNmMGVkMTI4NjUwYjQxZWU2MGFhODIyZGI5ZGQwNzkzZTM4MGVlNTE4NzIyNmRmZmU2NSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/domain/progress.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:f9502a17f2f301d7e09f5382b8e7028506d0b8f1d151052977a094effc3fa51d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_661d68905c574900b06ddfdfddd098f4",
+      "statement": "`total_sessions` is nominal program hours ÷ 8 snapshotted at creation and immune to later circular changes; `schedule_pattern` is free text that changes only how fast sessions are consumed, never the count.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L296-L302",
+          "version": "repo-lines-v1:sha256:485afd6dac56c71167cb5da0081e74e7f71d9f37c69088abf513ae80bb039865:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTBmZWJkZjZiNGRkZGQ1Yjg3ZDk1NjRlNzA2MWFjNjAwNzEyMmFkYWQ0Y2U5NWU5OTBmZjRhN2E3Mzg4ZDZmOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjQzZmZlMDExODczN2ExMTM0MTUzMzhlY2MzZmYzNDQ4ODU2MTA3ZDc3NjlhZGExY2UxYmVkYTU1ODViZDRmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjcyNjUwMjhhYjM4YWYxYWJjYWFiNDZkODFhNjZlZjVjYjExNzg3ZGRlYmEwYTUwNjJiZmE1MTNhYTJkZjk4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTRhMGQyZjAxMjEyOWY0MjY0ZDIxZTM5ZjdhY2ExMjljOWI3MTIyZmYyZGQxMTg2MzYxMzhiNjI0ZGRhODFiOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_41b97a05e55245a081a05368109a7663",
+      "statement": "`billing_records` is an append-only generation log enforced in the database, not by convention: the table has no `updated_at` and its RLS grants SELECT and INSERT with deliberately no UPDATE or DELETE policy, which is what makes a re-generation append a new version instead of overwriting.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L218-L252",
+          "version": "repo-lines-v1:sha256:a45ac2104edd9d3478f694ed78bddf52f8e011afa2a91549d3fce967f877881f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZTlmMTNiNmM5NGQ0NWQzN2MzZDYyNWY5MTI5YTY4ZmZhOTAzNGFiMGE5YzljODFiZjNiNTkxODM3ZWVjZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwYTRiMzYxMDBlYjYwMGE5MDE0MTg4YjllNmEzZGRiZTM0NDk3YWMwOTI0YzBhZTIwNWVjOTc1NWVhYWRiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyMGFmOWZmYmVmYTQ0Y2U3M2M4MWZhNTU0MzJmMzI2NDYxYjZjMjU1YjFiMmM4MGJlNmM0YzBiZmZlNzA2NTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlOWFkMWQyOWExNzFlMzgzZTdjOGI5NjY2ZWM1Nzg2NmNiNGNjMjY2NjRjMzQ4ZDc0NzAwNWJlMGU2Yjg2NzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5811a77f38f24311aae65078f5dba67d",
+      "statement": "`billing_type` mirrors `BillingTrackId` exactly with no assessment member, so the Assessment Fee billed by the Assessment Center cannot leak into the app and no enum bridge exists; adding a track requires editing both.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/tracks.ts#L1-L67",
+          "version": "repo-lines-v1:sha256:54144d161fd24fed522928325ab7001b1bbddca931d35460f5137a0fa0eaf777:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L80-L91",
+          "version": "repo-lines-v1:sha256:fe5de253636a3743cfa53b48faaa98648188aad9d8f253cf9c9c8bcc371a2835:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTllZTFhNjhmZWVlZjJlMjI4ZDU1MzliOTk2OTdmMGFiNGVkYjJjMmNjMDkzNjYxYTA4MjMxMzg4NzcwOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjYjY1YzYyYjc1N2QyMTk1ZThkMGVjZmRiZWQ5M2UwNTY4N2QzMTRiYTAxYTc1NzIyMTU1Y2M5Mjk3MmE3OWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhYjkxOWY0NmFiZWMwOWZiZWUyMTk5ZGNhZWI2NGYyZDVhMzAzNDQ0MmM0MzYzYjk0ODNjN2YyNjA3MzVkODYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9b0aa0bc00724cbb9779a031020869c1",
+      "statement": "Billing readiness has two deliberately non-interchangeable levels: `isBillingReady` is a threshold-only prep signal (ongoing and ≥80% progress) while `billingGate` is the compound ADR-001 §Ready gate requiring the threshold and a nonzero supporting set with every requirement on file — a zero-requirement catalog is not verified, and an uploaded doc satisfies it because §7.2.4 accepts the manual attendance sheet.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/readiness.ts#L1-L71",
+          "version": "repo-lines-v1:sha256:58cc641212a15a368a8dec209839121cdaded4d8b0e8e29046f3e72f1c9cb878:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/billing-readiness.test.ts#L59-L95",
+          "version": "repo-lines-v1:sha256:d2b5a8287b547b381921de7fa8efb2a94bb497de91b6be65386156fee21ed020:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkNjFkOTY1NWNmMzE4Y2Y0ZjY3YWY0MTZlZTI0MmNkM2FkZjc1Mzk0NzhmNTgwNGE3YzA5M2I4ZDgyMzRmY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cff9c158ce7548eb82d302d2571ba86b",
+      "statement": "The gate's document set is the critical requirements at pre-billing stages only (`aou`, `ntp`, `tip`, `train`), excluding bill- and assess-stage outputs because requiring them would make readiness circular.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/data/billing.ts#L19-L59",
+          "version": "repo-lines-v1:sha256:45f5896a7a3048b4932ca2d0ce935bca2f48b53e22c8884fa0e8bfd6c5bdf997:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZDExZmExNzgwYmJhMTBjMDJlMzNlOTMyZTE1YzRhNWVmNDk2N2ZkNTI0ZTMyZjNmYjg0N2RmYjBhMWY4OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5N2MwNGE4Y2E2YmQ2NTY1OThkYzdiNjRmZDBkMzk4ZTM4ZDE5MGJmYjBhYmQ3ZGY2OTU0NWUxOTM0NWIyYmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6cc0a51885ed47b8af32416421f85683",
+      "statement": "`buildBillingCard` passes an empty requirement list until a program-to-requirement source is wired, which closes every gate rather than fabricating a pass.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/data/billing.ts#L72-L94",
+          "version": "repo-lines-v1:sha256:76196fc8b3830c692bc40f1bedcc35dee274f99bebbe1addde92332a51494e9a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyNTUxZGMzMzY0ODZiODE2MTg5NTg4YjExYTI2OWUwYWIzYTA5MTJhYzM3Y2JhZjg5ZWRmN2ZhY2IzYTFlOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwNjM0OTAyY2Y4ZmEyYTg1NTUyNTBkZDFjOTY4ZDI5ZTE1ODViYTUzMTg5ZmIwNTcyNTFjODVhOTAxN2RkMjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d70368f692fe4b8690fbd3591fded856",
+      "statement": "The alert row announcing billing readiness claims only that the progress threshold was reached and defers the compound claim to `billingGate`, because `isBillingReady` does not check documents.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/alerts.ts#L30-L37",
+          "version": "repo-lines-v1:sha256:b975af59b682201e9cf3f32c16f28ccda282b3755c476236cf18770011ee578e:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJjZWI4NGEzNTkwZTIxYWVkZjY2NzYyOTUzM2FlNjBkYjA5YjA0YzhiZjhiNjRkOGNiYmQ0MDIwZDBjYjk0MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTMxMWNlZmQ4ZmI1ZTIwZGRlZGE0NWE1NmI1NTc3MTczNmE4OGY5YWQ2ZmQxMDM5ZWU2ZWRjNWFiY2FhN2M4ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjY4M2ViMGVlMzAyYjYzOGRhNDIzMWY4ZTRkMmNlMzYxMmI5NzRkODY2ZTQxM2M1NjhmM2YwNmQ3MzIwNDQ4ZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_aac5cd23e0a94052b79080fb85aee49d",
+      "statement": "A billing packet is a projection of one `(batch_id, billing_type, tranche_no)` triple with a display-only `PKT-0NN` reference; its `state` derives from blockers and progress while `BillingQueueView` gates generation on the card's `gate.ready`, so the two can disagree and the gate is the rule.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L1-L31",
+          "version": "repo-lines-v1:sha256:0ce17041b218e8dd75e2eda58c5d549b1d61c3ac7caf41339dfe0c72f8c83b7b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NDRjYzBjZWVlZTIxMzY2OTM2OThhN2NkMjE2NmI5MTE3MDliNTFmNjhlNzJkZTBiOTZmY2Q0OTdjYmExMzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5ZTcwYjZiMTNhODAyNTdiODlkOWZiYWVmZTBkMjI1NjVlNjJlOWZmMjIzNjE0ODU4YTYyNmQ5NWUwYTUzYTUifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L93-L114",
+          "version": "repo-lines-v1:sha256:eecc98091d4ff57f83c75c4d9340d74d4a5adc5c637ed874fd8c75288c682c5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTFjYThmYWY4MTFjOTdmNzc5ZTVmYWUyYzk3ODAwMDhjMjlkMjNlNzcwYmUyZDIxNTE2OTA1MWRjYzUzYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzY2RkNzNmYTJmODdmMmMxYTM3MzcxNzJlNGU1ODBkOTc0MjQwNDQ2YjQ3M2ViY2Q1NzkyMWYyMmNiNTUxYWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ff48be9591de4169bd9295420b30f052",
+      "statement": "Nothing in repository code reads or writes `billing_records` yet: `buildPacket` hard-codes a completed batch to `settled` and others to `ready`/`draft`, and the queue ships chips for `generated`, `submitted` and `settled` ahead of the store, so ADR-003's persisted states are owed work.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L108-L190",
+          "version": "repo-lines-v1:sha256:b49c36987a23041df3bb56d60a9e222c492044c6b37a6f9418840fbf0e03fe87:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYzk0Mjk3NzhhMDA2MjE1ZDczMTc1ZmIzZWRiMzVmYjdlZDBmZjg4MDA0YWU4MDcxYTdlOWIwMmVjY2E5NzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiMTZkODRjMzkzNTYwNTQ4ZDEwMDY5MTRjZmE0ZjJkYTNjYWY0NGIwNDk3NGI2NDQ2NTA0MWZlMjAzMTVlZDQifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L61-L91",
+          "version": "repo-lines-v1:sha256:66ddc4d33c3c8e15eaa3e4c6634ab945cd21c98b7c45263d09e01fbf38678e40:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwZGNmYmJjODZhODVhNTlkODYyOGMxM2ZmYTQ0YmVmM2MzMzllNGRlZmEzNzQ1MWI1NmE2NTI3ZTY1NTBmZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMzdhZWQ5ZWQxMDg2YjNkNjExYTI0NTNlZGNiNjA0NjBlNjEwMWIwNjBkZjhjMjdkNzY2MDA3NjAzMzgwMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5M2RhNGNlNDBkZWQzYWYxYTRmNmY5ZGFkODE5N2I3MzFiMGViZTM2MGY5NTNjYzU4ZGFhNWYwNWY1YjdjOWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d0ad9b3420314529a1c4ac086a2139d8",
+      "statement": "`summarizePackets` builds the four queue tiles as sums over the projection, and the settled total is an observation total that counts only what someone marked, not a reconciliation.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L207-L247",
+          "version": "repo-lines-v1:sha256:5dcb52dd12e5bfe8bfd4a3ffe295a9e2eb026c1583110d12672a3e805e3c821c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmOGE0NWUyN2NlYjI0OTc0ZGI0NzM1ZjQ3ZmViMzIwMWE5YTY1NTE1NDg4MDdiNzY1NjcxMzYwMTM0YTczOWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhZmFjZjk4OWUzODY1NWQ4MTdmZjQ4OGI1MmUyNDY1NWQxYThhZTc4NWEyNTBjNTlmNTljYTgyZTRkMDBhMWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_37cccc18203a4003a2b597e853059c16",
+      "statement": "`buildStatement` produces one document per billing track: Training Cost is a flat per-scholar figure, TSF omits the New Normal and Insurance columns for TWSP so the document does not claim a component the program lacks, and Entrepreneurship is ₱800 per scholar CFSP-only; the builder admits the 20/50/80 ladder and generation log are out of its scope.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/statement.ts#L123-L157",
+          "version": "repo-lines-v1:sha256:c370b093c42986827e7a3fad662a0efe267317212e179c47a46d1f865a84bb96:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhZmE3NWEzYzFjOTdhNzNlMDg1MWJlMDViYjg5YWU3MDlhYjBjOTczNGI2YzNjZGU2MTcwN2U1Y2Y4OGUwZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0Nzc1Mjg1NTY3OTYzZjZiNWE3Yjc1NDk0ZjA3Zjg0ZjcwZTNkNWY1NzkxMzc2Njg3MjUwYzgyODk3YTY4NDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhODA4YzFiZWQzZWFhZWEyOTIzN2I2MGQ1MGU3MWVjNDEzNDJkMWU2NGU5ZTU1Y2M4NjE4NGVhZDc2ZGEwNmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0OTZmMjZiMjQ3NDcwNjlmODg5MGU1NGQwNGQxMTEwOWM5ZWE0MmJhZGE4ODVhZDUwOTU4NDVjYWU5NTQ5ZDYifQ"
+        },
+        {
+          "resource": "repo://modules/billing/domain/statement.ts#L210-L284",
+          "version": "repo-lines-v1:sha256:715f9919e74cc75dcd140d199e1ddefab9cd4a16a0e1cfa9e366a50f35c26472:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhZDMzOTE2OTEwNmE1NzUyMmY2OWE2NDUxNjBiNDJkZmQxZDQyN2ZmZTEyY2IxMGFhMTUwMjFjNTEyZTU3YmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1NGI1N2UxMzFkNGQ4NGVhMmU2YjVkYWNjYjQxNzgzZTE1MzVkYjM5ZTkwYTc0ZjVmNjY0ZDVjNjlkYThmZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_299bdca95c2f46c4a06262c853b6f9da",
+      "statement": "`tsfAmount` sums TSF only (`totalDays × ₱160 × scholars`) because Training Cost needs a per-qualification snapshot absent from the `Batch` contract; a partial labelled figure is preferred to an invented rate.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L68-L77",
+          "version": "repo-lines-v1:sha256:645220d4ad8a9591ac82ab60f6182e9f7fea81b36b192a1809eb7db53a0b9022:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlODk3MGUyYmJhMzQ3NzE3NTlhOWU5ZDZmNjIxYmVlZjY2NTYxZGY4NDM3NjVkYmE3ODUyN2Y4NTYxZWRkZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlOWEyOGFlMGUzOTIyNDlhMzBlNzEyNDkwNzM3ZTUzOTVlN2FjNzc4YjE3MTgyZWUzNjI5ZDVjMGQ2MTY2MjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5e9a4004fa4744dda3028fa339678aa9",
+      "statement": "`daysUntil` returns `POSITIVE_INFINITY` for a null *or unparseable* date, because a `NaN` day count would silently corrupt sorting and urgency downstream; `urgencyTier` routes every non-finite count to the neutral `muted` tier and the tier switch in `deriveBillTone` is exhaustive, so a new tier cannot compile without a tone.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L195-L207",
+          "version": "repo-lines-v1:sha256:b01c64bfa1aa4661351d19e97bb4173a39444a589b3255cd08d001838c701c38:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiYTFiMDBmNmZiMTlmZGE0Mzk5ZmFhNzE5ZTIzMzVmNzUyZTAyMDhlNTVkZTMzNjk5MTEzNmFkOWRjNzUyZGQifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/urgency.ts#L8-L19",
+          "version": "repo-lines-v1:sha256:a8de93cce428ea8e18ee8d3f85ffd8799d81b8663962f57a83d27ce7b33a2d44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4Njc2OTlhN2U4Yjc0ZTI2YzFjYTRkNzdhMzZmMjBjMDRkNmM4MzQzNzRiYzJlN2UwNGEwZWZmYmMwZjE1NTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMWQzZTVmZjc3M2JhOWQxOWJmOTMxY2IyNzdiMTE0ZGYxODg1NmMzNjAwNWVhMzVhOGJlY2VkNzEwOTc0YzgifQ"
+        },
+        {
+          "resource": "repo://modules/batches/ui/billTone.ts#L6-L31",
+          "version": "repo-lines-v1:sha256:b31e8b301b7c15cae2de0bd2728d0159b78d26b552d290b97615ee16ebc695f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3OThlNjhkNGQ5ODVkMDU0NDQ4ZDZlMDRlNmFhYWNiOTUzMzJkMzliMTAzNzEwMDEyYWE3NTFlYjEyMjJhNTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_908710860aaa4d1cb5fd35cc73a517a7",
+      "statement": "`hasRecordedBillingDeadline` is separate from the deadline-agnostic `hasOpenBillingObligation`, so an open obligation with no recorded deadline is still open but never counted down; consumers report it as a data gap — `billingDeadlinesMissing` excluding it from next-billing and overdue, one aggregate `billing-deadline-missing` attention row rather than one per batch.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/attention.ts#L39-L85",
+          "version": "repo-lines-v1:sha256:a83c73e506c8f330cf5a8f335a82c7385971b82d49a58e201822e0d25a01be32:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYWZjZTg0ODVjMWUyZjZkNmNkYTZjYWE1YWEwZGIyZDU0MjYzYjM4MWNhYWI3YzJjYzdkNzUzMDhlNTI5ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNzE3ZGFiMjY1NDNkZmIyMDBmYmQ4MjBhNmM2ZmQxMGYyYWJmYjM1ODVkOTZjYWE4NTE0YmJjYjhmNzU0MGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBkZjhkYTA3ZTkxMTI0NzI0MWIwYmY4NzM0YmM4M2VjMGFiOGExN2JkNWZmNGY3NmFhYWM1YmViODQyYzJmM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMjhmMGRiNDQwZjY1MTc1YmJlYjlmYWFkYzZmZWNhYzFkNTljMjhiNzI2ZTJiNjFlYzNmNWQ4NTEwY2FiYTEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L33-L65",
+          "version": "repo-lines-v1:sha256:cffbf9c07c0cd6fc314bdd486ed903bc18753558f0d24b642e79a48f002f65dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NTY0Mjk2ZjZhMWY3MWRlMmE0MmQ5ZTdlYjlmOTdjNWRiYzgxMjIxMjAyZjgxNGRhZWNhYzE3ZDhiMGFhNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1ODhlZjMwZmY5ZDY0NjM4NzJlODk1Mjc1YTA4NmJmYmM2MGZjZWNlMDljNmVjODY5NGU4NWE4OGI1YzU3MTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MDMzMjcyN2UzNTc3YjNlZDg4ZmNkZTlkNTE1ODcwOTAzZWIzYTZkNjcyZjY3MmFmMzFjMWJjNzIzMDE4Y2UifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/urgency.ts#L21-L35",
+          "version": "repo-lines-v1:sha256:1c9fbfa274a60e50e747d4c37c0b3d7586620fbc7f6973ed86c11dc5f0111a81:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5MzlhZDEzZjdmOGEzNmRlMjE0ODkzMWUwZGZhYzBiNjc0ZDczOTFkMWNhNWZmNWEzMGEzODAzMTAwZGVmY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_98146deb3c884730b17e174ee9bedba2",
+      "statement": "`batches.billing_deadline` is nullable and a null means not recorded, never inferred from `end_date`; until the unapplied migration lands the mapper's `row.billing_deadline ?? null` makes every batch render the unavailable state instead of a countdown.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L10-L46",
+          "version": "repo-lines-v1:sha256:6addbe166ffdc4a4026539e4b7355e7272578b2bf84a3bb9718f7e60ae44ee2a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlMzYzNGRiYjgwMWE3M2I3MGU4OWVkNzc1NDZjNzdiMTA5M2JiODhjOWU0NzkxOGU5NjY1OTRkYTQ5OTRhZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjNDBhMmQyZjE0ZjQ0NTA3Yjg3ZGNlNTJiNDBlNjljMTlhNTkxYWZkOGQ1MTc1YTU2YmNlN2Y5OWE5Yjg4OGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5MzUyNTE4MDhjNDY1MzY2OGEwMjY3MDdjNzhjNzc5ZWRiNTkwOTIwMTQwN2ZhNGY1MzhjZjZlYjdmMTE3NWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkMGFhZGUzOTFjMmMyMzMxODVmNDg0YmYyM2I5YjllM2U5MWQyMWQ1YzMwYjY4MTEwYjk0ZTcyNWFjYmY2MzMifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L258-L262",
+          "version": "repo-lines-v1:sha256:62c1f1f4823f9b693ca7401e58bbc7bc4bac18e1f6b9ef4ecdb957d08ce9455f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY0YjM4NmEyMGUwY2VhZWUwZGNjNmQ2Yzc2NTAzMTZkM2I1ODQ0NDFiYjRjMzIxN2YxOTgyNmEzMjliZjI3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIyNmIyMTJjNTRmNjBhNTMwYTkwMGIxODA3ZDhhZDM3MjEwNWRlZjczNzUwNjlhZDc0ODFlYzdkOGY2NjRlZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTgyNzRhZDIxMTA0MzdkODYzNjU0MjYxNzIyZWZmMjlmNWQwYjQxM2I3ZjdkODAyOTg0MWUzM2NmZjg3ZjJlYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODY2N2I1ZjI5ZGNiYmI1YmM3ODQ4MmQ3MmZiMmJmZjg2MDVmYWNlMjU3MmQ4N2I0ZTVmYzRhODQwNzI1YjQxZCJ9"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L161-L175",
+          "version": "repo-lines-v1:sha256:4b2e297ff24f046d03fef95c7eb1913da11f33d2394d0134617c54b13396edbd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0ZGI1ZmY3Yzc2ODk0NzA2Y2QyNzdjOThhMjgxMmQxMzhlYzZjMDhlNjNkOTRmM2VjMTAxZjE3Nzg4NzBmOGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkZmY1ZDFjYWY5ZmM1ODY5Y2Y0MzJlZWUyYzNkZDA3ZDMzN2Q5MTVhYmNmYWE1YWQ4NjMzY2Q0NmM4OWNkMGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzNWQzNGZiYWMzNDEyMDNlNmU0ZjNjYTNiMDlhY2Y2MTIzMjQ0NDIzMWE0MWZkYjc1N2M3Njg3ZTAxZGEzMzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_287011faa6e34e05be19e8cd8163c83c",
+      "statement": "`batchAlerts` raises a critical billing row only for an *open* obligation whose tier is `critical` or `overdue`, so a finished cohort's negative day count does not alert; `alertCategoryCounts` re-derives per batch against that batch's own program catalog so one program's requirement never counts as missing on another's.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/alerts.ts#L38-L84",
+          "version": "repo-lines-v1:sha256:9716fe5a6acd00ab444a23b0cf67ffb21eb60173f1dbb50566d6d6fe08b7b441:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkOTIxZmZhYmNhMTRiOWQyYzE3ODZmZjkyY2FkNTIzNmZkYzBjZTI5NmM1MmM2NjI4NzdiOTM5MzRlNDYzYjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwNzlmOTkzNmJhM2VmOWM4ZGJjYjI4MzJmNjM0ODgyZDE0MDJhN2NjZTlmNzhiODE3ODE5ZDk0ZGY3MGExOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ed6a39839eeb4c50bdebc447b8392653",
+      "statement": "ADR-007 replaces the retired ≥5-absence rule with dropout on absences exceeding a floored 20% of the batch's `total_sessions` or on 3 consecutive unexcused absences, whichever trips first; the threshold is a program default with a nullable tenant override whose null inherits the program rule, and the old count column is dropped rather than cast.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L162-L174",
+          "version": "repo-lines-v1:sha256:61823a350e1ffdcb33d2321a274e648b205f189626caaf7debbbeabcb4f37268:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NWRlN2MyMWNlOTc0M2Y2Y2VkY2IyNGU4NmU2Y2FhZDA5MTlmZTg0ZTUwM2VjZTBlOWY0MzU3OGEzOTZlZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwN2I3ZThiYzZhYzYyODc3YWVlZDJhNTJmMzBjM2YwYjI4ZDk5MWI2YzI0MWJmNWM3Zjg2NDIyYWE0NTRhY2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L48-L63",
+          "version": "repo-lines-v1:sha256:acb4a801bfe9a616a7cced65665f48ae9480338d642096fe40cfcbd05061df95:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1M2NmOTdhNzJhMzVjYTZkOGNhODg0NDFhYTQzYzQ3MGM4YTVhODE5NjVkYjMyNDAyMjM0OTQ4ODk5NTU0Y2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhNzYxYTk5NWExYWQ1NjBlMDdjNDAwMzAzODNkMDM0ZDMzZDM3NzVhZWZmNzdjYzRkMDkxNmY3MmM4NDRlMmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNjFjYjJjZDZjMGQyMzVjMGU0MDg4YzYzNmM1ZjE1ZWY4NGY5MzI4ZTA4Zjg5N2ExNjljYzc1YjIyMjYzYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwMGIzMzU0ZTZiZjA0OGNhOTI0MzEyODFkYTkwZDA0MTU3NGVmZDc1MmE2NDg2YTc2OWNiYjJlNjU5NGJiYzYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L46-L94",
+          "version": "repo-lines-v1:sha256:6f9ed83fd179fc405aca5bfbaedb74280dc347c9a2461acfc797a12793a09a84:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNzM2ZDIwN2I2YmE0NWJjYjljMzMyYjc2YTg4YTM3ODU4MjM5YzM0ZGYxZmM4MzIyNWI4NDkwMDdmNmU4ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2OTI5YmJlYTc3MTZkMzA0NjM2NGE0N2ZkMzczNDFmMzM1ZWMyOTUyYjYxNDNhYWU1ODEyMmMyZWFkNDFhNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwODNiMTFhMjEwNGM5YjU2ODAzZGJjM2QyZjNmMjE2NGYzNjBmYjcwMTQwNzhjNjU3N2Y3NDA3MDAzNThiYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c1d43e18dea6405c89ccbb756b08d7bc",
+      "statement": "`attendance_records.excused` defaults to false — the safe direction, since silently excusing an absence understates dropout risk — and the consecutive streak runs over recorded rows ordered by `attendance_date` because no session-calendar exists and an unmarked date is not an absence.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L51-L54",
+          "version": "repo-lines-v1:sha256:dea34bbf2c9c0ecc9c4b1e63d4e78766b104f1f3cef69014adf46fa2f8f9d0b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcxN2UxMzVkMTJjMDA0NGYxNDI0ZDFlM2ZkNzhhNDQ1ZWUxNjI5YWVlNDVkYTc2N2JjYThjNzQxMmYzYTFmMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhmZmQ4NTBhNmZmYjVjMWJhOTk2ZTc2OWFjMzYzNGRlZjQ2NmVmODk4MWJiYjFjN2Y0NDc2N2M3MGE0YmIzMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI5ODg3NmI1NGI0MzlkOTkxYTA5MjQ2Y2U1MzYzNGVmYmUzYmRjNjkwMDFmZmNiZDkxOGU3YThiYmZjZjhkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWI1MDQxODU1NDc2MWIxZmY5NjBiODBkNzgzNGRlZTZlZDEzMWJkZjI4YTJhOWVmOWMyNGVhZDc5MmJkOGU3ZCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L31-L44",
+          "version": "repo-lines-v1:sha256:104e077ad884c878fcc1cfd0c010ccc291479406740ff29423bee19ca1e7bd92:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNzM2ZDIwN2I2YmE0NWJjYjljMzMyYjc2YTg4YTM3ODU4MjM5YzM0ZGYxZmM4MzIyNWI4NDkwMDdmNmU4ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExZDNhMzUzODc2ZDA3MWNmYTRkMjY4ZWViMjJjNzk5NjllYmY1YjI5M2ZkMWIxYzlmZThhY2JlYjI3OWMxYzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxM2Q0MzMyYzE3NzVjMjIwM2JkYTk0NmM5YWFmOWJjMWMzMDIxODYzNzQ2NTM3ZmI1OWMzNDNjNzY1NTEzOTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjNzdkODc0MTAwMGM0NTE1NmI0MWRjY2VjOTBkMDM2MzI5YjVkOWU5ZWE5ZTJhMDExZWQxZDRmMzJjNzY2OTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5f71ba8377fd4fe995abcfe283f85b74",
+      "statement": "The dropout outcome is computed, not written: flipping `learners.is_active` stays a manual registrar action, generated billing is never rewritten, and the FF2 absence deduction keeps running off the raw absence count; the math itself is unbuilt — `modules/attendance/domain/eligibility.ts` is planned and no repository code reads `max_absence_percent` or `excused`.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L53-L63",
+          "version": "repo-lines-v1:sha256:112f7c45b1e5491afa3ac555c524033e70c470323d988a4f5ff542d09e4aeb0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxN2EyZjE2ZjUwZGNkN2Y4NmQ2ODJmMGIwODY1MjAwYjI2MDc0NWZhZDUyYzY4ZjM4NWNmYWJlMTY4NTNiMDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhNzYxYTk5NWExYWQ1NjBlMDdjNDAwMzAzODNkMDM0ZDMzZDM3NzVhZWZmNzdjYzRkMDkxNmY3MmM4NDRlMmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxZTRlM2FjM2QxMzg1ZmZiMDNmNGI3ZTc5NmEzYTc2MzYwYjgxMTU2MTE3MDMzMDMxODdmNDE2N2Y4NmRjYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwMGIzMzU0ZTZiZjA0OGNhOTI0MzEyODFkYTkwZDA0MTU3NGVmZDc1MmE2NDg2YTc2OWNiYjJlNjU5NGJiYzYifQ"
+        },
+        {
+          "resource": "repo://modules/attendance/README.md",
+          "version": "repo-file-v1:sha256:2249b63a2fd7b919edd4defb8abc80ad7f275b5099015899bf24412bc0bd5e56"
+        }
+      ]
+    },
+    {
+      "id": "claim_f7b51ddbb6e8406a925da52fc08b39c1",
+      "statement": "`checkRqmCode` normalizes invisible characters, Unicode dashes and whitespace before validating, rejects the NTP's four-part request number with a message naming the difference, and treats program or provider mismatch as a warning — while a partial unique index on `(tenant_id, rqm_code)` enforces one RQM code per batch without colliding all-null legacy rows.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/rqm.ts#L16-L94",
+          "version": "repo-lines-v1:sha256:bbedb7d5e08fa1b1e79ccf7c7068cba34db9017fe69daff0a9632df6144d6914:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmYzE4ODMwM2Q4NzNhNjU3YTU2NjUyYjEyYjY5Y2M1ZTYyNjU3NGFhYjk3MjJmNmU1ZWM0NDQwMDI2MWJmN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4M2I5YjQ3YWMxOTE3MzVhMzkwNjE3MmRiMjIzNzEzYmZlMjg1ZTAwMjdhMzljNTg5NzFmMTZiYWQ0YWJlOGIifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L313-L320",
+          "version": "repo-lines-v1:sha256:15a86a4abb85663b0bcc80453cc84da7f414fb41ca415e540088e2502f834048:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDhhMTY3NmY5ODc4OTQzODhhYWE2ODVlM2U0NDgwODYzNDA2NGU4ODk2YzhkYTU5NjZhMThmY2FjMWY1NThjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjU3ZmE2YTc5ODg5NmIwY2I0OTRiMjFkNmU0ODlhMGJlMjFlYzJjZjE5YzU3YmQyMTczNjg1MTM3ZjFiZDEwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE4ODg1OWNiZDEzNzVmNDU0ZWYxNWZkYzVhMzc2OWU2OTI0ZGFmNjM0MjQxNWVjMDk0NGQ0YjYyNWM2OTk1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjIwMDNmYzZlNWEzZjgyNGE3MTYyZmU5ZTNkYTc5YzY4Y2M5NGRjNDIxZWUyNzc3OGExNmQ4YTNiYzk5OTY2OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_91c4254ce6c34419a32afd74c9dd01fc",
+      "statement": "`setBatchRqmCode` writes only while the stored value still equals `expectedPrevious`, reporting a concurrent edit as `conflict-or-denied` rather than overwriting, mapping a `23505` unique violation to `duplicate` and keeping other errors generic.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L378-L418",
+          "version": "repo-lines-v1:sha256:656ea97837349ad7ab6832a341fb70a0d18db6d005722cf7856387390318489f:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2N2E0NmNiMzg1ODA0MDUxY2FkZDhmYmQzNDg4MDNiZDhkYjc5ZTlmZjAzMWM5MDdkNzdkZWM2MzUyNDBjNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/rqm.test.ts#L154-L187",
+          "version": "repo-lines-v1:sha256:f5b8f520e5af2e7df70319a62a0bbd017d891b22c3fc0a2eedb96ed49d67b3fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiMGY4NzFiYzJhMGNmZmJiZGU0NGE1Mzk4Y2YyNzZhM2Q1NTBjOGY4Njg3YTFkNGE5NjVmOGZjOTE4NjBlMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2ZTliNWJjNDEyZTY1OTQ0NDY5MzkwOGU2NjJmNzlkYzViMjJjYzQwNTI3OGRiMGY4MWU0ZTQ2NTRkMWY1MTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b2db4311a9e4592ac840646784fa5f4",
+      "statement": "ULI is the permanent learner key, reconciled by value on import, and a row lacking a valid ULI is invalid rather than imported blind.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-001-billing-and-domain-model.md#L172-L179",
+          "version": "repo-lines-v1:sha256:9c972573ef6bdea9fa32046c74c144d3c2e9d4abb403907d53fd8d4d8650bb85:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY0ZDJiMzZkYTE5ZjI0YWZmYmIzYmUyNDgxNjFmMTY1MzAwYzhiNGU2NjMzYjdmNWViNjUzMTg5YWM0NDRlMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDAxMDM1Y2IzN2Y5NDZkZDY5MWY4NmM3Zjk3YTQwNmU4N2EzZTVmNjhlYmRkZDhkNDA3MWRjYzAxMDcyYjlkZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODRhOTFjMTkwMTYzYzViNjdhODMwY2FiMDFmOGJiZDhhMGQyNjI3ZTQ2Nzc2YzAyMDBkNTRiOTg5NjRjNmZiZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzhlY2Y4N2Q3NmZiMWM5ZDViYWQ1MTEyZmY0MTg0ZDY2YzlmYjM2OGJlMGMyYmZmNjU3ODdlZjI1Y2JhYTMyMCJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L69-L78",
+          "version": "repo-lines-v1:sha256:bc76b7fe33efad6decb245e0241cb9a9e0e92b17ced2688b1c6503336987d464:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0N2U0MTQzNzc5MzFmN2FjMDNmNGE4YTY4MGE4NGM1MDFiOGIwMjUzZDBhZDU1Njc2OWMxNWMxMmY5ODYyOTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzNzAzMDEyMTVlNjdlMzU4ZWVkMGQwNTAxZTJhNGJjODcwNzIwMzhjM2JmMjM1ZjU4ZWZmY2FjOTk5YjJkZGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmOTc5OTZjZWM0MDZmOWEzNDYyZDQ5NWQ1OTQxN2MyNjkyOGUzYmI2N2Y2MDVlZDVjNDdlODgzYjU0OWU4YWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmMDYxYTM3YWNjN2FhYjc4N2Q5MDFkNGFmNjY4ZDZmMjJjNTQ5MTE0YTU2YWM0MGI4Mjg2YzUzNTY2NjY1NzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5a41eadbf74044899d3b106b0356e222",
+      "statement": "Alerts are computed on read with no cron, email or alert table, so a notification surface never drifts from the batches driving it but also never survives a page load.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-003-billing-packet-queue.md#L37-L46",
+          "version": "repo-lines-v1:sha256:64d171bf5328bbad75afa63ba9c6adfda5c4cf7e1e1d1ed3e39ee7f93a2db21d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjZjYyZmJiZGRiZDM1OTQ1NDk3MDg3NzZlNWExMGMyNWY2OWM4NTIyYmRiNTkzYmVhOTVjMzY4Zjg0ZTJhZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwNjNhYjBmNDFhNGQ0NDQ3N2IzNzBkNGExZGI0MDdkMTI4YTEyODU0ZjkxMTZkYmJiMDc0NTMzYTE2NGFkNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmMDJjNGM5YWNmMTEyYjE3ZWYwYzkzMTRjYzE1MTNkNDE2MzA4OTU1OTE5OGU1YWQ5MDYyNTRjYmRjMjg2ZjgifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/alerts.ts#L1-L16",
+          "version": "repo-lines-v1:sha256:7996665a725cefdb66dc63ca4323ac3e34ee1b32e14de01b760d187684a6aa62:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzNjE1MjYwMTAxMDkwYWJjMzkxMDYzYWFkMjBhZTc2ZWY2ZmVkNjY5YjlhMTRkM2U3OTcwNDZhNDlmNGY5ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzYWQ4M2E4MDdmY2FmN2Y4ZDJiM2Y4MDExYjRmYzY2NWRmYjExNGU0MGQ5Zjk3Mjg2ODU2NThlYjI0OTAzY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e5caad6462504c18ad3d9f3f7894942f",
+      "statement": "`deriveTrainerMetrics` removes the four billing keys from the metrics object itself, not just from its type, so no trainer component can serialize a billing figure through (RULES rule 5).",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L67-L84",
+          "version": "repo-lines-v1:sha256:70edfbd46cc49f2007081da3451fcde80f1f6e37cad8e3925a76f3993b1413e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-11-18T01:01:49.569Z"
+  }
+}

@@ -147,9 +147,6 @@ sources:
   - id: openwiki-source-0fd3605db2590862922583b6
     resource: repo://tests/unit/tenant-access.test.ts
 generated: { by: "openwiki/0.5.0", at: "2026-11-16T02:29:16.800Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
 ---
 
 # Module Boundaries and the Data Layer Pattern

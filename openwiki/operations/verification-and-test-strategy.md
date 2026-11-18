@@ -5,7 +5,61 @@ description: The ordered tsc → lint → test loop and the rule each command de
 tags: [testing, verification, vitest, playwright, lint, typecheck, ci, rls]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
+    at: 2026-11-18T01:01:49.569Z
+sources:
+  - id: openwiki-source-5f5b95b3d6a215fa02ceb945
+    resource: repo://.env.example
+  - id: openwiki-source-be5cf73d76241cd97cfddc1d
+    resource: repo://.github/workflows/claude-code-review.yml
+  - id: openwiki-source-6d4b4e707b8d60b6ccfa3425
+    resource: repo://.github/workflows/openwiki-update.yml
+  - id: openwiki-source-89a62965cacab8710f57d4cf
+    resource: repo://.github/workflows/qodana.yml
+  - id: openwiki-source-5800ada5a3e47a6960fb6e27
+    resource: repo://.github/workflows/stale.yml
+  - id: openwiki-source-7c03237a6b57ffb3e526a51b
+    resource: repo://.nvmrc
+  - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
+    resource: repo://app/(dashboard)/layout.tsx
+  - id: openwiki-source-a2371d6362e5db4bc834ad03
+    resource: repo://CLAUDE.md
+  - id: openwiki-source-624c50c8276ea1f31b187ca3
+    resource: repo://docs/adr/ADR-005-demo-account-tenant-scoping.md
+  - id: openwiki-source-dc20addc30fb71fa529c13bd
+    resource: repo://docs/IMPLEMENTATION_PLAN.md
+  - id: openwiki-source-77b021311c7cb4c8d8432fb2
+    resource: repo://e2e/auth.spec.ts
+  - id: openwiki-source-2dca4e2a28dbda97e3884837
+    resource: repo://e2e/global.setup.ts
+  - id: openwiki-source-2fda883e9b76745f69f487f7
+    resource: repo://eslint.config.mjs
+  - id: openwiki-source-58478215433a32dbc8ee2b3e
+    resource: repo://modules/import-export/README.md
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
+  - id: openwiki-source-5e753d9d77984cb67aae1517
+    resource: repo://playwright.config.ts
+  - id: openwiki-source-f7ae5e0747518115ed202c7e
+    resource: repo://RULES.md
+  - id: openwiki-source-d81538d8891efe37053aeccb
+    resource: repo://supabase/config.toml
+  - id: openwiki-source-ab3c62d5452f5df905bfc01d
+    resource: repo://supabase/seeds/dev_profile_memberships.sql
+  - id: openwiki-source-2020074c6fdeab02aae020b7
+    resource: repo://tests/unit/batches.test.ts
+  - id: openwiki-source-4b1944144311805b722ef6ef
+    resource: repo://tests/unit/dashboard-domain.test.ts
+  - id: openwiki-source-d779956f2a715b2e3f40cf22
+    resource: repo://tests/unit/learner-import.test.ts
+  - id: openwiki-source-763cabdcd60de0e5da8f9a60
+    resource: repo://tests/unit/supabase-server.test.ts
+  - id: openwiki-source-0fd3605db2590862922583b6
+    resource: repo://tests/unit/tenant-access.test.ts
+  - id: openwiki-source-98d5ddb014a0fd4d678f6f2a
+    resource: repo://tsconfig.json
+  - id: openwiki-source-b58f839a189d87a7e1f37d39
+    resource: repo://vitest.config.mts
+generated: { by: "openwiki/0.5.0", at: "2026-11-18T01:01:49.569Z" }
 ---
 
 # Verification Loop and Test Strategy
@@ -26,8 +80,13 @@ architecture breach is reported before a test wastes a minute proving it.
    is a *total* map, so a new DB enum variant fails compilation until someone chooses its UI
    treatment. The typecheck is also the only thing standing behind every "typed against real
    Supabase" claim in the data layer, since no test resolves a live schema. **There is deliberately
-   no npm script for it** ([`CLAUDE.md`](/CLAUDE.md) lists it as `pnpm exec`): typecheck is a step
-   in a sequence, not a product command, and a `typecheck` alias would read like a build.
+<!-- openwiki: broken internal link [/CLAUDE.md#L21] heading anchor "L21" does not exist in "/CLAUDE.md". Fix the href or restore the target, then delete this comment. -->
+   no npm script for it**: [`CLAUDE.md`](/CLAUDE.md#L21) documents the command as
+   `pnpm exec tsc --noEmit` and annotates it "no dedicated script", and
+   [`package.json`](/package.json#L10-L23) indeed has no `typecheck` entry — the `scripts` block is
+   `dev`, `build`, `start`, `lint`, `preview`, `test`, `test:watch`, `test:e2e`, and the `wiki:*`
+   helpers. Typecheck is a step in a sequence, not a product command, and a `typecheck` alias would
+   read like a build.
    `tsconfig.json` is `strict`, `noEmit`, and includes `**/*.mts`, so the Vitest config is checked
    too.
 2. **`pnpm lint`** — rules 7–10. The `import/no-restricted-paths` zones put `app → modules → shared
@@ -111,6 +170,7 @@ prior project and calls `clerkSetup()` once to obtain a Clerk Testing Token; the
 `waitForURL(/\/sign-in/)`. **What it proves is the gate's location.**
 `proxy.ts` only copies the pathname into an `x-pathname` header; the redirect comes from
 `requireAuthenticatedUser()` as the first statement of
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 [`app/(dashboard)/layout.tsx`](/app/(dashboard)/layout.tsx#L12-L13). A move back to
 middleware gating — or a route group accidentally placed outside `(dashboard)` — is exactly what
 this catches, and it is rule 1's standing proof. It is *not* a journey suite: no signed-in role
@@ -138,10 +198,12 @@ authorization claim in the wiki currently rests on reading migrations. Two conse
 
 - Any test that does call the hosted project walks through rule 36: no statement against live
   Supabase without explicit permission. Set the environment up first and ask — see
+<!-- openwiki: broken internal link [/openwiki/operations/live-supabase-and-migrations.md] file "/openwiki/operations/live-supabase-and-migrations.md" does not exist. Fix the href or restore the target, then delete this comment. -->
   [Live Supabase and Migrations](/openwiki/operations/live-supabase-and-migrations.md), where
   missing variables make an RLS test fail in a way that reads like a policy bug.
 - Because there is no staging and one hosted project, the tests that would prove the security
   boundary are the ones with the highest setup cost and the most to lose. That is the honest
+<!-- openwiki: broken internal link [/openwiki/architecture/tenant-isolation-and-rls.md] file "/openwiki/architecture/tenant-isolation-and-rls.md" does not exist. Fix the href or restore the target, then delete this comment. -->
   reason the gap persists — see [Tenant Isolation and RLS](/openwiki/architecture/tenant-isolation-and-rls.md).
 
 ## Writing a spec that will hold
@@ -159,5 +221,7 @@ authorization claim in the wiki currently rests on reading migrations. Two conse
 ## Where to go next
 
 Rules 7–10 in detail: [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md).
+<!-- openwiki: broken internal link [/openwiki/concepts/error-snapshots-and-honest-empty-states.md] file "/openwiki/concepts/error-snapshots-and-honest-empty-states.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 Rule 19's guard ordering and honest empty states: [Error Snapshots and Honest Empty States](/openwiki/concepts/error-snapshots-and-honest-empty-states.md).
+<!-- openwiki: broken internal link [/openwiki/operations/live-supabase-and-migrations.md] file "/openwiki/operations/live-supabase-and-migrations.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 Rule 36 and the hosted project: [Live Supabase and Migrations](/openwiki/operations/live-supabase-and-migrations.md).

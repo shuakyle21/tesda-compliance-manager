@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:15a6236d71e8908869dfef13f4c77b92ab0713fb506192b80b5927d9748b686b",
+  "claims": [
+    {
+      "id": "claim_6884da3ae2b2427298f98cb157b06333",
+      "statement": "RULES.md rule 34 is stale: it asserts there is no test runner and that `pnpm test` is a placeholder, while `package.json` scripts `test: \"vitest run\"`, `test:watch` and `test:e2e` and `tests/unit/` holds 32 spec files; correcting the rule and the \"when the runner exists\" heading above rule 35 is a legitimate change.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L123-L128",
+          "version": "repo-lines-v1:sha256:53993c0c457e16701d630200c7a7fa76be2feafc73608bbd5bf44449fc159d77:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGQyYWE4ODYxZDUwMzdiOTIwZGU5MjMzZTE1NzE0MDNlN2FiMjZlNmUyODFlOTNiYjIyMGZjOTkwYmVkYmExOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWI0NGI2NTgzNzEyM2NlNTY0N2Y0M2QxZTAzY2ViZmIzMGRlOWUxOWIwMTMwMjk4OTViOWU2Y2E1ZjBiNjAwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q1MDk4ODI2YjUwMjhkNjNhZTVlMTA5ZTVhMzNhZjg0NmZkZDNkNTg5ZTA1ZWIxZTE3YjYwZTJhZTE3ZGZjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgxNWEzOGU4ZDUwZDZkMjg0ZDk2NDFhYjgxZGNiY2FlYTAzYTFlMDE1N2RmN2QwOTRjNjMzNGNjNDAyZTNiMyJ9"
+        },
+        {
+          "resource": "repo://package.json#L10-L23",
+          "version": "repo-lines-v1:sha256:c7dd3ae8d95922a091c7b9e4e4b1db172a50c0e0ffa6a054746b6f265c634634:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwOWVlMmFiYmZkZTY3NWVjNmJhNmQ0MThjMTNkMzNjNGQ4YjhiNjVjYmE2OTVmNTdjZDY1YjgzMmFkMDliN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZTgzZjc5YTEwNjRjN2Y0YjFjOGM1NWFlOTFiZGNkMjA4MTkyODVkY2MyMGMwZjU0ZDA5OWFiNDQ2MDgxNjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6860d7705a73463cb917256c1b094a7a",
+      "statement": "Nothing in CI runs the verification loop: the five workflows are claude-code-review, claude, openwiki-update, qodana and stale, and claude-code-review only invokes the review plugin, so green is a local self-imposed gate.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/claude-code-review.yml#L28-L44",
+          "version": "repo-lines-v1:sha256:2a3331b451a21f549ff9c142fefee9b63acd3852a265f6e6b100595693031d96:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4OTk5MTEwM2Y2YmE4ODhlM2RlNzY1MWM1YTMwNWM3N2U1NTQ3Njc3M2FiYTgzOTU5MWVjYzViZDBmMmFiMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZjhmNjBkMzc2MzQ4MWU0OGU0MGRlNDhiOGRiYWEzMjM0Mzg4MDUwMDBjYmY5NmI5ODMwNjkxYmFmZTFjODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiYjBmNDBiZTM0ODM4OWRhOWI1NjcwZjFjYWM5ZjU1ZmI3YjQ1YjNmNmRkMzBhZmFiMGViNTU3YWUyNzZmNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjNzFmZWEwMjc5MWNmMWE1YTBlNzdlMjNiNGMyMDA4NThhY2Q5MjExNTVlZmE3YjJjMDJjZTJiNjY5M2MwMzkifQ"
+        },
+        {
+          "resource": "repo://.github/workflows/qodana.yml#L20-L26",
+          "version": "repo-lines-v1:sha256:a07467b636e4e759da754d063039319bfa7a5100717f9fbb239e4b8222e2689e:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGEwN2MyYjc1M2UzZDk4ZGNiMTdlYjExMTAxMGQ0YWMwNzg2NWY5MDg4NmM2ZjAyNGMxMGVmMTYzM2ZjZmUzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZhZjA2MDgwOTU2MGI4ZjU3NjExNWE3ZDg0M2VhODY2MmQ3NzAyOTAxMDkwOGNlMmQ3YmRiMTkzYjI2ZDVmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjQxYThlMTI0Zjc5YmZkMzEwZDg3MGNhNWE4ZTc5YTUxNWQ3YTQ3NjhhZjFmZDhlMjI2NjEzM2JmZWQ3NzhhZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTU0ZTQ0MWRmYjdjNDIwYjhhNTUyZjU3Njk0OTllM2NjMzY1MTU0OTY5YTdmOTZjYjg0ODk3MTdiN2I1MWFlZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f6a5515cf1644f488f640dee76dcb04c",
+      "statement": "The unit suite cannot start at all on Node 21: Vitest 4 bundles rolldown, which passes an array to `util.styleText` and throws `ERR_INVALID_ARG_VALUE` before any spec loads, so the terminal shows a bundler trace with no test counts rather than a failing assertion.",
+      "evidence": [
+        {
+          "resource": "repo://CLAUDE.md#L28-L31",
+          "version": "repo-lines-v1:sha256:8c40de92fb5ca632687897f4d7f9e91d8f37bdea13099eaf25d29e430331dd11:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzhkZWU2MDdhZTgxMjc5MTViMGJiNjQ1OTJkZTEzZGZlMTFlOWQ4NDM1YWFmNDBmNDUyMzcwNjczZGIyMzRhNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzFhZWY3ZDdkYzE2NDQ5MGFlODZlZTRmNzdmNGFhYzEyMDI5NjVlMjdkOTg4NDQ5NGU0NzFmZWRlZjZjZThkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWM0MWVmYmM3NmFjMzhjZTY5ZWE0NDg0Y2VjNzQzODdjY2JhYThjZWFjMmU0MmYxMDIxYTdhMmI0ZDRiYjYyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTg2OWYwYWMwZDA0MTg5NzIwNDc5N2NiZjdmMTQyMmEzNTAzYjEwNDQyYTIzMWFlMGIxOTAwNzc3ZDY2MmMzZiJ9"
+        },
+        {
+          "resource": "repo://package.json#L7-L9",
+          "version": "repo-lines-v1:sha256:e09ee2abbfde675ec6ba6d418c13d33c4d8b8b65cba695f57cd65b832ad09b7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWY2MDE1NTQxMjJlZmU4NTVkNTZlMTBjYzliYWYyMDMxY2EzZjRhYjExY2RiYTIyZjFlYmM1ZDM5YTc1NTgyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDg4YTAyMWZhYjRlMGVhMzZhNDdlODA0ZmJkZTE3YWE4YjFjYjdmNGMwMmRkNGI5YzdhNDk2M2ZmNGE0ZDkxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTYyYjVhMTM2NjRhZDk5MzgxYTZkYmU1MmUwYTBlNGQyMTAzNTVlYTQ4ZDkxOTQxMTc5NjA1ZmJhMmIzM2FmNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_92f433646bce4a0981af35e5d76afb7f",
+      "statement": "`import/no-restricted-paths` in eslint.config.mjs generates one zone per entry of a hardcoded `domains` array, so a new module that is not added to that array silently loses the privacy of its `data/` folder — the one way the automated rule 7–10 enforcement can be defeated while lint still passes.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L5-L48",
+          "version": "repo-lines-v1:sha256:662f9a28a573aa48e3af165373f9f9a2379a2d42ee1671aafca1635feff28d27:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4OGZmZjA4MzAxYTJhOGYwODk0ZTZiOTI5ZmY3MzVmZmE1NGQxZWRkZmEwZDI1ODM0NWU4ODZmZDBlMmQyYTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmODQyNDQ1YjQyN2JkNDQ4ZGUwMjVmNzM5MDI4ODlhNzEzOThjZDJmZWE2MDVhNTVlMzYzY2UyNWRiYWRjODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmYjE4OWRjM2NhZjdmN2U4MTQ3YjEwMzYwZDNlNDMxMzUyZDVlMmVkNjIyMjgxNTc0OTc3NTYyOTI1NjVlNTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_94dde2d8f99141438266e623fcda5ab9",
+      "statement": "`tsc --noEmit` is deliberately scriptless, and because tsconfig is strict with `**/*.ts`, `**/*.tsx` and `**/*.mts` included, the specs, the Vitest config and the ESLint config are typechecked too; the total map `DB_TO_UI_STAGE` makes a new DB enum variant a compilation failure until a UI treatment is chosen (rule 18).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L61-L62",
+          "version": "repo-lines-v1:sha256:0cec12228519fb2d127126573986c6c84d3a4981379cde196f173c753abf2000:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjVlOWQ0MmNhMDJiZmRkOTIxOTMxN2VjM2JkMTc3MTA1N2U1YzgzZDBlMzkwZGI3ZjliZmVlMTJkM2M4YWM5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTZhNDY1ZTcxMDEwNTNlZTQ5NjM0NDIxYTZiYjhlNDQ0NWI4MWM0ZWZjZTY0NjlkYTFhZTkwYWEzNjU2NjUyZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2M5YzZlNWIyZTRkM2Q2NTliMzU2ODFmNTVhODBmOWU2MWZlYTQ5NDZmN2Q5NDhkN2VhYTQ3OTQ3Nzg4NzUwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWVkYTEzZGYyNTIwYzFjMmQxOGU4NGYyN2ViNjUyYzliYmU0NzRhMDZiNzMzOTg2YjYzZDNlNTU1Yjg0Y2Y0NCJ9"
+        },
+        {
+          "resource": "repo://tsconfig.json#L1-L33",
+          "version": "repo-lines-v1:sha256:7b79fb6dde52a2cda573bf27ffe36efddd5290b85fa4f705419d661f302579c9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3NGUwMDEzNTNlZDM4NzgwYTBiZTUwZWZkMjhjNTQwOWU1YzBkMTI0ZWJiZTkyODhhMjM0ZDFhMmU0NGZmOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6d500c5b4da94d72bdece514d1864da8",
+      "statement": "The route-level guard ordering (forced `?state=`, then sync-failed, then no-tenant-access, then empty, then role denial) lives in an unexported `guardState()` in the dashboard page module, which has no spec, so a reorder is only caught by reading the route.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L136-L150",
+          "version": "repo-lines-v1:sha256:86c5fa1586dca474c187efa9c21d7e2fc501b361156e7ca533c6c71e514e3831:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0NzJlNDJlMThkYjViMmU4MWNiZDRiNzQ0M2Q2MDc5NmVhY2EzM2RlNmQxNGJhZjc5ZGEwYzY3M2M1YWFmOWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxMTYxYWFmMjc3NTZiYjgyNjBmNjc1NDQ3YzRiN2RhNzQ3NTliOGZhMmM5NmZiNTAxZWU1MTM1MTFiY2Q4NzYifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L83-L88",
+          "version": "repo-lines-v1:sha256:8070fd08349430bf2f4a59b3a6130c546670fc26926c86e3c9511254dcf2df44:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDk5MzVhYzA5MDEwZTBhODFmZTA1NjNjNzYyYzVjNTc3MTMyNDJiZjhhZDE2NDcwN2QzNzAzZjI0Y2MxODg4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYyNmY4NTM1ODM2ZTUwZmE1NGE5ZDBjYjM0NmM5ZWViYjk4MDY4YTEwMDFhMzM0NTc5YmZjODc4ZTk0ZTUyMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzg4NzBlOWJiYmE3ZDc4ZWE0YzYwNmU3ZWI0YjM0NDNlOGNkOWEwNzU4ODU0ZGJkYzc4ZTYzMzQ5MWI0ZDczOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjFhNWM3NGM5YjRjYTJiYjFkZTVjYTRmMTcyNWRiYmFiNzVlMzAwZDNlMjA0ZDZmYmM4NzQwMTFkYzIxMjMxMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5005547f1e794d14b3fbb8fb355572cc",
+      "statement": "`tenant-access.test.ts` pins the silent half of rule 19 by asserting `withTenantAccess` rewrites only an `ok` snapshot and never overwrites a `sync-failed` or `unconfigured` one, and that `unknown` access never behaves like `none`.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L63-L67",
+          "version": "repo-lines-v1:sha256:f86d9c6163383682e63bbf31a1ca3b9b684ce38d45ec1007d2138454bd8cb182:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5MDM1ZDQ5OGM1MmQzZjAwMWQ2N2U2ZDAyZjExNTkzNWI1YTYwYTEyOTQ3Y2QwNzMyZTgwOTgwYTdmMDI1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTA5MGIyZThlYTg5ZDliNWU5MjM3ZDU3OGIwZGY3NjBhYTllNGIxMTJjYTQxOWI0NDNiMjFhODQ4NjIyMDhjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjAwNjJkOTcwOTI3Y2Y2NzFmOGVmNThkYzhkMzU1YWM2NTQyZWQ0NjIxMWZlYzAyZmFkNDAyYjFmMWVhNTA1ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTBjOWIxNGNjNWU4NDM5YWQ4NGMwYTJiMzFiYTMxZTU4NzhiMTQ3NzRhOGJiYzI4MzZiMTY5MjUwYjM1MzYyNiJ9"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L72-L75",
+          "version": "repo-lines-v1:sha256:fdaa8c0afd86d89887ad3e40fcd7f53318de755bc93fc81fefc546cab826bb4b:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDBiM2RlMTBkYzgwZmJmNzJjMTMzNzFkYTViOTNiZTk3YzE3NzE2N2EwMDYwZDA4YzQ1YjdkN2U3ZjU1YjQxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDAxMjE3ODg1YmJhOWY2ZDE0YWE0N2ZhMjUyNjFlZjIzMzk5ZWEzNzYzMTI0N2U5YjAyYjA3ZTFmMjBjZGZjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDQxYjdhYjBkZGRmYWUzOWYyNDcwNGI3NzIzNzU4MmNlZjhhN2UwYjZmZDZkYWJhMDZkNjNmOTIxZGNlMzA1YiJ9"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L92-L98",
+          "version": "repo-lines-v1:sha256:1169ad8be849100ddd2e73a9c437534e2d778c7ac35d07196753b71ceb9d06fd:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmFkOTlkYTgxNWU5YTNjMzg1ODc4MzAyMmZlNDRkNzc3NjJlMmMzMzQ2NzA5MTk2NDkxM2RiMjViNDczMjAzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmIyY2NmYTkzYmY5MGEyNDU0Y2E5MjNlNzQ4OTQ2MjZiN2ZiYTk0NzcwN2NjMzEzYmQ2ZjgxZDY5MjI0NTJiMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_96c684b995a647ae99c53ad3bc8d755d",
+      "statement": "`supabase-server.test.ts` mocks `createClient` and Clerk `auth` and states in its header that it tests how lib/supabase/server.ts decides to call them (the `accessToken` callback, throwing on a missing token instead of degrading to `anon`), not an integration test.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/supabase-server.test.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:a4aa732811ebadd552f3e62ae73ee9f28048c1d9d302c7998206c7b524389cb8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1ODg5MDM2MjM3NDUxODYzOGRiMWVkNjZmMThhMTFlOTMyMDk5NzE1MDU0MWY1N2I1NTYxY2JmZDRmZjVlZjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b4fc733e88a5444580980dcf3cfb806a",
+      "statement": "Fixed as-of dates are the convention: `dashboard-domain.test.ts` takes `daysToBilling` as input via a `dated(days)` helper and never reads a clock, while `batches.test.ts` freezes time with `vi.setSystemTime` in `beforeEach` (no `vi.useFakeTimers()`) and restores with `vi.useRealTimers()` in `afterEach` to assert a whole-day count between two fixed dates.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L145-L159",
+          "version": "repo-lines-v1:sha256:c03c8d9ef7921b9b1e7739d2e8e6b953e2b7dec36282486ac8b09952a85e6f2c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzZTc4MGFlOWVmMDQxNGQ3MzQ0YzI1YTQwMjlhYzlhMDQxMzkzNWUwYjViYzJmYjUwMDJjMTUxYWIwMDVmNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3NmEzZDY4Y2E4MGEzMzJiODRlNWFhOWI4ZGFkMjk1MTI5NTgxN2M0MjBlZWZhYWQyYWVlOWYwODI1YjNmM2QifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L9-L43",
+          "version": "repo-lines-v1:sha256:827003718fe1c4d1dd4491ea747922864f4f5b8301dfc899561d5f1316b47fd9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzN2QwMjkzNjc1M2VlZWYzMGQ1YTcxNWI2NzY0YTUzN2VmMzRhYmIyYjViZmY2OTY2ZWI0OTJmMzE4MmVhNWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3OGZhZWZkM2ZlMmYxMzkwYTA5ZDgxNzU0YTllNDExNzdjODA0YjVmYjRjZWZmMmQyYTVmNDFlYzk4ZWU1NWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhNjZkMjQ3NTFhZDcwZDFhZTkxY2U2NmEyNGQwMWRmNmJkYmRkMWQ3ZWRlNGQ1NDJhNzg4ZWM0NTNjN2Q2NGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4c76532caac54ce5b0d2ae574b2d2eef",
+      "statement": "`e2e/auth.spec.ts` is the standing proof that the redirect gate is `requireAuthenticatedUser()` in app/(dashboard)/layout.tsx and not `proxy.ts`, which only forwards the pathname header; a move of gating into middleware or a route group outside `(dashboard)` is what it catches.",
+      "evidence": [
+        {
+          "resource": "repo://CLAUDE.md",
+          "version": "repo-file-v1:sha256:099cfb0612cf712e2330b04186f24c979185e8879a16a0a5b9f20a952736bb3f"
+        },
+        {
+          "resource": "repo://e2e/auth.spec.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:354cc9613971f6951b935075b765487af67f029e3f73f65347e21b273d60c53a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwN2QzNTAzNDY0YmQ4N2RlYzMxOTcwY2YxNWViNjk4ZDhjMmY5ZGJkZjFjMjBmMjkzOTJhYmMzZWEyMjA2NzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9f2617deb551438e83bbd35ada3f23d0",
+      "statement": "`pnpm test:e2e` boots a real Next dev server through `playwright.config.ts`'s `webServer: { command: 'pnpm dev' }` (reusing an existing one outside CI) and needs a Clerk testing token minted by the serial `global setup` project before any spec runs.",
+      "evidence": [
+        {
+          "resource": "repo://e2e/global.setup.ts#L1-L11",
+          "version": "repo-lines-v1:sha256:bdc537f62df3160c4b17063a475b2d6d5af1c30e74e511b12d2a8786a3619aef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwNjFhOWRmZWIwMjlkNzY3NjRiNjk1NDZjZmVmYTQ4MzBiNGFiZjJiMjAzYjNmY2JiZmU3YjQwZjBlNDM5NmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://playwright.config.ts#L9-L35",
+          "version": "repo-lines-v1:sha256:3e6cb5fb299eb33ed59dd30447fbc8dd1848a365c9270578d7da561e8aa1f800:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyY2VjYjE0NGE0NmY1ZGNmMTJhNjE2OWZjZWVkNzY5NWU4Mjk0YjA5MGRlNzZmMzY2MWNkZDAyNDkzMDAxNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiOTBiMTRkZWQyNDI0N2VhN2NlZmY0ZDk2MWNhMTVlYjA2YzU5ZjhiNzY2MmUwNmQ3NzM1ZWU4NmUwNDJlYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5ea512f779c74363a7c95be3effb19fc",
+      "statement": "The real-Supabase RLS/tenant-isolation suite that rule 35 requires with no mocks does not exist: `docs/IMPLEMENTATION_PLAN.md` reserves `tests/integration/` and `tests/security/`, but `tests/` holds only `unit/` and the e2e specs live in `e2e/` rather than the plan's `tests/e2e/`.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L127-L128",
+          "version": "repo-lines-v1:sha256:159c138480fc933de5615d406096fe91ae670a4596a34a49456c96e376a7f3a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDQ2Y2Y1NjkyZDFlNDA2Nzc5MDEzM2Q5NjM3MjA3YmI4OTVmNjlhOWNhYTMyMTk2Y2I3OGM3ZjdkYjljMmI2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWI0NGI2NTgzNzEyM2NlNTY0N2Y0M2QxZTAzY2ViZmIzMGRlOWUxOWIwMTMwMjk4OTViOWU2Y2E1ZjBiNjAwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2RmNjhlZDk2NjJlOTI0Y2RhOGZjNzIwNzY4N2FkOGQwZmFjZmNiODljZTk4N2JlOTg3MzljMTRiYzZjNzMyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgxNWEzOGU4ZDUwZDZkMjg0ZDk2NDFhYjgxZGNiY2FlYTAzYTFlMDE1N2RmN2QwOTRjNjMzNGNjNDAyZTNiMyJ9"
+        },
+        {
+          "resource": "repo://docs/IMPLEMENTATION_PLAN.md#L112-L120",
+          "version": "repo-lines-v1:sha256:fe761162cb2361cf2244dbbb51bdfc86d402020a9db1d7a7ef09df77c04b637e:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NmMTFhZDQ0YmQzYzFkNDg1MjJiZTU1MDdhNDhiNWQ5ZWQzODc0ZDhkNGM0MWMzMWQ3MTRiZWJlZDY1MWNlYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTBkNjQwNWU1ZGYyMmY0YmJlZTIzZmFlOGNkMmIzMjk3OGVlZGViZTM5YmRkMzcyMWRiNTJmYzgyNTNlZDNmZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRlNzUyMzRhNmYzMWI4NjMwMDI5ZTFiZTI2ZmZlYWVhOGQwZTc0ZGYxZWQ2ZjNhMWM1YzcyNTI3NTk2MTNiOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWJkOWEwNDAzM2Q5NDFlMjhmYmNmNzQzYWMxMzgwMTZiZjNmZWU1MGU1MTc0YjY1MWM1NmEyODdmYzNiNzE3YiJ9"
+        },
+        {
+          "resource": "repo://docs/IMPLEMENTATION_PLAN.md#L493-L493",
+          "version": "repo-lines-v1:sha256:add918c3dc46aa684edd7919507c23244ce83f7bbb522147fcb3bdac360df9ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWRkOTE4YzNkYzQ2YWE2ODRlZGQ3OTE5NTA3YzIzMjQ0Y2U4M2Y3YmJiNTIyMTQ3ZmNiM2JkYWMzNjBkZjliYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWRkOTE4YzNkYzQ2YWE2ODRlZGQ3OTE5NTA3YzIzMjQ0Y2U4M2Y3YmJiNTIyMTQ3ZmNiM2JkYWMzNjBkZjliYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTgyY2I4MjMxMjczNTMyYmYxZjdiNjgwMWYwODI0YmY5NjM5OTcxMzk0OTJmNjE3YjkxMzU4OWQyMzViM2FkNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTRjMGI0OWUyMjE5YjZjN2JjNmY0NzliZGUwYjMzNjMzMWMzMzIzMWJmNGJlNDU0ZmZmMmZjNjVmNTlkMjQwYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3e368589fbd54007a76e2faf9b7c1b24",
+      "statement": "The suite is fixture-in/function-out and covers mappers, domain rules, route-scope folds, keyless component renders and Clerk/env seams, but leaves the write half of `importLearnersCsv` untested: no spec references `importLearnersCsv`, so the I/O half of the import path has no coverage.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/learner-import.test.ts#L1-L9",
+          "version": "repo-lines-v1:sha256:f5d8c1ac5bab37f4247d1eb77e31d72d4731195cbb5f99202dd484c0d3e55620:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDA4MjAxMDkyOTI0NTg4NmJmZTBkYTlmZWJjMWZlYWFjMjUwODgwNDRhODNmOGUxNzg4YjU3NGMwOWYyNDg3OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGUxM2EwNjYxNWUxZTlhMzRhMGI3OTJiNDY1M2MxMmNhN2Q5YWVlNDllYTBjNTNjZTgxY2IwMjFhY2E2NzZlNSJ9"
+        },
+        {
+          "resource": "repo://vitest.config.mts#L11-L14",
+          "version": "repo-lines-v1:sha256:d7505e5b3ea407a5bf4ac105b0d8dee1f0c7f69b39dcc93c42c9b923053f2604:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTkzNmRmN2E1YTNhYWYxODBjZmZkMWQ2NWM2NDZlZjZhZWEzNTJjYzI3Nzc0Njg2MTk5Y2Q4ZmIzZTg5OWM3YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDk0NTI3Zjc2M2I2MjJhY2MxMDFhNDlkMTRmNzYzZTVhODkxNjVlODg5YjY0NjZhMjlkYjQwMzQ3ODg1NDNkNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2fe668d64f2847be8ff22021a9d5cfd9",
+      "statement": "ADR-007's dropout math is neither built nor tested: `modules/attendance/domain/eligibility.ts` and any `eligibility.test.ts` are absent, and nothing under `tests/` names `max_absence_percent` or an absence count, so a green suite does not verify the 20 % or three-consecutive-absence rules.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L162-L174",
+          "version": "repo-lines-v1:sha256:61823a350e1ffdcb33d2321a274e648b205f189626caaf7debbbeabcb4f37268:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NWRlN2MyMWNlOTc0M2Y2Y2VkY2IyNGU4NmU2Y2FhZDA5MTlmZTg0ZTUwM2VjZTBlOWY0MzU3OGEzOTZlZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwN2I3ZThiYzZhYzYyODc3YWVlZDJhNTJmMzBjM2YwYjI4ZDk5MWI2YzI0MWJmNWM3Zjg2NDIyYWE0NTRhY2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql",
+          "version": "repo-file-v1:sha256:0bbbe1517a8f8a035901f5669f3cabaae3f726d76c69d21b71cc99a5b480b605"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d881e3902884f998b9b3c3593d36d51",
+      "statement": "`auth-provisioning.test.ts` is a live stale-spec case: its fixture supplies `publicMetadata: { tvicamsRole, tvicamsTenantId }` while the source now parses that metadata through `parseInvitationGrant`, and the spec's invitation cases only walk the update path, so they stay green while pinning nothing about the parse.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/data/provisioning.ts#L18-L19",
+          "version": "repo-lines-v1:sha256:967b2a8673703c0d5288e141d26d6087c3dcbba23826b84fceda246ea1b3bd5c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDNkYjdiYjU4ZjUyYTViNmE2YTBjYzU0MzQ1OWU2ZjIzMzIwZGNlZDdlMzk2YjkxYjRlYjQ1YjIyOGRlZjA2YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JkNzgyZDQ2MjNmOThkY2I0ZTdlY2I2NGVjYjk1MTA1MWY5YzI4MGMzM2FkODQ0ZDc1NDg2ODM1ODgwMzcwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzU4N2IyYzk4NDAzMzZiMzYwODgwNTZkMDViNjQ2MzM3ZDcyMTNjMzMzMzdlYTE5ZjEyNGIyMjhmYWI5NDY3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzdiNDg2ZDhlYTIxNzRhMDcxNGQ3MTNjNWY1YzE1YzEzNWFmY2QxMDNhMWJlNDE0NDk4ZGUxZWI2NGJhMjQwMiJ9"
+        },
+        {
+          "resource": "repo://tests/unit/auth-provisioning.test.ts#L43-L67",
+          "version": "repo-lines-v1:sha256:39ddafdec13157557ea0c6d78d6e2dafb66b33829b74c4feb6adaf568ec02fa9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZDZkNjYzN2EwYzY1YTBmNmNiYWY2YWMzY2FhMmRjOTI3OTVhZGE3ZDlhYTJlNzE5ZTlmMWE0MjUxYmVmYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjEwYTllNzdkYWE0ZTY5MDQ2ZWZhMzA4ZjE5MGM0ZGVmYWJiNGU1NmZmZGI1NWY3MWNiMmQ0Y2Q0ODRlOWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwZTAyM2E1MTBhMjA2NTk4MjUxZDlmY2ZhOGJjZmFiOTIyN2I4NGUwYzVhNzg1Zjg5ODJmMjg1NDZhOTMzODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_04739b66fecd41a0a647033e84cdda65",
+      "statement": "A repo spec can pass while pinning superseded behaviour: docs/DASHBOARD_DESIGN_AUDIT_2026-10-24.md §9 lists such specs, and both headline examples have since been repaired (`urgency.test.ts` now expects the `overdue` tier, `batches.test.ts` keeps the recorded `billing_deadline` instead of `end_date`), so specs must be grepped for retired constants after an ADR or threshold change.",
+      "evidence": [
+        {
+          "resource": "repo://docs/DASHBOARD_DESIGN_AUDIT_2026-10-24.md#L286-L290",
+          "version": "repo-lines-v1:sha256:07021dadd4f34781a7557ac65fd6c12dffa003cf568c42c8fc362264893db744:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGZhMGUwZGExNzYzMjFlMjZiMGNmYmQxY2RkY2M0ZTI4OGY2MTU0NjZiZDkyZjgwNzNmZTlkNDNmMjU5Zjc5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmMyZTczNDIyOTE0NTQ0NWY4MjMxMjgzNTVmOGI0N2NiNjA5MDVmNTdjOTg2MDY4MGY5NWM4NDY2ZDFiYmMxYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDYxZjk4MGRiMzI0ODQzY2E1MTI4ZmU0ZjU4Yzg0OGM1NmRkZGY2NzEyYzI4ODAwNGRkMDFmZDE4MTE0YmY4YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L172-L175",
+          "version": "repo-lines-v1:sha256:b2f2ff256569e7347b4217d0e074ac0d1e697277678be2588d7a11b95f928691:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWM0MzY1NGQwYmM1OGI3MWUzM2UzYmI0ODhkMzc4NjQ5YjAyMjQxZjE4NDZkNTFjOWE4MGFlMjQxYWExOWM5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDYwODdjOGZhMzM5YjRiYjU2NjcyZTQ4NjNmYTMzNTliNGI0Njg4ZWVhZjFkZGQ3MTlmNjVmYTZmNzMzNjFlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjM1ZDM0ZmJhYzM0MTIwM2U2ZTRmM2NhM2IwOWFjZjYxMjMyNDQ0MjMxYTQxZmRiNzU3Yzc2ODdlMDFkYTMzNSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/urgency.test.ts#L13-L15",
+          "version": "repo-lines-v1:sha256:422352a6b0fc2cb1fe643c3a3b30f8fdb13f7af5ab37a21a6d3475d27dac8cc7:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmRkN2FjMzEwZTg3OTA4ZmUxMThhYjRiM2RkY2MwYTlmNGU3MWY5ZjFhMDM1OTI5OWU0ZTg5NGM3ZmY5N2Q0YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDU2OGQ5MTQwMmU4MTc1YmNiMTFhOTAyNTlmZDFjYmE5NDI2ZDkxZTM0OGFiYzdjNjAxMWJiZmZkNGYxOWMxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTE0MDY0YzlkM2YxYWQ5MTRlZjk2OTY0OWI5NzIyZDE5OTM3OGY5MDc0ZDk4NmE5ODIwYWNkZTkwOGZhNjEwYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2a16972d059a4d28872fbaa5aa65c88c",
+      "statement": "`auth-provisioning.test.ts` mocks the service client and asserts callers use the atomic `ensure_profile_tenant_membership` RPC rather than a select-then-insert, accepting a concurrent `23505` duplicate.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql#L4-L4",
+          "version": "repo-lines-v1:sha256:64558e5472a1566704e619cd4f0bd2f827ea0e15c64ccef12ad3441258639af0:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ1NThlNTQ3MmExNTY2NzA0ZTYxOWNkNGYwYmQyZjgyN2VhMGUxNWM2NGNjZWYxMmFkMzQ0MTI1ODYzOWFmMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ1NThlNTQ3MmExNTY2NzA0ZTYxOWNkNGYwYmQyZjgyN2VhMGUxNWM2NGNjZWYxMmFkMzQ0MTI1ODYzOWFmMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDUwYzIwZmVlNTNjODBmODEwNzhmMmUxZDIyZWFiMDBiZTkzYjM4MTUxMDQ2ZDI0MTE3YTdlYWExOTc0Mjk1MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjVhOWVlYjQzYWI5OTRlZTYwNDI0YzI4MDdmM2I3MjUyYThlZDMzYTlkNjE1OTc5NGFmMzQyZDIxZTA1NWNiNSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/auth-provisioning.test.ts#L57-L70",
+          "version": "repo-lines-v1:sha256:89fd8334487bf6668124631174280b3c025cc0f390bd92e6162ebd70cb63d734:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3ZDgxYTMzYWIzY2VhYWNhNTUwMWZhNWQyYTYzMDAxODVkZDE4ZTliNjllMWNjYjViMTM3ODI1MzI2NTEzMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMmFjYWI4MDczZDc0MzdlYjhiYjQ1MDAxNDZjMTc0YTM0YTVlODQ1N2Q5ZDgxZmY1MTBhMDkzNWEzYjNmZTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5ZjM4ODJjNGM5MTU2YTQ3ZGVjMmQ2MDA4NjU2MTc1ODg4ZDljZTVlMzc5OWQ3NzEzNzFlNTIxYjEzNTFmY2YifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-11-18T01:01:49.569Z"
+  }
+}
