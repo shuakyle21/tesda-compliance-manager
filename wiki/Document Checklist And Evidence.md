@@ -4,6 +4,17 @@ Required documents are **configurable per scholarship program** (`program_docume
 
 ## Status flow
 
+```mermaid
+stateDiagram-v2
+  direction LR
+  [*] --> missing: stage reached (required_at_stage)
+  missing --> pending
+  pending --> submitted: valid upload or link (activity_log)
+  missing --> submitted: valid upload or link
+  submitted --> verified: Admin or Coordinator verifies
+  verified --> [*]
+```
+
 `missing → pending → submitted → verified`
 
 - Evidence is an uploaded file **or** an external link (`documents.storage_path` vs `documents.external_url`).

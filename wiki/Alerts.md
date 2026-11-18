@@ -4,6 +4,17 @@ ADR-001 decision JJ1: alerts are **computed on read** — derived from batch sta
 
 ## Triggers
 
+```mermaid
+flowchart LR
+  BS["batch state at render time"] --> F{"computed on read"}
+  F --> A1["billing readiness"]
+  F --> A2["NTP-lag deadline"]
+  F --> A3["missing tranche docs"]
+  A1 & A2 & A3 --> RS{"role scope"}
+  RS -->|Admin / Coordinator| D["notifications drawer + batch badges"]
+  RS -->|Trainer| T["no billing or NTP alerts"]
+```
+
 - **Billing readiness** — per billing type at the 20/50/80% thresholds, gated on verified tranche documents ([[Billing Engine]])
 - **NTP-lag deadline** — the "act within N days" clause ([[RQM And NTP Authorization]])
 - **Missing per-tranche documents** ([[Document Checklist And Evidence]])

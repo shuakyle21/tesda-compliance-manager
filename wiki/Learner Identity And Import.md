@@ -8,6 +8,16 @@ The **ULI** (a national TESDA identifier) is the permanent primary key on every 
 
 ## Import wizard: parse → enrich → commit (S1)
 
+```mermaid
+flowchart LR
+  CSV["CSV: batch metadata + roster"] --> P["parse + validate"]
+  P --> E["enrich: program, schedule_pattern, total_sessions, cost snapshot, RQM/NTP"]
+  E --> PV["preview + dedup by ULI"]
+  PV --> C["commit atomically"]
+  C --> N["new ULIs inserted"]
+  C --> K["existing ULIs skipped, nothing deleted"]
+```
+
 A CSV import carries **batch metadata + learner roster in one file** (raw-T2MIS-export shape), committed atomically (R2). The **enrich** step supplies what the CSV can't:
 
 - confirm program/qualification

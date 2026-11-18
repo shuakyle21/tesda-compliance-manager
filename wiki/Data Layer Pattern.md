@@ -19,6 +19,20 @@
 
 ## Error shaping: discriminated snapshots
 
+```mermaid
+flowchart LR
+  Q["fetch: typed Supabase query (RLS scopes rows)"] --> MAP["map: pure row to domain (mapBatchRow)"]
+  MAP --> D["derive: lifecycle and date helpers"]
+  D --> SNAP{"BatchesSnapshot"}
+  SNAP -->|ok| UI1["render data"]
+  SNAP -->|unconfigured| UI2["honest empty state"]
+  SNAP -->|sync-failed| UI3["empty state + sync-failed banner"]
+  R["route: withTenantAccess()"] -.->|"replaces ok only"| NTA["no-tenant-access: NoTenantAccessState"]
+  SNAP -.-> R
+```
+
+> Current behaviour: `unconfigured` renders an honest empty state, with no mock data, and `no-tenant-access` is folded in by the route, not produced by any query (see CLAUDE.md).
+
 Data functions return discriminated unions (see `BatchesSnapshot`): **`ok`** / **`sync-failed`** / **`unconfigured`**, so Server Components map states straight to UI. `unconfigured` (no Supabase env) falls back to mock data silently; `sync-failed` (configured but errored) must surface the sync-failed banner. **Never leak raw Supabase/SQL errors, table names, or internal IDs to the UI.**
 
 ## DTO contract rules

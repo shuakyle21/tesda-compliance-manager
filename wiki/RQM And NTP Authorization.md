@@ -4,6 +4,16 @@ How TESDA authorizes a batch, per ADR-001 decisions Z3, Card, Cap, Lag.
 
 ## One RQM code = one batch (Card)
 
+```mermaid
+flowchart LR
+  NTP["NTP / Annex M document"] --> R1["RQM line 1"]
+  NTP --> R2["RQM line 2"]
+  NTP --> R3["RQM line n"]
+  R1 --> B1["batch: rqm_code, approved_slots, total_amount"]
+  R2 --> B2["batch"]
+  R3 --> B3["batch"]
+```
+
 One Notice to Proceed (NTP / Annex M) document lists **multiple RQM lines**, each a unique allocation. **Each RQM line becomes its own batch.** There is no `program_rqm` table — the RQM/NTP fields live **directly on `batches`**:
 
 `rqm_code`, `ntp_number`, `approved_slots`, `total_amount`, `indicative_start_date`, `ntp_approval_date`, `ntp_received_date`
