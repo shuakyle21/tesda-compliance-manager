@@ -3,9 +3,6 @@ type: Architecture
 title: Architecture Overview
 description: The TVI-CAMS map — what the system is and is not, the stack, the request path from Clerk through proxy.ts to the (dashboard) layout gate, the anon-key client and RLS, scoped /t/<tenantCode> routing versus the platform registry, the lint-enforced import model in one table, a one-line-per-module catalog, and docs/ADR precedence. Every section links the neighbour that owns its depth.
 tags: [architecture, overview, nextjs, supabase, clerk, rls, routing, module-boundaries, adr]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-17T04:33:34.390Z
 ---
 
 # Architecture Overview

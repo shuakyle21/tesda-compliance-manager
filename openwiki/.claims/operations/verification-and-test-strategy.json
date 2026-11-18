@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:92b45847f76bb98b5b8dd4340c8f2c95b136a30a9e56109a5e2e5ed1233849b4",
+  "pageVersion": "sha256:a5114117bb545b042f51db06b3433da58c86d55cb26ffc0b29e4ddc337e4d86d",
   "claims": [
     {
       "id": "claim_3161f57f9e3044309c9b4373865a42e2",
-      "statement": "The verification loop is ordered `pnpm exec tsc --noEmit` → `pnpm lint` → `pnpm test`, cheapest signal first, and has no npm script for typecheck on purpose so typecheck reads as a step in a sequence rather than a product command.",
+      "statement": "The verification loop is ordered `pnpm exec tsc --noEmit` → `pnpm lint` → `pnpm test`, cheapest signal first; there is deliberately no npm script for the typecheck, which `CLAUDE.md` documents as a bare `pnpm exec` step annotated \"no dedicated script\" and which `package.json`'s `scripts` block does not alias, so typecheck reads as a step in a sequence rather than a product command.",
       "evidence": [
         {
           "resource": "repo://CLAUDE.md#L17-L24",
           "version": "repo-lines-v1:sha256:96d9c85f6dd3f2469ba4091c6eb788f6243045da36a8c9c1bbc48e7133135083:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRlMmY1MzI4ZWU2ZTgwNTBlOGFhZmQ4ZGM4NjlhMDY5Y2Q5NTg0ZWRhYWY1NGZlNTg5ZDczYzNiN2RjZDc5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdjMDZjNTYxZDVjMzI3MzQzNjg1MjY4YTQ2YjMzOTFmMzk5OGVlZTg5MGQyYmU1MWYwZDIxY2M0YTUzYWU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGNkY2Q3ZWQyNWM4YWQ5YjQ3MDg4MTczMTk3Y2Y2OGU3M2I4ZTY1Y2Q3YTdjNmZjMDYxODYyNjAxZmJiM2JkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWM0MWVmYmM3NmFjMzhjZTY5ZWE0NDg0Y2VjNzQzODdjY2JhYThjZWFjMmU0MmYxMDIxYTdhMmI0ZDRiYjYyZiJ9"
         },
         {
-          "resource": "repo://package.json#L10-L22",
-          "version": "repo-lines-v1:sha256:5ceeb28f7ae381350ad856003dec32f89c33aa7e1f0541b6d217b4e54fa6267e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwOWVlMmFiYmZkZTY3NWVjNmJhNmQ0MThjMTNkMzNjNGQ4YjhiNjVjYmE2OTVmNTdjZDY1YjgzMmFkMDliN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZTgzZjc5YTEwNjRjN2Y0YjFjOGM1NWFlOTFiZGNkMjA4MTkyODVkY2MyMGMwZjU0ZDA5OWFiNDQ2MDgxNjgifQ"
+          "resource": "repo://package.json#L10-L23",
+          "version": "repo-lines-v1:sha256:c7dd3ae8d95922a091c7b9e4e4b1db172a50c0e0ffa6a054746b6f265c634634:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwOWVlMmFiYmZkZTY3NWVjNmJhNmQ0MThjMTNkMzNjNGQ4YjhiNjVjYmE2OTVmNTdjZDY1YjgzMmFkMDliN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZTgzZjc5YTEwNjRjN2Y0YjFjOGM1NWFlOTFiZGNkMjA4MTkyODVkY2MyMGMwZjU0ZDA5OWFiNDQ2MDgxNjgifQ"
         },
         {
           "resource": "repo://tsconfig.json#L1-L33",
@@ -285,6 +285,6 @@
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-18T01:01:49.569Z"
   }
 }
