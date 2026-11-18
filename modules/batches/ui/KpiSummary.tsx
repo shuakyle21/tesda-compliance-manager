@@ -14,7 +14,7 @@ import { UrgencyIndicator } from '@/shared/ui/UrgencyIndicator';
 import { formatDate } from '@/shared/dates';
 import { pluralize } from '@/shared/text';
 import { urgencyTier } from '@/modules/batches/domain/urgency';
-import type { DashboardMetrics } from '@/shared/types';
+import type { BillingMetrics, TrainerDashboardMetrics } from '@/shared/types';
 
 type Variant = 'critical' | 'warning' | 'neutral';
 
@@ -34,7 +34,7 @@ function scoped(sub: string, population?: string): string {
   return population ? `${sub} · ${population}` : sub;
 }
 
-function ActiveBatchesCard({ metrics, href, population }: { metrics: DashboardMetrics; href: string; population?: string }) {
+function ActiveBatchesCard({ metrics, href, population }: { metrics: TrainerDashboardMetrics; href: string; population?: string }) {
   const scholars = scoped(`${metrics.activeScholars} ${pluralize(metrics.activeScholars, 'scholar', 'scholars')} enrolled`, population);
   return (
     <MetricCard
@@ -72,7 +72,7 @@ function billingVariant(days: number): Variant {
   return tier === 'warning' ? 'warning' : 'neutral';
 }
 
-function NextBillingCard({ metrics, href }: { metrics: DashboardMetrics; href: string }) {
+function NextBillingCard({ metrics, href }: { metrics: BillingMetrics; href: string }) {
   const next = metrics.nextBilling;
   if (!next) {
     const sub = metrics.openBillingObligations
@@ -96,14 +96,14 @@ function NextBillingCard({ metrics, href }: { metrics: DashboardMetrics; href: s
   );
 }
 
-function documentStatus(metrics: DashboardMetrics): { sub: string; variant: Variant } {
+function documentStatus(metrics: TrainerDashboardMetrics): { sub: string; variant: Variant } {
   if (metrics.docCompliancePct === null) return { sub: 'Not yet tracked', variant: 'neutral' };
   if (metrics.docMissing) return { sub: `${metrics.docMissing} required missing`, variant: 'critical' };
   if (metrics.docPending) return { sub: `${metrics.docPending} awaiting review`, variant: 'warning' };
   return { sub: 'All required documents on file', variant: 'neutral' };
 }
 
-function DocumentsCard({ metrics, href, population }: { metrics: DashboardMetrics; href: string; population?: string }) {
+function DocumentsCard({ metrics, href, population }: { metrics: TrainerDashboardMetrics; href: string; population?: string }) {
   const value = metrics.docCompliancePct === null ? '—' : `${metrics.docCompliancePct}%`;
   const { sub: status, variant } = documentStatus(metrics);
   const sub = scoped(status, population);
@@ -120,7 +120,7 @@ function DocumentsCard({ metrics, href, population }: { metrics: DashboardMetric
   );
 }
 
-function ProgressCard({ metrics, population }: { metrics: DashboardMetrics; population?: string }) {
+function ProgressCard({ metrics, population }: { metrics: TrainerDashboardMetrics; population?: string }) {
   const value = metrics.sessionProgressPct === null ? '—' : `${metrics.sessionProgressPct}%`;
   const sub = scoped(metrics.sessionProgressPct === null
     ? 'Attendance not recorded yet'
@@ -137,25 +137,29 @@ function ProgressCard({ metrics, population }: { metrics: DashboardMetrics; popu
 }
 
 interface KpiSummaryProps {
-  metrics: DashboardMetrics;
+  metrics: TrainerDashboardMetrics;
   links: KpiLinks;
   /** Dashboard only — the shell row has no queue to point at. */
   attention?: AttentionCounts;
-  /** Trainer routes omit billing figures server-side (CLAUDE.md role rules). */
-  hideBilling?: boolean;
+  /**
+   * Office screens only. The billing card renders when this is passed; trainer
+   * routes never pass it, and their metrics carry no billing keys at all
+   * (`deriveTrainerMetrics`, RULES.md rule 5).
+   */
+  billing?: BillingMetrics;
   /** Cross-school overview only: the population every total describes, e.g. "across 3 schools". */
   population?: string;
   /** Cross-school overview only: a card rendered before the shared ones. */
   lead?: ReactNode;
 }
 
-export function KpiSummary({ metrics, links, attention, hideBilling = false, population, lead }: KpiSummaryProps) {
+export function KpiSummary({ metrics, links, attention, billing, population, lead }: KpiSummaryProps) {
   return (
     <section className="dash-kpi-grid" aria-label="Key metrics">
       {lead}
       <ActiveBatchesCard metrics={metrics} href={links.batches} population={population} />
       {attention && <AttentionCard attention={attention} href={links.attention} population={population} />}
-      {!hideBilling && <NextBillingCard metrics={metrics} href={links.batches} />}
+      {billing && <NextBillingCard metrics={billing} href={links.batches} />}
       <DocumentsCard metrics={metrics} href={links.documents} population={population} />
       <ProgressCard metrics={metrics} population={population} />
     </section>

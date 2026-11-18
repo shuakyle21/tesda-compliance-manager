@@ -264,8 +264,7 @@ export function SchoolsOverview({ summaries, queue, metrics, batches, filters, o
             metrics={metrics}
             links={{ batches: '#schools', attention: '#needs-attention', documents: '#documents' }}
             attention={{ total: queue.length, urgent: queue.filter((entry) => entry.item.severity === 'urgent').length }}
-            // Billing is per school in the table: batch codes are not unique across schools.
-            hideBilling
+            // No `billing`: it is per school in the table, since batch codes are not unique across schools.
             population={population}
             lead={
               <MetricCard label="Managed schools" value={managed} sub={leadSub} iconName="building" href="#schools"

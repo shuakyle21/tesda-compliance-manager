@@ -106,6 +106,7 @@ export default async function SchoolDashboardPage({ params, searchParams }: { pa
 
       <KpiSummary
         metrics={metrics}
+        billing={metrics}
         links={links}
         attention={{ total: items.length, urgent: items.filter((i) => i.severity === 'urgent').length }}
       />

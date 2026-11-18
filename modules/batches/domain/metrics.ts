@@ -16,7 +16,7 @@
 import { summarizeOwnCatalogCompliance } from '@/modules/documents/domain/compliance';
 import { displayBatchId } from './rqm';
 import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from './urgency';
-import type { Batch, DashboardMetrics } from '@/shared/types';
+import type { Batch, DashboardMetrics, TrainerDashboardMetrics } from '@/shared/types';
 
 function isActive(batch: Batch): boolean {
   return batch.status === 'ongoing';
@@ -62,4 +62,23 @@ export function deriveDashboardMetrics(batches: readonly Batch[]): DashboardMetr
     docTracked: docs.tracked,
     docUntracked: docs.untracked,
   };
+}
+
+/**
+ * The trainer-facing summary. The billing keys are removed from the object
+ * itself, not just from its type, so they cannot reach a trainer screen even
+ * if a component later serializes the whole summary (RULES.md rule 5).
+ */
+export function deriveTrainerMetrics(batches: readonly Batch[]): TrainerDashboardMetrics {
+  // The four names are bound only to be dropped from the rest object.
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    nextBilling: _nextBilling,
+    openBillingObligations: _open,
+    billingDeadlinesMissing: _missing,
+    overdueBilling: _overdue,
+    ...trainerMetrics
+  } = deriveDashboardMetrics(batches);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+  return trainerMetrics;
 }

@@ -20,7 +20,11 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   // never `resolveRouteRole`, whose `?role=` preview override would let any
   // caller conjure the row. This only decides what the menu lists; the route
   // and Server Action re-check it, and RLS sits under both.
-  const profileSnapshot = await getProfileSnapshot(clerkUserId);
+  // The profile and the platform check are independent, so they run together.
+  const [profileSnapshot, isPlatformAdmin] = await Promise.all([
+    getProfileSnapshot(clerkUserId),
+    resolveIsPlatformAdmin(),
+  ]);
   const dbRole = profileSnapshot.status === 'ok' ? profileSnapshot.profile.role : null;
   const isAdmin = (await resolveTrustedRole(dbRole)) === 'admin';
 
@@ -37,8 +41,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   // helper is right here -- a failed check should hide the row rather than
   // render a link into a denial. The route itself tells `sync-failed` apart
   // from `denied`, because there the two need different screens.
-  const isPlatformAdmin = await resolveIsPlatformAdmin();
-
   // The KPI row is not rendered here: a root layout does not re-render on
   // client-side navigation, so a row placed here kept the previous school's
   // numbers after a school switch. Only the two dashboard pages render one,

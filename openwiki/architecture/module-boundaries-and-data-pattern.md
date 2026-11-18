@@ -5,7 +5,7 @@ description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,u
 tags: [architecture, module-boundaries, data-layer, ddd, import-direction, eslint, supabase, snapshots, no-tenant-access, type-safety, uli, write-path]
 sources:
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
-    resource: repo://app/(dashboard)/layout.tsx
+    resource: repo://app/(dashboard)/layout.tsx#L12-L71
   - id: openwiki-source-0555213af97e8aa00bf4b119
     resource: repo://app/(dashboard)/schools/new/actions.ts
   - id: openwiki-source-75140e138296a68cc258200e
@@ -149,7 +149,7 @@ sources:
 generated: { by: "openwiki/0.5.0", at: "2026-11-16T02:29:16.800Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-16T02:29:16.800Z
+    at: 2026-11-17T04:33:34.390Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -161,7 +161,7 @@ The rules that matter most for day-to-day work:
 - **No business logic in `app/`.** Routes are thin Server Components: they fetch via a module's `data/` layer and compose module `ui/` + `shared/ui/` primitives (RULES rule 11, `[review]`).
 - **A module's `data/` is private to that module.** Another module imports its `domain/` or `ui/` surface instead; only `app/` may fetch from any module's `data/` (RULES rule 8, `[lint]`).
 - **`domain/` is pure** — business rules with no I/O (RULES rule 14, `[review]`).
-- **`shared/` must never import `modules/` or `app/`** (RULES rule 9, `[lint]`).
+- **`shared/` must never import `modules/` or `app/`** (RULES rule 9, `[lint]`). `shared/` is the only zone in the matrix below with no legitimate upward edge at all — the check is symmetric, so this page's own `shared/` convention still holds.
 - **No index barrels** — deep imports are the convention everywhere, including `shared/` (RULES rule 13, `[review]`; no `index.ts` exists in the tree).
 - **Only module `data/` layers may import `lib/supabase/database.types.ts`** (besides `lib/supabase` itself); components import domain types from `shared/types.ts` or a module's `domain/` (RULES rule 10, `[lint]`).
 - **Every entity contract returns a discriminated snapshot** — four states, no fabricated data (RULES rule 19). See [The snapshot union](#the-snapshot-union-ok--sync-failed--unconfigured-plus-no-tenant-access).
@@ -197,9 +197,11 @@ The rules are not stylistic preferences. Each one closes a specific failure:
 - **`shared/` is leaf level.** A primitive in `shared/ui/` that starts reading module data or encoding a module rule has crossed the boundary and belongs in the owning module.
 - **Raw DB types stay in `data/`.** `modules/batches/data/batches.ts` imports `Database` and defines `BatchRowWithProgram` privately, so no component depends on a column name.
 
-The lesson generalizes past readability. `database.types.ts` stubs every table's `Relationships` as `[]`, which leaves supabase-js unable to infer embedded joins, so six long-standing `as unknown` row casts survive in `activity.ts`, `batches.ts`, `learners.ts` (twice), `tenancy.ts` and `users.ts`. The casts are a boundary seam, not a hole in it: all of them live in `data/`, and the file header records adopting the generator's real `Relationships` as the way to retire them.
+The lesson generalizes past readability. `database.types.ts` stubs every table's `Relationships` as `[]`, which leaves supabase-js unable to infer embedded joins, so six long-standing `as unknown as` row casts survive across `activity.ts`, `batches.ts`, `learners.ts` (twice), `tenancy.ts` and `users.ts`. The casts are a boundary seam, not a hole in it: all of them live in `data/`, and the file header records adopting the generator's real `Relationships` as the way to retire them.
 
 One thing the zones cannot see: each `data/`-privacy zone is written with `modules/!(${d})/**` as the *target*, and a single zone's target set is evaluated as "path is any module except `d`, **and** a `data/` folder is imported". A module's own `data/` file importing a sibling `data/` file therefore matches the can-except-`d` half, so same-module `data/` → `data/` imports (e.g. `batches.ts` → `learners.ts`) pass lint and relying on the rule to catch them would not. Same-module `data/` → its own `domain/` is legal anyway.
+
+The zone targets are also enumeration-by-path, not authorization: the `app/**` target in the same array means an `app/` file may import any module's `data/` (that is the composition-root privilege, below) but the `shared/**` target means nothing under `shared/` may — while the per-domain zone's target list already contains `./modules/!(${d})/**` only. The matrix is therefore exactly what the file spells, and a zone that is absent is a boundary that is absent.
 
 These restrictions are enforced in [`eslint.config.mjs`](/eslint.config.mjs) with `import/no-restricted-paths` (RULES rule 7) and reviewed in PRs. The `domains` array at the top of that file generates one `data/`-privacy zone per module, so the enforcement is only as complete as the array: a folder added under `modules/` but not to the array has no enforced boundary at all. A violation otherwise surfaces as a lint error naming the offending import.
 
@@ -300,7 +302,7 @@ The shape every data function follows, from `modules/batches/data/batches.ts` (R
 4. On a Postgrest `error`, return `{ status: 'sync-failed', error }` with the raw message **kept server-side**.
 5. On a thrown error, return `{ status: 'sync-failed', error: String(err) }`.
 
-No branch ever returns fixture data. `selectBatchesForDisplay` is the display adapter (below); it turns the union into an array. (The residual `shared/mocks/` seed dataset backs only a hand-set `?state=` preview override, not any snapshot branch.)
+No branch ever returns fixture data. `selectBatchesForDisplay` is the display adapter (below); it turns the union into an array. (The residual `shared/mocks/` dataset — where the source tree still has one — backs only a hand-set `?state=` preview override, never a snapshot branch.)
 
 ### `domain/` — pure rules, the only cross-module surface
 
@@ -370,7 +372,7 @@ A screen holds only its narrowed rows by the time it renders, so guarding wrongl
 4. **empty** — a real fact about a reachable school.
 5. **no-results** — the client island's filtered-to-nothing state, which is not a snapshot fact at all.
 
-`…/t/[tenantCode]/(sections)/batch-cards/page.tsx` destructures the two statuses into booleans and, inside its zero-row branch, returns the sync-failed callout **before** the `NoTenantAccessState` **before** the `EmptyState`; `…/t/[tenantCode]/dashboard/page.tsx`'s `guardState` runs denied → `syncFailed && batchCount === 0` → `noTenantAccess` → empty. `(sections)/billing/page.tsx` holds the same shape (`sync-failed` with zero rows, then the access state). The report route guards both snapshots it holds: `syncFailed` is `batches.status === 'sync-failed' || roster.status === 'sync-failed'`, so a failed roster still raises the banner even when the banner's own copy only mentions batch data.
+`…/t/[tenantCode]/(sections)/batch-cards/page.tsx` destructures the two statuses into booleans and, inside its zero-row branch, returns the sync-failed callout **before** the `NoTenantAccessState` **before** the `EmptyState` — the sync-failed banner is deliberately inside the zero-row branch so a stale-but-populated screen keeps its rows. `…/t/[tenantCode]/dashboard/page.tsx`'s `guardState` runs the `?state=denied` preview → `syncFailed && batchCount === 0` → `noTenantAccess` → empty. `(sections)/billing/page.tsx` returns its denied preview first, then a `syncFailed && batches.length === 0` retry state, then the access state, and derives `syncFailed` as `snapshot.status === 'sync-failed' || forcedState === 'sync-failed'` so the preview cannot outrun the real status. The report route turns the two snapshots it holds into one boolean — `syncFailed = snapshot.status === 'sync-failed' || rosterSnapshot.status === 'sync-failed'` — so a failed roster still raises the banner even though the banner's own copy only mentions batch data; its zero-row branch then picks the access state before the `EmptyState`.
 
 The ordering is a convention, not a type constraint: nothing stops a screen writing the `EmptyState` first, and a reviewer is the only thing that catches it. Because the access check is `after` the failure check, a caller who both has no school and hit a query error is told the read failed — which is why `withTenantAccess` never rewrites a non-`ok` snapshot (next section).
 
@@ -386,7 +388,7 @@ The pair is optional in practice: a mapper computes `dataAsOf` from whatever `up
 
 Writes cannot return an `ok` snapshot with rows because there are no rows to return, so write paths use a *result union* with the same discipline: an outcome discriminant plus a payload, never a throw. Representative cases:
 
-- `UserAssignmentSnapshot` — `assigned`, `not-registered`, `denied`, `sync-failed`, `unconfigured`. The `denied` state is what keeps an RLS refusal from being reported as a broken connection: the shared `writeFailureSnapshot` helper classifies Postgres `42501` as `denied` and anything else as `sync-failed`.
+- `UserAssignmentSnapshot` — `assigned`, `not-registered`, `denied`, `sync-failed`, `unconfigured`. The `denied` state is what keeps an RLS refusal from being reported as a broken connection: `writeFailureSnapshot` in `modules/tenancy/data/users.ts` classifies Postgres `42501` as `denied` and anything else as `sync-failed`, and an update that matches **zero rows** (the policy's `using` clause excluded the row) is also `denied` rather than a silent success. `modules/tenancy/data/schools.ts` draws the same `42501` → `denied` line and adds `duplicate-code` for a unique violation, so "that school code is taken" never reads as a broken write.
 - `UserLookupSnapshot` — `found`, `not-registered`, `sync-failed`, `unconfigured`.
 - `LearnerImportSnapshot` — `ok { inserted, updated, skipped[] }`, `validation-failed { errors[] }`, `sync-failed { error }`, `unconfigured`; every validation branch runs before any Supabase client exists.
 
@@ -415,9 +417,17 @@ Raw Postgres messages are accepted on this path: `sync-failed` and `partial` car
 
 ## The enum bridge
 
-Every database `Row` field that a domain type names differently is translated in the mapper through a **total (non-`Partial`) map**, so a new DB enum variant fails compilation until its UI treatment is settled (RULES rule 18). The property to preserve is totality, not the map itself: the compiler, not a runtime lookup, is what forces the decision. `DB_TO_UI_STAGE` in `batches.ts` is the canonical example — `training`/`assessment`/`billing` → `train`/`assess`/`bill`, `entre` UI-only with no DB column, `completed`/`blocked` → `null` because `deriveLifecycle` treats them as special cases rather than a pipeline position.
+Every database `Row` field that a domain type names differently is translated in the mapper through a **total (non-`Partial`) map**, so a new DB enum variant fails compilation until its UI treatment is settled (RULES rule 18). The property to preserve is totality, not the map itself: the compiler, not a runtime lookup, is what forces the decision.
 
-`ASSESSMENT_RESULT_TO_UI` in `learners.ts` is where the forcing function earns its keep: `Record<DbAssessmentResult, string>` makes each new `assessment_result` variant a compile error until someone decides whether it reads `''` or a word. The deliberate exception is `DOCUMENT_ICONS` in `documents.ts`: a `Partial` map with a generic fallback, because `document_key` is per-program configured data rather than a closed enum.
+`DB_TO_UI_STAGE` in `batches.ts` is the canonical example and the one RULES rule 18 names: it is typed `Record<DbLifecycleStage, LifecycleStageKey | null>`, so every DB variant must appear — `training`/`assessment`/`billing` → `train`/`assess`/`bill`, `completed`/`blocked` → `null` because `deriveLifecycle` gives them their own treatment (all-done and nothing-active respectively) rather than a pipeline position. `entre` is UI-only, carried by `UI_PIPELINE` and absent from the map's value set.
+
+The same discipline is broader than batches and comes in three flavours:
+
+- **DB → UI label/role maps** — `ASSESSMENT_RESULT_TO_UI` in `learners.ts`, `DB_TO_UI_ROLE` in `tenancy.ts`, and the action→tone map in `activity.ts`, each a `Record<Db…, …>` that makes a new enum variant a compile error until someone decides how it reads.
+- **UI → DB maps on the write side** — `UI_TO_DB_ROLE` in `users.ts`, a `Record<AssignableRole, DbProfileRole>` so a role with no DB value fails at compile time rather than the write failing at runtime.
+- **Coverage maps inside `domain/`** — `EVIDENCE_REJECTION_COPY` in `documents/domain/evidencePath.ts` is a total map over the rejection union, so a new rejection reason cannot ship without copy.
+
+Note that a total map over an enum is only as good as the enum: `batch.status` is normalized by a hand-written ternary (`normalizeStatus`), not a map, and its `TODO(contract)` asks for the two status unions to be aligned instead. The deliberate exception to totality is `DOCUMENT_ICONS` in `documents.ts`: a `Partial` map with a generic fallback, because `document_key` is per-program configured data rather than a closed enum. The same instinct makes `Record<string, …>` (not an enum-keyed map) the right type for the qualification-keyed tables in `modules/billing/domain/rates.ts` and for `buildPackets`' `schoolCodes` map.
 
 ## ULI is a key by value, not by row
 
@@ -437,7 +447,11 @@ Two consequences reach the data layer. The import reconciles inside one batch, s
 - `BatchesSnapshot` and `getBatchesSnapshot` — union type and `cache()`-wrapped fetch, the `unconfigured` check first. `tenantId` is optional: supplied, it is scope *selection* on top of RLS for one school; omitted, the query spans every school RLS allows, which is what the admin overview and trainer routes use.
 - `selectBatchesForDisplay` — the display adapter.
 
-Three things make this file the reference rather than an example: the state union is exhaustive, the mapper is exported for tests, and the fetch is `cache()`d. The caching matters because `app/(dashboard)/layout.tsx` and each page call `getBatchesSnapshot` independently in one request; the same treatment is applied where one request reaches the same contract twice — `getProfileSnapshot` (the layout's admin nav row, the Sidebar user card and the school switcher all read one snapshot) and `getPlatformAdminSnapshot` (the layout's boolean `isPlatformAdmin()` helper, and `schools/new`'s page and Server Action, which call it directly to tell `sync-failed` from `denied`). `cache()` scopes that sharing to the request, so a later navigation re-queries.
+Three things make this file the reference rather than an example: the state union is exhaustive, the mapper is exported for tests, and the fetch is `cache()`d. The caching matters because `app/(dashboard)/layout.tsx` and each page call `getBatchesSnapshot` independently in one request, so `cache()` scopes one Supabase round-trip to that request and a later navigation re-queries. The same treatment covers the other contract a single request reaches twice: `getProfileSnapshot` is `cache()`d because the layout reads one snapshot and then derives three separate things from it — `isAdmin`, via the trusted role from `profileSnapshot.profile.role`; `fullName` for the Sidebar user card; and `tenants`/`defaultTenantId` for the school switcher — while `tenant-scope.ts` caches its own `getSignedInProfile` so the `/t/[tenantCode]` segment layout and its page resolve one scope from one profile read.
+
+`getPlatformAdminSnapshot` is the interesting case, because the same request-scoped cache is asked at two different resolutions. The layout wants only the boolean, through the polymorphic `isPlatformAdmin()` helper that folds both failure states to `false` — a failed check should hide the "Add school" row rather than render a link into a denial. `schools/new`'s page and its Server Action need the *status*, because `sync-failed`, `unconfigured` and "not a platform admin" are three different screens there, so they call `getPlatformAdminSnapshot` directly and branch on it; the helper's own docblock forbids using the boolean form in those two places. The platform check is also a different axis from `profiles.role`: the layout runs the profile snapshot and the platform RPC in one `Promise.all` and derives `isAdmin` from the trusted role, never from the platform flag. `cache()` keeps this from being three RPC round-trips.
+
+Neither cache makes the answer trustworthy for a write: a `/schools/new` Server Action still re-reads through `authorizePlatformAdmin`, and RLS remains the boundary under both.
 
 ## Two loading routes, and why the roster is separate
 
@@ -460,7 +474,7 @@ The split is deliberate and the delivery route (`app/(dashboard)/t/[tenantCode]/
 - `selectBatchesForDisplay` is asserted to return `[]` for `unconfigured` and `sync-failed`, and to return the rows for `ok` — including an `ok` snapshot with zero rows, which stays authoritative. (`no-tenant-access` is not exercised here; `tenant-access.test.ts` covers the fold that produces it, not the adapter.)
 - The `ok` path is asserted not to touch mock data.
 
-No test currently pins the guard *order*, which is why the failure table's first two rows are real risk rather than hypothetical.
+No test currently pins the guard *order*, and no test renders the page components that implement it — only `tests/unit/sidebar.test.ts`-style render tests exist for shells. Adding a state to `Sidebar`'s `isAdmin`/`isPlatformAdmin` pair is pinned at its own `describe` ('Operations list'), but the route pages themselves are unrendered, so the failure table's first two rows are real risk rather than hypothetical.
 
 `tests/unit/documents.test.ts`, `tests/unit/doc-compliance.test.ts`, `tests/unit/doc-blockers.test.ts` and `tests/unit/evidence-path.test.ts` cover the document rules. `tests/unit/evidence-path.test.ts` asserts that a path containing a separator in any segment is rejected, and that the tenant segment is checked first.
 
@@ -481,7 +495,7 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 3. Add a member to the snapshot union only if it is genuinely distinct in kind (`not-found`, `validation-failed`), and omit `no-tenant-access` where the data is not tenant-scoped; keep any freshness pair on `ok` only.
 4. Write the unit tests against a fixture typed with `Parameters<typeof map…>[0]`, and guard the failure-before-empty ordering in each consuming route.
 
-**A new enum column:** add a total map in the mapper, and let the compiler drive every call site.
+**A new enum column:** add a total map in the mapper, in the direction the data moves, and let the compiler drive every call site. If a column is configured data rather than a closed enum, say so in a comment and use a `Partial`/`Record<string, …>` map with a fallback instead — the totality claim on an enum-keyed map is only honest while the key really is one.
 
 **A write path:** return a result union, keep the raw error server-side, and check `denied` distinctly from `sync-failed`. If the write can match an existing row, decide the match key in `domain/` (as `reconcileWithExisting` does for ULI) and materialise it as separate parse / validate / reconcile / insert / update steps — do not expect a partial index to serve as a conflict target. A partial-success `ok` carries the rejected rows so the caller can show them.
 
@@ -500,6 +514,7 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 | a fake row on `unconfigured` | UI that looks live but is not | no snapshot branch returns fixtures |
 | a `Partial` enum map | new DB variant silently `undefined` | total maps, compile error |
 | a raw column read in a component | rename ripples past the mapper | `database.types.ts` restricted to `data/` |
+| `isPlatformAdmin()` used on a route or action | `sync-failed` and "not an operator" collapse into one "denied" screen | call `getPlatformAdminSnapshot` and branch on the status there; the boolean is for the nav only |
 | reconciling on `learner_no` | same person re-imported as a second row; pairing lost when the source report omits it | reconcile on `uli` only, reject in-file duplicates |
 | an update built from every column | a names-only re-import blanks earlier T2MIS detail | detail columns go to `learner_details` only, as an upsert of the filled keys |
 | treating a failed write as one transaction | silent partial state on a mid-file failure | `partial` carries the real counts and the error |
@@ -508,8 +523,11 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 
 ## Related
 
-- [Data model and RLS](/openwiki/architecture/data-model-and-rls.md) — the schema, the `learners_tenant_batch_uli_key` index and `learner_identities` in full, the RLS functions the snapshot states depend on, and the `database.types.ts` regeneration contract (RULES rule 20).
+- [Tenant isolation and RLS](/openwiki/architecture/tenant-isolation-and-rls.md) — the schema, the `learners_tenant_batch_uli_key` index and `learner_identities` in full, the RLS functions the snapshot states depend on, and the `database.types.ts` regeneration contract (RULES rule 20).
 - [Architecture overview](/openwiki/architecture/overview.md) — where these layers sit in a request.
+- [Domain vocabulary](/openwiki/concepts/domain-vocabulary.md) — the TESDA and lifecycle terms the mappers bridge.
+- [Error snapshots and honest empty states](/openwiki/concepts/error-snapshots-and-honest-empty-states.md) — the rendering side of the guard ordering.
+- [Verification and test strategy](/openwiki/operations/verification-and-test-strategy.md) — how the mapper and fold tests are run.
 - [`RULES.md`](/RULES.md) §1–§3 — the boundary and data-layer rules and their enforcement levels quoted above.
 - [`RULES.md`](/RULES.md) §4 (rules 21–26) — the UI rules a `ui/` layer is held to.
 RULES.md`](/RULES.md) §4 (rules 21–26) — the design-system rules a `ui/` layer is held to.

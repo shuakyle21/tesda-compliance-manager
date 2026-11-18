@@ -99,8 +99,8 @@ export function EgaceOutcomesTable({ rows, stages, isMulti, tenantOf, totals, ra
                   }
                   const v = egaceVal(b, s.key);
                   return (
-                    <td key={s.key} className="egc-td egc-num egc-val" style={{ color: v === 0 ? 'var(--color-text-disabled)' : colorDk(s.colorKey) }}>
-                      {v === 0 ? '—' : v}
+                    <td key={s.key} className="egc-td egc-num egc-val" style={{ color: v === 0 ? 'var(--color-text-muted)' : colorDk(s.colorKey) }}>
+                      {v}
                     </td>
                   );
                 })}

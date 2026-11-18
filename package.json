@@ -18,7 +18,8 @@
     "test:e2e": "playwright test",
     "wiki:init": "openwiki --init",
     "wiki:update": "openwiki --update",
-    "wiki:visualize": "openwiki visualize"
+    "wiki:visualize": "openwiki visualize",
+    "wiki:github": "node .github/scripts/sync-github-wiki.mjs"
   },
   "keywords": [
     "design-system",

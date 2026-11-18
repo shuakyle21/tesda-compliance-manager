@@ -2,22 +2,23 @@
  * The KPI row shows on this dashboard only, not on the class screens. It
  * covers the trainer's own classes, which RLS already limits to batches
  * assigned to them (`can_read_batch`), so no tenant scope is applied. Billing
- * figures are omitted server-side, never CSS-hidden (CLAUDE.md role rules).
+ * figures are stripped from the summary itself by `deriveTrainerMetrics`, never
+ * CSS-hidden (RULES.md rule 5).
  */
 
 import Link from 'next/link';
 import { MetricsRow } from '@/modules/shell/ui/MetricsRow';
 import { getBatchesSnapshot, selectBatchesForDisplay } from '@/modules/batches/data/batches';
-import { deriveDashboardMetrics } from '@/modules/batches/domain/metrics';
+import { deriveTrainerMetrics } from '@/modules/batches/domain/metrics';
 
 const TRAINER_LINKS = { batches: '/trainer/classes', attention: '/trainer/classes', documents: '/trainer/classes' };
 
 export default async function TrainerDashboardPage() {
   const snapshot = await getBatchesSnapshot();
-  const metrics = snapshot.status === 'ok' ? deriveDashboardMetrics(selectBatchesForDisplay(snapshot)) : null;
+  const metrics = snapshot.status === 'ok' ? deriveTrainerMetrics(selectBatchesForDisplay(snapshot)) : null;
   return (
     <div>
-      {metrics && <MetricsRow metrics={metrics} links={TRAINER_LINKS} hideBilling />}
+      {metrics && <MetricsRow metrics={metrics} links={TRAINER_LINKS} />}
       <div className="mb-6">
         <h1 className="t-page-title">Teaching dashboard</h1>
         <p className="t-body mt-2">Your assigned classes, attendance and training progress.</p>
