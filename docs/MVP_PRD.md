@@ -222,7 +222,7 @@ days).
 
 **7.7.8 Billing readiness & supporting documents.** Each tranche requires
 verified supporting documents (Billing Statement [app-generated], MIS-0302 /
-Terminal Report, Annex K, Daily Attendance Sheet) tracked at tranche level. A
+Terminal Report, tranche support packet, Daily Attendance Sheet) tracked at tranche level. A
 billing-ready alert fires only when the threshold is reached **and** the tranche's
 supporting documents are verified.
 

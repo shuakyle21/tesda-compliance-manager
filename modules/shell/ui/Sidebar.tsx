@@ -120,6 +120,7 @@ const ADMIN_OPERATIONS: NavItem[] = [
  */
 const PLATFORM_OPERATIONS: NavItem[] = [
   { label: 'Add school', icon: 'building', href: '/schools/new' },
+  { label: 'Qualification images', icon: 'photo', href: '/qualifications' },
 ];
 
 // A trainer is never an admin/platform-admin here, but the guards are

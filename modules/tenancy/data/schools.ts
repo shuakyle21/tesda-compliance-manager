@@ -21,8 +21,9 @@ import { createSupabaseServerClient, isSupabaseConfigured } from '@/lib/supabase
 import type { Database } from '@/lib/supabase/database.types';
 import type { SchoolCommand } from '@/modules/tenancy/domain/schoolDraft';
 
-// `cluster` (migration 20261111120000) is not selected by `listQualifications`.
-type QualificationRow = Omit<Database['public']['Tables']['qualifications']['Row'], 'cluster'>;
+// `cluster` (20261111120000) and `header_image_path` (20261113120000) are not
+// selected by `listQualifications`, so this screen keeps working before they exist.
+type QualificationRow = Omit<Database['public']['Tables']['qualifications']['Row'], 'cluster' | 'header_image_path'>;
 
 const RLS_VIOLATION = '42501';
 const UNIQUE_VIOLATION = '23505';

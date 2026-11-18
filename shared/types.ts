@@ -198,6 +198,8 @@ export interface Batch {
   programId: string;
   name: string;
   qualification: string;
+  /** Signed URL of the qualification's header image for the detail hero; absent/null = neutral header. */
+  headerImageUrl?: string | null;
   program: string; // generic ScholarshipProgram code (e.g. 'TWSP' | 'CFSP')
   ncLevel: string;
   trainer: string;

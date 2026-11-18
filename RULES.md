@@ -95,7 +95,7 @@ reviewing, or merging code.
 28. **`assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim** from the
     design bundle and excluded from lint/build. Edit the source design files instead, or confirm
     with the user first. **[hook]** (`.claude/hooks/protect-static-dirs.sh`)
-29. **`FIGMA FILES/`, `diagrams/`, `.design-sync/` are design artifacts, not app code.** **[review]**
+29. **`diagrams/`, `.design-sync/` are design artifacts, not app code.** **[review]**
 
 ## 7. Docs precedence
 

@@ -47,7 +47,7 @@ Single **Next.js 16 App Router** app (React 19, TS strict, Tailwind v4) talking 
   - `data/` — fetch → map → derive. The **only** place (besides `lib/supabase` itself) allowed to import `lib/supabase/database.types.ts`.
   - `domain/` — pure business rules, no I/O (`modules/batches/domain/urgency.ts`, `modules/billing/domain/readiness.ts`); unit-test with fixed as-of dates.
   - `ui/` — domain-aware components.
-- `shared/` — leaf level: `shared/ui/` props-only presentational primitives, `shared/types.ts` (UI domain types — kept as one file). `shared/` must never import `modules/` or `app/`. A per-module type split of `shared/types.ts` was **considered and deliberately deferred** (TES-68) while `shared/mocks/seed.ts` constructed 11 of these domain types there; the mock dataset was removed entirely (mock-data retirement), so that blocker no longer applies — the split is unblocked whenever someone wants to do it.
+- `shared/` — leaf level: `shared/ui/` props-only presentational primitives, `shared/types.ts` (UI domain types — kept as one file). `shared/` must never import `modules/` or `app/`. A per-module split of `shared/types.ts` is possible but not started. No blocker remains.
 - `lib/supabase/` — the external Data boundary (client/server factories + generated `database.types.ts`).
 
 **Import direction is ESLint-enforced** (`import/no-restricted-paths` in `eslint.config.mjs`): `app → modules → shared → lib/supabase`. Another module's `data/` is private — import its `domain/`/`ui/` instead (app/ may fetch from any module's `data/`). No index barrels; deep imports are the convention.
@@ -84,7 +84,7 @@ misreading a status by color alone is a real operational failure, not a cosmetic
 
 `assets/`, `preview/`, `screenshots/`, `ui_kits/`, `uploads/` are ported verbatim from the design
 bundle and excluded from lint/build (`eslint.config.mjs` globalIgnores); a PreToolUse hook
-(`.claude/hooks/protect-static-dirs.sh`) blocks edits there. `FIGMA FILES/`, `diagrams/`,
+(`.claude/hooks/protect-static-dirs.sh`) blocks edits there. `diagrams/`,
 `.design-sync/` are likewise design artifacts, not app code. **See [`RULES.md` §6](RULES.md).**
 
 ## Git / workflow
