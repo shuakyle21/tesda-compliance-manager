@@ -2,88 +2,151 @@
   "schemaVersion": 1,
   "pages": {
     "/openwiki/architecture/data-model-and-rls.md": {
-      "pageVersion": "sha256:365b4739dd82bfa713954530722f46888fb35a0f27816e9850516ad4bee4f832",
+      "pageVersion": "sha256:b2703aab11a8423c725482edbc79618237a1149332c6836005b146b59b4cc61e",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "32846966-353c-40eb-9db1-42ffeb266e49",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
     "/openwiki/architecture/module-boundaries-and-data-pattern.md": {
-      "gitHead": "986ea82221f0a56900b510c80907706d8163a453",
-      "sourceFingerprint": "sha256:8a92b24fb4bcbc22c5de5927299a2a4e838a2bef2940178ffe4d750a4edaa577",
-      "pageVersion": "sha256:287d6bf8bef15c568aac44d99dd6782d932b70d767965fc3e535cb4602effc17",
+      "pageVersion": "sha256:b578ffc7f481a259cc8fd56bf12838e1173066fd55a74c24dfd2a97821d7d971",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "32846966-353c-40eb-9db1-42ffeb266e49"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/architecture/nextjs-routing-and-request-path.md": {
+      "pageVersion": "sha256:97da79c6d3be7378e7fe79bf5f694608501d4f08c0b972294f2b37a4810af10b",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
     "/openwiki/architecture/overview.md": {
+      "pageVersion": "sha256:e894cdbc0aa13775d325c6a3beb37d231da4259d96c17080524f0051571c4b58",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/architecture/tenant-isolation-and-rls.md": {
+      "pageVersion": "sha256:14d384ff159158b96d382d06791f012163f8f6c031866db27a3c229154f4e7ed",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/modules/analytics-activity-settings-and-shell.md": {
+      "pageVersion": "sha256:b0bea5b305a15fb5311c8a0770bea95eb07841755218e9cd3b0a215be2e00f89",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/modules/auth-and-provisioning.md": {
+      "pageVersion": "sha256:4fb8fca1e03c37bc2eac72c229d22e4d2ecdb0e058181565b138ba9912e627fd",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/modules/batches-and-lifecycle.md": {
+      "pageVersion": "sha256:94f7aac202d65213eab0a4032c5160b6648fa75178a4805b25dfba4143364344",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/modules/billing.md": {
       "gitHead": "986ea82221f0a56900b510c80907706d8163a453",
       "sourceFingerprint": "sha256:8a92b24fb4bcbc22c5de5927299a2a4e838a2bef2940178ffe4d750a4edaa577",
-      "pageVersion": "sha256:c253059e4af1810238a52f1687ba446e5e59ed8adf2d7c209b5f7ae86e605cf5",
+      "pageVersion": "sha256:bce023890fa294c95ac00c042351440338b6cdc2bfbb4be4a5851db1c7b62478",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "32846966-353c-40eb-9db1-42ffeb266e49"
     },
-    "/openwiki/architecture/schema-and-rls-reference.md": {
-      "pageVersion": "sha256:472733e7f622a234cfcc323929b522a51a1c3256591637791f2fe488c21885cd",
+    "/openwiki/modules/documents-and-evidence.md": {
+      "pageVersion": "sha256:64970ccb8350d97717dc693609fa0c50d7754569256a8d06ca060dbed7cbf3a5",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
-    "/openwiki/domain/batches-and-billing-rules.md": {
-      "pageVersion": "sha256:ac17d75da5462d7a1f341916617897d41a932e9062e717ed6f583bf23140dcdb",
+    "/openwiki/modules/import-export.md": {
+      "pageVersion": "sha256:d447cd02b210e29bd275c92dfaa46f4d91c9aa9c5306183060ac2e676fbdb557",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
-    "/openwiki/guides/module-boundaries-and-data-pattern.md": {
-      "pageVersion": "sha256:ca73dc56f6adcf481b566a5c9ac43738d9ae8c3512cebadb1067bd289f1610a4",
+    "/openwiki/modules/reports-and-t2mis-export.md": {
+      "pageVersion": "sha256:dc2597156a375e3d89e73cf193471e9970de24933701cef297d88c4fc846b353",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
-    "/openwiki/guides/verification-and-test-strategy.md": {
-      "pageVersion": "sha256:15a6236d71e8908869dfef13f4c77b92ab0713fb506192b80b5927d9748b686b",
+    "/openwiki/modules/tenancy.md": {
+      "pageVersion": "sha256:cb932efd4bccaacc8b5fd34392bb693e7422a0bf1860e25c21c2224610bb9ce1",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
-    "/openwiki/integrations/clerk-identity-and-provisioning.md": {
-      "pageVersion": "sha256:caeb809c814a267c20901802351ca4c7d42875bf7c521333414f8d3e7407c051",
+    "/openwiki/operations/live-supabase-and-migrations.md": {
+      "pageVersion": "sha256:dd4afe822a9aff3dd6248287dcc41cf3d1324abd1864cb8582bca7e2ce80a907",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
-    },
-    "/openwiki/operations/supabase-and-migrations.md": {
-      "pageVersion": "sha256:ff82f335de023ef813442761061190c6966e1263f27a86c0a5fcb8f4868e9a82",
-      "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
     "/openwiki/operations/verification-and-test-strategy.md": {
-      "pageVersion": "sha256:a5114117bb545b042f51db06b3433da58c86d55cb26ffc0b29e4ddc337e4d86d",
+      "pageVersion": "sha256:43d973b1376c5f4fc58327304c856cd63f6f3f20fc673c7894ac5091c0e16a0d",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
     "/openwiki/quickstart.md": {
-      "gitHead": "5b7a28be54f2436683c7c04cdad2aa64031181d9",
-      "sourceFingerprint": "sha256:39f43d07543bd9da9b0cdaaaba33274922abeda978c63459ab600344d3de1cf2",
-      "pageVersion": "sha256:dae67a15de0170016d067dc1e5ed1d785d59bbb40adcb66d4804c447740fffad",
+      "pageVersion": "sha256:e3d4200bc71a40ae621e162aa23a0333cc3f838622a2a3f5fa50fae302e33cb5",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "395a36ef-7db4-4b82-b49f-d52be563550f"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
     },
-    "/openwiki/security/tenant-isolation-and-role-authority.md": {
-      "pageVersion": "sha256:574983ec58b3bf8c615c2f3bdc7e77ff1de77446c9a321e9a1f34c8a1b710e05",
+    "/openwiki/workflows/attendance-and-dropout-eligibility.md": {
+      "pageVersion": "sha256:6d07e7bd60bd7ff243e8f97850ea8f96bea08babb87c865260d86f008f2fc986",
       "completedBy": "openwiki/0.5.0",
-      "completedRunId": "78dc24d9-3bc4-4d9a-a06d-678c06600586",
-      "gitHead": "ab54dace31ae6271f7f4eace3e69293f54b3e9a4",
-      "sourceFingerprint": "sha256:86636999454972f9af83d501b210b17789c65b2422c1118caf59aee2eb899b20"
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/workflows/document-compliance-and-evidence.md": {
+      "pageVersion": "sha256:6a12a988c7a7590d549f411ae25e727e890176841f2d710ebbf42807baeef2e5",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/workflows/reporting-and-export.md": {
+      "pageVersion": "sha256:36ec92fc47e0aa784337d46f3af09a43670acaa343358202cf4907c8e526c4e7",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/workflows/tenant-scoping-and-role-authority.md": {
+      "pageVersion": "sha256:2bfd13c281d8e56efaca9c47e2d16c51929bf1947ca3c7fa8bf2f04b7c9ddc38",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "54a3b81a-a047-4e75-a1c9-8da3cf415d8c",
+      "gitHead": "5896368ce9ff80f549543f96449e2dfd8ed9163a",
+      "sourceFingerprint": "sha256:d69b7f71ae927907a73ea471c2ef810e4005b92025237b61458d464a26a55152"
+    },
+    "/openwiki/workflows/user-provisioning-and-membership.md": {
+      "gitHead": "986ea82221f0a56900b510c80907706d8163a453",
+      "sourceFingerprint": "sha256:8a92b24fb4bcbc22c5de5927299a2a4e838a2bef2940178ffe4d750a4edaa577",
+      "pageVersion": "sha256:b7943540178b0540630387c6814252cccc44992dc5f3ae172537829e7778f2c6",
+      "completedBy": "openwiki/0.5.0",
+      "completedRunId": "32846966-353c-40eb-9db1-42ffeb266e49"
     }
   }
 }

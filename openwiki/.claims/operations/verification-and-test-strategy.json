@@ -1,18 +1,22 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a5114117bb545b042f51db06b3433da58c86d55cb26ffc0b29e4ddc337e4d86d",
+  "pageVersion": "sha256:43d973b1376c5f4fc58327304c856cd63f6f3f20fc673c7894ac5091c0e16a0d",
   "claims": [
     {
       "id": "claim_3161f57f9e3044309c9b4373865a42e2",
-      "statement": "The verification loop is ordered `pnpm exec tsc --noEmit` → `pnpm lint` → `pnpm test`, cheapest signal first; there is deliberately no npm script for the typecheck, which `CLAUDE.md` documents as a bare `pnpm exec` step annotated \"no dedicated script\" and which `package.json`'s `scripts` block does not alias, so typecheck reads as a step in a sequence rather than a product command.",
+      "statement": "The verification loop is ordered `pnpm exec tsc --noEmit` → `pnpm lint` → `pnpm test`, cheapest signal first, and has no npm script for typecheck on purpose so typecheck reads as a step in a sequence rather than a product command; CI mirrors that order so a boundary breach or an enum the mapper forgot cannot merge.",
       "evidence": [
+        {
+          "resource": "repo://.github/workflows/ci.yml#L36-L43",
+          "version": "repo-lines-v1:sha256:e9c314c114c95fae60eb71865c076eabd7727d389344691f26a2e35bf7c62442:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTdkNTk1MTZkMTM0MWIxNDY0YWNiMmMyOWI1OGMxYWQ5ZjM2ZDVhYjlmMjc2ZmM5MzQ3NWQ5ZDQ3YzRhNzRlNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2FiM2FkMTJiMjI5Y2ZhY2JlYjkzZDBiNmMyNzE3OGFiMDZlZGRiYTAzYTI3YjEwYTQ5YjIzNzNiZDk4MTRlNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzgzMWZhODQ5ZDA4NTk4OGU0ZDRmYWQ0MGQxNDZlZjk1NWQyMjkyZTdjN2ZkOWQ5OGRjOTIyZTQ4NzljNWFmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
         {
           "resource": "repo://CLAUDE.md#L17-L24",
           "version": "repo-lines-v1:sha256:96d9c85f6dd3f2469ba4091c6eb788f6243045da36a8c9c1bbc48e7133135083:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRlMmY1MzI4ZWU2ZTgwNTBlOGFhZmQ4ZGM4NjlhMDY5Y2Q5NTg0ZWRhYWY1NGZlNTg5ZDczYzNiN2RjZDc5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdjMDZjNTYxZDVjMzI3MzQzNjg1MjY4YTQ2YjMzOTFmMzk5OGVlZTg5MGQyYmU1MWYwZDIxY2M0YTUzYWU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGNkY2Q3ZWQyNWM4YWQ5YjQ3MDg4MTczMTk3Y2Y2OGU3M2I4ZTY1Y2Q3YTdjNmZjMDYxODYyNjAxZmJiM2JkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWM0MWVmYmM3NmFjMzhjZTY5ZWE0NDg0Y2VjNzQzODdjY2JhYThjZWFjMmU0MmYxMDIxYTdhMmI0ZDRiYjYyZiJ9"
         },
         {
-          "resource": "repo://package.json#L10-L23",
-          "version": "repo-lines-v1:sha256:c7dd3ae8d95922a091c7b9e4e4b1db172a50c0e0ffa6a054746b6f265c634634:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwOWVlMmFiYmZkZTY3NWVjNmJhNmQ0MThjMTNkMzNjNGQ4YjhiNjVjYmE2OTVmNTdjZDY1YjgzMmFkMDliN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZTgzZjc5YTEwNjRjN2Y0YjFjOGM1NWFlOTFiZGNkMjA4MTkyODVkY2MyMGMwZjU0ZDA5OWFiNDQ2MDgxNjgifQ"
+          "resource": "repo://package.json#L10-L22",
+          "version": "repo-lines-v1:sha256:7b903be428cf10805d1407186f5d665516e70f4bfa4af68d9e762acc520f379f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzYTllYmJjZWZiN2MwMjEyZjJjYTdiMjk0NTU2YjFlMzMwZTdmY2E3NjhkZWZhNmZiZmJmZWU3OTZmODRhY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwOWVlMmFiYmZkZTY3NWVjNmJhNmQ0MThjMTNkMzNjNGQ4YjhiNjVjYmE2OTVmNTdjZDY1YjgzMmFkMDliN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4ZDIwMTdlYjA4MmIxMzA3NzE4YTM4YzJiNDU3OTY0M2Q4ZDdiMWIwZDI2ZjJlYjU2ZWUyNWMxNmYyMDg1M2EifQ"
         },
         {
           "resource": "repo://tsconfig.json#L1-L33",
@@ -198,23 +202,19 @@
     },
     {
       "id": "claim_2b1b0e715d684b44b2dd41ff2a30a380",
-      "statement": "Nothing in `.github/workflows/` typechecks, lints or runs the tests: the five workflows are `claude-code-review`, `claude`, `openwiki-update`, `qodana` and `stale`, and none installs dependencies or runs `tsc`, `eslint`, `vitest` or `next build`, so green is a local self-imposed gate.",
+      "statement": "`.github/workflows/ci.yml` is a real gate — it fires on every pull request and push to `main` and runs `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm test` on Node 22 with no secrets, so an import-zone breach or a non-compiling enum cannot merge; what it still does not run is `pnpm build` and `pnpm test:e2e`, because only App Router compilation catches some Server Component errors and the e2e run needs Clerk and Supabase env.",
       "evidence": [
         {
-          "resource": "repo://.github/workflows/claude-code-review.yml#L28-L44",
-          "version": "repo-lines-v1:sha256:2a3331b451a21f549ff9c142fefee9b63acd3852a265f6e6b100595693031d96:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4OTk5MTEwM2Y2YmE4ODhlM2RlNzY1MWM1YTMwNWM3N2U1NTQ3Njc3M2FiYTgzOTU5MWVjYzViZDBmMmFiMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZjhmNjBkMzc2MzQ4MWU0OGU0MGRlNDhiOGRiYWEzMjM0Mzg4MDUwMDBjYmY5NmI5ODMwNjkxYmFmZTFjODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiYjBmNDBiZTM0ODM4OWRhOWI1NjcwZjFjYWM5ZjU1ZmI3YjQ1YjNmNmRkMzBhZmFiMGViNTU3YWUyNzZmNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjNzFmZWEwMjc5MWNmMWE1YTBlNzdlMjNiNGMyMDA4NThhY2Q5MjExNTVlZmE3YjJjMDJjZTJiNjY5M2MwMzkifQ"
+          "resource": "repo://.github/workflows/ci.yml#L1-L43",
+          "version": "repo-lines-v1:sha256:344ac071ac6f32b5812eff267f1d05f8a1cf4c339d67299f771938eb0764ddfb:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2ZTFiMzJmYTA5MDc5YWUyZjAwMDFmZmYwZWNhMjdiNDk4NTk1N2Q0ZWI0ODU3OTI5YjNjZjA1OGZhYWU1NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhYjNhZDEyYjIyOWNmYWNiZWI5M2QwYjZjMjcxNzhhYjA2ZWRkYmEwM2EyN2IxMGE0OWIyMzczYmQ5ODE0ZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://.github/workflows/openwiki-update.yml#L30-L50",
-          "version": "repo-lines-v1:sha256:7fe7e13d086610349df43336c6a8e5e9b271f10d6b180de614115b08101474ec:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiMzJiOTg3MjYzZGYyMTYzZTcyNmQ0OGI5MmY2Zjk2NTE0OGNiNmI2ZDI4MzE3OTE1MTRjOTM5ZjgzN2ExNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ZjIxODFiOWIzNDA0OTRjNzljYzBiNmNiNTUxYjJiMjY0NDFiYWZlMTRlYzc3ZDhjNzc3MDIyMWE2MWE0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlZjE2ZTNjOGI1NGUyYjIwNDgxOTZhYmI0Y2Q4MGQyMmE1MDhlY2Q2MDc0NjEyNGEyZWEyZGNjMzQxNzk5ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3OWU4MzliNzQyMTIyZTNlZjBjNTU1NjM2NDNiYmIwMjZlOGQwOTAzOTgwMTY0ZWExNDllNGY5ZTliNGZkYTcifQ"
+          "resource": "repo://package.json#L12-L18",
+          "version": "repo-lines-v1:sha256:d5fdc3e4e723d081d671ecc05f89b4f364eb789ddeb8d2a7ba742b4aa608874c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQ5MmY0ZDYxZWI0NjJjYTcwYjZlYTJmYzg4ZDk3OWFhYWJhNjlmMDdlNzg5OWUyMjRmMDMzN2I3ZTY1MGNhMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWFkZGY4NzJmNWRjYWM3MWI0NDIzNmY0MDBhNzRmOGJiMTgyMDczY2FiNzA3YzY1Y2ZiMTk4ODI2ODY0NGQ2NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWE4NDA4MzllMzVkYWMwZTk5YmU0MmUyNTkxYjRjODY4YzkwNjFmM2QwM2QwMmI0NWUwNTZhMjMzMmQ3NDM4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjhhOTJiZmZlNGVkY2MxYTMyNzMyZDczYzU4ZDNiNGYzMGZmNDFlYWQ0NWNiMzZhNjc1ZjQyOTIyYThjZWExNCJ9"
         },
         {
-          "resource": "repo://.github/workflows/qodana.yml",
-          "version": "repo-file-v1:sha256:142d87354cf58b355977bb4eac4ad902e4f98e05f5c33427cab0df7d15f38c8d"
-        },
-        {
-          "resource": "repo://.github/workflows/stale.yml",
-          "version": "repo-file-v1:sha256:538edddffd370451c196ef3bc4d243abd7fbe3d7ad7b34fb6e3eafe70db162d0"
+          "resource": "repo://playwright.config.ts#L9-L16",
+          "version": "repo-lines-v1:sha256:cd7b3036f0e5c6b240a5891abe7d0063e5de9b46197bfff8c1b1987dee73e3c2:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJjZWNiMTQ0YTQ2ZjVkY2YxMmE2MTY5ZmNlZWQ3Njk1ZTgyOTRiMDkwZGU3NmYzNjYxY2RkMDI0OTMwMDE0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWI5MGIxNGRlZDI0MjQ3ZWE3Y2VmZjRkOTYxY2ExNWViMDZjNTlmOGI3NjYyZTA2ZDc3MzVlZTg2ZTA0MmVjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmI4YjdhNWE1YWI2NTFmM2EyMGE2OWI2MzJlZjY4YTEwMDFjYzhjZjViMDM4MDJlNTEzNzcxNWFkMGI5ZjcyOSJ9"
         }
       ]
     },
@@ -281,10 +281,28 @@
           "version": "repo-lines-v1:sha256:241fc249efa71b0e7a97f7f4eb8b89494a59cb3f87d71be6aad63aa3ba5e3d3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQxZmMyNDllZmE3MWIwZTdhOTdmN2Y0ZWI4Yjg5NDk0YTU5Y2IzZjg3ZDcxYmU2YWFkNjNhYTNiYTVlM2QzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQxZmMyNDllZmE3MWIwZTdhOTdmN2Y0ZWI4Yjg5NDk0YTU5Y2IzZjg3ZDcxYmU2YWFkNjNhYTNiYTVlM2QzYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjUxNjg3NWVmZTIzYmMzZDQzZjE5MjcwNDg2OGVkYjU1Njc0MGEwNWJkMTYwMmFlODQ3MDBlNWJmNWVlNzVjZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJiNDdjYTJjZmUxMzYyYmFiNDM0ZjY3NzY5NDA3ZjU2OWU1MDZhOGI2NDcwYTMyMzc0MDEyNzNjZWM5NmE4OCJ9"
         }
       ]
+    },
+    {
+      "id": "claim_50dd3903e04b43e884d393208bf30c50",
+      "statement": "`pnpm lint` is the bare `eslint` script over the flat config, so the strict zone set of `import/no-restricted-paths` is what the linter applies; it must be run locally before every push because it is the only automated enforcement of those import rules and the local run is where an agent or author sees the violation.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L12-L12",
+          "version": "repo-lines-v1:sha256:b9f1e41d88f4aebf8fb670a61c9e6a678f4ba639fbb23122812211d86c84154d:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjlmMWU0MWQ4OGY0YWViZjhmYjY3MGE2MWM5ZTZhNjc4ZjRiYTYzOWZiYjIzMTIyODEyMjExZDg2Yzg0MTU0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjlmMWU0MWQ4OGY0YWViZjhmYjY3MGE2MWM5ZTZhNjc4ZjRiYTYzOWZiYjIzMTIyODEyMjExZDg2Yzg0MTU0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzE5MjFmYjg5YWVhYTA5ZmEyMDY1MGY2Mjc5NDMyMWNkMjIxYWFhODc5ZGUwZTE3YjE4ZTdiNzRjNWI1MWY3ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDhiMmRjOTdlYjA0NzBkOGEzMDFmMjAzNzkzNzgwODkwZTgyMDBlYTQ2ZDViYzYzNjBmMjA1NzM3OWU4NWQ3MSJ9"
+        },
+        {
+          "resource": "repo://eslint.config.mjs#L26-L47",
+          "version": "repo-lines-v1:sha256:f7686e0ff1ebad8bddac311f0943883c19ad781a13ebc61dd657da41f1da97c2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MGMyNTEzZDE3NjJjMmUxZjExNTVmZGNmYmY4NGM1ZTUxYzRhOGI0NzU5ZTU3ZDdmNTE2ODcxZWVlNDcxNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlmMTVkYzA3NTEyMTZmMDYxOWVlNWJjYWI2ZDM0YTdlZWY4MmYzZjQxOTBjZjcwNWY2MjBkMjQyNzU2NTU2ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMTBlYmUwZGE0Mjg2MDRhN2FhNTJmNzU5OWJiNjdlMTMwNDQ2YTJlZDNhNmJmMTQwNWNmMjk1OTBkOThmYmYifQ"
+        },
+        {
+          "resource": "repo://package.json#L14-L14",
+          "version": "repo-lines-v1:sha256:551b18c075a648752da7862776867b2d6a252455ee76944633fd500923b210b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUxYjE4YzA3NWE2NDg3NTJkYTc4NjI3NzY4NjdiMmQ2YTI1MjQ1NWVlNzY5NDQ2MzNmZDUwMDkyM2IyMTBiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUxYjE4YzA3NWE2NDg3NTJkYTc4NjI3NzY4NjdiMmQ2YTI1MjQ1NWVlNzY5NDQ2MzNmZDUwMDkyM2IyMTBiMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmE2MzRlNmE3OTFjNzcyYzE4MmEyMGEwMjUwNTIwZGIwZTdmNTBlYzA5YWY2NDVkODJmNWFiOGI2MTNkNzM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTg3ZTk3NjU1MTNjMWU3YmJlNzc5MDExMTI3Yjg4ZDNmNjUyZWY0MWM1YmE1MWRiNDAxODA5YTc4Mjc0OGM5MiJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T01:01:49.569Z"
+    "at": "2026-11-18T03:56:44.398Z"
   }
 }

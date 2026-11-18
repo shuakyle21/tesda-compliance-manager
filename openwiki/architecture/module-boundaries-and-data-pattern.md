@@ -1,11 +1,11 @@
 ---
 type: Reference
 title: Module Boundaries and the Data Layer Pattern
-description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the lint-enforced import direction and never edges (rules 7–10), each module's private data/ surface, the fetch → map → derive contract and its write-side form (fetch existing rows → reconcile on ULI → explicit insert/update), the discriminated snapshot union every data-driven screen maps onto with its mandated guard order, the total-enum forcing function, and the ULI-only-key consequence of tenant-scoped learner rows.
-tags: [architecture, module-boundaries, data-layer, ddd, import-direction, eslint, supabase, snapshots, no-tenant-access, type-safety, uli, write-path]
+description: How TVI-CAMS groups code into app/, modules/<domain>/{data,domain,ui}, shared/, and lib/supabase/ — the lint-enforced import direction and never edges (rules 7–10), each module's private data/ surface, the fetch → map → derive contract and its write-side form (validate in domain/, write in data/, return a discriminated result, never throw), the discriminated snapshot union every data-driven screen maps onto with the withTenantAccess fold and its mandated guard order, the total-enum forcing function, and the ULI-only-key consequence of tenant-scoped learner rows.
+tags: [architecture, module-boundaries, data-layer, ddd, import-direction, eslint, supabase, snapshots, no-tenant-access, type-safety, uli, write-path, server-actions]
 sources:
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
-    resource: repo://app/(dashboard)/layout.tsx#L12-L71
+    resource: repo://app/(dashboard)/layout.tsx
   - id: openwiki-source-0555213af97e8aa00bf4b119
     resource: repo://app/(dashboard)/schools/new/actions.ts
   - id: openwiki-source-75140e138296a68cc258200e
@@ -16,8 +16,12 @@ sources:
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx
   - id: openwiki-source-79e2020a0930b43798845956
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx
+  - id: openwiki-source-ce194fb513f902915fafa99b
+    resource: repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts
   - id: openwiki-source-fac1d0830b5bfbb903fdd40f
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx
+  - id: openwiki-source-7ded6d9e4b97a5fd4dd6e34e
+    resource: repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx
   - id: openwiki-source-34483bdeb5950b355468581b
     resource: repo://app/(dashboard)/tenant-access.ts
   - id: openwiki-source-20d1ca31256bf756f33f5462
@@ -60,12 +64,8 @@ sources:
     resource: repo://modules/batches/domain/metrics.ts
   - id: openwiki-source-f395ba62d0eeb11fc4865d2f
     resource: repo://modules/batches/domain/overview.ts
-  - id: openwiki-source-b465e228246df6e8641b81df
-    resource: repo://modules/batches/domain/urgency.ts
   - id: openwiki-source-886b912a26937e31a540838d
     resource: repo://modules/batches/ui/BatchModal.tsx
-  - id: openwiki-source-22f1e37c371371edc123b5ae
-    resource: repo://modules/batches/ui/dashboard/DashboardCallouts.tsx
   - id: openwiki-source-a2deebc15e6ad791c1a8091d
     resource: repo://modules/batches/ui/dashboard/DocumentStatusDonut.tsx
   - id: openwiki-source-7cb36b33e9628c982ac3ac0f
@@ -146,7 +146,10 @@ sources:
     resource: repo://tests/unit/learner-import.test.ts
   - id: openwiki-source-0fd3605db2590862922583b6
     resource: repo://tests/unit/tenant-access.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-16T02:29:16.800Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-18T03:56:44.398Z
 ---
 
 # Module Boundaries and the Data Layer Pattern
@@ -200,7 +203,9 @@ One thing the zones cannot see: each `data/`-privacy zone is written with `modul
 
 The zone targets are also enumeration-by-path, not authorization: the `app/**` target in the same array means an `app/` file may import any module's `data/` (that is the composition-root privilege, below) but the `shared/**` target means nothing under `shared/` may — while the per-domain zone's target list already contains `./modules/!(${d})/**` only. The matrix is therefore exactly what the file spells, and a zone that is absent is a boundary that is absent.
 
-These restrictions are enforced in [`eslint.config.mjs`](/eslint.config.mjs) with `import/no-restricted-paths` (RULES rule 7) and reviewed in PRs. The `domains` array at the top of that file generates one `data/`-privacy zone per module, so the enforcement is only as complete as the array: a folder added under `modules/` but not to the array has no enforced boundary at all. A violation otherwise surfaces as a lint error naming the offending import.
+These restrictions are enforced in [`eslint.config.mjs`](/eslint.config.mjs) with `import/no-restricted-paths` (RULES rule 7) and reviewed in PRs. The `domains` array at the top of that file generates one `data/`-privacy zone per module, so the enforcement is only as complete as the array: a folder added under `modules/` but not to the array has no enforced boundary at all. Because each zone is generated from the array entry, `data/**` is private *without a hand-written per-module exception* — the thirteen names in the array are the whole policy. A violation otherwise surfaces as a lint error naming the offending import.
+
+That lint error is the diagnostic, not an obstacle: it means a feature needs another module's rows, and the fix it names is "import its `domain/` or `ui/` surface, or fetch in `app/`". The wrong fix is to paste the mapper into the second module or to widen the zone.
 
 ```mermaid
 flowchart TD
@@ -230,6 +235,7 @@ flowchart TD
         DD1["data/documents.ts"]
         DD2["domain/compliance.ts"]
         DU1["ui/*"]
+        R1["pages, layouts, actions.ts"]
     end
 
     subgraph SH["shared/"]
@@ -279,9 +285,12 @@ flowchart TD
     TEN2 -. "never: another module's data/ is private" .-> BD1
     BAT2 -. "never: another module's data/ is private" .-> TD1
     DOC2 -. "never: another module's data/ is private" .-> BD1
+    R1 --> TD1
+    R1 --> BD1
+    R1 --> DD1
 ```
 
-Solid arrows are allowed import directions; dashed arrows are rejected by `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). The tenancy/batches/documents trio illustrates the cross-module rule with real modules — `BO1 → DD2` shows a batches domain file reaching documents' public `domain/` (compliance) but never its `data/`, and `BD2 → TDO1` shows an `import-export` `domain/` helper (`ageOn`) reached from `batches/data`, the same one-way move across a module boundary rather than a copy.
+Solid arrows are allowed import directions; dashed arrows are rejected by `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). The tenancy/batches/documents trio illustrates the cross-module rule with real modules — `BO1 → DD2` shows a batches domain file reaching documents' public `domain/` (compliance) but never its `data/`, and `BD2 → TDO1` shows an `import-export` `domain/` helper (`ageOn`) reached from `batches/data`, the same one-way move across a module boundary rather than a copy. The three `R1 →` arrows are the composition-root privilege: only `app/` may reach three modules' `data/` in one feature.
 
 One arrow is mislabelled above: the zone at rule 8 targets `modules/*/domain/**` too, so a `data/` → `domain/` import is only legal **inside the same module**. What crosses a module boundary from `data/` is a *domain* file of the other module (`BD2 → TDO1`, `BO1 → DD2`) — never that module's `data/`.
 
@@ -289,7 +298,7 @@ One arrow is mislabelled above: the zone at rule 8 targets `modules/*/domain/**`
 
 ### `data/` — the fetch layer and the raw-type boundary
 
-`data/` is the only layer that talks to Supabase and the only one allowed to import `lib/supabase/database.types.ts` (RULES rule 10). Its job: issue a typed query whose rows RLS has already scoped, map them to UI domain objects, and return a discriminated snapshot instead of throwing. It also owns the *roles*-omission boundary — a query that selects contact, address or employment columns is declared in the file's header as trainer-denied, and the route is what redirects.
+`data/` is the only layer that talks to Supabase and the only one allowed to import `lib/supabase/database.types.ts` (RULES rule 10). Its job: issue a typed query whose rows RLS has already scoped, map them to UI domain objects, and return a discriminated snapshot instead of throwing. It also owns the *roles*-omission boundary — a query that selects contact, address or employment columns is declared in the file's header as trainer-denied, and the route is what redirects. `modules/batches/data/learners.ts` and its roster contract exist as a separate file for exactly that reason (see [the roster split](#two-loading-routes-and-why-the-roster-is-separate)).
 
 The shape every data function follows, from `modules/batches/data/batches.ts` (RULES rule 17 names it the reference):
 
@@ -299,19 +308,23 @@ The shape every data function follows, from `modules/batches/data/batches.ts` (R
 4. On a Postgrest `error`, return `{ status: 'sync-failed', error }` with the raw message **kept server-side**.
 5. On a thrown error, return `{ status: 'sync-failed', error: String(err) }`.
 
-No branch ever returns fixture data. `selectBatchesForDisplay` is the display adapter (below); it turns the union into an array. (The residual `shared/mocks/` dataset — where the source tree still has one — backs only a hand-set `?state=` preview override, never a snapshot branch.)
+No branch ever returns fixture data. `selectBatchesForDisplay` is the display adapter (below); it turns the union into an array. `shared/mocks/` was removed entirely by the mock-data retirement, so nothing stands between a snapshot and the screen: the `?state=` overrides that remain are hand-set booleans and `forcedState` strings folded in by the route, never a second dataset.
 
 ### `domain/` — pure rules, the only cross-module surface
 
 `domain/` holds functions and types with no I/O — input in, output out, no `await` (RULES rule 14). `modules/tenancy/domain/access.ts` maps a profile snapshot to an access verdict; `modules/batches/domain/metrics.ts` maps a `Batch[]` to `DashboardMetrics`; `modules/documents/domain/compliance.ts` maps document records plus a catalog to compliance figures.
 
-`modules/batches/domain/metrics.ts` is also where the boundary shapes a design: its `deriveDashboardMetrics` needs document compliance, which lives in the documents module, so metrics sits in `domain/` — the only layer allowed to reach another module's `domain/`. It is called by the school dashboard and by the trainer page's metrics row, and reused per school by `modules/batches/domain/overview.ts` so the cross-school overview and a school's own dashboard cannot disagree about that school.
+`modules/batches/domain/metrics.ts` is also where the boundary shapes a design: its `deriveDashboardMetrics` needs document compliance, which lives in the documents module, so metrics sits in `domain/` — the only layer allowed to reach another module's `domain/` (it imports `summarizeOwnCatalogCompliance` from `modules/documents/domain/compliance`). `domain/` is where the derivation lives for a second reason too: it is pure over a `Batch[]` the caller already loaded, so the dashboard route, the trainer page's metrics row and `modules/batches/domain/overview.ts` (per school, for the cross-school view) all call the same function and cannot disagree.
+
+The trainer page shows the other half of the rule. `app/(dashboard)/trainer/page.tsx` fetches through `batches/data` with **no** tenant filter at all — RLS already limits batches to those assigned to the caller (`can_read_batch`) — then runs `deriveTrainerMetrics`, which strips the billing keys from the object itself rather than typing them away (rule 5). Scope is a selection parameter, present or absent, never authorization.
+
+Routes also compose the *other* modules' private `data/` layers on the write side, and that composition is why some files live in `app/` rather than in a module. `app/(dashboard)/t/[tenantCode]/actions.ts` is the model: it composes three modules' `data/` layers (tenancy's scope resolution, batches' `setBatchRqmCode`, activity's `appendActivity`), which cannot import each other, so the join has nowhere else to live. Its header states the four-part shape: validate through a module's `domain/`, write through its `data/`, return a discriminated state, never throw. Two details in it are the pattern rather than the specific field: the school is re-resolved on the server from the URL code against the caller's own memberships (no tenant id is ever read from the form), and the role comes from `profiles.role` via `resolveTrustedRole`, never the `?role=` preview override — both are defence in depth, while the `batches` UPDATE policy remains the boundary. `app/(dashboard)/tenant-access.ts` and its sibling `tenant-scope.ts` are the same join on the read side (auth's `getAuthUserId` with tenancy's `getProfileSnapshot`), each encoding no rule: the scope rule lives in `modules/tenancy/domain/scope.ts`, the write validation in the module's `domain/`. `tenant-scope.ts`'s `requireScope` carries the one refusal worth knowing about: it redirects a trainer to `/trainer` on an `ok` scope only, and returns `null` on everything else so the segment layout can render the state.
 
 `domain/` is what other modules may import (rule 8) and what `data/` layers import for shaping. It is also the natural hoist target: when two modules need the same rule, it moves into one of their `domain/` layers and the other imports it — never into `shared/`, which cannot import modules.
 
 ### `ui/` — components that know their domain
 
-`ui/` renders domain types and may read domain helpers, but performs no queries. Server Components in `app/` may compose another module's `ui/` freely; `ui/` may import its own module's `domain/` and `shared/ui/` primitives, never a `data/` layer.
+`ui/` renders domain types and may read domain helpers, but performs no queries. Server Components in `app/` may compose another module's `ui/` freely; `ui/` may import its own module's `domain/` and `shared/ui/` primitives, never a `data/` layer — and never `database.types.ts`, which is the lint zone's explicit reason for naming `./modules/*/ui/**` alongside `app/` and `shared/` (rule 10). A `ui/` file that starts typing props with a `Database['public']['Tables']…Row` has re-exported the schema to every caller.
 
 ### `shared/` — leaf level, never module-aware
 
@@ -321,17 +334,21 @@ No branch ever returns fixture data. `selectBatchesForDisplay` is the display ad
 - `shared/ui/` — props-only presentational primitives.
 - `shared/vocab.ts` — closed TESDA vocabulary (employment statuses, EGACE stages).
 - `shared/text.ts` — pure string shaping (`pluralize`, `initials`).
-- `shared/mocks/` — the hand-written seed dataset; it is what backs forced-preview states (a `?state=` override), not the `unconfigured` branch.
+- ~~`shared/mocks/`~~ — removed by the mock-data retirement; it used to back the `unconfigured` fallback rather than being throwaway fixtures.
 
 `shared/` imports no module and no `database.types.ts` (RULES rule 9, rule 10). The dependency direction is total: everything may import `shared/`, `shared/` imports only itself.
 
 `shared/` also carries no data access and no accessibility knowledge beyond generic props. It does **not** re-export module code — that is the rule that keeps `shared/` a leaf (rule 9) — and a primitive that grows module-specific behaviour moves out.
 
-The two remaining `shared/` files describe a world with no data layer: `vocab.ts` records that the closed TESDA terms stay here because the consumers live in two modules, and `text.ts` carries copy shaping. Neither substitutes for a `data/` layer, because `shared/` cannot query.
+The two remaining `shared/` files describe a world with no data layer: `vocab.ts` records the closed TESDA terms stay here because the consumers live in two modules (and that they used to live under `mocks/`), and `text.ts` carries copy shaping. Neither substitutes for a `data/` layer, because `shared/` cannot query.
+
+Note that removing `mocks/` also removed rule 16's blocker: `shared/types.ts` no longer needs to stay a single file for the seed dataset's sake, though nothing has split it yet.
 
 No `shared/ui/` primitive imports `modules/`, so one always renders from props.
 
 ## The never edges
+
+Never means never, and the two documents agree on the list: nothing under `shared/` imports a module or `app/`, nothing outside `data/` (or `lib/supabase` itself) imports `database.types.ts`, nothing under `modules/` imports `app/`, and no module reaches another module's `data/`. A fourth zone per module is not needed because the per-domain `data/` zone already covers every non-owning target, `app/` included; the `app/**` target appears only in the `database.types.ts` zone, which is exactly why `app/` may read one and not the other.
 
 Four edges are forbidden outright, each for a concrete reason (RULES rules 7–10):
 
@@ -342,7 +359,9 @@ Four edges are forbidden outright, each for a concrete reason (RULES rules 7–1
 | `shared/ → modules/` | `shared/` would stop being a leaf and start a cycle | same |
 | `shared/, modules/ → app/` | `app/` is the composition root; anything under it is a leaf-ward violation | same |
 
-The reverse (allowed) edges exist so every layer has a legitimate way to get what it needs without bending the private-`data/` rule. Cross-module data needs are met with a `domain/` import or a parameter the caller passes — `batches/data/learners.ts` importing `ageOn` from `import-export/domain/t2mis` is the working example; `app/` may call two modules' `data/` layers side by side because it is allowed to see both, which is exactly how the report route pairs the batch snapshot with the roster.
+The zones cover `database.types.ts` explicitly: the first zone in the file targets `./app/**`, `./shared/**`, `./modules/*/ui/**` and `./modules/*/domain/**` with `from: './lib/supabase/database.types.ts'`, so `data/` and `lib/supabase` are exactly what remains. Components import domain types from `shared/types.ts` or a module's `domain/` — never a generated row (rule 10).
+
+The reverse (allowed) edges exist so every layer has a legitimate way to get what it needs without bending the private-`data/` rule. Cross-module data needs are met with a `domain/` import or a parameter the caller passes — `batches/data/learners.ts` importing `ageOn` from `import-export/domain/t2mis` is the working example, and its whole import list is `lib/supabase`, `shared/types` and that one `domain/` file; `app/` may call two modules' `data/` layers side by side because it is allowed to see both, which is exactly how the report route pairs the batch snapshot with the roster.
 
 The alternative, for pure logic that both modules genuinely own half of, is duplication kept in sync by hand: [`modules/batches/data/batches.ts`](/modules/batches/data/batches.ts) re-implements `modules/documents/data/documents.ts`'s document mapper and says so in its header, because two private `data/` layers may not import each other.
 
@@ -353,7 +372,7 @@ Every data function returns a discriminated union the caller must narrow before 
 - `ok` — mapped rows, plus the freshness pair below.
 - `sync-failed` — the query errored or the client threw; `error` retained for logging only.
 - `unconfigured` — no Supabase env; not an error, just "nothing wired yet".
-- `no-tenant-access` — **never returned by a query** (RULES rule 19 names only three), because RLS answers an unattached caller with a *successful empty read*. The route folds it in via `withTenantAccess`, which rewrites only an `ok` snapshot so a real failure is never masked, and leaves an access verdict of `unknown` ("could not check") untouched.
+- `no-tenant-access` — **never returned by a query** (RULES rule 19 names only three), because RLS answers an unattached caller with a *successful empty read*. The route folds it in via `withTenantAccess`, which rewrites only an `ok` snapshot so a real failure is never masked, and leaves an access verdict of `unknown` ("could not check") untouched. The fold lives in `modules/tenancy/domain/access.ts` — a *module's* `domain/`, not the route's own helper — precisely so any module's contract consumer may import it: another module's `data/` is private (rule 8), and only `domain/` crosses a module boundary. It is also why the verdict is a separate argument rather than something a `data/` layer computes: the entity contract owning the rows does not know about membership, and tenancy's `data/` may not be reached from it.
 
 Because three of the four states carry no rows, **the display adapter always collapses to `[]`** — `selectBatchesForDisplay(snapshot)` returns the rows for `ok` and `[]` for everything else — and the route must therefore inspect the *status* before deciding which empty-looking screen to render. That is the ordering trap [below](#guard-ordering).
 
@@ -369,13 +388,17 @@ A screen holds only its narrowed rows by the time it renders, so guarding wrongl
 4. **empty** — a real fact about a reachable school.
 5. **no-results** — the client island's filtered-to-nothing state, which is not a snapshot fact at all.
 
-`…/t/[tenantCode]/(sections)/batch-cards/page.tsx` destructures the two statuses into booleans and, inside its zero-row branch, returns the sync-failed callout **before** the `NoTenantAccessState` **before** the `EmptyState` — the sync-failed banner is deliberately inside the zero-row branch so a stale-but-populated screen keeps its rows. `…/t/[tenantCode]/dashboard/page.tsx`'s `guardState` runs the `?state=denied` preview → `syncFailed && batchCount === 0` → `noTenantAccess` → empty. `(sections)/billing/page.tsx` returns its denied preview first, then a `syncFailed && batches.length === 0` retry state, then the access state, and derives `syncFailed` as `snapshot.status === 'sync-failed' || forcedState === 'sync-failed'` so the preview cannot outrun the real status. The report route turns the two snapshots it holds into one boolean — `syncFailed = snapshot.status === 'sync-failed' || rosterSnapshot.status === 'sync-failed'` — so a failed roster still raises the banner even though the banner's own copy only mentions batch data; its zero-row branch then picks the access state before the `EmptyState`.
+`…/t/[tenantCode]/(sections)/batch-cards/page.tsx` folds the verdict first — `withTenantAccess(await getBatchesSnapshot(scope.tenantId), tenantAccessOf(profile))` — then destructures the two statuses into booleans and, inside its zero-row branch, returns the sync-failed `InfoCallout` **before** `NoTenantAccessState` **before** the `EmptyState`; the sync-failed banner is deliberately inside the zero-row branch so a stale-but-populated screen keeps its rows. `…/t/[tenantCode]/dashboard/page.tsx`'s `guardState` runs the `?state=denied` preview → `syncFailed && batchCount === 0` → `noTenantAccess` → empty. `(sections)/billing/page.tsx` returns its denied preview first, then a `syncFailed && batches.length === 0` retry state, then the access state, and derives `syncFailed` as `snapshot.status === 'sync-failed' || forcedState === 'sync-failed'` so the preview cannot outrun the real status. The report route resolves its hard trainer redirect before either snapshot exists, then folds `deriveTenantAccess(profileSnapshot)` into the batch snapshot and turns the two snapshots it holds into one boolean — `syncFailed = snapshot.status === 'sync-failed' || rosterSnapshot.status === 'sync-failed'` — so a failed roster still raises the banner even though the banner's own copy only mentions batch data; its zero-row branch then picks the access state before the `EmptyState`.
 
-The ordering is a convention, not a type constraint: nothing stops a screen writing the `EmptyState` first, and a reviewer is the only thing that catches it. Because the access check is `after` the failure check, a caller who both has no school and hit a query error is told the read failed — which is why `withTenantAccess` never rewrites a non-`ok` snapshot (next section).
+Every one of these routes satisfies rule 19 by *wrapping* the fetch in the fold rather than by ordering alone. That is why the guard order is exactly what rule 19 warns about: the fold guarantees a real sync failure survives as `sync-failed` even for a caller with no school, and the guard order is the only remaining barrier between that status and a "no batches yet" screen. A guard clause list trimmed to `EmptyState` first would swallow the banner in every one of them.
+
+The ordering is a convention, not a type constraint: nothing stops a screen writing the `EmptyState` first, and a reviewer is the only thing that catches it — which is why it heads the failure modes. Because the access check is `after` the failure check, a caller who both has no school and hit a query error is told the read failed — which is why `withTenantAccess` never rewrites a non-`ok` snapshot (previous section).
+
+The same distinction reaches the `/t/<school>` segment layout, which branches on `resolveRouteScope`'s four statuses in the order `ok` → `no-tenant-access` → `unknown` → `not-a-member`: a caller with no school is told so, a failed profile read gets its own "Couldn't verify your school access" retry state, and a code that is not theirs gets "School not available" with a link to a school they do have. Only the `unknown` branch renders as a temporary failure, which is the point — folding it into `no-tenant-access` would tell an assigned coordinator they were never assigned.
 
 ### Verify before display
 
-A data-driven screen never derives the verdict itself. Two helpers convert a profile read into one without inventing a fact: `tenantAccessOf(profile)` in `modules/tenancy/domain/access.ts` (pure, and what a page holding an already-resolved scope uses) and `deriveTenantAccess(profileSnapshot)` in `modules/tenancy/data/tenancy.ts` (what a route holding a profile *snapshot* uses, mapping `not-found` to `none` but `sync-failed`/`unconfigured` to `unknown`). Either result is passed into `withTenantAccess`, which is the only thing that ever writes `no-tenant-access`.
+A data-driven screen never derives the verdict itself. Two helpers convert a profile read into one without inventing a fact: `tenantAccessOf(profile)` in `modules/tenancy/domain/access.ts` (pure, and what a page holding an already-resolved scope uses) and `deriveTenantAccess(profileSnapshot)` in `modules/tenancy/data/tenancy.ts` (what a route holding a profile *snapshot* uses, mapping `not-found` to `none` but `sync-failed`/`unconfigured` to `unknown`). Either result is passed into `withTenantAccess`, which is the only thing that ever writes `no-tenant-access`. Note the asymmetry: `tenantAccessOf` cannot return `unknown` at all — a scope exists only for a caller who already has a membership — so a page using it is trusting `requireScope`, while the routes using `deriveTenantAccess` are computing the verdict on the same snapshot they already needed.
 
 ## The freshness pair
 
@@ -391,9 +414,19 @@ Writes cannot return an `ok` snapshot with rows because there are no rows to ret
 
 The `CreateUserFormState` in `app/(dashboard)/users/new/actions.ts` wraps the same distinction for a Server Action: it distinguishes `denied`, `failed`, `unconfigured`, `invalid`, and the success outcomes so the form can show the right message.
 
+### The write-side form for an ordinary field
+
+`app/(dashboard)/t/[tenantCode]/actions.ts` (`setBatchRqmCodeAction`) is the shape to copy when a form edits one field on an existing row, and it is worth reading as the mirror image of `getBatchesSnapshot`. Its header states the pattern and its rationale in four clauses: **validate through a module's `domain/`, write through its `data/`, return a discriminated state, never throw** — and it sits in `app/` *because* it composes three private `data/` layers (`tenant-scope`'s resolution, `batches`, `activity`), which cannot import each other. Contrast `importLearnersCsv` below: a single-module write can live in the module, and moving it to `app/` only buys the entry-point convention.
+
+Concretely: the school is re-resolved server-side from the URL code via `resolveRouteScope`, never from a form field; `unknown` profile resolution returns a save failure while any other non-`ok` resolution returns `denied`, so "we could not check" is never reported as a refusal; the trusted role is re-checked; the typed value goes through `checkRqmCode` in `modules/batches/domain/rqm.ts`, which is where an invalid code becomes `{ status: 'invalid', message }`; only then does `setBatchRqmCode` write. `RqmFormState` carries `denied` / `error` / `invalid` / `saved` so the island can render each distinctly — `SetRqmResult`'s five outcomes are folded into those four by `failureState`, which is the boundary where a module's result union becomes the form's.
+
+The load-bearing detail is what a zero-row update means. `setBatchRqmCode` writes with `eq('tenant_id', …).eq('batch_code', …)` plus a stored-value guard (`is('rqm_code', null)` or `eq('rqm_code', expectedPrevious)`), and a `select('id')` that returns no row becomes `{ status: 'conflict-or-denied' }` — **one status for two causes**, a concurrent edit and an RLS refusal, deliberately indistinguishable because both are resolved by reloading. The action's user copy names both possibilities rather than guessing. So a policy that matched nothing surfaces as a state the form explains, never as an error or a silent success. `duplicate` comes from Postgres `23505`, not from a pre-check. The activity-log append happens *after* the write and its own failure degrades to `logFailed` on the success state instead of failing the save.
+
+Note the two `tenant_id` uses here, which is rule 2's line exactly. `resolveRouteScope` validates the code against the caller's own memberships and yields `scope.tenantId`; the `.eq('tenant_id', …)` then narrows the update to that school. Neither grants anything — an admin of another school who guessed the code gets `conflict-or-denied` from the policy, not from the filter.
+
 ### The import write path, in full
 
-`importLearnersCsv` in `modules/import-export/data/learnerImport.ts` (line 175 opens it) is the one shipped mutation, and it is the fetch → map → derive pattern run backwards: **fetch** the existing teaching rows, **reconcile** them in `domain/`, then **write** explicitly. An import has nothing to render at all, so it is also where the `unconfigured` state changes meaning: not "render an empty state" but "disable the importer rather than pretend the import ran". The file's header says so — and nothing in `app/` calls it yet: `ImportCsvModal` is a "not available yet" overlay with no upload or sample picker, so `shared/mocks/` is not standing in for it either.
+`importLearnersCsv` in `modules/import-export/data/learnerImport.ts` (line 175 opens it) is the fetch → map → derive pattern run backwards: **fetch** the existing teaching rows, **reconcile** them in `domain/`, then **write** explicitly. An import has nothing to render at all, so it is also where the `unconfigured` state changes meaning: not "render an empty state" but "disable the importer rather than pretend the import ran". The file's header says so — and nothing in `app/` calls it yet: `ImportCsvModal` says importing is not available, with no upload or sample picker, so there is nothing standing in for it either.
 
 In order (lines 176–217):
 
@@ -416,7 +449,7 @@ Raw Postgres messages are accepted on this path: `sync-failed` and `partial` car
 
 Every database `Row` field that a domain type names differently is translated in the mapper through a **total (non-`Partial`) map**, so a new DB enum variant fails compilation until its UI treatment is settled (RULES rule 18). The property to preserve is totality, not the map itself: the compiler, not a runtime lookup, is what forces the decision.
 
-`DB_TO_UI_STAGE` in `batches.ts` is the canonical example and the one RULES rule 18 names: it is typed `Record<DbLifecycleStage, LifecycleStageKey | null>`, so every DB variant must appear — `training`/`assessment`/`billing` → `train`/`assess`/`bill`, `completed`/`blocked` → `null` because `deriveLifecycle` gives them their own treatment (all-done and nothing-active respectively) rather than a pipeline position. `entre` is UI-only, carried by `UI_PIPELINE` and absent from the map's value set.
+`DB_TO_UI_STAGE` in `batches.ts` (typed `Record<DbLifecycleStage, LifecycleStageKey | null>`) is the canonical example and the one RULES rule 18 names — every DB stage must appear, and `null` is itself a decision: `deriveLifecycle` reads it as "not a pipeline position" and lets `completed` and `blocked` take all-done / none-active treatment instead. The map's own comment says so. Do not re-list the mapping here; what matters is that adding a `current_stage` variant lands as a type error at that one declaration, next to the decision it forces.
 
 The same discipline is broader than batches and comes in three flavours:
 
@@ -443,8 +476,9 @@ Two consequences reach the data layer. The import reconciles inside one batch, s
 - `deriveLifecycle`, `daysUntil`, `toDisplayDate` — date and lifecycle helpers, with `daysUntil` returning `Number.POSITIVE_INFINITY` as the explicit "no known deadline" sentinel.
 - `BatchesSnapshot` and `getBatchesSnapshot` — union type and `cache()`-wrapped fetch, the `unconfigured` check first. `tenantId` is optional: supplied, it is scope *selection* on top of RLS for one school; omitted, the query spans every school RLS allows, which is what the admin overview and trainer routes use.
 - `selectBatchesForDisplay` — the display adapter.
+- `setBatchRqmCode` and `SetRqmResult` — the write half, in the same file so the column name and its guard stay beside the mapper that reads it.
 
-Three things make this file the reference rather than an example: the state union is exhaustive, the mapper is exported for tests, and the fetch is `cache()`d. The caching matters because `app/(dashboard)/layout.tsx` and each page call `getBatchesSnapshot` independently in one request, so `cache()` scopes one Supabase round-trip to that request and a later navigation re-queries. The same treatment covers the other contract a single request reaches twice: `getProfileSnapshot` is `cache()`d because the layout reads one snapshot and then derives three separate things from it — `isAdmin`, via the trusted role from `profileSnapshot.profile.role`; `fullName` for the Sidebar user card; and `tenants`/`defaultTenantId` for the school switcher — while `tenant-scope.ts` caches its own `getSignedInProfile` so the `/t/[tenantCode]` segment layout and its page resolve one scope from one profile read.
+Four things make this file the reference rather than an example: the state union is exhaustive, the mapper is exported for tests, the fetch is `cache()`d, and the write beside it (`setBatchRqmCode`, with `SetRqmResult`) is the write-side counterpart. The caching matters because `app/(dashboard)/layout.tsx` and each page call `getBatchesSnapshot` independently in one request, so `cache()` scopes one Supabase round-trip to that request and a later navigation re-queries. The same treatment covers the other contract a single request reaches twice: `getProfileSnapshot` is `cache()`d because the layout reads one snapshot and then derives three separate things from it — `isAdmin`, via the trusted role from `profileSnapshot.profile.role`; `fullName` for the Sidebar user card; and `tenants`/`defaultTenantId` for the school switcher — while `tenant-scope.ts` caches its own `getSignedInProfile` so the `/t/[tenantCode]` segment layout and its page resolve one scope from one profile read.
 
 `getPlatformAdminSnapshot` is the interesting case, because the same request-scoped cache is asked at two different resolutions. The layout wants only the boolean, through the polymorphic `isPlatformAdmin()` helper that folds both failure states to `false` — a failed check should hide the "Add school" row rather than render a link into a denial. `schools/new`'s page and its Server Action need the *status*, because `sync-failed`, `unconfigured` and "not a platform admin" are three different screens there, so they call `getPlatformAdminSnapshot` directly and branch on it; the helper's own docblock forbids using the boolean form in those two places. The platform check is also a different axis from `profiles.role`: the layout runs the profile snapshot and the platform RPC in one `Promise.all` and derives `isAdmin` from the trusted role, never from the platform flag. `cache()` keeps this from being three RPC round-trips.
 
@@ -467,11 +501,11 @@ The split is deliberate and the delivery route (`app/(dashboard)/t/[tenantCode]/
 `tests/unit/batches.test.ts` exercises the reference implementation end to end. Its value lies in the assertions, not the coverage number:
 
 - `mapBatchRow` gets a fully populated fixture and asserts each field, including that snake_case columns become camelCase and enum strings become UI lifecycle entries.
-- A separate block asserts that an unavailable value is `null`, never a fabricated zero — the same rule the failure table below states.
+- A separate block asserts that an unavailable value is `null`, never a fabricated zero — the same rule the snapshot union states.
 - `selectBatchesForDisplay` is asserted to return `[]` for `unconfigured` and `sync-failed`, and to return the rows for `ok` — including an `ok` snapshot with zero rows, which stays authoritative. (`no-tenant-access` is not exercised here; `tenant-access.test.ts` covers the fold that produces it, not the adapter.)
 - The `ok` path is asserted not to touch mock data.
 
-No test currently pins the guard *order*, and no test renders the page components that implement it — only `tests/unit/sidebar.test.ts`-style render tests exist for shells. Adding a state to `Sidebar`'s `isAdmin`/`isPlatformAdmin` pair is pinned at its own `describe` ('Operations list'), but the route pages themselves are unrendered, so the failure table's first two rows are real risk rather than hypothetical.
+No test currently pins the guard *order*, and no test renders the page components that implement it — only `tests/unit/sidebar.test.ts`-style render tests exist for shells. `withTenantAccess`'s own behaviour is pinned, but the clause order inside a page is not, so a mis-order is a real risk rather than a hypothetical one.
 
 `tests/unit/documents.test.ts`, `tests/unit/doc-compliance.test.ts`, `tests/unit/doc-blockers.test.ts` and `tests/unit/evidence-path.test.ts` cover the document rules. `tests/unit/evidence-path.test.ts` asserts that a path containing a separator in any segment is rejected, and that the tenant segment is checked first.
 
@@ -489,12 +523,12 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 
 1. Add the type to `shared/types.ts`.
 2. Create `modules/<domain>/data/<entity>.ts` following the batches reference: `unconfigured` first, `try/catch` around the client and query, raw error retained, mapper exported, `select*ForDisplay` returning `[]` for non-`ok`.
-3. Add a member to the snapshot union only if it is genuinely distinct in kind (`not-found`, `validation-failed`), and omit `no-tenant-access` where the data is not tenant-scoped; keep any freshness pair on `ok` only.
+3. Add a member to the snapshot union only if it is genuinely distinct in kind (`not-found`, `validation-failed`), and omit `no-tenant-access` where the data is not tenant-scoped; keep any freshness pair on `ok` only. Where the data *is* tenant-scoped, do not add the member either — fold it in at the route with `withTenantAccess` so no `data/` layer has to know about membership.
 4. Write the unit tests against a fixture typed with `Parameters<typeof map…>[0]`, and guard the failure-before-empty ordering in each consuming route.
 
 **A new enum column:** add a total map in the mapper, in the direction the data moves, and let the compiler drive every call site. If a column is configured data rather than a closed enum, say so in a comment and use a `Partial`/`Record<string, …>` map with a fallback instead — the totality claim on an enum-keyed map is only honest while the key really is one.
 
-**A write path:** return a result union, keep the raw error server-side, and check `denied` distinctly from `sync-failed`. If the write can match an existing row, decide the match key in `domain/` (as `reconcileWithExisting` does for ULI) and materialise it as separate parse / validate / reconcile / insert / update steps — do not expect a partial index to serve as a conflict target. A partial-success `ok` carries the rejected rows so the caller can show them.
+**A write path:** return a result union, keep the raw error server-side, and check `denied` distinctly from `sync-failed`. Where an RLS refusal is indistinguishable from a concurrent change, name the combined state (`conflict-or-denied`) rather than guessing which it was, and let the user copy offer both readings. Validate through the owning module's `domain/` before the write, re-resolve the school and role on the server (never from the form), and put the action in `app/` if it touches more than one module's `data/`. If the write can match an existing row, decide the match key in `domain/` (as `reconcileWithExisting` does for ULI) and materialise it as separate parse / validate / reconcile / insert / update steps — do not expect a partial index to serve as a conflict target. A partial-success `ok` carries the rejected rows so the caller can show them.
 
 **A new module:** create `modules/<name>/{data,domain,ui}` and add the name to the `domains` array in `eslint.config.mjs` — the array entry is what generates that module's `data/`-privacy zone, so a folder it omits has no enforced boundary at all.
 
@@ -517,12 +551,15 @@ Real-Supabase RLS/tenant-isolation integration tests are still outstanding; the 
 | treating a failed write as one transaction | silent partial state on a mid-file failure | `partial` carries the real counts and the error |
 | relying on the partial ULI index as an upsert target | `on conflict` never fires; duplicate rows per batch | reconcile in JS, index as backstop only |
 | trusting the `data/`-privacy zone for same-module imports | a `data/` → sibling `data/` import lints clean | treat the zone as cross-module only; `domain/` is the public surface |
+| a new module missing from `eslint.config.mjs`'s `domains` array | its `data/` is importable from every other module, silently | add the name with the folder; the zone is generated from the array |
 
 ## Related
 
 - [Tenant isolation and RLS](/openwiki/architecture/tenant-isolation-and-rls.md) — the schema, the `learners_tenant_batch_uli_key` index and `learner_identities` in full, the RLS functions the snapshot states depend on, and the `database.types.ts` regeneration contract (RULES rule 20).
 - [Architecture overview](/openwiki/architecture/overview.md) — where these layers sit in a request.
+<!-- openwiki: broken internal link [/openwiki/concepts/domain-vocabulary.md] file "/openwiki/concepts/domain-vocabulary.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Domain vocabulary](/openwiki/concepts/domain-vocabulary.md) — the TESDA and lifecycle terms the mappers bridge.
+<!-- openwiki: broken internal link [/openwiki/concepts/error-snapshots-and-honest-empty-states.md] file "/openwiki/concepts/error-snapshots-and-honest-empty-states.md" does not exist. Fix the href or restore the target, then delete this comment. -->
 - [Error snapshots and honest empty states](/openwiki/concepts/error-snapshots-and-honest-empty-states.md) — the rendering side of the guard ordering.
 - [Verification and test strategy](/openwiki/operations/verification-and-test-strategy.md) — how the mapper and fold tests are run.
 - [`RULES.md`](/RULES.md) §1–§3 — the boundary and data-layer rules and their enforcement levels quoted above.

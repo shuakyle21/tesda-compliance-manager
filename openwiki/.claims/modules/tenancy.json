@@ -1,0 +1,514 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:cb932efd4bccaacc8b5fd34392bb693e7422a0bf1860e25c21c2224610bb9ce1",
+  "claims": [
+    {
+      "id": "claim_9a83964e1a614b02a8ab689d0d75af0a",
+      "statement": "A `TenantScope` is built only from `profile.tenants` (itself an RLS-scoped membership read), so an unknown or foreign school code yields `null` rather than a scope; queries then add `tenant_id = scope.tenantId` as selection on top of RLS, never as authorization (rules 1–2).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L20-L27",
+          "version": "repo-lines-v1:sha256:7a73080e88abee31fa20fcf2e98e912cfa1014b46b5300590955109a69559e37:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzFhYjNlNDE1N2I3MDVlZTljYWJjNGFjMjY3ZTNjOTJmZTE2NjdlZTg2MDg0OTg5NWMyOTgzZGQ5NWEwYjRkMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzNmOThjZjY3ZDc5MDVjYjM5MTEwZjYwOWVhZDMwMTg5ZWJkMGNhNTEwMmVjZGJhYWU1MjZkMjcyMjNiNjZjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDZlYjBhMTAwYTgwNDE2MTMxOTUxNGVkMzFmNjhiMzI5YWI2ZjllOWQ4MzZhNGUzNDA4OTBkNTkzNGZjNjM5YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDk2MGEyZTI0MTNmZGRlYTg0NDJlYmU2MjIyMzY3ZDU0YThiM2UwMWQ5OTY1YmJhMjY4MzgwNGNmNmQ1MjJkMyJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L1-L51",
+          "version": "repo-lines-v1:sha256:5e5380b0c562eb27cc2aa11177b7499ffb1b96f10b3747f63f8ff57e3aa53a30:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZmNmNTExMTdiN2EwMjI5YWU0OGVjNGQ1YmQ2MzgwZjM0MGY5ZjE0NmY5OTE3NmFmNTE1MTJjNGI5YzJhMjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_53eb22e64b744ac6985f9669e06cf830",
+      "statement": "`scopeForCode` matches school codes case-insensitively on both sides and `scopedPath` lowercases on the way out, so a generated link and its membership match always agree.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L47-L61",
+          "version": "repo-lines-v1:sha256:8e1fcf265d3f1eba623f106d8f857ba412fd386d77cd1ad738e934adce9b01f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YTA1ZTg1MTI2YWY0NzIzYWVkNmNlYmU3OGQ0NmJkNDQ0OGFmZmFjODQ3NjE0M2QzZmQ0MzNmNzM0OWI1YjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViNjE1MDA2NDY2NzY2NjlkNjNlZDRkN2ViYWY2YjFmNDQ4MGQ2YTY3NDBmMjZhZDE5ZWJjMmEzMmJiMzQ3NzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2NmUzM2FlNTM0MTEyYzQ4ZTQ0MDkyYTY0MGZhZmRiYjQ2MTdlYWExMGQ5YWNmZmJjMzM0NWU3NzkxN2M2Y2YifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L24-L28",
+          "version": "repo-lines-v1:sha256:f55b0b07a1f78fdf99e79ce3de0a3757124b230a441a15176ebb27b254c1b403:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDJjYTY0NDBhNDQ4MTQ1N2ZjZDIyMzRhYTkzZmE3ZGVjZWEyMWYxYTc1ZDIzZTgwMzQ1ZGIzODM0MTZiZjJlZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWUwMGRhOGUxZjNjZDY4ZTU1MDU2ZTAxOTVhNTg3N2E3MzE3MjllYzI5MWQyMmQ4MTEyMjM2ZGIxYTY0MGU3MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGYyOGFkMDcyMTg1NzU4YmU4ZjkwZmNmNWNlZjQyMmEwMDc3NWNjOWM0N2VmOGMyNzQxMzQ5OTNhNGFjMzJmYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc61c72814324e0bae9c53fbb17327bd",
+      "statement": "`SCOPED_SECTIONS` is the single compile-time list of code that lives under `/t/<code>` — `ScopedSection`, the Sidebar's section-named workspace rows and `legacyRoute` all derive from it — but nothing enumerates the route directory, so a section added outside the list is reachable yet earns no legacy redirect and no nav row, and `isScopedSection` currently has no caller.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/legacy-redirect.tsx#L16-L34",
+          "version": "repo-lines-v1:sha256:c92f58d7f146fce84f904c8e6be4129b7d60150df8d64e97623520ff143e9e09:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZmYyMDMzYmEyYjZmMjExMjExMDQ0MDY3MTI3NzgwYjViMDlhYjhhYjUxYTI0YzNmM2Q1MjA4NTA0ODdhODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzODg2MWE2Y2JmMjRiYTA4ZTAzNWZmMWQ4Mzk0MWQ4MWQzMDE0YzllMGJkYWJjZTBlNzY4ZWJlNGJkNGU5OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L28-L45",
+          "version": "repo-lines-v1:sha256:4aa6d46ede021fbf67d8f547cf077ae75d52aff42a65d42f743c10dc75f55e70:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYwOTNiMWI2MjFmY2YwYmUwOGNmNmExNjk2OGZiN2YzYTRkZGZjOTM5MjY4YjkwOWYzMjhmNzEwNjAxMDM2MWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkZjM4MmIzYmMwMmQwMDZiM2Q1MzQwMjQ0YzNmOWNhOWM0ZDY2MDhjNzEyYjQ1MWE3Y2IyNGRlNzVlYzZkMDYifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L25-L40",
+          "version": "repo-lines-v1:sha256:7854d52a80f0e985d162fe8327b0703223d87b77347d7006e4b03dba97c7950d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNzk5NzgxZWI3ZTdiYWZkNWY2ZDA1MzM3ODFmNTU1MDYyZmNkMjk1MDg5MTdhZmY2MDlmMmQ3MjViZjI5ZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3OGZiODM0NjNjOTA2ZGFkYTVlNmVkYzdjZDNmNmM1NGM1MzA3NWMzZTkwNGM0OWY2MDBhNDExYTJkM2FiOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlZTNkYTY2YzhmNzY0ZWQ2YzVkODE2ZjM1OGRjZTBhYzU0ZjlhYmM3Y2EwMTQxODRlYzhiN2IyNGI1YzM3NTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7880810ff0f246d59bccc3647a55a02a",
+      "statement": "Route composition for the scope lives in `app/(dashboard)/tenant-scope.ts` rather than the module because it joins `modules/auth` identity to tenancy's profile and only `app/` may import two private `data/` layers (rule 8); `resolveRouteScope` returns a `not-a-member` state with a fallback school instead of ever falling back to all schools.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L40-L49",
+          "version": "repo-lines-v1:sha256:2bab0f21132768697d5f1b5c4ee91073199740e37dbb712c44e829b1277d6721:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MjE2ZThlOWMwYTFhNjhkMDZjMmZiYWE1ZmQyMTM5NDgyYjhlZmQwYTE5MzE1YjkxNWU2Y2NlODQ5ZDg5ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmYmNjYzE4MTdlZThiNTUwY2JlNzNlNjMzNjdlYmI3YTkyMWIzODA2OGFlYWYzZmE2OTY1ZDkxYTgyZDUzNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L1-L52",
+          "version": "repo-lines-v1:sha256:6ff33528aa3aa3db03645f4e43c71e6c6bd74692ec3073f5907f7d7f35e2254b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzNDdiOTYyMWU0Y2YxNTkyNDkxNmFhZDMwYTczZDE4MjdjNjliNGY5YjVhZGYwMDU0Y2RhNzQxODMzMWEzYmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8047bba1de334038bef3dda518fdf593",
+      "statement": "`TenantAccess` (`granted` | `none` | `unknown`) lives in tenancy's `domain/` rather than `data/` because every module's snapshot contract must fold the verdict and another module's `data/` is private, lint-enforced by per-module `import/no-restricted-paths` zones.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L41-L42",
+          "version": "repo-lines-v1:sha256:5f034bc284a9888b9a6b7cb639f998478d24eaf0338e5d53d152f5f41214e045:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNjNTU2ZWZjODIxYjExNzgwNzY3ZGUyMzgzN2E2ODYxMzhmMWU3NGVhMzEwOWJmNjdlZmRlZGMxZmI5NzBiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDgyM2E4ZDM4ODU0ZTFiYjBiZWE3YmU5ZDJiODY1OWQzMzFhNDA5NThmYjlmY2MxZjYxZTE2NWQyMmYwOTVjZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGM3YjY1NDBiZDJiNGVhNjE2YmU2OGI4NjliYjRmNWU0ZDVhNWEzZmYxYWEwY2Y4OGFiNmFjM2IwNzUxNTZmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmIzMDY3MGQyN2Y4ODFlYTU4NTFlM2ZlNzY2ZTBiMzBhYWFhYjY5MDhhZTk4ZjdhNjVhNzg4NWQ3ZTk5MGVhZiJ9"
+        },
+        {
+          "resource": "repo://eslint.config.mjs#L38-L44",
+          "version": "repo-lines-v1:sha256:303316133cc2c24d30f2b04dd7ba50bf5dbe0a67dc08dea17e4d59839bdbc9cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY4ZTE1NWFhNjIzNWI0Zjg4ZWQ1MjYwYjVhZjI0MDZlMTZlMTI4Y2E4NTk0NjhjMDQwZDcxYjk3NTRmYzZkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I1N2RlYmE4YzlhZmMyY2JiZmM0ZTExNWMzMzk3ZDJlZmIzMzBmYzhiNDIyMmNjODcxZmUxYzlhNTAwNjNhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDYwODU1NTU1YjM3ODBiYzMzOTA4NWZmOWQ3NDI2MzAwNDFmNDJhOGVjZjc1MWI4M2IzNDg4M2YwNGFkNWIxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ2ODU4YjBiNzMxMTgxY2IzNTk1N2VlYWIwOTc3ZWE1YzA2YjIzMDJjNWJjNTI0YmMzN2RiMWRhODE4YTBkOCJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L15-L18",
+          "version": "repo-lines-v1:sha256:46d8350b7ea0697a5d4a5425501ec08045cdfc4c561ad999fd8a331dd0526b46:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWE0YzQxZjRhMGIwYzA3MmJmYjU1OGJlMjBlMWE1OWEyN2Q2MTQyYzU4MDY1MzI3NDg1ODdmMzEyZjg5YjY0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWQ4YzU3NmY5MzFmZTMzNjZiNjFhODc3ZDUxMDQ2MDExOGFkZjI2OWM4ZGQwZDk1YmFmYmQ0MGEyNGIzOTNkNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_650a5a5b1b844d978389c61ef823f727",
+      "statement": "`withTenantAccess` replaces only an `ok` snapshot, so a `sync-failed` or `unconfigured` result is never overwritten by the tidier \"no school\" story and `unknown` changes nothing; `deriveTenantAccess` maps `not-found` to `none` but `sync-failed`/`unconfigured` to `unknown`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L157-L177",
+          "version": "repo-lines-v1:sha256:77b32c203405015811fb61213eb97b9505a46b1773a7effd55d39b7bf3c687eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2YjllYTg1MTUxOGMzZTA1ZTRiZjBhY2Q4YTJiZThkYzgwOWU2NzU5MTljOTIzYzM1NWRlNzBlNGIwMDUzNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L41-L57",
+          "version": "repo-lines-v1:sha256:6279c9bc1ed2f84718af50fa847b4803f240c30bd98c555c4247e4ddfd81163d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDhmNjE4ODM0MWVhYjBkYWM4NTFhNTY5ZWVlMWE3NDdjMDkzMGIwMjVmNDcyZWViNjA2ZjFmODVlODRiZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1YzlkMjJlMzZhMTA3MzljODI0NDU5YzZkYWYyYTBkMjU4Y2JiNzlkNWIxMWUyNzBjMGE1ZTQxZTMzZDRiYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L59-L97",
+          "version": "repo-lines-v1:sha256:4398bdf049b3cbb2667e96d10a4564545bfdab9cd8455bce7ea364bbe8dee936:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTRhOGIxM2NkZmNmNzEyNjU4ZjIxNmNjYmVlYWUyOTQzZmRlYjAwZjFjNzY3NmQwMWY5NjI3ZDk4MGQxMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0f4a2204399c4405ae907fcd186dfd02",
+      "statement": "`getProfileSnapshot` takes the Clerk user id as a parameter instead of resolving it, because the `profiles` SELECT policy admits same-tenant rows so an explicit filter is required and the resolver sits in `modules/auth/data`, which this module cannot import.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:86dd1ce3592521b058bafdb0631bbd2c2498323d8738407ead3aad2b25172941:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNjMzNzFjYjFmNDZhMzNlN2IxZWRmMzdmMDRlZGE3NjI1YWM1YmVmNmY3ZmYyMmIxMTE0ODI2MmIxZjEyMWEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L132-L146",
+          "version": "repo-lines-v1:sha256:ced77e76c96e622e0fd41492ebd61d862fe40f067d318e0455e11c6f466fab17:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ODcwYzNiNTlhMjRlNjAwMTUyOWM2MTQzODc4MWQzZDVlMzAyM2M1Y2Q3Mjc3ZDlkMDZiYzMxNWQ2ZGViZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhMzM5NTQ4YjZlNTRlNzk0ODc4NDFhNDMyZjJiZGNhOWNkNTEwZjBlNWQyYTY0NjE0ZjZmN2M1Mzg1NzIxYTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhMDMwMDA1MmM3YzFjZDNkMGY1MzAzYmVlMGFkMTljYWU1OGViY2E3ZWYzYjM3NzM1YTllZTM5ZGQ4OTZjNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1ZGQ3MGYwMzRiMmZmYWJiMDY4NTk0ZjY2ZTVjNzE2NGRkZGQyMmMzOTY5ODcwYjEzN2U0OWYwYmFkMjQ0MTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e553e0545bfb46ddbf4cf0f5457e5c23",
+      "statement": "A signed-in person with no `profiles` row is reported as `not-found` rather than `sync-failed`, keeping \"provisioning has not happened yet\" distinct from an error.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L102-L123",
+          "version": "repo-lines-v1:sha256:3623ba080f115f40aed6df1ebc47b4cda33cb0609e8bda5dd1c7d317bd11d3fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MTk0Njg0YzU1OGMyODhmYTk2YzM4M2RjNDJjNTQwNDBiMzBiNDVhZDBjOWEwZjFlYTdhMWRkNDA3ZDFhODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkMzlhMGE4M2VkNmRlNzY3MDg1ZGFmZDRmZTFkNTAwMWQxYjlmN2ViNDBhNjFlMWI2NDg3OTA3MWIzMWVhY2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzMzcwYzUzZGU5ZmM5OTEzMjgwMWFkMjFlYWY4ZDU5N2Y4NTJkZjZlOTU1ODViNzg2NThlZDhjNmZjMGRlYmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_42767c2c83694930bda7332781017055",
+      "statement": "`ASSIGNABLE_ROLES` is deliberately narrower than `UserRole`: the UI-only `owner` has no `profile_role` enum value, so offering it would build a write Postgres rejects, and `DB_TO_UI_ROLE`/`UI_TO_DB_ROLE` are total maps so a new enum variant is a compile error.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L34-L43",
+          "version": "repo-lines-v1:sha256:4d4fa94831877a9a61cddf670f5e886a54988a0fc4bd829100cfbb91c1941b42:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwMmVjNWQyYTU2ZGM0YzJhZjEwMmQxYzg4ZGFkYmE4MmIxZTkyMmQxOTViNDFiMTk3NWVmMjljZWQ2ZjEyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzYWJjNzU3NjJmOGFmMWJlNWE3NjRlNWM0NmNlODg2ZmM4OTVjNmFhZmZmY2Y1MTBiZmE5Mjg1M2NhNWIzNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhNmU4M2UxMDRiYzRkZWViODEyY2RiYTkxMTU3Mjc5MzY0Y2MwMzgwMmNhODhlYmE5OThlN2ZkMGEwOWM5YzQifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/userAccess.ts#L16-L32",
+          "version": "repo-lines-v1:sha256:90a3bb7db3058a31d586fb3f2a51c03d6ace2bff746db46a369413727a5aa488:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4NTk5NjY4ZjA1MjQzOGViNGRkM2UxYmU4OWRlOGQ3ZmRkOTE4ZTJkOTAxNWEyNmFmNjIxNDQ0NzBlYjE0NDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2NTA4NTMzZmIyMjc2N2RiODljYjgwNDNhZmNmMmJhNTM4YmJjNTgzYTQxMTAxZWMzYTQzMWNlOTgxM2JmMDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4ZGNlZjg1NTRiNDk5NmM4YWI4NzBkYmE1MDBlYjdmZWU3OTc1ZTIxOTY4ZmY4MGVhNDcwYjNlNjE5N2VjZjcifQ"
+        },
+        {
+          "resource": "repo://tests/unit/user-access.test.ts#L39-L45",
+          "version": "repo-lines-v1:sha256:c08e24ae6bfb8bf869df277c9a7eb8ed75a18c2a828c3a98f65553f5a210c26f:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODFhZjc4YmJlMzJhNGUwODkyMzQyNjA4MDJiYzRkZjYwNmM0ZjY1MzZjNDkzN2Q3NzA3ZTFmYTA0NjRhMTRiMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIwNDBlMDk1YTk0ZTJhZGE3NGU0MjFmMzcxODc1MWE5MWE4MTBiZmQ2NmY0OGY0ZTkzOWM3Yjc0ODBlYjY3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTI3ZTdlZDc3MzE4MWE0NjgyYWM0NGI2Y2M5ZWVlZDZiMDY4ZGQwZTMzZmIzNGY4MjRiOTg2MDU3OGJjNGI0OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_280724c4caa74b1d9607bf81441e0172",
+      "statement": "`validateUserAccessDraft` receives `allowedTenantIds` so a submitted school outside the caller's own yields a field-level \"Choose a school you have access to\" instead of a bare RLS denial.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/users/new/actions.ts#L71-L80",
+          "version": "repo-lines-v1:sha256:0057b9a59927a4b666e0e10a0f980ba66dd299646ec0e875a4830111045ead80:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzNDM1Mjc4OWJkMGFkN2MxMGYyMDNlOTRmNzJlY2IxNTYwMWVjMzJmMjY4NmM4NDkyOTVhYWY0ODU0NDI2YWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5NmY0M2EzODdkZjAxNzNlNGE0MWE5NWIyMjc5ZjQyZWY3ZDYyNmI1MWFjOGIwMjE5NjJmYjhmNmJiZmIwNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/userAccess.ts#L103-L138",
+          "version": "repo-lines-v1:sha256:176415a597fb85e9a1155a5eaafab1443a120e905f814fe97c220fa0f449771d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2MzFkODU1ZWY1ZmNmNTcyZjZhOTIwYjdlYzYwYmU4ZjQwYTJhOWRhMzI3ZDgyNjM2ZDY2MzQ3YjQxMDU2ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjYWY5YTI5NGVjNjc2ZDQxZThiMmM2ZTdmOTkwMmFjN2UyYmMwMTlkZTFkYWUxNmUzNzZiYzIxNGU3MmNiMzgifQ"
+        },
+        {
+          "resource": "repo://tests/unit/user-access.test.ts#L97-L105",
+          "version": "repo-lines-v1:sha256:4877a8d4f4a3d59732ae7d1f85e31645e9a43a60978728279041fb7586d72be8:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmUxZmJmMWNlMGM4OWNjNDQzYTBiMzY3MTA1MmRkZDNkZDM3MGVlMDllMzUwZmUwMGQxOTFjY2YxZjNlNTAzNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGM4NmFiZWIyNmYwYzM5ZjU5YzIzNTM0NzQ4NWYwMGNjZDFlNWQ0NzgxMWZiZDA5ZmUzOTY3ZWZkNGFlOTYyOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGY2OThhZTU2NGE3NmU4NTQzMTI2N2EwOGQyZmMwNTE5NzYwNTBjZTk5YzFjYzVhOWJlYzUxMTgzOTFjYjEzMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5d348323f7a43c1afa1a58c1e8bc5ff",
+      "statement": "The email lookup is escaped against `ILIKE` wildcards (backslash first) and then re-checked for exact normalized equality, because `assignUserAccess` changes the role of whatever row comes back and a wildcard match would grant access to the wrong person; `not-registered` stays deliberately ambiguous so another tenant's membership is not leaked.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L134-L177",
+          "version": "repo-lines-v1:sha256:13ec61834fa82772bff396c092faccb39e3af5dbffec1aeee056f689135ec578:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkMzlhMGE4M2VkNmRlNzY3MDg1ZGFmZDRmZTFkNTAwMWQxYjlmN2ViNDBhNjFlMWI2NDg3OTA3MWIzMWVhY2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0OTBmMDM4NjhiMmI0NjFmM2I4MzIwZDY5MDcxYTdjZTEwYmRkN2ZlNTQ0NTMwZmUwMzM2ZGJlYzBmYTE4MGQifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L40-L57",
+          "version": "repo-lines-v1:sha256:6dbdee60ef5838efc6ca75b8afee12a65eb7fc9cfd44a915005fb5ddc3d15473:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhODI2ZWY5OThmYWJlNjI0MDA2OTI2OGE1Y2JlZmQwMjQzYmQ1Yjc1OThhYzA3NDNlNTM5MjNjZjUxZjQ1ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTI0NDAyZWFlMWE4YjkxNzQ0NDZjZWZjMGQ4NDYxMTU1NTk3Yzc4NGViYTBjODJhZTFlOWJiM2QzZDU4MzgifQ"
+        },
+        {
+          "resource": "repo://tests/unit/user-access.test.ts#L192-L211",
+          "version": "repo-lines-v1:sha256:fb894d38ffd0a0d74b36ec994d3798d4e847fa72f7e01be52bd40ae4ae901451:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c04a9da3c4f4c4ab9e6f2b76eb969ff",
+      "statement": "`assignUserAccess` runs the role UPDATE before the membership INSERT, treats zero updated rows as `denied` because an RLS-blocked UPDATE is not an error, and compensates with a best-effort `restorePriorRole` on INSERT failure — a half-applied promotion to `admin` could otherwise read and set roles across the whole unassigned profile pool.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L251-L323",
+          "version": "repo-lines-v1:sha256:2ba1a1fcfbbfa109d37cbf81d1adf0f9590ad4fc8d78d257c76daf64428a1b0e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiMTBlZTFjNWMzN2EzZmJlYWVmNjZlYTlmZGRjNGZiNjVmNWMyNGI0MThlMzc1ZTU4ZDY0N2M5ZTc5MTg3MGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzOTdlMmY3ZTQzMDExYzU3OGE2ZDc3ZjEwM2YzN2EzNjk1N2I3ZTNhNGEzMmYyOWZjNGNmODk5MmNlOWE3NjIifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L325-L377",
+          "version": "repo-lines-v1:sha256:e37720add5e98ad48407e149e7d694ce40233098c0a98ee7b37678bb2f0adf42:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwMDU1ZTc1MWJjOGYwMDljZDY5ZjNmNGIyMDUxNDBkMjUxYTc0MjgyOGZmZWRiN2MwOTMwZjkwYWFkNjgwYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5OGJjMDg2NDQ4NGE5YWE0NWM3YzU3NzI5NjA5NDE2YmIyMTEzOGQ1ZWMwYzk1OWQ3NmRkZjBiMDNjMDcyNjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5YzgwNjcxMWVlYjY5NDNkNjZlNDEyNWQ0MTZhNjNmZjFiNGJiY2FiNGFhODY1MTE2YTcwZmY0OThiZWNkNmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b177fa32a9c4227a51e7c3e33a56610",
+      "statement": "The membership INSERT always writes `is_default: false` because the membership read policy is tenant-scoped, so an empty list for someone at another school must not be read as \"no memberships\" and produce a second default that makes landing depend on row order.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L80-L96",
+          "version": "repo-lines-v1:sha256:9d9b751d8443c8283226d39e778a729faccdf60570aa79ea23741d05bd835940:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYzY0NTk5ZGU1OWE2Mzg4MGQxMWY0N2JlZmEyYjdmMjYwZDYwMGZjNTVlMzAxZDI5NDNjYjA0NDYxODQ0MDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZjU2YjM3ZjEwMzkzOTQzOTc4OWZmNzRmZTAyNzVkNzhjOTA1Mjc1ZDJiZWRkNWI4YTJkMGRjYjE3ZjE1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkZDVlYTM0ZjQxNzIyMWI0MDM5NmViNTE0YmQzYjMwNDQ2OWUwZmYyMmUzNTNkNjNlYjI3MmJhMDAzYzQyYzcifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/users.ts#L279-L303",
+          "version": "repo-lines-v1:sha256:04cf154f30a861d5f1e486802916d05f9749821440ade017645ed8d58a7d1c24:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkODQ3YzA1ZThiNWU3YTkxYTFiOGU1ZWQyMjU3NWNiODk0YzQyOTg2YTE3YWJmOTY2N2QxMzhhNGNlN2RhY2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4OGExNzc3YjZhN2EyN2IxZTI4N2IwOThmMjJkZmIzNWJkYzYwMTIwYjU1NTRjMDZjODY1MmZkMzEwNzMyYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkNTM4ODVhNmZhNWJiODExZWQ0MGEyOTgwYjVkODI2ZDc5ZWRiY2I2NmJkMjM4NDFkM2ZmZjIxOGZhNDk3NWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3c5f6756ad843c48825d016924c3719",
+      "statement": "`public.platform_admins` carries no policy or grant for `authenticated`, so it cannot be read through the anon client and cannot be self-granted from the application; the app asks `current_user_is_platform_admin()`, a `security definer` function returning only the caller's boolean.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L76-L90",
+          "version": "repo-lines-v1:sha256:237510c2d9bc2599adfe421f5c4bd725af47eabbc34a181944b1832420de1c0c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyMDAyZmU5ZTE4MWVmMmZkOWJhMTVmZDM5ZWUxOTE3NGE0MzYwNjEwZWMzNDBkZGM0YjAxYjY0NzBkY2I1OTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0Njc1N2U2YTMyN2I2MzI1NjMyYjcwNWJiZTU1YTI1MWUxZjk0MWE1NDFjZWM3YzMyNGU0NWRmYzNhYWViNWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiZDFhNTM5MmYxZmE0MjE4Mjc5ZjdjMTEyNDY0YjkwMjVlNGVjMzU5MWJmODRjZWQ4YjhkMDU1NDFiMjBkY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmZjBhMGVjNTlmMGFlYjM4NWQ4M2M2ODY0Y2MxM2QyNzMyOWNmMjllNGUwMWI5MTYyOGM1MmU5N2Y0ZjFhODQifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L86-L126",
+          "version": "repo-lines-v1:sha256:f862d3e9b802213c0a8132b62e4c224cf5574baaf49e3396e1fb1e58ef660329:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhZGMzODQzNGM3MzcxOGRlNjQyN2I4ZTFjOWI5ODRlMzFjMWFjMDVlMjU1OWIzNjc1ZTU3N2RiYWI2OTM1NDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiZjVlMjBkNWEzMTliYjkwN2NhNDk3ZWI3OWQzZjg4NjIzYjU1ZGEwMzE4OTAwOWRiODIwMzRhZjJkOTA2NzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4ZDljZTBlOTA4MzdlMWY5NGJkZWRlZjlhMWQ4ZGQzMjBkZTMwNTVjZjFmYmFmNzc0MmI4ZTJkNTIzZDg1NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMjdmZWYxOTU1Y2UzYzkwNzAwZWI4ZDZiMTA3ZTQwNWFhYjE1NGQ2NjVkOTgwOWM4ZjliNGMwYmM0NmU4M2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5a86440df144e40a869913ef3b32515",
+      "statement": "`isPlatformAdmin()` collapses every failure to `false` for callers where a failed check should hide a link rather than render into a denial, while the route and the Server Action use the full snapshot because they must tell `sync-failed` from `denied` (rule 24).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L81-L83",
+          "version": "repo-lines-v1:sha256:08bfd5a9b228b4406c47a45470ecc15508baa9f0a12914aea199b4f97d975848:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2RkODY0NWYxNDE1ZTQwYzJiODk3NDgxM2EyMzVhMmY5MzA5ZTgyMThjNjgwMTE0MTM3NWZhOTY0MDQzZDc3MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzI5NjUxYzRiYjIwNmMwYzZiYTE2YmFlZDVjZmZkMmRjZGM0YjRjOTE2NjVlYjNjNjExMTZlNGRhNzViNDE5ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDc3MmM5MjJmYzY1N2VlNjIwNTNhNzM0NWU1ZjM0M2E5Yzc3YTA3YTgwZWI0MWMxZWEzMTg1M2U5NTk5ZDY1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTdhM2VjNGJhNGRiZDkxMGY3ZDE2ZjhiM2Q2YjkzNmQ5YTk5OTkwY2E3Y2U5YzNmOTg2MWQzY2JiM2VlYzA3NiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L37-L43",
+          "version": "repo-lines-v1:sha256:385b4df2da69800350cb0d433e966e781e6b4bc002bbf2b482f757d567a602bb:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFlNzY2ZjVjZWIzMWU0ODE1NDc1YTc4YThkNTA2M2NjOTY0OGY3OGJjYmUxYjE5MjM0YTMzOWM2ZWZhMmQzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDRlNWM5YmY5NjI1MGRhNzQwZDY5MzhkMGE2Njc5NjU4YmJlYmIyNTEzYWY2NWIzYjE3YThmZjcxYmRlNzAwZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDhiNDJlMzc4NDFlNGU2NTM5Y2ZmYWIxYjU3ZDExYmM2YTRmNTdmZWQ5MDEwM2ZjNGM2NjdmY2QwNTIzNzkwZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2VjZTY4MDBmYTQ0ZjJkMjUwZGYxNTIzYjU4M2JiYTZkOGI2YTExYTc3OTg2MjkxZjg0NjFhNjIzYzI3ZWFhOSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/platform.ts#L56-L68",
+          "version": "repo-lines-v1:sha256:ba9d60e14d94ab7e8a4c57f05189107a0af56c3904807c61c9376a8f08af64fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViMWVhMTVhMGY3YjFkNzc0MWMwOTJkZTgwMmQzOWZkYTQ0MzRlY2YwNWY5NDM1OGM2ZjM2OWNhOTExNmUyMmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1e2433e224e74c1493d2a5d0c4e739ff",
+      "statement": "Platform admin is a separate axis from `profile_role`: holding `admin` at a school grants nothing on `/schools/new`, and the reach is the registry only (`tenants`, `qualifications`, `tenant_qualifications`, unassigned profiles, seating a tenant's first member) — widening it to a compliance table or letting the operator seat itself needs its own ADR (rule 30).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L100-L113",
+          "version": "repo-lines-v1:sha256:b0b9832fa243c741481d0d4fbb210cee4dd938ec75bedfd924bb4b6507a2c27d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmMzg3ZTRjNDdkYTY4Y2EzY2M4MTljYzkzMzVkZTI5MzdhOGU5ODg2NTQ2YjRmYTUzYzhjNDRmYzhhZGQwZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0OTZhMTUyYWY1OGY5ZTczZDZkZjVkZTA0NjRlM2FjNTc5NDI4MGE0MGI3YjNiNTBlZmRiOTM3ZmQzNTU0ZTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk4MWU0YTZjN2M1MjRhZWEwODg4MGQwZDI2N2ViMGI2OGUxZmM5ZGMzNGZlNDAzNGJjYjA1ZjFhZjk3YzY4ZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5ODY4OWZmNGRlZDRhMWRmZjE4M2FlOTdmYzYyNjQ2ODE0MTMzZmI5ZTFjZjQwMGVmMzZjMjhhZmEwZmQ1ZGIifQ"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L48-L54",
+          "version": "repo-lines-v1:sha256:a634ee7d1de7224a815b19953983d3dab20e2aec45acbe9ae7338d71ea33ba3e:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmUwN2FiYTFmYTUyM2U3N2M2ZGE2NDAyMmFiZThjZGIwNDQ3M2Q2MTNlZWQ1YmNlNDM5YTc3N2UwYzQyOWEyMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTU0MTUxMTkxMWU2NTM3M2UzM2NiY2M2ZGY1ZTAzNmMwYjZlYmUyMDNhMWZmMzg1ZDZlYWEyYzcxYzJiZTIyOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmExZTdhMWMwZDAxOGUwNzliNGRlMDljZjdmMTcxNzQzMTVmZDlkOWQ3NGU1MTZlZDMxM2NhMjM2MWZhZWE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L92-L125",
+          "version": "repo-lines-v1:sha256:80933951b2f2772a2808215cd6487b1416b6129643d503ff60601546a54eb478:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0NzVhYmEwZTU0MTEyODlhMjZmZmY3ZjJjYzIzMGMyYTE3NDVmY2ZkNzQ3OTE1YzYzOGJmYWQ3ZTRjYjEzNmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0N2Q4NWU0MzE4MmU1MzNiZTgyMmY1YTc0OTVmMTVjMGE1NzhkMWMxOWJiNThjNGQ1ZmYyYmYyOTBiM2U2MjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4Y2Y2YzY4YzA3ODVjMDZmNjkyZGE5MDk1NGExNjRlOTdiZjQyZTIyNTE2ZjNmYTE5ODYwNTk5OGUwMThiZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5YmQ0N2I4M2Y5ODIxMTIwODAyNjU5OWVjNjk2NDAxOWI2MTJmZmYyYTk0Yjk2Y2MxZWY0ODQ1YmY2Y2UyZmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_caca3aac43c94e7592e02885e0bc0be0",
+      "statement": "The platform-admin seating policy carries two load-bearing predicates — the seated `profile_id` is not the caller's and the target tenant has no members yet — and because its second predicate reads `profile_tenant_memberships`, narrowing that table's platform-admin SELECT policy silently weakens the INSERT.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L103-L125",
+          "version": "repo-lines-v1:sha256:7ef17516925f79b36e256c3bb80396bcd25356ec66a5822e2b6d3f53b0582fd8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4ZWQ1ZWZjODk0Y2E0NWNjYjhiNThhMzJjYmRkZmM3Yzg2OWZmNjRkMjFiOTYxZDhiM2ZhNDBmMzIzMjdmYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0N2Q4NWU0MzE4MmU1MzNiZTgyMmY1YTc0OTVmMTVjMGE1NzhkMWMxOWJiNThjNGQ1ZmYyYmYyOTBiM2U2MjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1YWZhMDkxZmVmY2NhY2Y2YWQ3MGQ3YzhiMzgwNGJiMTczMGE3MWRhY2M5MjM5NjNlY2RjYzg5OTZkOGNiZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5YmQ0N2I4M2Y5ODIxMTIwODAyNjU5OWVjNjk2NDAxOWI2MTJmZmYyYTk0Yjk2Y2MxZWY0ODQ1YmY2Y2UyZmYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L306-L359",
+          "version": "repo-lines-v1:sha256:e3d653917244f891942b872dd8581826721795e587d0802693a8747c05ba98bd:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjMjBhNWRhM2MxNGJkY2YzZjgzZjljMTczYjYwYmNmZDE2MzI0ODBmZDM4YzFmODA5MTc5ZWNkMmI4NDNlMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNmY4YTIyNDJkZDJiODcxN2EwYTg4MmM1ZTZlNDE5MzE5MDhmZDk2YmZkZDNhMDE1YTQ0ZWUxY2MzODU2OGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjYWM5NTRhNDQ0Nzc5NzM3ODM5ZTc3MjViZmZiYThiODkyNGEwNjZhNGMzZjA0MzA5NDdiNDkxOWM3ZmZmMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjMjFmOTFmY2Q1NzY0MDViOTUyY2U0NjA1ODViYjI5ZjAwNmNlNGEwYjg5M2Q5MDNlZThmZGVhZTJiN2ExNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_66a524a36cb847aeb568abc6a5c596f9",
+      "statement": "`create_school` is `security invoker` so RLS evaluates every statement inside it and a non-admin gets a policy violation rather than a privilege, buying atomicity for the school and its program list without moving the security boundary.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md#L144-L154",
+          "version": "repo-lines-v1:sha256:93ded452586cc3a17df5711f5f7b8892e3e60011813755165fec9855233114c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhMGZjZGY2MmI1MGQ0YjBlODgzN2YwYmNjMTAzNTI1YTE4NGE5MjE3ODY1YjcyMTYyYzgwZWUxZWQ1NTMwZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyNDAyODMzYzhmMTA0NDZiYWRkOTI3Y2EwOTNkOTE5ZTgzNWZmODY5NzRlNzRjMmNjYmRhZjMyZWMwMDg2YTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZmM4YWVmMTY5MGU2OGI1YjFlNDE0NDQwNmZjZTliNDhkZjc2N2MwYTk1NTQ4MGEyNmQzMTY3ZGViNjJjMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/schools.ts#L111-L124",
+          "version": "repo-lines-v1:sha256:6ba913ac99cffc5fb373c9016c25356842d02e53149296623c64ac226d8b60ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxOWVjYzA2MTA2NmZmZDk4ZTVmYzBmNGUwYTMzMGUyZDFmNmJiNDI4YzNlODhmYjE3ZjBhNDE0Mzk3NDliMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5MmE0NzA3OGQyNTA4N2FmNDBiMTA0NzM0MGQzYWE4ZTUyY2U3MWNlNzBkMjQ3YTljN2E3NTRlZWU4MjhhYjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_464fe151ec5547939bf7ba1109e105bb",
+      "statement": "`createSchool` distinguishes `42501` as `denied`, `23505` as `duplicate-code` and everything else as `sync-failed`, and treats a null return from the `returns uuid` function as a failure rather than a success.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/schools.ts#L104-L168",
+          "version": "repo-lines-v1:sha256:3235e9c57b72ddaabe3b5e8297dc2c4546f618926f5d77478fd77bfefd807155:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0ZGE2Y2ZjM2FlYjI0MzRlOTEyYTBlMjhiMDFmNjNlY2E3NzdhYzhmZWFkYzliNjQ2NjQxM2EwNmUwZmZmMWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1NWFjZTljYzEyZDg0NjgzOWRiNzVmYTM0MmZiNzE4ZTkzM2EyMmY2YWRmOGY1NjM2ZWU1YmNmNTUyYTYwOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5fab409481a7407ebecebdf425e7c86e",
+      "statement": "The school draft validator uppercases and strips the code so `akb` cannot coexist with `AKB` as two schools that read as one — a collision the unique constraint would not catch — and rejects a code outside `[A-Z0-9]{2,12}`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/schoolDraft.ts#L139-L158",
+          "version": "repo-lines-v1:sha256:a016ce8f8655b97ce6d0e7083c478d3af0182344982d42aafb5697025ffbe787:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NTUzZTZlNTQ1ZTc3ODAxOGQ4M2ZhYzNhMDk3MGU2NzMzYjFmOTRkZDRlOWNmMDZmYzdkOWMxN2MwMjNlNTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlNzIzNzBmZjdmYmNiZDhlMTgwNDM2YjgwNjcyZGZiODRiY2ZjODgzZGJjYjc1ZTk0NzYxY2Q4YTc4OGMzZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyMjExNGM2ZjlhZmRlODM5OTIxMDNlYjIzYTM2OTAzNDI2NDJmZTYyM2U2NDFmMTJjNzBhNGMzMWQyZWJiMzcifQ"
+        },
+        {
+          "resource": "repo://tests/unit/school-draft.test.ts#L103-L109",
+          "version": "repo-lines-v1:sha256:c3f486a34aedaaf30c50b46c491871c0557589b6ad97005573366b9a3d9efa08:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTc1YzVkZjQ2YTdlMGI2NjRjYjRlOWJlMzA1MzIyNmI4YmI3M2Y2ZWY2ZGYwNGU5ZTk0NTc5M2FmODIxMTFlNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQxNzcwMmRhN2E4NTA3ZmQ5MDkwNDA0ZmM1Y2IzN2JiOTljMDk0MzFlMTA5OGFkODQ2MGZmYjFmZTY0ZmMyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDkzYmM3ZGM0NzU2Y2RmOWRjNjM3ZjRlZmZhYmRhOGRmMTUzMzIyYjlkOGZiMzgwOWQ5ZGM2YmMwMGJlZjY1MSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/school-draft.test.ts#L62-L66",
+          "version": "repo-lines-v1:sha256:b802577ff1917f5a6f848f488a58ce74de1a2c11ea1475a3d3014e149c371dec:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzNiOTI0ZDczZjQwNWM1OTViY2ViZWI2OTQyNjVhOGExZjEzODljOTk2NjMyZjc1YzdhNjIyNWRmMDRhMzUxOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIwNDBlMDk1YTk0ZTJhZGE3NGU0MjFmMzcxODc1MWE5MWE4MTBiZmQ2NmY0OGY0ZTkzOWM3Yjc0ODBlYjY3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI3ZGMwZmJhMjJlMmIwNTA1N2IyMmY3ZmMzNjEyNjNjZWQxNzEzYjkxNzY1NGZlMTE3OWY1NTc4NmRiNWM5NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d11197e454814e6f995a50c7ccdb6c15",
+      "statement": "Program rows are validated in the draft's own index space — blank rows skipped, an unknown id turned into \"Choose a qualification from the list\", a duplicate qualification caught before the `(tenant_id, qualification_id)` constraint, and zero programs rejected — because checking against the compacted command list would file messages against the wrong row and report only the first offender.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/schoolDraft.ts#L160-L228",
+          "version": "repo-lines-v1:sha256:924836ca2199df52173b9a3657b61249a9b2d60d5cb4d46d06cfc3cb38303cad:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5M2UxZDY2NjA2YmYyM2UxODRmOTA0OWZlYWMxMDA0YTgwMjNjYmYzYjkyNTM4OTQ4OTliZjllN2U4YjFlMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwMmJlNGEzYWRmNDVjNWY5ZmQxNDkwMDAwMmNlMjY2MzE4YTA2MTJlNjRjMzIxMDg3N2JmZTBmMjQ2ZGU2NzAifQ"
+        },
+        {
+          "resource": "repo://tests/unit/school-draft.test.ts#L119-L226",
+          "version": "repo-lines-v1:sha256:5af2006da21116783d337c91e8f5e6c0658ef9a9ab74d34eabecb600eff6141e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwODQ1YjEwYWU4MmRmNDVhZjk3OGU0NThmZDBmYjM5MjdhNDQzNzE4ODI0MDU5YTU4NTBmMzdhMmU1YjU1ZWMyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzYTNlNDZmOTQyNzZiNmY2ZjRlZDFmMDJhZjc4YmVmNmEyZWUxYzQzOWRkNTU4NGI5NzM5NDgzMTMyMTRkMmI3IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmNjg3N2M5OTg3MTk0MGM5NTBmM2RmZWVkOTMyYjg0YjEyYzhhNjI4ZTcwZTcyYjk5N2M0NDVhN2Y3NTYzYWUxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2OWRlMWNiZTQwYmY3MzkzYjAyYTc5MjBmOGE1ZjQ4MmQzMTliYTRmMjgwMjU1OWZiODJhMzlhOWFiOTNiOGI2In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_58f95246b48d4ecc908cc109b25bbf71",
+      "statement": "A blank COPR number stays valid because a school is routinely entered while its certificate is still being issued, and empty optional fields become `null` rather than `''` so \"not recorded\" has one representation.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/schoolDraft.ts#L134-L137",
+          "version": "repo-lines-v1:sha256:36ae0a96995f3a6765dce8938d8f81f051bcfb64231dca8a9fb09d655e76eda1:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWVkNTQyY2RhYjc4NjQ1YTFmYzBlNGIyNTAzNTA4ZDA3ZTU2MmUyNjg0ZjliMGRmNjQyYTQ0ODE4NzAyNjM2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDYzMWQ4NTVlZjVmY2Y1NzJmNmE5MjBiN2VjNjBiZThmNDBhMmE5ZGEzMjdkODI2MzZkNjYzNDdiNDEwNTZkMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2QzNTZmMjNlMjFmMzgwOTAzYjAwZmUyYjhjOTIyMGVkMWQyZjlhZDkzNTcwOTdmMjkxODgyZWVhM2ViZThiZiJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/schoolDraft.ts#L230-L243",
+          "version": "repo-lines-v1:sha256:0f229d06c6e319a607553c976c0297f47ef08a83943d65a5056b8eff3480cd6c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1MjU2MDY4MzRmNjBhZGMyYzJhOGRmNWU2YmE5MTIwNTQzNTQ1YTEyYjhlNjFjOGVhODY5YWYyNzg3ZDg1MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzM2M4NzE5NTQ4YzYxZjBmYjE1Mzc5MmNiODIzNmVkM2ZmYjQ2M2YzOGEwMGVmMWIwYTc3ZDlhY2IzZTc4MTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/school-draft.test.ts#L83-L93",
+          "version": "repo-lines-v1:sha256:5f47e0fb3e45b1d7cd70e69268d927fee2c5ed7f62e70a5537bb24782c2d0a1d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkZTMxMjIzOGExNTg4MGNlZjE0ODM5NGY0MWMzNzZlN2UzNzkxODQ0Y2QwZjRlYTRhNTgyZmQ3NDZhM2FjZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4MWUwODdjYjA0ZGE5NTQ5ZWVjYTBiM2QzYjFkYjNmZjI0YmY5NDg0ODEyNmI4YmMxYzdhYTFiYWEyNDY1NzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyZTdkYzg1ZWJlZWZhNWNhMGUwOTdhNDViNGNmZTQ2YmI2MDYxODhlMzgwZTNiZjljNzRiYzllMDNhNWJiNGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eac1be1b33794284aa568d02257c8b5f",
+      "statement": "`createSchoolAction` sequences authorization, the qualifications lookup, `validateSchoolDraft`, then `createSchool`, returning a discriminated form state rather than throwing, and `/schools/new` renders distinct signed-out, non-admin, unconfigured and sync-failed states before the form.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/actions.ts#L67-L165",
+          "version": "repo-lines-v1:sha256:31f2ed5c960a86b2437ed1dc80d34d6d6608bbdba05b9c8af53f87c1c1976b73:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmODdlZGI1NTNiZDBmZjY3ZjNhYjA4M2JlMTUyYTk5NThiOGEzZmRmZDE4ODg0ZjQ1OThmNDcwMDQwYzJiNWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5ZjQyMjA2NWI2YzQyZDQ3Yzg5ZDVjNjlkMTc1MjhmOWU1ODlhNmI2NTg0ZGM1Y2Y3YjE0ZGVmMzM0ZDMxZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L81-L140",
+          "version": "repo-lines-v1:sha256:c521aea9ab577c921128e981a5386d725fe3f466e8f55259a041b3b1916d8e5f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYzZjY2I3ZDQ1YTMzNzk1OWFkZjA0M2VlYjQ4ODVlY2E5NmFmNTI0ZDc5NzI0NjM5YzBhNzc0NzY2MTYzNTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNDFmYmIzMGMyZjc0MmUwMDJkZDc3YjI3NmQyMzM3ZGExOWZkZWY1MGExYjE3YjAzYWQ0ZGRmYmVlZjdiNGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_097eb868d2f44a5d8528834a085afd7e",
+      "statement": "An empty qualifications registry makes the add-school form unsubmittable, because a school must record at least one registered program, so the page says so instead of rendering an empty select.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L127-L140",
+          "version": "repo-lines-v1:sha256:9a358434fa8a52478033cc04e5578fff6261d8e36d48d952d6b8df5673c5a5b1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxZjY3M2NlNzBhYmI0NGUxNjcwNDdiZTg0NTIzNTM3M2ExNTQ4ZGE1YmYzODA2YTVmOWY5N2Q3NjlmNmZmOWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMTEwNmI2Nzg2MGM1NzAyNzJkZDg4YTYxNjQ3MDMzZDZjZmI3MjMwZjdlNDUzY2JjZDE5NjI2ZGRhMzE2YzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNDFmYmIzMGMyZjc0MmUwMDJkZDc3YjI3NmQyMzM3ZGExOWZkZWY1MGExYjE3YjAzYWQ0ZGRmYmVlZjdiNGEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/schoolDraft.ts#L219-L225",
+          "version": "repo-lines-v1:sha256:12132c99eb5df4a7564455e4c5272b5499eb75bf6b3c8db7ba1c256edb26e967:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRlNzg1YWZhMzc3ZWQzZWJhODJmZDFiZGE5NDFlNzUzNGFhMjVkMjIxMjg4MWMwYjBhZjUxMjQwODg3OWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTE0NjE1ZGRiYmRkYjMzMzE2ZWFhNzc5OWYzMTA0MWM5NDg3MjNiZjdlY2E5MThhZDY5ZWYxMThlYjQ2ZjE1MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTFkMzA2ZWY5MTFjMjYyNjhlYjU1OTY4MGFlMDljMTBmMDY2ZWZjZDk0ZGIzOWVlNWEwOGE4NjlhMGM1YzM0NyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d179a642b2d84ab285f6dc0e094700a4",
+      "statement": "`/schools/new` is deliberately not gated on `resolveRouteRole`, whose `?role=` preview override would let the screen be previewed into existence, and the platform-admin sidebar row is hidden from non-operators as usability only.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L104-L121",
+          "version": "repo-lines-v1:sha256:162750f7049178b0f82916b7936166759040a47f382b32cc2d6c22ac682714c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwOTFhOTI0MTE4Yzc1Y2JkY2Y2NThjMDhkMWIzODMzZjU4ZjZhYzkyYmZkOWRjMTQ4ZjE1NzY4NzFiMmIwMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0MzI0NjYxN2I4YzIzY2MzM2VmZTE4YTA5NTcyZjAzOWNlNzhlYmIyNDMzNjRlMmUzN2M0MjMyNDRmNjdkYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjODYzYjdiNjI0NWNjNTc5M2Q3ZjgwYWU5Y2IzMjY0MzBmYzIxODRkNGYxZmIwODc4MmM1ZWQyZjYwYjdjY2MifQ"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L111-L135",
+          "version": "repo-lines-v1:sha256:0a5dc8c60b2944bef465f5a38a6f420c46832e3d1f7b6805cb71ff329b7a0656:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxZGUyNGQ5Njc4ZWM2OWM4ZWYxMGIxMTZkYzE0MzEwYWNjYjBlNGQ3OTc0YjMxYmQ0NzFhYjllNjRlNGQzNjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiZTQ4YjViZTk5YTdhYjhkMzMyN2YxNzA4ZjM2MTZhOTlhMWU2ODA3ZjA5MDRhM2YwMTczMmQ0MWM3YzAxZjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_68c4c2ff4f154c98a441f85a02fbadf5",
+      "statement": "`public.platform_admins` has RLS enabled with no policy at all, so the deny comes from RLS-with-no-policies rather than withheld grants; the Supabase linter's `rls_enabled_no_policy` finding is therefore the design, and any policy added to the table is a way in.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L71-L91",
+          "version": "repo-lines-v1:sha256:b0645643762a2d5dc1aac0911773e0ea4626bca7319ea3e9d2c8877ee42b27c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2MDdiMjY2Y2Y0ZDc0Mjk4MzRjMTA4M2U2ODIwMDczMzIzZDlhOTQyMTY1ZGEyNjkyZDliMzc0NTMyYjVhNGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NjJlOTdkZDMwNzA4NGY0NjdkYTU4Y2JiNTliMzhlMmI3NjYyMDJjMDVjNTE1NGI0ZGI4YjY4N2M2YzlmYzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiMzZjYmMzNmQxN2IzNWY1NjlmZDhmNWQxMWJlNmNkNTU5NDRkMDVhM2E2ZjVmYjk4YzdmOGJhZDhkOWE0N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2MDg2OTdiYTM1YWFmNzc2ZGM1ZDI5NTg3ZDE4ZTMzOTgzNmY4ZjMzNzkwNzBkMTFkNjUwNWNkOTM0MWNjZGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f39be571e5ec43f7a9672325cdeeee45",
+      "statement": "`app_private.is_platform_admin()` joins `platform_admins` to an active profile, so deactivating a profile silently revokes platform-admin status without touching the `platform_admins` row.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/platform.ts#L38-L54",
+          "version": "repo-lines-v1:sha256:db93d57fb00888c2a5faca9b9af19946648c3297f4b514bd654e6092b5ad06d7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0YzU2ZDhmZTk3Nzk4ZmFjYmMzMDJkNGIzZWMwNmVhODdkM2Q5YjdlMjRjMTkwZjc4YzY3NmIyMmVkY2ExOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzZTlhZDI5MDFjYjRjNDE2ZTI4ZTJhZDUyZjU4ZmNlMzcyMDA3OTRhOTZiYWU1MGQwYjkxNmYzMmViNGY0NGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwZmFmYWMyMWE3YjJhNWQzNjEzMDE1NjIyMzRmODFmYTc5YTU1YWFiMmM5OGY2OThiMWNlN2Q0MTI4ZGM0YzcifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L93-L107",
+          "version": "repo-lines-v1:sha256:aa733c31fa88cb8766744cbc6b5b3973bf7d0d84d830cf0b84355b4b6d6c4250:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZDJiMjkwNzlmZDYzOWQxOWIxYjc5M2QyYzQ3ZGFlMjE4MjY1OTA5MTY3YzQxMTFhMDM0ZDkxM2U2OGQ3YTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzNDRmZTc4MTAyNjdiODQwMDhhNTI4Yzc2MWUzNzM5OTRjZWNmOWZhNmIzOTFhNzAzYTc3MDYzODk4MjA2NzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlZjZmMzc5NzQ4YzkxMTZmM2Y4MDk1ZWE5ZWEwNTAwM2ZmZjZhNWNmNTJjNmUwYzgwNjRhNmM5ZDU4ZTE5MDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5381cffaeb10415bb069d44e0a076ddf",
+      "statement": "The platform-admin reach on `tenants` is SELECT/INSERT/UPDATE with no DELETE policy, so an operator can create and amend a school's registry row but cannot remove a school.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L95-L201",
+          "version": "repo-lines-v1:sha256:aab5fa22de6a02a2a9716eea132bf5d92160d26bc9a06f33d317644351f6161b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YmJiMmQwNmZlZDA3N2FlNTkwYzgzODRhMjA4NWY4M2M2MzU4YWJkOGMyZWI1ZWRkM2Y0ODIxNDMwNzBlZmUwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjMGU2Y2I5YmYzM2UxOTI3MTQ4MDU1YTg0MjE5ZTBlZDU4Mjc2NmMzNmRmYWQwYzE5MDhmZjQzMTE4YWM3YjdlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkNjA4Njk3YmEzNWFhZjc3NmRjNWQyOTU4N2QxOGUzMzk4MzZmOGYzMzc5MDcwZDExZDY1MDVjZDkzNDFjY2RhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyMjkyNmNmMDM1YWRmYmIyYzNhYzI1MTIwMjdiOTg3ZjcxYjMzZmU3YTQwMzcyYTQxNDg2NTljYTBhMGE3NTI0In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_7e80d8a9c0cf4eb59679d0c7106e3c67",
+      "statement": "The `qualifications` platform-admin policy is `for all`, not read-only, yet no screen exists that edits the national list or an existing school's program list — those registry writes are reachable only by statement.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L123-L140",
+          "version": "repo-lines-v1:sha256:d6eeec24ebf4760b67198b54c3375fd5288bc99240f8c726470131f62f4a1880:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2MGQwNjE3YWJhMTI1ODZmNjMzZDNlOTc0MTA1M2IxOTBlMWFiMjczZTE3YWQxZGU2NDZjNmNmM2UzYjU1MjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNDFmYmIzMGMyZjc0MmUwMDJkZDc3YjI3NmQyMzM3ZGExOWZkZWY1MGExYjE3YjAzYWQ0ZGRmYmVlZjdiNGEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/schools.ts#L81-L98",
+          "version": "repo-lines-v1:sha256:80ad55f8b7eaccb4cc59f107a959cddf5343110dcb3dbb3ceb10c9f927137d8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwOTYwN2VmOGI3YzIxMTg5NDU0OWUwOGMzZGRmMDI0NjkzZWE2YjVkMzFkZTAyMzE2ZjI0YjVmYzEyNDYyY2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlMWI1NGY1YzA1N2U0MmVhZDNmZThhYzhmZTEyZTZjNWJiMzU2NjAwMGNiNWVmZWZmYzZhNjI4MDhjMmJiNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiY2E4NmJlMTQ3M2U4YTg1MTU4ZGM2ZDIxMDMyOGU4YWEyZTBkZTBkMGVjNjQyNTI5M2VkZjVmOGI4YWM3YjAifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L196-L201",
+          "version": "repo-lines-v1:sha256:d3c743f0cd464a6af0983ba29211980312f8fbb8c32e6d41640d0defb963cf01:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVmOTJiOGI3NzRiY2U3YmQ2MTM2OWE1MmFjOWMzYjQ3Mzg0MDkyOGYyZTNhNGNmMDQ3YmQwMjQyODdjYzQ1MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzBlNmNiOWJmMzNlMTkyNzE0ODA1NWE4NDIxOWUwZWQ1ODI3NjZjMzZkZmFkMGMxOTA4ZmY0MzExOGFjN2I3ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWIyNDMzZjkzYzhlMGExM2U2ZWI0YzI0MzRhZDIzMzlkYTFjODRhNjU0OGMzYTYwZjI4MWQzYWIzYzg5NzRlYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjI5MjZjZjAzNWFkZmJiMmMzYWMyNTEyMDI3Yjk4N2Y3MWIzM2ZlN2E0MDM3MmE0MTQ4NjU5Y2EwYTBhNzUyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8e421a413bcd4b0e8b7f7a5343df0961",
+      "statement": "The `/schools/new` action re-reads the live qualification list and validates submitted ids against it, so a page rendered before the registry changed still cannot submit a foreign qualification id.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/actions.ts#L136-L161",
+          "version": "repo-lines-v1:sha256:6c6f1b3a99ef186ded92688ea9da9d7efbf579d84dfa849ec7635fdc890d8a49:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkYWY3MWY1MDM1YTM2NTI3YTI0NzBhYmJkOTZhMDY2MzY2ZTQwMzkzNjNlY2E2ZjQyZGE4MjIwN2U4NTM4MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxYjkzMzg5ZTBmYzY4M2U2ZDQyZDNkNTRmMTcwY2E1Mjg0NGE5N2EwNWRhZTQzYmM3ZjAzNzZhY2JkN2VkNmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmMzRlMDVhMzc0MWRkNjZjMmViMDY5ODkzMDUyNDdmYzk5ODZlNmNjNDIxMzBmOTk4ZjNhNDJkNTdlZGYwMTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhMTNiYTU0NWJmMTEzNWJhYWFmN2I5NTczOGI5Y2E1NDExMmU5NzY2NjhhODIwMTdkNWU1YjEzMGU2MWJkNDQifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/schools/new/actions.ts#L94-L105",
+          "version": "repo-lines-v1:sha256:66417ab18e26f93f60427f46ea45d312d799c9b5f434d95a3ab1c0646c3e942f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMTFlNjUwMWQ0M2Q2YzRmMmUyMjQzNWVhNTRjMjkxYWNiMWNlMGY0YTA5ZjRjOTUxY2UwNzY0NDI5Y2MwZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2N2FhYWQxNTkxMmQ4Y2Q4NzMzMGY0Zjg4YWY4OGU0M2E1OTIyNjlhMDBkMjk5OTZiNGZkNWViNjNiOWI5MGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmZmY0ODUzNjAzNjBkN2I1YjkwNzI5MTJlYmQxMTI1ZTA3YjliYjg4NzNhMDdiNTg1OTNlZDM5Yjg2MDNkNmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_53eba3b857db4d1bbcd5d212875a9885",
+      "statement": "`resolveRouteScope` returns `not-a-member` with a caller-specific `fallback` scope and never an all-schools scope; only `redirectToDefaultScope` forwards to a default, and only for a legacy unscoped path.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L40-L49",
+          "version": "repo-lines-v1:sha256:2bab0f21132768697d5f1b5c4ee91073199740e37dbb712c44e829b1277d6721:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MjE2ZThlOWMwYTFhNjhkMDZjMmZiYWE1ZmQyMTM5NDgyYjhlZmQwYTE5MzE1YjkxNWU2Y2NlODQ5ZDg5ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmYmNjYzE4MTdlZThiNTUwY2JlNzNlNjMzNjdlYmI3YTkyMWIzODA2OGFlYWYzZmE2OTY1ZDkxYTgyZDUzNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L46-L52",
+          "version": "repo-lines-v1:sha256:3bd54eb3ce3abd91968177633f92cd611ea4d7a60b06b84658d5fbd7b3b4fa3b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTIxYTM4NTdiMDI4OTgxODE1MzJmNmFiYTNhNDQ1ZGEzZDVlZTRhNTA3Yzk0NGE0N2Q4N2IzMDBmZTEwZjA0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWZiYjc5N2Q5NjU5NWE2ZjkwNTk0ZDNjNDFlOGRiNzk4OWRlNDU0NmI1NWQ5N2NlMzQ1MmY2NTNhMWRkMTQxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTM0N2I5NjIxZTRjZjE1OTI0OTE2YWFkMzBhNzNkMTgyN2M2OWI0ZjliNWFkZjAwNTRjZGE3NDE4MzMxYTNiYiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L85-L99",
+          "version": "repo-lines-v1:sha256:e3f1b275936dd82506a54a849424a611423056d0a86914d71197dfea94f8bea6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMmUyZWU5MzFhMjEzYjFiNjI0ZTJhNmE3NzMyZTM1NThiMTg0ZTdhZDA3ZDA4ZjliNzdhNTY1NjYwZGY1YTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NGZkZmZhYmYwNzkwNTNjYWIzZWY4NzBhZTBmMDI0NDNkZDlhM2UxYmZjZTgzMTBjYmQ2OTQzY2VmNzBhNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzZmU1MWMxZmU0ZDdjOWI5YTcwMWZjZmU3MmExMTJhYzUwODZmMzQ4ZWQyOWIzZTUzODg2MmM3M2U4MjQzNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bbde15ac4f884ed4af46824460b3a287",
+      "statement": "Route-level access composition is duplicated in two cached `app/(dashboard)` files — `tenant-scope.ts` for scope and `tenant-access.ts` for the verdict alone — because both join `modules/auth` identity to tenancy's private profile read, and `cache()` keeps a layout and its page at one profile read.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-access.ts#L1-L35",
+          "version": "repo-lines-v1:sha256:eb21d50b8e856577c7e46b17ca962a0bcd5380a009ce68b6e4f17ef2a6683655:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3NGZiNWU2YWE5MTA0ZTdhYjdhNTBiMjJjNmI2MjI3Y2UzM2U2YjFmODJhMzYyNWM2NWNmNzBjMWVhNWIyZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L1-L52",
+          "version": "repo-lines-v1:sha256:6ff33528aa3aa3db03645f4e43c71e6c6bd74692ec3073f5907f7d7f35e2254b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzNDdiOTYyMWU0Y2YxNTkyNDkxNmFhZDMwYTczZDE4MjdjNjliNGY5YjVhZGYwMDU0Y2RhNzQxODMzMWEzYmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b6d42471b3eb4817a1ed50c684fcdc70",
+      "statement": "`requireScope()` sends a trainer to `/trainer` from the page path rather than the layout, because a layout does not re-run on every navigation.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L63-L76",
+          "version": "repo-lines-v1:sha256:843c6cdbe79f9395e427fdee1418e274e0cbd1c7fcb8fcccd2cb237fe491c275:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0YTYwMzEyM2MzOTY4YTczNTM1ZWU5YzBlNzg4NDVjYzZjOTAzMWZhNTBmM2NmM2FiNzc0NGM0MDVhYjliYzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjNTA5NmI2NzFlOTIxOTU5YjA5YTliNDFhNTVhZGJlYmEyYmU2ZDI3NmIwYTUyMGNiNGFhOGM3MWY2YmU3YTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba6b48b732304d9c9a52c0fe829f616d",
+      "statement": "No unit test exercises `assignUserAccess` or `createSchool` against a database; RLS has no unit coverage and real-Supabase isolation tests are outstanding, so the seating predicates must be verified by reading the migration.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L24-L43",
+          "version": "repo-lines-v1:sha256:ffd98975972eacf2387ca6d9ab6b3abc1b76404df1e55642cda91690bb66dcf9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyY2E2NDQwYTQ0ODE0NTdmY2QyMjM0YWE5M2ZhN2RlY2VhMjFmMWE3NWQyM2U4MDM0NWRiMzgzNDE2YmYyZWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlMDBkYThlMWYzY2Q2OGU1NTA1NmUwMTk1YTU4NzdhNzMxNzI5ZWMyOTFkMjJkODExMjIzNmRiMWE2NDBlNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2YzNlMzNlNGJiZjIwZmJkOGI5Y2QwMmQzYzNmMDg4NGIwYjRmMGU1ZjE0NmYxNTRkMWE3ZGM3ZjM4OGJjMWQifQ"
+        },
+        {
+          "resource": "repo://tests/unit/user-access.test.ts#L195-L210",
+          "version": "repo-lines-v1:sha256:2208e9cad49aa9d9e4f8045a668c626f53957a50e0d0dcfe4c30f2cbfa99729d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxNmNkMWYzMjUwZjQ4MGVhNjM3NDIyNjFiOGM2NGE0NDRiYzIwMGI2MTllNDdjN2UyMzg4MmNmMDMwNzQwN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MzRlNTkyYzEyMzEyNDVlMTE4MmNiODk0MzI1ZGU2MGVjYmY5ODU3ODA5NjI5ODE5YWQ3MDNmOWI5MWZmOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVmMTU3NmUzN2M3YTNiNTFkZDNhOGU4M2YzODM2MzVjNDljZjYwYzQ5YTZhOTZkYjdkNTRmZmNhN2I1OGVkMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4MTdmYmI3M2M5MmIzNmQ1ZTQ4OTZmZjUxYzFiNThlZWMzMzBiYmU5NjFiYTA1ZmM2MjA1Zjg2N2VhMWJjZjYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-11-18T03:56:44.398Z"
+  }
+}

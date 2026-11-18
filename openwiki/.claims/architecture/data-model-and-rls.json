@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:365b4739dd82bfa713954530722f46888fb35a0f27816e9850516ad4bee4f832",
+  "pageVersion": "sha256:b2703aab11a8423c725482edbc79618237a1149332c6836005b146b59b4cc61e",
   "claims": [
     {
       "id": "claim_2451e47bfaa74c17ab764a2de4103019",
@@ -1471,10 +1471,94 @@
           "version": "repo-lines-v1:sha256:7d9ca659a6298b984bf4815eef985f3a406d4dee6ed223d70eb0dbcc085bc13c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzNWU3NDQ5MjE0OWRhY2I3MzQzZmIyNjEyNDg1ODJjNTNjZjQxZjczNGE5NThhYjQwZDhmMzgxNjUyZWI2NzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkOTE5YWZlMmYxODY0MzViZGFmMTE4MDEwNGMwZDhlYTg0MzA0YTJhNzA4YzE3YjMxNGE5YjA4ZmEzZmUzYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmNWYxZGY5ZGY3YzI2ZDQzNGU4N2MwOGRlNjAzMjRhN2YzYjA1ZDUwNDc3ZDc4NWYzZmY4Y2U3NjJiYTA1ODEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_7f697692cd744b3f889ea33dc97eb2d4",
+      "statement": "ADR-008's read path has shipped even though its migration has not: modules/batches/domain/urgency.ts maps a non-finite daysToBilling to the muted tier and hasRecordedBillingDeadline gates the countdown, BatchModal renders 'no billing deadline recorded' / 'Not recorded', the needs-attention queue emits billing-due, billing-overdue and billing-deadline-missing items, and the dashboard exposes billingDeadlinesMissing — but no screen writes the column, so every live batch renders as not recorded until deadlines are entered by hand.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/attention.ts#L35-L85",
+          "version": "repo-lines-v1:sha256:1bac5833822a9491b590692752c467961dc864a468153eb1340167ddbcbce44e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZWJmNWM3OWFmOThjYWY3MWRkMTRiYzUzOWJmNDBhZGYwMzVjNGI3NWZkMTcwYWYzNGUyZmUyYzA2NmQwOGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzNzE3ZGFiMjY1NDNkZmIyMDBmYmQ4MjBhNmM2ZmQxMGYyYWJmYjM1ODVkOTZjYWE4NTE0YmJjYjhmNzU0MGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3NGEwZTVhOTQwYWFlN2JlNTBkNTQ5NDJkMDFiNmJhNzk2OTdkZjA2M2Q5YTE4ODdhNjUxN2Q1NzJkMjFmZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMjhmMGRiNDQwZjY1MTc1YmJlYjlmYWFkYzZmZWNhYzFkNTljMjhiNzI2ZTJiNjFlYzNmNWQ4NTEwY2FiYTEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L48-L58",
+          "version": "repo-lines-v1:sha256:9c3e87efb89da3f5609e2ee36efb5df5327c5da7af5ec0aa342f4a5c7912cfb8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMzVmMjVkNjZjM2U4YzYwZjFhYzE2YmU0MjA4YTk5NzJhNDk5MmIyNTRlYzQ0YmM5NDM4MmM3MmEzN2I5YzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1NzhkN2NmZThkNTM0YmI5YWIzMzgzNDliMDYyYzczZjdjZDBjYjFjM2QyMzRlMzc3MTE5MDMxMWQ4YjI3OGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiMTYxMGYyY2MwYjliODIzZmEyZGI5ZGRlZmE3MTA3NjAyODBjNjVlOTM5MzJkNTQ5ZjkyMGFkNTQ1ZDkyNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjYjJkYzIzNGE4NGUxN2QwNzE2MTIwYzA0OWY1YTVmNTI1ODlmYjBmMjdjNmIwZWFkMjNlM2E4NTAzYThiNGEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/urgency.ts#L8-L35",
+          "version": "repo-lines-v1:sha256:554f8792af32443a9cfd48502930ce658cbd4076de194a22acf0f99ee7f86c59:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4Njc2OTlhN2U4Yjc0ZTI2YzFjYTRkNzdhMzZmMjBjMDRkNmM4MzQzNzRiYzJlN2UwNGEwZWZmYmMwZjE1NTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/batches/ui/BatchModal.tsx#L239-L253",
+          "version": "repo-lines-v1:sha256:0e826699f016a59f4fe67eb21c8998e040ef7a59f72501ae001434d0fc5636d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxM2E2OGY0YTI0ZDc3ZWUyYjZkOGEwYzViOWE2NzIxZGVlYWYzMmUwODYyZTliMTVmZTY5ZjU0MTkxMjlmNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTAwNTlmNDhjYTU2ZjZiNTBmZGM2OWExNWM3YjdlNjMzY2MxZTEzNjA4ZGFhNTBlZDkyM2JlYjBmNjM2ZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyMTY0OGM1OWM3Y2ZhYzQ1MTllNjVkMTRjNzcxZWFkZGE2MjdlYjZjM2U4MGZlMmRlNjljY2Q2YTViMTVkMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0YjY4ZWFhYzNjZGUxZjY1YjRhNzE5Y2Q1NzdhY2Y4NzczNjZjY2IxYjdkZTA2ZTQ4NjhjODhjNTZjODAyN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4d2b6d76b1a741c7a8b56277a1c03a8b",
+      "statement": "The `?? null` tolerance on batches.billing_deadline in mapBatchRow is needed only while the column is absent from the database: the only TODO(contract) left in modules/batches/data/batches.ts is for trainingDays/trainingDaySchedule/notes/duration, so the end_date substitution described for non-change (1) is no longer present in the mapper.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L255-L275",
+          "version": "repo-lines-v1:sha256:d1b9cc33a2d0b2be7a96144083b73d1727d3da7e90a3609cb57fa555626cf4ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhNzlhOTBkYjdhNWRlODQzOTEwYjI5ODFjZWEzM2ZkZGI0ZmYxZjJiMWI0NjlmMTkzZDg1MDJmMzM2MjY3ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyNmE4Y2Y4NzY4NzkyYTQxYzZjMzVhNzJlNGM0YTA1NWMzNGQxZTk2NjU0MTA0N2ZlODg4ZTUxMjZkMDE3MWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjODE5NzRiOTRjYTRiNzMzZWZhNDU4MTUwNjVjZGJmODZkZDE3MTY0OTEzMDY4MWVjYzFlOWZkNThlMzEwYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyZjYwNGMzNjk3OTk2NzdhMmQzYWVkY2QwZGE5ZGI3OTQ1MWM3M2IxZWQ0Mzk4M2YxODM3YTM0ZmZiMDVjNTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fe00977157634296bd98778288e15d15",
+      "statement": "The facts query in modules/batches/data/learners.ts reaches the school registry by embedding tenant_qualifications off the batch id and selecting only batch_code and training_calendar_code from the row; neither the composite FK column batches.tenant_qualification_id nor any code referencing it appears in application code.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L165-L215",
+          "version": "repo-lines-v1:sha256:5ce11ceb5494419c72225115f002eac84a990afa9a47bb0d995e5bccbd573864:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2MTc2ZGIxOGMwZmE0NjAxMzM4ZjhiMDM2NjFkOGFhYWEyMDZhZWE0YmQ2MGExMGIwM2IzYTczNzQwZmRmYzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2NmRiOGM3ZjcwMjA2NTQ0MjE2YzZlZmIxYjBhZmI4MzNiMTM1ZTA5ZDQxZTczZDJjNzhjMDZmNWRkNGMzNDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyMzI2YmZjMmQ2ODIzMWUyNTIyMTRlYzVmYjViMzIyOWQ5ZjhkMzY4ODQ3OWJjYmUxNDc1MzM2MDUyMDZhZWYifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L275-L285",
+          "version": "repo-lines-v1:sha256:128c663d8953906ec4b79a3a67833e76e3cfdf0255d21907f95b68ed49fd7367:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwMDVlMGI1NjQ0YWExZGIyM2ZjZjIxMTY0ZWQ4ODhjNDMxYTM3MjBhN2UzNDBjYTM3NmIxYzEwMTdjZGEwYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2NzdmZTFmMWNkMWJhMmNmY2M3MGE2NjFlZWIxYWI4YTljMmY0ZTJkMTJhOWVmMjRkNTE5ODY2NDJjMDE3OWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4MDU1ZDM5MzcyMDA2OTk2NTRiOGM4YzY0NDk3NzdjYWU4N2VmYzI2MzFmZGE2ZGE1MmU5YmRlNGJhN2Y0YTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5YTYwNzU5YjZlNjMzMjRhMWY2ODI4YzgxMDg1NDUzYTE0ZDRiOWViMmQ0OTRjYjk2ZjBmYjNjYTA3Y2YzZTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_73be7e0610764035a2f848fa090bf611",
+      "statement": "Grepping is_platform_admin across supabase/migrations returns line hits only in 20260906114735_add_school_registry_and_platform_admin.sql (plus a ledger mention in README.md), confirming the platform-admin axis reaches the registry tables, unassigned profiles and the seating INSERT and no compliance or billing table.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L190-L372",
+          "version": "repo-lines-v1:sha256:283abe3df4d20880bf86b72d59b4f63e752314a2d37246e60034b285b27815ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YWI0ZWQ1N2IxOTE5MGVhMDIyZTFhNjgyNzhjOTJjZTZjNTMzZTI2N2JiMDg3YjE4OTMyODk1NjQ1ZGVkNjcyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0OTk2N2VjMWVkMzgzNmY4ZWIxN2FmZjE3MmI1YmZlZjdkZTYwNDg1YTQzOWM2Y2ExMWM1OTFlMTc1NTczOWFlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1YWYwY2M0ZDQyNDc3MDM0ZTgxZTgxYThkZGIwZTllYzEzZDNhZjY1MzE3N2YyNTkzOGZmOWY3MzFhYjEwZmM3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MWU2MmNlMDEzYjJlNzdmMjQ5ZGYzNzUwMzJkNjM1OGQ4ZGY0YjU4ZTg3ZjBkZDk3NDcxOWJlZGMzYWNhYzZlIn0"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L95-L97",
+          "version": "repo-lines-v1:sha256:345a901f45b232f42f3d2356c71e2db0cd5150b302210bd575ea1feea9a1ad58:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzAxNTAzMzA5MjYyNjViODdmZmJlYWFiNzA3NTMxNGYyNGEyM2I4NDY3ODE0YTE1N2JlYzQ1YjFmMmY0ZmExMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg2ZjRiN2JhMDBhNjg1ZTQwYjM1NmZhNGNlNTM4MzkyYTQxOTYzMDY2YzU5YjMyZGI1NDAwNTExMjhiMjFiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWE5NWM5OGFiMDlkMzJmMDc1NzQ0OTUzMjYyYTI0ZDI5NWExOWIzYTYxNzM1MzNhMTU3ZmM5ZjIwNTkyNzg0OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDYxODE0YWU2OTZiZDFiZDM3NmEyOWU0YWQzMjhkMDQ1NGU0NTBmZTkyODhlNDFlZWNkNzBiYjRkMTBlYzc4MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_37b9878a55484a78bf9d9f6e808dafd4",
+      "statement": "The learner_details read policy names the office roles admin, coordinator and viewer and never trainer, while its write policy is can_manage_tenant — so the trainer exclusion on personal and employment fields is a policy split, not a column omission.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L108-L126",
+          "version": "repo-lines-v1:sha256:37eece92ee60f5f322ac00049bcc169f77f1282b72768708693033fc893789cd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAwZTBhY2MwZTY4N2E4NzI2NWU0NzIyZTUyNmUwNDQwYTE2ZGRhZjk3NjZkYWJiNGUwOWQ2NmUzOTI3OTU1YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NmY5YmU1NjUwODJiODg0ZWFiMWQ0ZTg2ZTI0MDk1NWE0NjRmNzczYzllMGUwMGNjNGEwZmQ2MThlZjgyMWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlNzAyZDhiNWIwNjE5ZGUyZTI4M2Y2MTcyNDg3NGI0MDg5MmQ0YmQ2ODcyMDIyMGU2MzBjNjEyMTNlNWE2NTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkZDY0NzJiOTY4ZTgzZTliYTEzYmQzMGRlNGU0NjIzMmFjMzVjZDUwMGFkNTU4MmUxYTdjZTJlZjc2YzY3OTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_41c5ab0e4aa5418b96bac52fadabbd94",
+      "statement": "The checked-in Database interface covers 19 tables — the 18 pre-billing tables plus learner_details — with seven enum aliases (no billing_type) and three function signatures, so the type file describes a narrower shape than the applied 26-table, eight-enum schema.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L37-L70",
+          "version": "repo-lines-v1:sha256:e836e0cd6000f5cfaa8cc6ecafd91fdb732ac3e4e83417e017b9ee170a24d31b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MDIyYWY2YzgzYjlkYmM2ZjgyMWUzNmQ5ZmFmMTBmODU5MzVmMDY0MWRkNzA3YWIzZjhkODFiMTkwYjhiYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4Mjc1OGIwMDQ0Y2NlNjc1Mjc0MjM0N2RmZDhmYzE1OTg4ZmRiNzM3YTcxOTdmMWVkYjM3NDkxNDdmZTFiNzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyOWM3NGMxOGM4OTc1OWJjMjk3YTljYjUzMzBkNGZlZGRiMzc5MDk2MmEyODYyOTgxZGJlNDZmYjhmMGJkOTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkN2JkZDM5OWY0OTg4MjRlYzFiMTgzMWJhOTI0YWE5MzdmYWY0Y2QyNmU3YjgxNzJjMzhmMDE1NzI3ODE3M2QifQ"
+        },
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L665-L707",
+          "version": "repo-lines-v1:sha256:d1e664fa967b4814f4c55fb8b46a9a82f6b64a6dac10987d6a03bd0c3ec46fe1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlMjQ5YTRiOTZiZjIzMThhMmFhYjNlMmM3ODNjODZmY2VhZWZlMmNiYTM2YmQzNzM0MDllYmViNzNiMGMzNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiMDhhZGMyNmNhYjkzNjM5MmQwN2YyNWU3ZjgwM2JiZWQ2ZGFjY2NmMGQyODQxOGVhYjFlZDg4NGZhY2EyN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-18T03:56:44.398Z"
   }
 }

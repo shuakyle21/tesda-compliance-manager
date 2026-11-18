@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:94f7aac202d65213eab0a4032c5160b6648fa75178a4805b25dfba4143364344",
+  "claims": [
+    {
+      "id": "claim_3c2884ce4ea94843875beb378e6b8f54",
+      "statement": "`modules/batches/data/batches.ts` is the repository's reference data contract (RULES.md rule 17) and is structured as three separated layers: a typed, `cache()`-wrapped fetch, the exported pure `mapBatchRow`, and derivation from the single `current_stage` enum; a `tenant_id` filter from a validated scope only selects the school because RLS remains the authorization boundary (rule 2).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L17-L18",
+          "version": "repo-lines-v1:sha256:3943d93de3ec30786ba0628c108a261355abde7fca89ae8427041e4326a567b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTBjNmE1MTIyMzc1OTJhZDJlYjIxYTkyZjY0OTIwNDEwMTIxNjEzMWZjZTA0YzRkYWEwMDg3NWQ1YmRiMGU1YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjMzMmQxZmM2YTE3MWQxZmRkZGY2ZDA3NDMxZTY1Zjk0YjZmNzIwNDE1YmNmN2MzMGMzOTYwOWJhYWJjNWY2NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTkyZjkwOWQ3NzNmMWYyYjQ1NjA1ZjQyYWExZTNmMzEyZmM5ZWQ0OWI0NDNjOTUyZWFlNTk0ODVlMzBhMGY4MiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:df63b8308ff976d0fdeeee9a75b631064321d9c9e45e8267bb97a0cd46690f2b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNjMzNzFjYjFmNDZhMzNlN2IxZWRmMzdmMDRlZGE3NjI1YWM1YmVmNmY3ZmYyMmIxMTE0ODI2MmIxZjEyMWEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L227-L290",
+          "version": "repo-lines-v1:sha256:63db68e3d7804f875ac4a523a3d60a34758d11689440baa7978c6c517fa82ad9:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YmEyYjU5OTY3MzJlNzEzOTBkM2UwY2M1YjliZmRmZTU4YWUzZDZkMzgzY2VhYTMyNzRiMzc1OTY1NWRlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkOTU3ZWQ3ZDcxMGJlYWQ4YjY4NTJlM2EyMTI1MjQwMzVhNjljMDAxZjE3ZDg5NWFjNmQxOTc4MTJkNjRmYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4MDAwMTgwZWJmMmZjZjZhM2ZmMzUyNzUyYTA0YTQ0ZTJjNjVlZWUyNTU2ZTUxYjlkZmE3NjQzYjRmMmMzNGIifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L324-L355",
+          "version": "repo-lines-v1:sha256:75a8b84d7aea67e5df0066ad2ca2ff08f78005a5c98b455feb97d89bfb879df3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1ZDAyZDAwOWQzN2ZjZThlNWZiMDhmNjYxMDUzNTJlZjEzNmZmODJlYmFjNTFmOTc5Mjc4NThlZjY4ODI5ZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_48efe3bddb1545e0a550fded971ee3f7",
+      "statement": "The mapper preserves a null-means-not-recorded distinction for the billing deadline and turns every absent or unparseable date into the `Infinity` sentinel rather than `NaN`, because the sentinel is what downstream urgency tiering and countability checks treat as \"no deadline\".",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L30-L36",
+          "version": "repo-lines-v1:sha256:fe2ee8dcbc381c7092cda8e57de1d8f16d9b585adf3abd35447e271183b2a038:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTUzY2Y5N2E3MmEzNWNhNmQ4Y2E4ODQ0MWFhNDNjNDcwYzhhNWE4MTk2NWRiMzI0MDIyMzQ5NDg4OTk1NTRjZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDgzZjFmNDg3NGI3YjIyM2UyMjhhMThmY2QxOTg5NDM4MDQ1YmQzM2UzNDBjYTdkOWM3NjM0ZGYyZTFjN2ZkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2IxNTdhNmQyNzY3ZmY3ZjQxMzNlZTI3NjUxMzY3YzZmZGZmN2FiNGZkOWJhM2NiNDI2MmUyYWE0NDkwY2NhMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWY3MzI4OWRlMWJiNWUzYTg0MzRjZmYzNjE2NzM4Zjg1ZTdkNDMyYzkxMzZjYTgwOTQwYjQ1OTgwYThhZWI4ZSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L195-L207",
+          "version": "repo-lines-v1:sha256:b01c64bfa1aa4661351d19e97bb4173a39444a589b3255cd08d001838c701c38:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiYTFiMDBmNmZiMTlmZGE0Mzk5ZmFhNzE5ZTIzMzVmNzUyZTAyMDhlNTVkZTMzNjk5MTEzNmFkOWRjNzUyZGQifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L258-L262",
+          "version": "repo-lines-v1:sha256:62c1f1f4823f9b693ca7401e58bbc7bc4bac18e1f6b9ef4ecdb957d08ce9455f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY0YjM4NmEyMGUwY2VhZWUwZGNjNmQ2Yzc2NTAzMTZkM2I1ODQ0NDFiYjRjMzIxN2YxOTgyNmEzMjliZjI3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIyNmIyMTJjNTRmNjBhNTMwYTkwMGIxODA3ZDhhZDM3MjEwNWRlZjczNzUwNjlhZDc0ODFlYzdkOGY2NjRlZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTgyNzRhZDIxMTA0MzdkODYzNjU0MjYxNzIyZWZmMjlmNWQwYjQxM2I3ZjdkODAyOTg0MWUzM2NmZjg3ZjJlYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODY2N2I1ZjI5ZGNiYmI1YmM3ODQ4MmQ3MmZiMmJmZjg2MDVmYWNlMjU3MmQ4N2I0ZTVmYzRhODQwNzI1YjQxZCJ9"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L224-L231",
+          "version": "repo-lines-v1:sha256:1e80f480f6fd2f40a75002717236a6dd4d1fb92148ead7aa48c7f3f58c66e5fc:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQwNzY4ZDlkYThiZjQ2MzZiZDAxZTFjZGNkMTg0ZDU5N2ExZGM5YzY2M2Q5OTkzMzE0NjhhMGEzOGNmYmZiMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc3OWQxMThkNmUzY2JmNDUwNTM5NzQ4ZGVlN2E0MzA3YWNiZTY0NDZjYmEyOTdmMjc2MGZhNWQwYmJhMWJjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQyMzE5NzI3ZmY5NDFjZjA1ZWYyYTQ4OTVmNjI4YTgyOGU3ZTI2NDBmYmIwMDI3M2M5ZjM2YTYzMTE1NjBkNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3dda29a13124670b4893e1bdda866dc",
+      "statement": "Progress is derived as a count of distinct attended dates divided by the batch's snapshotted `total_sessions`, and both halves must exist for a value: an empty attendance embed is read as \"unavailable\" rather than as zero sessions held, and no `sessions_held` column exists so the figure cannot drift from the attendance it summarises.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L110-L123",
+          "version": "repo-lines-v1:sha256:e8478dccba67d9ff6721e628e25a4d1b41c9b3c68216d9cbc2b0a8290d075f0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYThlMTNjYjJmY2E0MGFlZjNiNTA0NzUxZmRhZDMyZGMyNWQ3Mzg5ZGZkZGYxZGM3NjI2OWMxNWY1Nzk3OTIifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/progress.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:f9502a17f2f301d7e09f5382b8e7028506d0b8f1d151052977a094effc3fa51d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L32-L36",
+          "version": "repo-lines-v1:sha256:d50fb91c336cb50d04869242ac43845160bddf88bff227ef026a7f6bc5e2b751:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWIxYmNjNjM0MGVmNzdhYjRmOTcwN2VmODgzMTYxMzgzOTBkMDdiYTY3NGNiYWU2NTM5MTg4YzQ3ODMyOWUxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGEwYTAyM2FhOTg4NGQ1NTZhN2E4OWNiZDU5ZDIwYTA5OTljODI4NmM3YmMxOTY2OWRhOTRlYzJjNTk2NDI4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTU5NjgxMzQzYzllMTNiZTMyMDk5ZmI4ZGQ4ZmExNGQ4ZGQwZjc3MjE3Y2JjZjM3YzMxOGUwMWVhNTIzOWE0OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjcwNjlkZWYwMmE1N2JmNWM2Mjc4M2JhN2I2NTZhNDhmOTE0YjgxMmY5MDhiNDUzZTBhNGQ5MTQ1NmIyOTIxYyJ9"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L233-L245",
+          "version": "repo-lines-v1:sha256:aa0b60e5ec4e8c61457794f3b93ed4c8b2583a6c941699d5764d5a81d30be546:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzNzUwOTJmMDAxNDAzZmMwYzhkZGU5OWExN2QzNzU3NGRmOGU1MWUzOWUwNjY2YzVjZGYyM2E0NDFhNDU4ZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmYzVmNmI4ZTE2MzhiMzdjYWY1MjU5MjE1ZDA5MjViZDljYzhmMTdjODQ3NmRjY2M3ZDNkN2Y2NTI5ZWJlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmMTllNzk3OGQxZWU4MzdiMTQyZjJlZTVkY2Q1MWEwOTQ5YjA0Y2Y0YWUyMjMyYTI5MzJiMmQ4MmEyZDNmZjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a2a878ad04a04723b8b8cd29c3e30de2",
+      "statement": "The UI lifecycle pipeline is derived from the single `current_stage` enum through the total `DB_TO_UI_STAGE` map, where a new DB enum variant fails compilation until its UI treatment is chosen and both `completed` and `blocked` map to `null` so one marks everything done and the other marks nothing active.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L60-L62",
+          "version": "repo-lines-v1:sha256:20062d970927cf671f8ef58dc8d355ac6542ed46211fec02fad402b1f1ea505d:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ2MTQxZjkxYmY1MTcyMGM4N2EzZDk5NmQyY2JjYTM2MTJiNTc2NWFjODNlMGVhZjEyMDliNTdlY2I3ZmZkZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTZhNDY1ZTcxMDEwNTNlZTQ5NjM0NDIxYTZiYjhlNDQ0NWI4MWM0ZWZjZTY0NjlkYTFhZTkwYWEzNjU2NjUyZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDliMWQwMmE2MjExNmUxMGIwNTQ4ZDQzMTZkMmNkYjVhN2E5ZTk2NjIwN2Y2OTJiZmVhYmNjYjg2NTQxY2Y5OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWVkYTEzZGYyNTIwYzFjMmQxOGU4NGYyN2ViNjUyYzliYmU0NzRhMDZiNzMzOTg2YjYzZDNlNTU1Yjg0Y2Y0NCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L131-L193",
+          "version": "repo-lines-v1:sha256:0033c65a5e7064e12f36a653740c60bf8ac7c846f6b3b7659adbacd3be2ff409:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1MjI1YTk4MGJhM2E2MGUwMzQ1OGQ2MDg4ZjIxNTViM2FlMmFhNGJjMGM0OWZmOGRkYzk1OTBiNzk1NDY2MDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIwNjAxOTBhYmQ0ZTc1NzhhN2Y2OTMzMGM0YWYwODhjZTIwZmY5ZjY1ZDk4ZmJkNGI0YjRlOTE5NWNjYzdjOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmY2E0NTk3YzEzNzRiNzQzZjZmYjFhNWI5YzBiZmUwYWI4OTdlMDBjODM3NzhiODNjN2FhZDRmODBlNGY1YzAifQ"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L58-L81",
+          "version": "repo-lines-v1:sha256:02e5a5abb88c8fa496c35224c4d38e4ca79350e32522a9480ef3e03596f0a907:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0MDRiY2JiMDEyMDk0YzFmYWI1ZjJlZjZmNWJhZDRmMzIzMDZiY2U0ZTQ0MTEzMjc4ZjQxZGIwOGI3MjlkZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyMWY1OGVkMTQ2OGU3NTZlYmI3ZTUzMDFiOTQ5OWNiNDM2MmRhZTBjMmMyNWYxOWNjMGIwYmIwZjE0YmQyYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5NTQ5OWE3ZjcxZTJlMTE0ODg0OWE4NmI1NmU3ZThmZjk0ZjkxZmYzYTdlZDEzOWVjMzU2ZmE3NWQ1ODM2OWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d62619c4c4804809a62dc247f31e30af",
+      "statement": "Two lossy normalizations are paired with a preserved fact: the DB `blocked` status surfaces as UI `pending` while `Batch.blocked` is set from either `status` or `current_stage` for the attention queue, and the RQM code becomes `null` when blank while `Batch.id` stays the internal batch code so keys, URLs and lookups never follow the official code.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L161-L169",
+          "version": "repo-lines-v1:sha256:c0557dcdaf15212cb6574b5b2ce8f537e6c6cc677423be86aa4f9fae8c792bd1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDYzYWExZGU2ZDBiMWM2YjQ1ZDY2Y2MwZGU5NDg3MjQ2YjY2YjA5ZjFmOTNlNzdlN2UxNGUyMDEyODViMGRlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZhOTU1ODNlODdhZTQwODU3MzljOTc3ZDg0YWQ5NjA1ZDBkYmQzNjdhOWI1ODQ1YjYwODk3YjVjZjkzN2FhZCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L230-L249",
+          "version": "repo-lines-v1:sha256:50b9e5475d85b056999acc583c98c37b4806e691141e634c5f83c3bd5f33bcbf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyNDZiZTNmMTMxZjNhNjA4NmVlY2E5OWE0Y2ZjNzBkMWMzY2Q2OTliYTNlYjZkOWMxYjdjMmMxNTdhZmZkZWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwOWMzNDlkZDRiYTNmMjY5YjdiN2MwN2ZjZTgyMzhjNjJkMjEzYmQ3NzUyYTZkYzI3Y2Q2NGE2N2VhYzRhYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZjU2YjM3ZjEwMzkzOTQzOTc4OWZmNzRmZTAyNzVkNzhjOTA1Mjc1ZDJiZWRkNWI4YTJkMGRjYjE3ZjE1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkYzExMGNiY2MwMWIxYTQ4ODI2MzRkZTMyMjU3YTUyMjFiNzI5NzliMjkzZDI3NGUwNjdmN2E2Yjc2OTg5NDIifQ"
+        },
+        {
+          "resource": "repo://modules/batches/domain/rqm.ts#L1-L11",
+          "version": "repo-lines-v1:sha256:3812e2e7b4b89513d2bdd0c70dd29a990e0610f065f8113da4c160bafe9e8645:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5MTA5YTk4ZDE5NmRlYmY0M2Y3YTczNzE3YzBkOTBhOTg2M2NlZjczNmY3MWJhYzQ5ODcyOWU0ZDBjMmMyODMifQ"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L247-L296",
+          "version": "repo-lines-v1:sha256:fc35c4e81f5afe516bc22f883ee67355772c98a88ad74fd8a85564fb7b6507f4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmM2VhMTZiZjY5M2Y4NDA1MjRlNDFmMWVhNTcyOGUxMzU1MGQ2YjcxM2YyN2YyOTJkZDJkMTA2YzRkNzA0OTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjNGY1MmMzYTBmYTRjM2ZjNjljNGExYWE2MDkwZjc1NGM2M2EwZjk1NWI3ZjE3MmMwNGNhNTBhMzdmODFjMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljZTVkNzRmNDE1OWZlY2EzNTdhMmM5YzVmYjkzMGVjNGNkYmY0NDc5OTI3YTA0MjRjOGUzMDE2NTE4NjNjZDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0ec41fed42314da6a8122440b6af1a04",
+      "statement": "A batch's RQM code is unique per tenant via the partial unique index `batches_tenant_rqm_code_key`, so one RQM code means one batch and a colliding write is reported as `duplicate` rather than as a raw Postgres error.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L368-L417",
+          "version": "repo-lines-v1:sha256:c084ecab657d2abc24cb0b10938b19a8c6752a31acfd8342af10cf6798ff98f1:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1MDhmYzM5ZDhlMmU5ZDhhNmE1ZGRhN2JlNjc4NmI5ZjI4YTkxY2MyZDU3NjkyNzEzZTQ0NWFjMTJkZTQyNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3YzhkNTkwNTgzN2ZiYTFlMDFkOTg0ZTE5ZDgxOGE4YmMyZmU3ZGE2MTg4ODRiMTU4ZThmNzA0OTk2YjNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L313-L320",
+          "version": "repo-lines-v1:sha256:15a86a4abb85663b0bcc80453cc84da7f414fb41ca415e540088e2502f834048:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDhhMTY3NmY5ODc4OTQzODhhYWE2ODVlM2U0NDgwODYzNDA2NGU4ODk2YzhkYTU5NjZhMThmY2FjMWY1NThjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjU3ZmE2YTc5ODg5NmIwY2I0OTRiMjFkNmU0ODlhMGJlMjFlYzJjZjE5YzU3YmQyMTczNjg1MTM3ZjFiZDEwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE4ODg1OWNiZDEzNzVmNDU0ZWYxNWZkYzVhMzc2OWU2OTI0ZGFmNjM0MjQxNWVjMDk0NGQ0YjYyNWM2OTk1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjIwMDNmYzZlNWEzZjgyNGE3MTYyZmU5ZTNkYTc5YzY4Y2M5NGRjNDIxZWUyNzc3OGExNmQ4YTNiYzk5OTY2OSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/rqm.test.ts#L154-L187",
+          "version": "repo-lines-v1:sha256:f5b8f520e5af2e7df70319a62a0bbd017d891b22c3fc0a2eedb96ed49d67b3fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiMGY4NzFiYzJhMGNmZmJiZGU0NGE1Mzk4Y2YyNzZhM2Q1NTBjOGY4Njg3YTFkNGE5NjVmOGZjOTE4NjBlMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2ZTliNWJjNDEyZTY1OTQ0NDY5MzkwOGU2NjJmNzlkYzViMjJjYzQwNTI3OGRiMGY4MWU0ZTQ2NTRkMWY1MTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c13524b0ffeb4ab38df135ab0a87e9e6",
+      "statement": "`domain/rqm.ts` normalizes an RQM code before judging it — upper-casing, folding Unicode dashes to `-`, dropping invisibles and whitespace — gives a four-part NTP request number its own rejection message, and treats program or provider mismatches as warnings with provider numbers compared after stripping leading zeros.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/rqm.ts#L17-L71",
+          "version": "repo-lines-v1:sha256:795d712086ebd39e76e822b45cca251fdca94758ea3e2a30fef71211dc62b41e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NGQzMWU0ZmMyNjdmZDZhNmU5MTVmMjg2Y2YxYjA4NzU2ZTNlY2VmOWZhNjM5Y2RmZTJhZGMyMDFkN2RmMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhZTlmYzhjZmJlOWFhODkyMzBjNzRhMzllNjdjMDE2OWIzYWU2MzJhNGE4NmE0ZDA5NmE2ZWZkODIyMzE0MWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyZjk3NTM2M2MyMzVhMTg2ZThlZjdkMjMyYzU3N2NjZTE0MTIzYWYyMmUzZTE4ZTIwZmE3MTQxMGE5YzdiZjgifQ"
+        },
+        {
+          "resource": "repo://tests/unit/rqm.test.ts#L35-L105",
+          "version": "repo-lines-v1:sha256:230682b274599002af02e10d497479bf03be3824c2b0aeddf4d923970fac9639:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4MjQ0OWIzZGUzNzUzZjM0Yzk0ZDg2MmU4MTdjYmY4MWNkODNhMDgxY2Y3NTFhNDYyZjg0ODBhYmM2YTRlODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlMjJkYTA2OTI1MTFiMDJlNjZiMTVhMWExYWI2OTcyNWViZWIyYTQ5Y2NmZGJjMzdlOGQ4ZDE1OTI5MzI0ZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3MmZhOWEyMDg3ZDAxZTU2MWZkZDk2ZmYwODY4YTg3ZDcxZDExZGI1NjEyY2ViYzg5NGQ2YTFiNDE4ZjkwZDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d2124761f74423cb3d27ed05879052a",
+      "statement": "The RQM Server Action resolves the tenant server-side from the URL tenant code against the caller's memberships and the role from `profiles.role` via `resolveTrustedRole`, then validates in `domain/`, writes in `data/`, appends activity, revalidates the tenant layout, and returns a discriminated `RqmFormState` instead of throwing.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L1-L137",
+          "version": "repo-lines-v1:sha256:b0c5182e70f36e3682c72673d7a795f7b8b376228bf7faaca7cffb19b6c5ec2b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhYjUyN2IyODI2ZjZiMGQyZTA2Yjg2MTA3OTdiYmJlZmU0MGRhNWU0NTRjMDZiNGNiMmFlYThjYTQwZTBlZjc1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://tests/unit/rqm-action.test.ts#L35-L73",
+          "version": "repo-lines-v1:sha256:2334ae69712d326191cd0aa7a0abdbfcf0e5e35b3fd19f2ec137780a0704cba1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkMDk3MDg1OWU2ZTcwOGE5MWJjNTQ5NmM1YmMzMDdhMzM5NDkyMzcxMDllYzJkY2RmNzUxODRhYWVhMGRkOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2MjljODU1Yjg2OTIwMDExNDFhMjc3OGQ4MWFkZmE1YThjOGFlMTg2YzMzNTQzZGY1MzIwNzE5ZjBmMzIxZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_adfa7f6eebf445e4a1b9c759442a217a",
+      "statement": "The write only lands if the stored RQM code still equals `expectedPrevious` (`is('rqm_code', null)` for a null expectation), and a result matching zero rows is reported as `conflict-or-denied` because RLS refusal and a concurrent edit are indistinguishable through PostgREST.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L370-L417",
+          "version": "repo-lines-v1:sha256:3ed7f6e28f303a4d004f52b70f58cc355e992070da689ad2e011785e695c8102:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2YjE1ZWI3ZDI3OGFjZGY5Njg1OTA0OTQ4NGM1OWNkMDNjNzU5MjE3OTlkMDM2OTgyYzU1OTcyMmRiOGI5OTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2OTM1ZjBhMTEzYjE0ZmIyNjllMjZlNzhiOTMzYmRkYTlkZjU2ZDMzMTljODg5NzJmMTkyZmMxYmU4YmMzYjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/rqm.test.ts#L167-L186",
+          "version": "repo-lines-v1:sha256:0821de1676eb3cc2603e5370a85012d68b3a8a8c289c2c7432ca512f82b9e306:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxYWFlMWQ1YmU4MWQyYmU2ODFjNGZlMmI2Yjc0YWNmYzBhZDZmYTYwNDRhZmJmYjk0NzQyNzcxNDA2NzhiNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNmQyMzYwMDcyMmEzZGNiZDRjMTU5MGFmYTk5MmZmZGRkMjRjZmJlZWYxNzY2NTExZGJkMDU1OGNhN2Y5ZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxMmZiYjc4OTVlODI2YmVjNjQ3MmM5M2M5YzBhYTg4NTJmNjVhNTc4ZGU1MzIwMTYwYTBkNTQ1MjA2Y2M5YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_880a6a458ab04e34a6fb3bde71088acd",
+      "statement": "Urgency is a pure tiering of precomputed days-to-billing with inclusive boundaries (negative `overdue`, ≤6 `critical`, ≤21 `warning`, else `on-track`), and a non-finite value reads as `muted` so the no-deadline sentinel is never styled as a deadline.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/urgency.ts#L8-L19",
+          "version": "repo-lines-v1:sha256:a8de93cce428ea8e18ee8d3f85ffd8799d81b8663962f57a83d27ce7b33a2d44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4Njc2OTlhN2U4Yjc0ZTI2YzFjYTRkNzdhMzZmMjBjMDRkNmM4MzQzNzRiYzJlN2UwNGEwZWZmYmMwZjE1NTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlMWQzZTVmZjc3M2JhOWQxOWJmOTMxY2IyNzdiMTE0ZGYxODg1NmMzNjAwNWVhMzVhOGJlY2VkNzEwOTc0YzgifQ"
+        },
+        {
+          "resource": "repo://tests/unit/urgency.test.ts#L4-L32",
+          "version": "repo-lines-v1:sha256:97dee53fdc08fd769e67302e9e17dca417bb884ad0d68ced09cff4a9068f3a5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ZDdkNjc2ZTBlOTI5MzJjZmQ1NmEzYjNkNWZlMmRlYWIyOWQyZjkxMDgwZDliZWEyMGIyNjM2YTUyYmY0YjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4YTVlZDBjZDc0YzA2YmUzMGEwMDNhNWVlNDkxZTllMzQzNjMzNTc1NTRjOTQ4MjU3YWE1YTczYWRlOWUxYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_71c25b2e149d44e7a106bc49d2beef8a",
+      "statement": "An open billing obligation is deliberately deadline-agnostic — not completed, billing report not verified, billing stage not done — and a separate predicate decides whether a recorded deadline makes it countable, so an undated obligation is surfaced as a data gap instead of being counted down.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L33-L36",
+          "version": "repo-lines-v1:sha256:16fb90109a6d5a0bc50eb9df01b0348835d001ea41484a07897c8d0a5386e967:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmVjNmJiNDJiOTY3NDVlYjg2OWViNzlhMjI5ODE3MDEyOTJiMGY1OTZjOTI2ODk5YTUyMTRjMDYyYmNhMzdhMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDgzZjFmNDg3NGI3YjIyM2UyMjhhMThmY2QxOTg5NDM4MDQ1YmQzM2UzNDBjYTdkOWM3NjM0ZGYyZTFjN2ZkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjQ1ODIyYWUwZWJjMTFkODZhNzI1M2RlNDRiYTM4NjRiOWJhZmY5ZmY0NTU3NDg3NTlhNTk3Y2E4MmJhMWJmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWY3MzI4OWRlMWJiNWUzYTg0MzRjZmYzNjE2NzM4Zjg1ZTdkNDMyYzkxMzZjYTgwOTQwYjQ1OTgwYThhZWI4ZSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/domain/urgency.ts#L21-L35",
+          "version": "repo-lines-v1:sha256:1c9fbfa274a60e50e747d4c37c0b3d7586620fbc7f6973ed86c11dc5f0111a81:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5MzlhZDEzZjdmOGEzNmRlMjE0ODkzMWUwZGZhYzBiNjc0ZDczOTFkMWNhNWZmNWEzMGEzODAzMTAwZGVmY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L50-L60",
+          "version": "repo-lines-v1:sha256:8a33bb1a92c3650c43fade352c51c60335085360d1e6e3dad3de191dee0f7d87:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmZmVlOTkzNWQ5ZGViNDY3NTE4ZGQ5NjFmZTYxY2YwNmVmYTZiOWFhNDUwNjk5ZTU3NjRkZTllZWZkNDZiYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwYTIyNTA3ODI2ZTE5MmM3MzVjM2ZhOWE4NTJlZGM1OTA4MzI3Yjg2NjU2ZWUzMzhjYjY2MWYxMDA5NjA3MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0YmIxZGE4YjAzODE4NjNjMTQzYjU1YjlmZTBmYzYwYmQyNzEwYjRiYTI5NGJiMTJjNTQ3Y2Q2ODYyMzYzMWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_755eb49475f847ff9601556b60024c02",
+      "statement": "The needs-attention queue is built from recorded facts only: a sync failure sorts first, urgent items precede due ones, an untracked document is not treated as missing, and all open batches without a recorded deadline collapse into one aggregate `billing-deadline-missing` row instead of one row per batch.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/attention.ts#L50-L93",
+          "version": "repo-lines-v1:sha256:d0c4e73c400da73c3fec902d815543b34c07e4c14355066afc93bc43277e13fb:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NWRkMjA3YWViY2M2MWJlNmJiYzQyOGQyYjdlZWEzYjE5ODE5ZTZjZmQxMDZiZmNiNDM3OTZmZjhkNWViZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZmNmMWM1NTQxZTUyZWMzZWI0ZTUxNzg3OTkwNzhiNzFlMjAwYTFjOGJmMzJhZTZhM2RkNjRjYjc4YTI3ODQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5ZjFiZmNiZGUyMzdhMTIxNDEyMDUyNDRhOWNhNDAzM2I4OGVkYzAwNTlmNmQ1YzAzM2U0MTcxMmRhYTEyMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L63-L117",
+          "version": "repo-lines-v1:sha256:e4a0f147d44d2f63b1fc0ced34b0c26f9c41d96a12a42dd4ff5240d053cfbdc5:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiZGE1NDA3NWM0ZTkxMTUwZjc1NDM2ZjA0N2M3MDIxZmY3OWNkNTlkMDY5NzkzNjA1YzMxNTgzZDFlZTVhYTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4ZGNlNmZkMTgwNDFmMjg0ZjYxMWNjMjRkZGI2NDBlZmIyN2Q1YjFkNDhjM2Q0YmY1N2U5ZDk4MzBiNTE0Y2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a5b69f323a1046edb9ffb1591ad3a8be",
+      "statement": "`NeedsAttentionQueue` renders at most eight items, states the remainder, conveys severity as a word plus an icon rather than colour alone, and hangs its empty copy off only what was actually checked.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/ui/dashboard/NeedsAttentionQueue.tsx#L1-L120",
+          "version": "repo-lines-v1:sha256:2bde23f84fc657c070a7effb4825a2dc35b351453d010800e1cf1d8b79fd3706:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5NWVmMDFiYzA4ZGJjM2I2M2U0ZTc1ZWEzZDI2YTViOTQxODkxODc3ZTI3YWQ4OTEzMjljODQxMWQ3ZDhkYzRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_a604da8d402e470c8935656df935ebb6",
+      "statement": "`deriveDashboardMetrics` computes the one canonical KPI summary over a single active-batch population, leaves session progress `null` when no active batch has attendance, and reads no clock because every date figure is an already-computed `daysToBilling`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L21-L65",
+          "version": "repo-lines-v1:sha256:f4e0ac5be6cd6cda758405c54dfc6113abf1eb55c2ce65c3dbeb9889ed7194ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlNWNkNDlhYWUwNTI5YmU5Y2Y5MzA1NmUyZGNlZTI0MTdlODJjMjZkNWI3ZTgzZjIwMTJlMzAzN2FlYzQxZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzNTk3NzgxM2FkYTEyYjM0Y2E5N2U0MDc1Yjc2YmVlY2YzOGY3ZDQ2ZmU2Y2FhMjI1MzI2M2Q1ZTdkYmQwYmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MDMzMjcyN2UzNTc3YjNlZDg4ZmNkZTlkNTE1ODcwOTAzZWIzYTZkNjcyZjY3MmFmMzFjMWJjNzIzMDE4Y2UifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L132-L192",
+          "version": "repo-lines-v1:sha256:c633921e0c0031156b7f07b652a03e653314b650b9e0574a7ddf17924eac9103:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlNDgzZDRmZmU4YzExYzkxZmYxNGUwMTA5ZWRmOTA5OWQ3NjNhZWIyMGZmMjE2ZDQ4NTBlYjhmNGYyNDQxMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkM2E5NWZlZDNlZTBhYmNhNzU0M2IzZjEwN2QxMGY1YmMzZTUwMzQ1ZDA5OWZjZmU0ODgyOGI4YTBkNGI4MmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aa931cd051c444b282c73f4ab4a3670b",
+      "statement": "`deriveTrainerMetrics` strips the billing figures from the summary object itself rather than only from its type, so the keys cannot serialize to a trainer screen, and `TrainerDashboardMetrics` omits them at compile time.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L67-L84",
+          "version": "repo-lines-v1:sha256:70edfbd46cc49f2007081da3451fcde80f1f6e37cad8e3925a76f3993b1413e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://shared/types.ts#L340-L347",
+          "version": "repo-lines-v1:sha256:ad71e810e73c4810268835c218ec8945cd5fa1309f2470db7edf18afef436f1e:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWViODVlNDFlZGY2Zjg0ZDFhMmIzN2Q4ZTc2YmJmN2Q4MzM3NDE0NjFkYTgyNjgxNjYzYWU0MTM1Y2ZkMzFkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWUxYjNlOGExODY0MGQ1ZjRmYjM4Mjg1MTgzNzE1ODU3YWI1OTRhNTViNTUxMTBmNzU1N2VkYzY1YmZhYWVhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTZlMzAxNWZjYTk2NjE2YWIwYjRmMDUzNzIwNGM4ZDQwZGRiYzQ5Njg4OGFkYzA3MDdiZDUwNTY0NGI4Yzc3ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L120-L130",
+          "version": "repo-lines-v1:sha256:880c43159c4b5a4be2324c1aa7f3d6b28ebb37a5561de76ad0fdc258d42123d7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0ZWJjMjc0OThjNzhiNjQ4ZGMxZDZjNzlhZmM2YTNkZDg0Nzk4NWVjZWZjNWUwZmU2M2M2MDNiMjcyMWM0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmOTRmNWM4MTgwZjFjYTY0Y2QwMWE5OGVjMGRhMTczZDc0M2Q4NTc3NzQzMzMwYmRkNzg5OTQzM2ZhM2JhNTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6ffdaed1da304210b3d422df07e6aeb1",
+      "statement": "The trainer surface is trimmed server-side at the KPI layer rather than by CSS: the trainer dashboard fetches unfiltered batches, derives trainer metrics, and renders through a shell wrapper that passes no billing prop, so `KpiSummary`'s billing card has nothing to read.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L33-L34",
+          "version": "repo-lines-v1:sha256:b410f2f7331c127bb63863465587a226debb36a2311de7cc24afe6fb99ad40f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDMyNjI3Mzk2MzhkZTlhZTBiZGZkMjk3MDBjMzEzZWZkMWFjZjg4YjZkODM4ZWQ4MWJkNjE5NzZkNTc0ZTIxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWUwMzU3Yzc1ODNiYTU5Y2IwMDQ3YWUzODE3MjdjOThlNDE0NmUwZGZhYmI1NzMxZDUyOGY3MGVmYjBlZWIyMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDYyMjkyZmQ3MzIzMDYzNGEyY2Q1N2RjZTgwMmE2ZWI4ZjY0ZGE4YzM1Y2YxYzg3OTJiODBjYzJjZDE0ZGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDliZjg2YmJhYzlkNTIyMmQyYjllNjk2ODNhZDY3Zjc3NzY0YzY2YWQxYzhmMzUzYzcyMTZmNDQzY2ZmNGE0NCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/trainer/page.tsx#L1-L29",
+          "version": "repo-lines-v1:sha256:c2f30601b14a6ace0e83605447e818dd70f9239992303c7a9e00540bd9ef41b1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/batches/ui/KpiSummary.tsx#L132-L150",
+          "version": "repo-lines-v1:sha256:0c57e66ba242639a4b663d90c5690e1dc4bcf29ec7c42b0c7e5bdb24eab8dc2e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmZWI4YjU1Y2ZhMDc1OGNiNzVkYTkwNjZiMDhmYWRkMjA0ZTBkOGQzZGI0YjZlYThiNjUzYjk3NDZmYTQzZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ZDhkNzFiY2NhOTZiZGRiZDI0YWQ2MmE4ZTNlYmE0NDM4YWFkMDQ5ODliYTc3NGM2Y2RkYmFhZWY5NTZiNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjYWZhYTY3YjFlZGRiZWQ4M2JjNWU4NDVjZDc4MWE4YTJiYjkzMzNmYzM4Y2RlZjUyZTIwMDFiNGQ1YTRjYjYifQ"
+        },
+        {
+          "resource": "repo://modules/shell/ui/MetricsRow.tsx#L1-L25",
+          "version": "repo-lines-v1:sha256:c280c1aba27ceba39bb1318088d7566c8734c4386150670fe69e3c789b9b006c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzYTU0NWNiNmZjNDlkZTdlZjUyZDA0MDdhNDdiYWFmNjkyYjViZjE5NjFlY2NjZWQ1NzRlM2ZmZmMyYmI2MzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_587ca55fcaa14ed09f31bef54d10d429",
+      "statement": "Because the mapper is role-blind, the trainer trim relies on RLS for which batch rows and embedded document rows a trainer receives; rule 5's omission is only satisfied by the KPI and metric layers.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L33-L34",
+          "version": "repo-lines-v1:sha256:b410f2f7331c127bb63863465587a226debb36a2311de7cc24afe6fb99ad40f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDMyNjI3Mzk2MzhkZTlhZTBiZGZkMjk3MDBjMzEzZWZkMWFjZjg4YjZkODM4ZWQ4MWJkNjE5NzZkNTc0ZTIxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWUwMzU3Yzc1ODNiYTU5Y2IwMDQ3YWUzODE3MjdjOThlNDE0NmUwZGZhYmI1NzMxZDUyOGY3MGVmYjBlZWIyMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDYyMjkyZmQ3MzIzMDYzNGEyY2Q1N2RjZTgwMmE2ZWI4ZjY0ZGE4YzM1Y2YxYzg3OTJiODBjYzJjZDE0ZGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDliZjg2YmJhYzlkNTIyMmQyYjllNjk2ODNhZDY3Zjc3NzY0YzY2YWQxYzhmMzUzYzcyMTZmNDQzY2ZmNGE0NCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/trainer/page.tsx#L1-L7",
+          "version": "repo-lines-v1:sha256:4f8466c13f270bc6f02f78ddc6ff114ed91c0ffb7e55dac406df59fd1a7b265b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDk2YzIwMDg2ZWUwYjE2ZjRmMGE0MDk0M2FmYzU3YjQ5OGI0ZjNmZjljYzViMzZlMTk2N2RkN2QyMmE5MGM4YyJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L47-L60",
+          "version": "repo-lines-v1:sha256:3233991563b9e50d8511d213fc98e644dbd5eb635b0d8f3e70d38e6a9e4f4bfb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDRkNjBhZTkwMWNhMmI4Zjc3ODk4MTdiZjFlZDAxZDA5NTFiOGVjYzdlYTAyNmFmZTVjNzIwMGFhODU2YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YWVkMWI2ZDY3MGFhODFlNDdmOWU4YTEyYTk4MWQ3NjI3ZTk3OGQxZmY2OWVmZTM1YjcxZGVlOTZjOGI0OTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_212e6885f555496b98e75dc78971ffa7",
+      "statement": "`domain/overview.ts` groups cross-school figures per school with the same metrics and attention functions the school dashboard uses, keeps schools with no batches present, orders schools by urgent count then open items then name, and exposes only urgent items as school-labelled cross-school exceptions.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/overview.ts#L1-L57",
+          "version": "repo-lines-v1:sha256:b17877470dcaac74c748ff17f186bb56252be68de4646448f82a28658a1c53d6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L206-L233",
+          "version": "repo-lines-v1:sha256:e3e6bd7ab8217964f0e915f6084a208d8bc9ecf0efab17c875d9e17b19a2abbd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2MzIwNzJjODVhMGZhZDRlZjBhOTJkOWZmNzVkYzI5ZjA0Y2Q4ODRjZGQyMGU2M2Q3NTM4NmM3Yjk1ZTUyYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4f265170e94a48ee924d10f75aaf6c63",
+      "statement": "`domain/alerts.ts` is a second reader of the same batch rows for the analytics alerts donut, and its `billing-ready` row uses the threshold-only `isBillingReady` signal so its copy must not claim the batch is ready to bill.",
+      "evidence": [
+        {
+          "resource": "repo://modules/analytics/ui/AnalyticsView.tsx#L23-L23",
+          "version": "repo-lines-v1:sha256:db1d33e7cf8b64fb51994693ce9991679db72f8706d6777cb474424d30b90f41:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGIxZDMzZTdjZjhiNjRmYjUxOTk0NjkzY2U5OTkxNjc5ZGI3MmY4NzA2ZDY3NzdjYjQ3NDQyNGQzMGI5MGY0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGIxZDMzZTdjZjhiNjRmYjUxOTk0NjkzY2U5OTkxNjc5ZGI3MmY4NzA2ZDY3NzdjYjQ3NDQyNGQzMGI5MGY0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzZiNDRiYWE2MzEwNzdiY2M3YzI1ZWQxZGM0ZjU2NzAwZDY1MTY4MTY4ZmU2MDg2ODdhNjljODZjNDViODJjYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWQ3NThkYzRiYmJmZjYxN2QwY2FkYWRkMjdkZTI3YjY0NjIxNzY4NDAyYjA2NWFjM2Q3OTY4ZTNmZjMxZGUyMCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/domain/alerts.ts#L30-L65",
+          "version": "repo-lines-v1:sha256:8977572b9eb1c84b299003e2c7f13dd91e12b82d5d3d98fcd757610effeef8a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViY2ViODRhMzU5MGUyMWFlZGY2Njc2Mjk1MzNhZTYwZGIwOWIwNGM4YmY4YjY0ZDhjYmJkNDAyMGQwY2I5NDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzMTFjZWZkOGZiNWUyMGRkZWRhNDVhNTZiNTU3NzE3MzZhODhmOWFkNmZkMTAzOWVlNmVkYzVhYmNhYTdjOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjOGJmZDJiMzdiYWVlOTJjMmEwNzY0MGUwYTY1Zjc2MDVjYTQ4OWFhNzI1MzM3NmI1ZWEwZjZjYmMyZjEyNTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_16de6373eada4dfea6f8ea037e8c2da8",
+      "statement": "The dashboard route orders its guard ladder as forced denial, then `sync-failed` with zero rows before empty (rule 19), then no-tenant-access, then empty, and only renders the KPI row and queue when data exists; only admin and coordinator roles receive the RQM edit prop.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L34-L41",
+          "version": "repo-lines-v1:sha256:8e0d50b43ddf13465a1d7ab5de8d899fa6fa2f89a3fa045d1650b3f15de2f72b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGZjOTViNWE2NzkxMGVhZDIyZTU0MTdjMDIzZjIwYWVhZmIwMzRjZmY3ZmQ0ZGYwMGQ5OTliYTc2NjU1YmNhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzkxMzkyNjBhMGY5ZDNjMDAwMmVmOTY5ZmYwYjdlMjA5NTM3MzQ0MjA5YjYxOTc5NDJjMTY0Y2MxYTg0MDVkNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTNmY2MzYzFjZTY2Y2U5YTE5NjQ3NjBjYjExZGNkZWQ5ZDQwZDhiMjA2MzY3MmI3Njg5YmQ2MTJmNGU1YzExZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjM0ODE5NGNjYjkxNDViMmRkZmI3M2JhODY2ODVjN2NiZWE3ZDQwNjBkZTc0YzE1M2UzODg0NDI3OWJhM2E0NiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L73-L171",
+          "version": "repo-lines-v1:sha256:74fe2d2146494fbe5b4ba33a96f97e2fa6964ba4e211a8dcbdee9f9100c67ea2:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1YzE2YzhhMWY3MWRhM2Y3MTJiN2M5MGI3N2RkNTE4NjY1Mjc3MmQ0Nzc3YmNhZWQzNzExNjMzYjAyYjNjZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3MmM0MjEzNGNlMWFjOTllOWJjNWUxYjdjYjJjOWU5Mzc4NTkzNzcwNjFmNDY0ZDk1MjM2NTJhZDZkYzQ0MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyZmE0Mjk1MDIxYmVhYTcyYmQxNjI3MzYxMmY2ODJmYjMwZDNjOGE2MTAwNjAwYjI3YzJkZjE5ZmI1NDY4MTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_59c51da60ff84a96ad96ba62f14bb68a",
+      "statement": "`tests/unit/batches.test.ts` freezes the clock with `vi.setSystemTime` around the days-to-billing block because that is the only mapper branch reading `Date.now()`, while `dashboard-domain.test.ts` needs no clock at all because `daysToBilling` arrives precomputed.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L145-L189",
+          "version": "repo-lines-v1:sha256:7937d09b27b20b0726734d975682bec8f5eb73a6be49976960fbd28674f2e63b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzZTc4MGFlOWVmMDQxNGQ3MzQ0YzI1YTQwMjlhYzlhMDQxMzkzNWUwYjViYzJmYjUwMDJjMTUxYWIwMDVmNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwMmM3OGJmZDMzMmNkZjVkMzE4ODc3ZDMyYThmNGZhNDgyMWE2MjQ5MGNkZGE0YThiNmNkMjFhNDFkMjk2MTEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L9-L11",
+          "version": "repo-lines-v1:sha256:8708df063c7f62d12f081727e389ad87071dad93045316a5a7eabaaff22b0452:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjM3ZDAyOTM2NzUzZWVlZjMwZDVhNzE1YjY3NjRhNTM3ZWYzNGFiYjJiNWJmZjY5NjZlYjQ5MmYzMTgyZWE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjc4ZmFlZmQzZmUyZjEzOTBhMDlkODE3NTRhOWU0MTE3N2M4MDRiNWZiNGNlZmYyZDJhNWY0MWVjOThlZTU1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmZiNjc2ZDI2NGM0YTgwNWViYmQ1ZmU0MzhiMGE0MzAxMmJjYTdkMmJjMGJmY2JmMGI5MTY1ZWYxMWI4N2M4MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e806edd5abca45d8b3bafbe54e8cf58d",
+      "statement": "`billing_deadline` has no edit or import path anywhere in the UI and can only arrive with the row, whereas `rqm_code` is editable from the card and table views by admin and coordinator roles.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L36-L41",
+          "version": "repo-lines-v1:sha256:43b6503eb94cee8d4b609ae3f60c7de91d0e69080fe84490146c3787098e436f:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc5ZmNhZmE3NzA1ZWRjZGVlOTYzZjk5ODRkMWE1MDNhYjBhYmMxY2I3ZmNjYmVlNzFhODZkMmUyMGE3ODNjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzkxMzkyNjBhMGY5ZDNjMDAwMmVmOTY5ZmYwYjdlMjA5NTM3MzQ0MjA5YjYxOTc5NDJjMTY0Y2MxYTg0MDVkNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmYwNTUxY2IyNDE5MWVhZjVkYTE4YzdhMTZmZjI0ZTZmZDE2NGUxZGQ2NjlkYzdjODExMmIxOTM4ODI5ZjY1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjM0ODE5NGNjYjkxNDViMmRkZmI3M2JhODY2ODVjN2NiZWE3ZDQwNjBkZTc0YzE1M2UzODg0NDI3OWJhM2E0NiJ9"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L43-L44",
+          "version": "repo-lines-v1:sha256:26ba594022a49fbf6eec0e5b2f42651510fcc4e57a5ec4fa548d1021c83c5faa:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODI3NTZkY2Y5MWRiYjZjZDZkZjJmMzliMjE5NjIyZDc3ZWVjNGQyMmI4MDI0ODAwMTVlZDJiMzU3NGUxN2YwZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQ3ZGNmZWE3ZDc2YTBkN2Y0ODUwMzc3MDAwZjBkNjE4YjJmNzdmMmNkNTVlODdhNTg2MTJmMTc0Y2YwNDQ3NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzE2YjVhY2FhYzA0Mzk5ZGZiZTg5ZWJhYThiMDhhNmRiNWJlY2YzYTI4OWY4NTNkNjZiMWMyNjg0MDRmZGFhOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTU2YjBhNGU5MGRhYjhjZGUyN2E1NmMwOTFhZTgyNTFkNjZlMGQ1MDEzOWVhNGMwOTBjZjdhYjc0MDBjYjMwOCJ9"
+        },
+        {
+          "resource": "repo://modules/batches/ui/CardsView.tsx#L26-L56",
+          "version": "repo-lines-v1:sha256:3449aa8b445ceff0846a7c95feba10865b7cf73530679a4e0f84bce1cdf94d87:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MzU5ZGViNTI5ZWJjZTMyMDk4YjQ0NGZiYTRiNzI5N2YzYjA0OGI2YzNjOWM2MGZjMGYyMWE3ZDcxYzJhZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3YTMwYzgzY2M0ZjQ5ZGI1MzI2NDQ1NjE3ZTYwYTg5ZTVlMDAwYTJhNzU2NDE4YjIxODRlNzZlNTY2ZjQ0OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwZTE3NzRkYjUyZTNlYTQxOTk2M2M3MThlYTQzY2U4ZWQ1MDRhNDNhODBkODA1NzM3ZTU5ZWY4M2ZiYzJjYjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c6ed78aa9ae4ef683b703dbe1c0cdaf",
+      "statement": "`Batch.ntpLag` has no source in the mapper, so the `ntp-lag` alert category can never fire and a test pins that the field never claims a lag.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L284-L284",
+          "version": "repo-lines-v1:sha256:000c384910be19a63cc59957b012d9a78920e556d48fa66b0636131ef883178f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDAwYzM4NDkxMGJlMTlhNjNjYzU5OTU3YjAxMmQ5YTc4OTIwZTU1NmQ0OGZhNjZiMDYzNjEzMWVmODgzMTc4ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDAwYzM4NDkxMGJlMTlhNjNjYzU5OTU3YjAxMmQ5YTc4OTIwZTU1NmQ0OGZhNjZiMDYzNjEzMWVmODgzMTc4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2NiMzJkMDhiOGY5MGQzZDZmNzNlOTBjNDNmN2RiZDU1OWJlMmI0MWY2NmI4OTQyOWE1NzQ1Mjg1Mjc4ZmMzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzBhYjNiZWUxMjAyZTY0NzA4N2E5OTIwMmJhZmU3YWIyOWFjOTdiMmQ1MGFkZmFlYmE1MTQzY2Y2YmQ5NjYwNyJ9"
+        },
+        {
+          "resource": "repo://modules/batches/domain/alerts.ts#L63-L63",
+          "version": "repo-lines-v1:sha256:5774f8ea07016b28f24c27836f4fd4638de81f28b0fc95514afafff5987a3ebf:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc3NGY4ZWEwNzAxNmIyOGYyNGMyNzgzNmY0ZmQ0NjM4ZGU4MWYyOGIwZmM5NTUxNGFmYWZmZjU5ODdhM2ViZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc3NGY4ZWEwNzAxNmIyOGYyNGMyNzgzNmY0ZmQ0NjM4ZGU4MWYyOGIwZmM5NTUxNGFmYWZmZjU5ODdhM2ViZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q4ZDdlZTMxYTFlZGFmM2JkMWZjZjg3NGVjNDcwNDU4NTlhMjBlMGFiYTYyZWJiYWRjODU4MzYwYjYxNzY3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzcxNjliMjhkY2NlZjVkNzdlZmEzNjcwMzMzZTc5NTYyNTQ3NTkzZTczZWRiOWMxZmVlZjA4ZDc4Yjk5OGQ4YyJ9"
+        },
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L269-L271",
+          "version": "repo-lines-v1:sha256:49f2765b71fd90a19f1ddf2b16c1d8d39155d9905afbb310f61677db20fcff4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2Y0YjJkNmYxNjZhNTNkMTY4YjRkOTg3NTVkZGE1ODcxM2M1NTM1YmFmZmU2NmFjOGZlZjNjNTA4MTI5ZDE0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmJkYmYyYTU0NzE0MjM1YjU3ZWI2ODZiMjg0OGNhOTQyNTRiOGZmYTVmOGRkMjMyNTBlNzJjMjE5NzRmMTdmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTQzNGZjZTNhMDNkNDA2Y2VjOWVhN2I5ZjdmOWM3MjAyOThmYWViOGE5NGYzMmZmZGM3NzFkMjgwMGViZjMzMSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.0",
+    "at": "2026-11-18T03:56:44.398Z"
+  }
+}
