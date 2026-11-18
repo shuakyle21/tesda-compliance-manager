@@ -23,10 +23,15 @@ P_ADMIN_A=aaaaaaaa-0000-4000-8000-0000000000c1
 P_ADMIN_B=bbbbbbbb-0000-4000-8000-0000000000c2
 P_PERSON=ffffffff-0000-4000-8000-0000000000c3
 
+# Every call the script makes for itself (probes, cleanup, gate release) is
+# capped at 5 seconds, so a stuck connection cannot hang the failure path.
+QUICK=(timeout 5 "${PSQL[@]}")
+
 cleanup() {
-  "${PSQL[@]}" <<SQL >/dev/null 2>&1
+  "${QUICK[@]}" <<SQL >/dev/null 2>&1
 select pg_terminate_backend(pid) from pg_stat_activity
-  where application_name in ('conc_gate', 'conc_a', 'conc_b');
+  where datname = current_database()
+    and application_name in ('conc_gate', 'conc_a', 'conc_b');
 delete from public.profile_tenant_memberships where tenant_id in ('$T_A', '$T_B');
 delete from public.profiles where id in ('$P_ADMIN_A', '$P_ADMIN_B', '$P_PERSON');
 delete from public.tenants where id in ('$T_A', '$T_B');
@@ -55,7 +60,7 @@ session() { # <sub> <tenant> <app name> <gate: yes|no>
   local gate=""
   [ "$4" = yes ] && gate="select pg_advisory_xact_lock($GATE_KEY);"
   PGAPPNAME=$3 "${PSQL[@]}" -v VERBOSITY=verbose <<SQL
-begin;
+begin isolation level read committed;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"$1","role":"authenticated"}', true);
 insert into public.profile_tenant_memberships (tenant_id, profile_id, is_default)
@@ -66,11 +71,13 @@ commit;
 SQL
 }
 
-# Wait (up to 10 s) until the session named $1 is in a wait whose
-# wait_event matches the SQL condition $2.
-wait_until_blocked() { # <app name> <condition on wait_event_type / wait_event>
-  for _ in $(seq 1 100); do
-    n=$("${PSQL[@]}" -c "select count(*) from pg_stat_activity where application_name = '$1' and $2")
+# Wait until the session named $1 matches the SQL condition $2. Gives up
+# after 10 seconds of wall-clock time. A give-up is reported as a TIMEOUT so
+# it is not mistaken for a trigger failure.
+wait_until_blocked() { # <app name> <condition on pg_stat_activity columns>
+  local deadline=$((SECONDS + 10))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    n=$("${QUICK[@]}" -c "select count(*) from pg_stat_activity a where a.datname = current_database() and a.application_name = '$1' and $2")
     [ "$n" = 1 ] && return 0
     sleep 0.1
   done
@@ -84,23 +91,29 @@ check() { if [ "$2" = ok ]; then echo "PASS: $1"; else echo "FAIL: $1"; fails=$(
 
 # The gate: a session that holds the advisory lock until it is terminated.
 PGAPPNAME=conc_gate "${PSQL[@]}" -c "select pg_advisory_lock($GATE_KEY); select pg_sleep(60);" >/dev/null 2>&1 & PID_GATE=$!
-wait_until_blocked conc_gate "wait_event = 'PgSleep'" || { echo "FAIL: gate session did not start"; exit 2; }
+wait_until_blocked conc_gate "wait_event = 'PgSleep'" || { echo "TIMEOUT: gate session did not start within 10 s (setup problem, not a trigger result)"; exit 2; }
 
 # A inserts, then parks on the gate with its insert uncommitted.
 session user_conc_admin_a "$T_A" conc_a yes >"$OUT_A" 2>&1 & PID_A=$!
-wait_until_blocked conc_a "wait_event = 'advisory'" || { echo "FAIL: session A did not reach the gate"; exit 2; }
+wait_until_blocked conc_a "wait_event = 'advisory'" || { echo "TIMEOUT: session A did not reach the gate within 10 s (setup problem, not a trigger result)"; exit 2; }
 
 # B inserts while A is in flight. With the trigger, B must block on the
-# person's profile row lock that A holds.
+# person's profile row lock that A holds. "Blocked by A" is checked with
+# pg_blocking_pids, not just the wait type, so a lock held by some other
+# session cannot pass for it.
 session user_conc_admin_b "$T_B" conc_b no >"$OUT_B" 2>&1 & PID_B=$!
-if wait_until_blocked conc_b "wait_event in ('transactionid', 'tuple')"; then
+BLOCKED_BY_A="wait_event in ('transactionid', 'tuple') and exists (
+  select 1 from pg_stat_activity x
+  where x.datname = current_database() and x.application_name = 'conc_a'
+    and x.pid = any (pg_blocking_pids(a.pid)))"
+if wait_until_blocked conc_b "$BLOCKED_BY_A"; then
   check "session B waited on session A's lock" ok
 else
-  check "session B waited on session A's lock (it never blocked)" bad
+  check "session B waited on session A's lock (not seen within 10 s)" bad
 fi
 
 # Open the gate: A commits, then B's trigger re-checks and sees A's row.
-"${PSQL[@]}" -c "select pg_terminate_backend(pid) from pg_stat_activity where application_name = 'conc_gate'" >/dev/null
+"${QUICK[@]}" -c "select pg_terminate_backend(pid) from pg_stat_activity where datname = current_database() and application_name = 'conc_gate'" >/dev/null
 wait $PID_GATE 2>/dev/null
 wait $PID_A; RC_A=$?
 wait $PID_B; RC_B=$?

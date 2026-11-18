@@ -133,8 +133,12 @@ rollback file drops the trigger and function.
 | `profile_membership_concurrency.test.sh` with the trigger | Pass, 3 runs out of 3. Session B is seen waiting on session A's lock, A commits, B fails with 42501, one membership exists |
 | Same script with the trigger dropped | Fail. B never waits, both sessions commit, two memberships exist |
 
-The script orders the two sessions with a gate and a check on `pg_stat_activity`, not with
-fixed sleeps, so a slow machine cannot make it pass or fail by accident.
+The script orders the two sessions with a gate and a check on `pg_stat_activity` and
+`pg_blocking_pids`, not with fixed sleeps. Each wait has a 10-second limit. On a very slow
+machine a wait can run out even when the trigger works; the script then prints `TIMEOUT`
+(setup steps) or "not seen within 10 s" (session B), which means "rerun", not "trigger
+broken". The workers start with `begin isolation level read committed`, the level PostgREST
+uses.
 
 Limits: the concurrency test ran on plain Postgres 16 at READ COMMITTED. Under REPEATABLE READ
 the second transaction would get a serialization error instead, which is also safe.
