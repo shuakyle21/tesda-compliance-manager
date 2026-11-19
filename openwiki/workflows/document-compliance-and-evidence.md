@@ -3,9 +3,6 @@ type: workflow
 title: "Workflow: Requirement Catalog → Blocker or Verified Evidence"
 description: The chain from a program requirement catalog to a counted blocker, a closed gate, or an uploaded-and-signed evidence object — the missing → pending → submitted → verified order, ADR-004's untracked third class, which surface shows which number, and where the footprint changes.
 tags: [documents, compliance, evidence, adr-004, lifecycle, workflow]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-9c4f624af786337110d6df8a
     resource: repo://docs/adr/ADR-004-untracked-document-semantics.md

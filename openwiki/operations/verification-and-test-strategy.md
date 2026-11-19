@@ -3,9 +3,6 @@ type: Operations Guide
 title: Verification Loop and Test Strategy
 description: The ordered tsc → lint → test loop, what CI actually runs and what it still skips, why Node 22 is a startup requirement, how specs pin the clock instead of reading it, what the one permission-gated Playwright spec proves, and the boundary the suite never crosses — mocked I/O and a non-existent RLS suite.
 tags: [testing, verification, vitest, playwright, lint, typecheck, ci, rls]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example

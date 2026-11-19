@@ -3,9 +3,6 @@ type: Architecture
 title: Architecture Overview
 description: The TVI-CAMS map — what the system is and is not, the stack, the request path from Clerk through proxy.ts to the (dashboard) layout gate, the anon-key client and RLS, scoped /t/<code> routing versus the platform registry, presentation roles versus the trusted role, the lint-enforced import model, a one-line-per-module catalog, and docs priority. Every section links the neighbour that owns its depth.
 tags: [architecture, overview, nextjs, supabase, clerk, rls, routing, module-boundaries, adr]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-10906e03e3f3530d2d51e5ab
     resource: repo://.claude/hooks/protect-static-dirs.sh
@@ -105,6 +102,8 @@ sources:
     resource: repo://modules/tenancy/ui/CreateSchoolForm.tsx
   - id: openwiki-source-8e7d5d9b6492b85170c2d1cd
     resource: repo://modules/tenancy/ui/CreateUserForm.tsx
+  - id: openwiki-source-50a18d054b596a7ed0eeffb0
+    resource: repo://next.config.ts
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
     resource: repo://package.json
   - id: openwiki-source-5e753d9d77984cb67aae1517
@@ -125,7 +124,10 @@ sources:
     resource: repo://tests/unit/supabase-server.test.ts
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-19T03:55:05.435Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-19T03:55:05.435Z
 ---
 
 # Architecture Overview
@@ -145,7 +147,7 @@ This page is only the map. Depth lives with the neighbours, and each section bel
 
 | Concern | Choice | Why it matters here |
 | --- | --- | --- |
-| Framework | Next.js 16 App Router (`next ^16.4.3`, dev is `next dev --webpack`) | Server Components by default; client islands only for interactivity (rule 26) — and the layout gate below only works because Server Components run per request |
+| Framework | Next.js 16 App Router (`next ^16.4.6`, dev is `next dev --webpack`) | Server Components by default; client islands only for interactivity (rule 26) — and the layout gate below only works because Server Components run per request |
 | UI / language | React `19.2.4`, TypeScript `strict` | checked by `pnpm exec tsc --noEmit`; there is no dedicated script |
 | Styling | Tailwind v4 | UI rules are [`RULES.md` §4](/RULES.md), rules 21–26 — there is no `design-system.md` file in the repo, so do not go looking for one |
 | Identity | Clerk `@clerk/nextjs ^7.4.1` | `ClerkProvider` sits in the root `app/layout.tsx`; Clerk is identity only, never role authority |
@@ -194,7 +196,7 @@ Two routes sit outside the gate by design: `/api/openapi.json` checks `getAuthUs
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 Tenant context lives in the URL path segment. `/t/<school>/<section>` is a **selection, not an authorization** (rule 2): `scopeForCode` builds a scope only from `profile.tenants`, an RLS-scoped read, and queries then add `tenant_id = scope.tenantId` on top of RLS. [`resolveRouteScope`](/app/(dashboard)/tenant-scope.ts) is `cache()`-wrapped and four-way — `ok`, `no-tenant-access`, `unknown`, `not-a-member` with a fallback — and [`t/[tenantCode]/layout.tsx`](/app/(dashboard)/t/[tenantCode]/layout.tsx) renders every non-`ok` arm, because it is the only place in the segment that owns a state.
 
-`requireScope()` is the pages' step, and it does two things rather than one. It returns the validated scope or `null` (the layout already owns the state; it deliberately does not `throw notFound()`, because layout and page render in parallel and a thrown 404 could race the layout's friendlier arm — and without a scope there is no tenant id to query with, so security does not rest on it either way). **Past that, a trainer is redirected to `/trainer`.** Office pages hand full batch records to client components — billing deadline, BSRS — which rule 5 forbids a trainer to see, so the check sits in every office page's path rather than in a layout, because a layout does not re-run on client-side navigation.
+`requireScope()` is the pages' step, and it does two things rather than one. It returns `{ scope, profile }` or `null` (the layout already owns the state; it deliberately does not `throw notFound()`, because layout and page render in parallel and a thrown 404 could race the layout's friendlier arm — and without a scope there is no tenant id to query with, so security does not rest on it either way). **Past that, a trainer is redirected to `/trainer`.** Office pages hand full batch records to client components — billing deadline, BSRS — which rule 5 forbids a trainer to see, so the check sits in every office page's path rather than in a layout, because a layout does not re-run on client-side navigation.
 
 Two lessons are load-bearing and live in full on the routing page: a foreign code never falls back to "all schools", and `unknown` (could not check) is never rendered as `none` (belongs to none). Legacy unscoped paths redirect to the caller's default school with search params intact.
 

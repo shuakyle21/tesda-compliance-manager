@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:e894cdbc0aa13775d325c6a3beb37d231da4259d96c17080524f0051571c4b58",
+  "pageVersion": "sha256:a9e8fcf26a57e3781eb71ac8137a897a307315802bebc30c02f32181c878b99f",
   "claims": [
     {
       "id": "claim_58571fbf5c11477fa82a96febbe5080c",
@@ -18,11 +18,15 @@
     },
     {
       "id": "claim_8ad2c2afed414bb89a2b6e45adb91616",
-      "statement": "The app is Next.js 16 App Router (next ^16.4.3, dev runs next dev --webpack), React 19.2.4, strict TypeScript, Tailwind v4, Clerk (@clerk/nextjs ^7.4.1 with ClerkProvider in the root layout), and pnpm (packageManager pnpm@9.15.4).",
+      "statement": "The app is Next.js 16 App Router (next ^16.4.6, dev runs next dev --webpack), React 19.2.4, strict TypeScript, Tailwind v4, Clerk (@clerk/nextjs ^7.4.1 with ClerkProvider in the root layout), and pnpm (packageManager pnpm@9.15.4).",
       "evidence": [
         {
+          "resource": "repo://next.config.ts#L1-L12",
+          "version": "repo-lines-v1:sha256:2fd85de2fc32354b780ce1da7e224b2b3cd86e518319f54870cbd0da1855e5ee:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmNjc5MjcwYWFiZDgyN2Q4Nzk0NWM5ZmJiYzQ3OGIxODM5NGQyZTFmZDU3MTZjMzY1ZTJiNWUyYjExYmVkZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjYmMxN2NhOGY3MzU5NDc2NzgzMGEzNmVlZWFjNGNlNWZlYTVkZDM4Nzg1NWVhNzRmNDUxOTE5MTk1ZDVjMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
           "resource": "repo://package.json#L6-L51",
-          "version": "repo-lines-v1:sha256:d93175bc45f6931a2f74c0ddae0fc6780936fbbfcd345c830b15d3ae38c5e754:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiMzViZmYwZGE3YjU2NTE2NzRkN2IxOWIzYWNjNWU5Y2JhODI2YjkxN2JkNzU5NzlkZTFhZDhkY2YzNGVlNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNTA1YzYxMmNiNDY4MjM5YTJlMmVjNWY3YmE1MDQ4NWI4NjU3NGM2MTViYzA3MTliZjdmMGE3Nzk4MzM4MmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4MzdhMGQ3YTZlZGQ4MjQwZWY1YzVmMWQwYjE4YWYwY2ZjMzdjNjRhOTBhMWY1MWY0MTg3OGVlMmM5NmEwNzkifQ"
+          "version": "repo-lines-v1:sha256:80bb22b5de0dfbc3d767e7e07a2e274d77e362d32bec60ac4f0d476debe7d238:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiMzViZmYwZGE3YjU2NTE2NzRkN2IxOWIzYWNjNWU5Y2JhODI2YjkxN2JkNzU5NzlkZTFhZDhkY2YzNGVlNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhMzUyZmFiNTIwYjc1YTY0OTA1ZTIwNGYwMDAyNWY2ODgwZDJlMDA0ZjRhOWZmYjEyMDhjNjAxYWIyODMzZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNTA1YzYxMmNiNDY4MjM5YTJlMmVjNWY3YmE1MDQ4NWI4NjU3NGM2MTViYzA3MTliZjdmMGE3Nzk4MzM4MmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVkMDQ0ZTNkYmM2MmE4NjE5ODVlZDMxZGFkYTFhNzRiNjU4MmZlNzYxMzVkMmYzOGZkMTM4MThlODFjMDBkMDkifQ"
         }
       ]
     },
@@ -961,10 +965,20 @@
           "version": "repo-lines-v1:sha256:8f969aa792e5189c6d4e9833e0b24951c5bc085f6b5d5ce38a8d1ca45eddde60:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjVlYjc2YjA4NGE3YjYxZTBlM2M4MzgwNzBlNjdkZmI2MTI0MmJlOTZjNjQ5NTI0ODM4YTRkNjE2ODYwNDhlNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTJjNDA3YjY3NjgxYTUzNDU2ZWVlMGU1ZTIzOWQ0OTVlNWIzZTAwNGM0ODNlNWEwZDc5YzYzOTc3NGZiMTc3NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjU4NjgxMDdmMDVjOTk5NDVhYzNhM2ViNGJhZmVhYzI1NzgzMzEwMTA4YWJmYzFkN2MyM2FjZDVjZGZjY2NiMyJ9"
         }
       ]
+    },
+    {
+      "id": "claim_d9b2dc6db3774950bf9b01fd3530db74",
+      "statement": "requireScope() returns the resolved scope together with the profile, or null when the scope arms are non-ok; it deliberately does not throw notFound() because layout and page render in parallel.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L55-L76",
+          "version": "repo-lines-v1:sha256:7ca3804529be2c74affe2e39abe1971520664bfbf0caad99412aa103638bae49:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzOGUyOGM3NzMxMzQzMTJkNGUxZDc2ZjI1ODg2ZjAwMjVlY2E3M2FkYmMyOGZlN2E3MzZmNWRlOWI5N2EzYzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4YjdkNzgzMmE4MTQwYTJhYjMwYTJjYTI0OTk2NzEyYTc0NjIyMzFhOWYwMmMyYTA5N2YzNjI5NjZkNzQzYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-19T03:55:05.435Z"
   }
 }

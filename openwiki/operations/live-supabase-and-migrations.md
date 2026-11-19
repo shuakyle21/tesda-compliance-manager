@@ -3,9 +3,6 @@ type: operations-runbook
 title: Live Supabase, the Migration Ledger and Applying a Change
 description: Operating the one hosted Supabase project with no staging — the rule 36 permission gate and how the refusal is wired, how to read the migration ledger and confirm objects by name, why a filename must match the recorded version, the two standing unapplied-file hazards, why dev seeds never become migrations, and the order in which a landed migration is reconciled into types.
 tags: ["operations", "supabase", "migrations", "rule-36", "migration-ledger", "seeds", "database-types"]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-1fe463fcf07912e5cdbb5a91
     resource: repo://.claude/settings.json

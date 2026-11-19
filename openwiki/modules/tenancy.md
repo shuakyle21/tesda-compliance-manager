@@ -3,9 +3,6 @@ type: module
 title: Tenancy, the School Registry and Tenant Scope
 description: How a screen knows which school it is about and who may reach it — the profile snapshot and its verdict, the tenant-scope rule and its SCOPED_SECTIONS anchor, member and school write policies, and the ADR-006 platform-admin registry boundary behind /schools/new.
 tags: [tenancy, membership, tenant-scope, platform-admin, school-registry, rls, domain-layer, failure-modes]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
     resource: repo://app/(dashboard)/layout.tsx

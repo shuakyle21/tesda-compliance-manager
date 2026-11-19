@@ -5,7 +5,7 @@ description: Where a route lives and what guards it — proxy.ts as a non-gating
 tags: [routing, app-router, middleware, auth-gate, tenant-scope, roles, failure-modes]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
+    at: 2026-11-19T03:55:05.435Z
 sources:
   - id: openwiki-source-4ddc2be5b2adc07e50368090
     resource: repo://app/(dashboard)/batch-cards/page.tsx
@@ -21,8 +21,6 @@ sources:
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx
   - id: openwiki-source-79e2020a0930b43798845956
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx
-  - id: openwiki-source-377995b97e2edfb728fa1c9e
-    resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/table-view/page.tsx
   - id: openwiki-source-fac1d0830b5bfbb903fdd40f
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx
   - id: openwiki-source-7ded6d9e4b97a5fd4dd6e34e
