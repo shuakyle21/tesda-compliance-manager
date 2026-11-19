@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:97da79c6d3be7378e7fe79bf5f694608501d4f08c0b972294f2b37a4810af10b",
+  "pageVersion": "sha256:bc12d582908b6a7f1f8ff6eefb1d36a9deb15beae79e023d3d48ca7adcea6e2e",
   "claims": [
     {
       "id": "claim_f05fdeb46da34086b89b610ff879ab14",
@@ -174,15 +174,15 @@
     },
     {
       "id": "claim_9292ad24758a42faa53fa31fb1a67c05",
-      "statement": "The segment layout is the only place that renders a scope state; pages call requireScope() and `return null` on a non-ok result, and a page that forgets that guard falls through to running with an undefined tenant id.",
+      "statement": "The segment layout is the only place that renders a scope state; scoped pages call requireScope() and `return null` on a non-ok result. The cleared dashboard is the documented pattern rather than a bare `if (!resolved) return null`: it also redirects a trainer before deriving anything.",
       "evidence": [
         {
           "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L34-L37",
           "version": "repo-lines-v1:sha256:8415fb0a7427634fdb3d297df08bfd8325bc4f42d8157a1834e2b66c41e0a931:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmNmMTRkZjY2ZmM5ODJhYjYyNzAxMzM5ZjczM2E2NDUzYjIzOWEzNzNlZTU3YWFjZGE3MDMzZjE3NThiOGQwYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIwZmM4MmI4MzRkNzcwYWNlNWJlYjZjMGMwY2IxMTVhYjI3NzRhNTAwYzgxMDc4MWYwM2Q3ZGQxOTUwMDE0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODM4ODYxYTZjYmYyNGJhMDhlMDM1ZmYxZDgzOTQxZDgxZDMwMTRjOWUwYmRhYmNlMGU3NjhlYmU0YmQ0ZTk5NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmYwMjdmZTYyMTBkYzI2NThhMGE5NTM1ODdiNjU1YjkxN2YxOTJlN2QyMDM4YzUyNDY0NzA5MzAwODU3MzBjMiJ9"
         },
         {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/table-view/page.tsx#L25-L27",
-          "version": "repo-lines-v1:sha256:282defcab2a70de9697ad1cc35cafae2f9199da053180d0d652071c80f3767c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MGNiMzE3N2E4ODA2Mjk0ZmI4OWVlMDliOTg3ZjRlNmFkMTZlOTMzNzU3MDI1NTM2M2I1ZDU3ZDgxMDE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIwZmM4MmI4MzRkNzcwYWNlNWJlYjZjMGMwY2IxMTVhYjI3NzRhNTAwYzgxMDc4MWYwM2Q3ZGQxOTUwMDE0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGE2OTlmZDBjZjRkNTk3NjkzODdjMTFjZGEyMDBjYzJjNmE2ODg1ZTdlOTBmYTE4YjZlY2UyOGRmODQzYjc2OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWVkZTE1NGY3ZTU5YjQ5ZmYzYzVhNmM1NjE3YmU1MjVlYWJlZDRlYTUzZGJlNTQ1NWViNmI4NDAxMGJiNjdiOSJ9"
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L73-L78",
+          "version": "repo-lines-v1:sha256:725099e1af03f2269605834f9e5286ed289b5584108d5b0ccd1f24fc3034ac08:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDVjMTZjOGExZjcxZGEzZjcxMmI3YzkwYjc3ZGQ1MTg2NjUyNzcyZDQ3NzdiY2FlZDM3MTE2MzNiMDJiM2NmYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjhiYzAxNzM2ZGQ5YTE0NjI5YmM0NGI1YTFhMDY4MDI0ZDAwNDI0ODQ4MzE0Nzk2NmVlYTYwMDE3MzgyNjhjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjcyYzQyMTM0Y2UxYWM5OWU5YmM1ZTFiN2NiMmM5ZTkzNzg1OTM3NzA2MWY0NjRkOTUyMzY1MmFkNmRjNDQzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODZhZDM1OTZkNDAyNmM4MWQzMGI2NjRiMzY3NDlmZDgyNjBhZDVhNzkwMzhjN2M3MDEyNmJiNjA0NzNiNzVkNSJ9"
         }
       ]
     },
@@ -322,7 +322,7 @@
     },
     {
       "id": "claim_1eedd351a42b45a196de054ea06ebee5",
-      "statement": "/overview is the one unscoped office screen, admits admins only via resolveTrustedRole and redirects everyone else to /dashboard, and returns a NoTenantAccessState when the caller has no memberships.",
+      "statement": "/overview is the one unscoped office screen, admits admins only via its own resolveTrustedRole read off getSignedInProfile and redirects everyone else to /dashboard, and returns a NoTenantAccessState when the caller has no memberships.",
       "evidence": [
         {
           "resource": "repo://app/(dashboard)/overview/page.tsx#L1-L33",
@@ -346,7 +346,7 @@
     },
     {
       "id": "claim_9fe50c57b4764efa981702fe4374ccc3",
-      "statement": "getSignedInProfile and resolveRouteScope are cache()-wrapped so a layout and its page share one profile read per request, and a failed identity read collapses to 'unknown' while a missing profile row collapses to 'none', never the reverse.",
+      "statement": "getSignedInProfile and resolveRouteScope are cache()-wrapped so a layout and its page share one profile read per request, and a failed identity read collapses to 'unknown' while a missing profile row collapses to 'none', never the reverse. resolveRouteScope is a linear fold over that union: `unknown` -> unknown, `none` or zero memberships -> no-tenant-access, an unmatched code -> not-a-member with defaultScope, a match -> ok.",
       "evidence": [
         {
           "resource": "repo://app/(dashboard)/tenant-scope.ts#L37-L52",
@@ -507,10 +507,100 @@
           "version": "repo-lines-v1:sha256:97a7255b814c619acd58caabfdafa094a72602b125a004ac38b4613a7c40531c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhYTJiMGE0OWRjY2M3ZTQyMGE2MjI1N2VlNDc5ZTI5ZGE1OGM0M2I4MDZiOTZkMjNmYzZiNDI4MDY4NmI0ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3ODU4Zjc2YTRjN2YwYjZlOTcwZjU3MTY2ZWM1ZmFiMzQxYTkyYzY5N2RlZjQ5OTA4YTdkMWQ1MWE5YjUzZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_e5142e3432a64c51b7b1010d9469df5a",
+      "statement": "legacyRoute(section) builds each legacy unscoped route as a one-line LegacyScopeRedirect, so the section list is the single registry of legacy stubs; /dashboard reuses the same component with the trusted-role dispatch in front of it.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L12-L25",
+          "version": "repo-lines-v1:sha256:da3a573e7a34d315a264fd42adf7feb22b4dee1612eb5533e64053d61ea747be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyZGQ2MjE0ZDlhNTYxZDdkNDIyZGM5NDQ5OWZjMDA1MDJjZGU1NTI5NmMwNWZhOWNkODg1ZjBhNzczMjRlMWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0ODc5NzY5MTE0ZmFjM2YxODQ2NDdmYmFjZTA1ZjI5ZjQyNTRiZDk4NGRjYjY0MjczMzU1MWY3ZDYxMmRjMmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/legacy-redirect.tsx#L16-L33",
+          "version": "repo-lines-v1:sha256:ffc1449aea17797a78112583c68d5a720840f842ff6e627f79a7191fcb977f50:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZmYyMDMzYmEyYjZmMjExMjExMDQ0MDY3MTI3NzgwYjViMDlhYjhhYjUxYTI0YzNmM2Q1MjA4NTA0ODdhODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzODg2MWE2Y2JmMjRiYTA4ZTAzNWZmMWQ4Mzk0MWQ4MWQzMDE0YzllMGJkYWJjZTBlNzY4ZWJlNGJkNGU5OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a00f7be4f3e147518225b2621e5c856f",
+      "statement": "A scoped page must consume the non-ok arms and the trainer case without fetching; the school dashboard is the reference: `!resolved -> null`, then `role === 'trainer' -> /trainer`, only then the validated scope and profile.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L73-L80",
+          "version": "repo-lines-v1:sha256:394dcb8aeb33cfc5d24d67f04ce597abc10cacd4a2f8a459e9b3bb750de52a8b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDVjMTZjOGExZjcxZGEzZjcxMmI3YzkwYjc3ZGQ1MTg2NjUyNzcyZDQ3NzdiY2FlZDM3MTE2MzNiMDJiM2NmYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODRiYTM0ZTU0OTczZThkOTBmMGNhNGU2NDlhM2U2N2Q3ZGIwZjk5NDUwYTY1M2JkNDUwNDg2NmRjMTM0NjgwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjcyYzQyMTM0Y2UxYWM5OWU5YmM1ZTFiN2NiMmM5ZTkzNzg1OTM3NzA2MWY0NjRkOTUyMzY1MmFkNmRjNDQzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmE5OGE2OWU5YjQxZDE4MWZlN2U4ZWFkYThhYzZjYWVhM2U4OTAxZmQ3OWM1YTM1MGE4Yzc3OWY5ZmYzYTFlMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3fd3c57d41c644679cc3c33c588a6182",
+      "statement": "An empty profile.tenants resolves to no-tenant-access rather than not-a-member, so a provisioned-but-unassigned user reads as no access instead of a typo; mismanaging the split names the wrong absence.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L46-L52",
+          "version": "repo-lines-v1:sha256:3bd54eb3ce3abd91968177633f92cd611ea4d7a60b06b84658d5fbd7b3b4fa3b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTIxYTM4NTdiMDI4OTgxODE1MzJmNmFiYTNhNDQ1ZGEzZDVlZTRhNTA3Yzk0NGE0N2Q4N2IzMDBmZTEwZjA0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWZiYjc5N2Q5NjU5NWE2ZjkwNTk0ZDNjNDFlOGRiNzk4OWRlNDU0NmI1NWQ5N2NlMzQ1MmY2NTNhMWRkMTQxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTM0N2I5NjIxZTRjZjE1OTI0OTE2YWFkMzBhNzNkMTgyN2M2OWI0ZjliNWFkZjAwNTRjZGE3NDE4MzMxYTNiYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c705ee2155d94b698b7dfb41a136b46a",
+      "statement": "New unscoped screens such as /schools/new and /users/new go directly under (dashboard)/ so they stay gated but unscoped; each carries its own authority check because the router's x-pathname trainer flag says nothing about them.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L12-L16",
+          "version": "repo-lines-v1:sha256:c74809a461cb6f648681bc99aeb838772f6c770bc248e84a9b3e838314b7931f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjMxNzRkMzE1Y2E1M2FkM2M2NjE1OWQ0YWRjYWViZGFjMDAxMTBjNjljMzhjMzgxNGI5ODFlZmZlZTk3MzcxNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTdmNjU1OTkxNGNkNGE5ZjI0ZGExY2ZkNGViNDJlOWYyNjVlMDg2NTgzZTJhMzdlOGQzZjgxZDI2YTU2NjE2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWEwMGM1ZWM5NmQzNGJhYjhmN2JjMGIzZmYwY2IyZmYwNzRiMmQ4MTA3OTAxZTUxNGVlY2UyZTk2ZWM2N2Y4ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjc5MjBjYzI1NzMxNzRmNDhjMDA4MDBiZWU2NjFiZGU3OTdlZDI0MDRmMDYyMTZjMDkwZTI5OTUwOGY5OGVkNiJ9"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L130-L132",
+          "version": "repo-lines-v1:sha256:095285f0c5c3ca6c2cb21308148db7ab924f3a761c650d8161b138e6f0e2e65e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWZjNGFiZWQwZjEyYWM0MjNlMTU0MDU1MTk5MmU3ZjAxYzRjMWUwMDg5ODRmOWQzMDM3ZjdlMmVkYzQ2OWUxYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTJjNzZkYjQzOWFlYTFmMGNlZjkwNGNhNmJiZTNiMTZjMTQ5ZTI4ZmFlOWVjNTI5ODVkMWFjYTI4ZmE0NjU4YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjgxZTBlYTM3NzUyMzI5NGZjZGQ5Yzc4M2I3ZmY4NDJmYzdkZTY4NWQ5ZjU5ZDQ4YmJmNmRkYzg0NTY0NTU5ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzAyNmNhM2YyOTMzZTE5N2Y4MTQ5OThkOGRkODQ1ZjU5YjM4NmU4MjE1OTZiNDMwZjkwZDE4OTk3YjMxYzIxZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_420335dc93114bda9fade1cc5b888bbe",
+      "statement": "The trainer redirect is checked in the page path rather than the layout: requireScope redirects on profile.role === 'trainer' after an ok scope, and a layout does not re-run on client-side navigation, so a layout check could be skipped by navigating between sections.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L77-L78",
+          "version": "repo-lines-v1:sha256:032429f5ebe9e34359cbe3aecbc53a79d948d218d90cf161ecdc3ef5b12a5bd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmVmMWFkNDg4ZDgwN2FjMDhlMzA5ZTU0MDk1NDA5ZWEyNGI0Nzc4NTg3YTc2YzhhNWI0NzIxZjMwMDYyZjBhOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjhiYzAxNzM2ZGQ5YTE0NjI5YmM0NGI1YTFhMDY4MDI0ZDAwNDI0ODQ4MzE0Nzk2NmVlYTYwMDE3MzgyNjhjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWFhMWQ2NzY3ZThkMTU2NDAwNjdiZmNhMDUxMTg0MTZkODEyZjg5OWM4ZTgxYTBjY2M4NjU4OWVhZDEwMmFmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODZhZDM1OTZkNDAyNmM4MWQzMGI2NjRiMzY3NDlmZDgyNjBhZDVhNzkwMzhjN2M3MDEyNmJiNjA0NzNiNzVkNSJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L54-L76",
+          "version": "repo-lines-v1:sha256:08f7bab475c99f532f56e280736120fb274be7c198f14f333332da2cce56cfa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5af5c0f52a714d35aff7c8131580c975",
+      "statement": "Extension rules follow the tree: a new scoped screen needs a directory under t/[tenantCode]/(sections)/ plus a SCOPED_SECTIONS entry (a directory without the constant is not a valid legacy target), and a new /api route must carry its own gate because nothing upstream checks it.",
+      "evidence": [
+        {
+          "resource": "repo://app/api/openapi.json/route.ts#L5-L10",
+          "version": "repo-lines-v1:sha256:09548396904698f00524c69309261ff3c1f5f68623cee95ca46c51f346d866d0:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjg0YWFhMTdiOTJiNjY4MTY3ODc3OTQyMGNlYzJkNWRhN2YxMThjNmFjYjk2MTQyMDM5NmZkZWFiMGY0MTVhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWY0NTUzYjg3M2ExY2Y0ZTg5MDE5ZmM4YTA3Y2ExMmIxM2MxOWQ3MWZhNzNlN2ExNmU5NDMxYjhmNWQxYWQ0MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDM1YzQ2Njk3Mzk1NzMxMTU1NDc0NTRkMzQ4ODFhYzFjMTEwODY4ODk2MzZlMGIwNTQ3ZTA2NDRkMDM2MjhlNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L25-L40",
+          "version": "repo-lines-v1:sha256:7854d52a80f0e985d162fe8327b0703223d87b77347d7006e4b03dba97c7950d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNzk5NzgxZWI3ZTdiYWZkNWY2ZDA1MzM3ODFmNTU1MDYyZmNkMjk1MDg5MTdhZmY2MDlmMmQ3MjViZjI5ZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3OGZiODM0NjNjOTA2ZGFkYTVlNmVkYzdjZDNmNmM1NGM1MzA3NWMzZTkwNGM0OWY2MDBhNDExYTJkM2FiOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlZTNkYTY2YzhmNzY0ZWQ2YzVkODE2ZjM1OGRjZTBhYzU0ZjlhYmM3Y2EwMTQxODRlYzhiN2IyNGI1YzM3NTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5297d8cceae24b3bb0dd3f3f62da1265",
+      "statement": "tests/unit/tenant-scope.test.ts pins scope construction (foreign code null, default chain degrading to null), the scopedPath/parseScopedPath round trip, and — via a role-bearing Clerk metadata mock — that resolveTrustedRole answers from the DB role; the segment arms and the /trainer redirect have no direct unit coverage and the e2e suite proves only the gate.",
+      "evidence": [
+        {
+          "resource": "repo://e2e/auth.spec.ts",
+          "version": "repo-file-v1:sha256:2706660ca2cd119fb48c5eaa0d7fda2b02a784907b437ec03dd265525ab6832b"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L1-L53",
+          "version": "repo-lines-v1:sha256:3cf88dda2befa6d49f62bded10d6556f23a2aac317d0241807a39e81cb00d72b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyZmM5NTFlOTljYWQwYTUyNmQ4YzNkMjdiZDc1ZTYxMWU3OWMwOTViZTRkOGEwYjk1ZjMzN2Y3NmU2N2E1NTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-19T03:55:05.435Z"
   }
 }

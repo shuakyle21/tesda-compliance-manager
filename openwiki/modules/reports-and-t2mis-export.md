@@ -3,9 +3,6 @@ type: module
 title: Reports, EGACE and the T2MIS Export
 description: The report screen's EGACE outcome rates and employment follow-up over an enrolled base, the trainer redirect and combined sync-failed signalling on the report route, and the dependency-free XLSX writer that fills and wraps the 48-column T2MIS layout owned by import-export.
 tags: [reports, egace, employment, t2mis, xlsx, export, trainer-boundary, fr-15]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-c30669730475f4aa9f33c2b1
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx

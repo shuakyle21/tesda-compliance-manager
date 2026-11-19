@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b2703aab11a8423c725482edbc79618237a1149332c6836005b146b59b4cc61e",
+  "pageVersion": "sha256:37eb58bc5e5042954e630a9184f6a40c551a9c8c64fe53dbc304d68192df6ea0",
   "claims": [
     {
       "id": "claim_2451e47bfaa74c17ab764a2de4103019",
@@ -1555,10 +1555,160 @@
           "version": "repo-lines-v1:sha256:d1e664fa967b4814f4c55fb8b46a9a82f6b64a6dac10987d6a03bd0c3ec46fe1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlMjQ5YTRiOTZiZjIzMThhMmFhYjNlMmM3ODNjODZmY2VhZWZlMmNiYTM2YmQzNzM0MDllYmViNzNiMGMzNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiMDhhZGMyNmNhYjkzNjM5MmQwN2YyNWU3ZjgwM2JiZWQ2ZGFjY2NmMGQyODQxOGVhYjFlZDg4NGZhY2EyN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
         }
       ]
+    },
+    {
+      "id": "claim_95060643407c490289d74b10312757dc",
+      "statement": "The `public` schema holds 26 tables with RLS enabled, but three of them sit outside every `can_*` helper's reach and form today's surface the app cannot read: the billing domain is schema-only (no data-layer call, and `packets.ts` still calls `billing_records` \"table not yet migrated\"), while `platform_admins` and `learner_identities` are denied by RLS-with-no-policy. `learner_identities` issues no grant in its migration either, yet the deny it actually has comes from RLS, not from withheld GRANTs — the same mechanism as `platform_admins`, the opposite of what its own section comment claims.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md",
+          "version": "repo-file-v1:sha256:6a577cf79fd88fea6ece9333fe49317e6b6e51dcb97dd44fdba53dcdd629ed70"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-001-billing-and-domain-model.md",
+          "version": "repo-file-v1:sha256:0e6eb710499fcecd2a1eed2d440fa65561c3944a261db8c13eae2f7b1a909b6f"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md",
+          "version": "repo-file-v1:sha256:ec6c5635a48d09fd2a904d9ee7a1de2911049655515f03a6750cb61239a981c2"
+        },
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L112-L113",
+          "version": "repo-lines-v1:sha256:151a05adbf161ba55b45f1560ed53824130f7f6002754c8d8d2d710ee23a7c3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJiNWE3MTgwMTRmN2FhMWY1ZmI0ZmY3Y2Q2OWZlOTM1ZDY1ZGVmNTFiNDhkOWExOWM1NjJhMWU3ZGUwMGEzYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWIxYWRiZmQyZDkzYWQwNGU2MmJlMGFmZGE2OGE3OTFjMzJjNWU1NDY2ZDlhOWNiZjIzZTIxNmM3MGQwNDkwMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNjOGY3ODkxOTE5MmEzYTZmYzE4Y2Q0Mzg1ZTYyYWMyYjgyZGU3ZTRhZjI0Nzc3ZjMyMDQwYTNmMTU1MzFkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzkwZTk2NDU2NDdjMGQyYTRiYTg5YzlmOThmZDU3NGMxYjYxODdiNDVjMjVlZjViNDdhN2Y0NDNkMjdhZTJkZSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L73-L91",
+          "version": "repo-lines-v1:sha256:5218ba567d312989cf684d46cc24934b960dea1190cd8cab653cb7d24feb3938:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZTMxOTc3NTgxODc4MTJkOGQ0OTMyM2M2MjU2MzRkMWFjYzU5NmIzZDY5YmQwYmYzM2M1YjNhMzY3NTI1ZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NjJlOTdkZDMwNzA4NGY0NjdkYTU4Y2JiNTliMzhlMmI3NjYyMDJjMDVjNTE1NGI0ZGI4YjY4N2M2YzlmYzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1ZDI1M2Y5ZmQ0MWNmNzBmNTAyMzZmYmY2NTE2NzBkYWNiMzQzNTZmZWE0ZDkyMzhmMThjZjc5NGY0MmFiNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2MDg2OTdiYTM1YWFmNzc2ZGM1ZDI5NTg3ZDE4ZTMzOTgzNmY4ZjMzNzkwNzBkMTFkNjUwNWNkOTM0MWNjZGEifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L594-L599",
+          "version": "repo-lines-v1:sha256:cf95ed70ba1d9cffcb4959eafbfc7b70d6e1376fb72cfd337beeb296b3af0771:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODdlMTcxMjg4OWI4NWFlNDdlZjY4ZGIxZjhiMzZhMmNiNjAzOTBhNTliY2JjZjM3OGY5YWY1NWVkNmY3NDE1ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTgzZjQ3ZjM5NTBiY2EwNWI2NzAzMDA1ODg2M2RhYzAxNmI3OTRiNjMwYTk4ZDk5MGQ0YjlkMmUyZjQ0OTVkOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTcwZjc0YTg3NDhkNjZhYzkyNGE3YzMxZjFhZGZiYmJkNzEzZTkzOTAwZmUxYWRiYWQ2MDA5MWY4MTQwNDM3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTAyMTM1MjQ5YTVlMmNlZDkyMDA0OGYzNDJhYzNiZTAxZDU1NDRmYWE2NTc2MDc3MWVkNmVhYjYxNDA1ODZjNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_daf7fcb69ce547ef80e0cd6f954bfc46",
+      "statement": "`app_private.is_platform_admin()` reaches exactly five tables through policies — `tenants`, `qualifications`, `tenant_qualifications`, unassigned `profiles`, and `profile_tenant_memberships` — and its only non-policy call sites are its own definition, the `public.current_user_is_platform_admin()` wrapper, and its grant/revoke. Widening it to a compliance table is a documented boundary change under rule 30 / ADR-006; the later T2MIS file touches the boundary only structurally, through a composite FK it does not widen.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md",
+          "version": "repo-file-v1:sha256:6a577cf79fd88fea6ece9333fe49317e6b6e51dcb97dd44fdba53dcdd629ed70"
+        },
+        {
+          "resource": "repo://docs/adr/ADR-006-platform-admin-and-school-registry.md",
+          "version": "repo-file-v1:sha256:ec6c5635a48d09fd2a904d9ee7a1de2911049655515f03a6750cb61239a981c2"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L337-L372",
+          "version": "repo-lines-v1:sha256:d115b7840e63eca53efa2f2acf4098788caee615edec907b6577b386448951ee:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4N2I2YWRiODZmMDU4MDM1YWY3ZWYyNzgwYTA5ZTNiOGZhY2EwZjBlMDk0NGU5ZWU5YzRiYjIyOTlkNTQwZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1ZjBiYzM1OWY4ZjJjN2JkMDJiODViMTUyMmFkZmNjMDFiMDlkMDQ4ODcyMGJmODA4ZWQ0YTc3MzU0Nzc2MzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxZTYyY2UwMTNiMmU3N2YyNDlkZjM3NTAzMmQ2MzU4ZDhkZjRiNThlODdmMGRkOTc0NzE5YmVkYzNhY2FjNmUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L93-L126",
+          "version": "repo-lines-v1:sha256:929ea3b008a0c1ca2cbd5fe97e04c4b9391598712414cae049faf7fd8797311a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZDJiMjkwNzlmZDYzOWQxOWIxYjc5M2QyYzQ3ZGFlMjE4MjY1OTA5MTY3YzQxMTFhMDM0ZDkxM2U2OGQ3YTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiZjVlMjBkNWEzMTliYjkwN2NhNDk3ZWI3OWQzZjg4NjIzYjU1ZGEwMzE4OTAwOWRiODIwMzRhZjJkOTA2NzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzNDRmZTc4MTAyNjdiODQwMDhhNTI4Yzc2MWUzNzM5OTRjZWNmOWZhNmIzOTFhNzAzYTc3MDYzODk4MjA2NzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMjdmZWYxOTU1Y2UzYzkwNzAwZWI4ZDZiMTA3ZTQwNWFhYjE1NGQ2NjVkOTgwOWM4ZjliNGMwYmM0NmU4M2MifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L45-L49",
+          "version": "repo-lines-v1:sha256:114247a35735fb2bb93757c5cd0600e13d2d9ca41ff1c7e13198a99d14eda3e5:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzhiZmY0MTQ0NTkzMDkxMjJkZGFkZmE5YjcyOTBhMzViZjM3MTBlMjI3ZjU2NzJlNmViNTZmNGEzMmM3MzI4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODg3ZGRhNTM3ZWJhZTMxYmVhYTBiZDdkN2Q2YzkwNDc1ZjNmODg2ZTI3NjQ2ZDVhODFiNmNiZjg2YjNiMjZhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDA5ZDc2NjBlOWQ0M2EyYjAyNDExNzlkODZkYjRlOTNjZGZhNmY1MTRiMWU4MGJjMGUxYzNjMTQwOTkxMWE5YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDYxY2FlZGI0ZGFkMTkyZmI1ZmM4NDMxYmYyMDk0ZDNkZjc5YmE3NzMyMGUwN2FhYWE0NGI1MDdkZTQ5ZjlhYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b8575286bbbc44999b8234e9765c87cc",
+      "statement": "`learner_details` rows are written by one bulk `learners` insert followed by one `learner_details` upsert per learner (and by per-row `learners` updates on the update path), so no transaction spans the two tables: `learners` commits atomically and details follow row by row. A mid-run failure therefore leaves learners with blank details and reports `partial`; re-importing converges. New learner ids are recovered from the insert's `.select('id, uli')` and paired by ULI, which is sound only because `validateRows` already rejects a ULI repeated within the file.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L61-L75",
+          "version": "repo-lines-v1:sha256:a013d7e35f18e568ff5749ff64c3de0c2fa7b6782fe602efde3ac337b3e6da95:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwODVhNDBjZmY3MjFhNjc5ZmJmMmNhNTFjYmY3Y2UxYzYzOTczOTg0YzQ1YTE4MDE1MjRmMWRjZGE2NmQ1ZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlNWIyZmJiOGM2NTMzZWM3MGI1MjYxZjlmNWZhODZjMTE3N2M1Nzk5MWQxMGRjN2E0NWY4YWY5MjdmZTQ1OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzMWNkZTYxZmFiNDljODIzN2ZiY2E4YmRkOGQ5MzFmMDNjYmJkNzUxZmNmOTYzZTBhYTEzYzE3ZGUxMjA4ZjQifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L77-L157",
+          "version": "repo-lines-v1:sha256:c564ea7f2f6a0fba83bad2abc3283e4de1c75f0a655e64808ab2e867cae28353:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2YjU5YWNmZTg5MGJiOGUwMWQ3M2Y2NTA1ODU5ODc2YWYxZDUyMmQxMWIwMzY5MGRkMjUwOGUzYjE2YWQ3MjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NjE4NTJjMzljNmYzMTYyYTNiZmIzYTY3YTJhODRiNmY5ODEzOTA1MGE1NDQ2OWYzY2ViYmU0Nzk1OGUxMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhNzI3MGQ0MzA2MDU2YmZkN2ZmNDYxYjNhZWNjNDQ1MWVhZmFiODI4ZDA3MTkyZjg5MzZlM2NhM2JiNjZmYWUifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts",
+          "version": "repo-file-v1:sha256:278fceb97af9263c22b146530138c739cd9e60be5a3bc0c048734115cd0a6509"
+        }
+      ]
+    },
+    {
+      "id": "claim_ee2a4a5fe00c4f9e8bb5021840bd6ba1",
+      "statement": "Both halves of `20261024110000`'s recorded state — that `batches.billing_deadline` is live, and that the rest of the file is only \"partly checked\" — are claims, not evidence: the newest ledger block records them and `database.types.ts` repeats the column, but nothing proves it. Its two objects are `if not exists`-guarded so a re-run would not fail, yet the repair route is still check-by-name then insert the version.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L310-L311",
+          "version": "repo-lines-v1:sha256:c262ac56d3516f8898d15851cd3e48cdf87e5803298fae8abd894d84d6e53fe8:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTgxYWM0MDUwNmJhNDM2Njg2MzFlZGU1M2Q4YzEyNWZkMDhmOTY3N2M2NTQ5YjA1NzIxZDI2ZjRmNzBiMzQ2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDBiYjJmNDFkNmNhYzc4MDJhNjRiZDczMzJkZDJhNjFiYzFiZjJjNDAxNDlkNDlmNTJjNGZlZGViZjg5NTkyMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGFmNGE5YWZlMjcwMjk4MDQ1NmQ5MjM1YmQ0MWI5OTVjODU1N2M1MjE2N2Y4OWM1OTM3MTAyNjY4NWE1ZmI3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzQxNzhkODA2YTU4ZmYyYzAxMjZhZWMxM2JlZDQ3NjIyNjJiODk0OGZmZDY4MWRiMTU4ZGY2NzQ3ZTI5YzA5OSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql#L1-L18",
+          "version": "repo-lines-v1:sha256:d8fa70735a2b6fa407011721454b80cc1f7317ad6aa807ebf6d9524e3f8bda22:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlOTJjY2QzNDE0M2YyYTZiYzA5Y2QyZWE1MGI5M2JiY2U1YTQyMGVmNzk0YTM4MDRhMzA1MzIzZmMxMTE3MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmNjllM2RlZmUwODU3OGY5ZDI5OTk0ZDNkNmMzZjc0OGZkYzYyOTBlYjIzMjk5NDljNGFmZWIwZGNiNzNlMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L106-L124",
+          "version": "repo-lines-v1:sha256:32de80942ba50505e435ae58f3dadb4a8d6c8d470bb0c4e1b71bcd9a9640c743:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4OWVkYjhkZDE5MmY5Yzk2NjY0MjcxYmJhNWNhMjIwOGU1ZGVmNWM1OWE4NTQ3ZTZlZWI0YTk2N2ExMTViZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhYmU0YzlkMjdhODhmZmRmOGY2YjUxYThlYTNmYmJlMWMxNWFkMDRjMmU1NDhjZDQyM2IyZWY2N2JiZDE2OWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3NTBkMjI4MTA3NjdmNGYwZTUxNGViNWY2NzQ1NTdiYzdhZjYwYTc5MDQ0NjgyMTUxODJiODdmNTZlMDZiM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwMzU2ZTJmZWQwOGQ3NGJiNzczNjgxNTQ1MGFlMjg4YTMxZTdjMDA5ODMyOTAwZWE3N2M1NzBkZDU1ZjhjODMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba0fd607e6bf4b03848c62e3c4b7bef6",
+      "statement": "The `program_id` delete behaviour differs by table: `program_document_requirements` and `program_billing_rules` cascade on `scholarship_programs` deletion, while `batches.program_id` declares no action and so refuses the deletion — the reason a funding program in use is undeletable.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L102-L120",
+          "version": "repo-lines-v1:sha256:1f2bafad220373a4149777d6424d97d9e81c3c5569f5a8c0e4b96aad21e4a7b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3ZTFlZDMzYTRkYTgyN2EzMTY3YjMxY2FjNzQ1ZDUyMDBiNTk5YjE0MDU1ODNlOTkxMjYzNTc2NmU4MzY1NmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYmVjNzEyNThiY2Y1Njg5MTUyMjQ3N2U5MmIyNzcwZDVhYjQ2ODAxYTE0NTY1MWQ3YzVmYmIzZjI1YTNhMzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxNjVkZWIxMjc2YTUzMzRjZDM3M2FkM2RiMWJmNWFmYmQ5ZmE4Zjg1NTllMzkxZjIzMDYwY2JkM2QzNjAyOWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhmY2NjNDIzNzM2ZjMyYTYxY2M0YzFhN2UzNWU2YzQ0ZWI0ZjYyMGMwOTdkZDc5ZGYxNzE2OTFjZWRlZDJlMTQifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L131-L135",
+          "version": "repo-lines-v1:sha256:7f8843da52710b2d577c70d6ded916687be47b7e10c8296362f37e70a47a1b97:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMThhMjc3ODJkODk2ZjA5MDBkYjQxNDY2NTljZTkzZmQyZjQ0Mzc2MTJlNzkzM2JkZWQ5ZmEyMWEyMjI0MTgwNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmViZTEyMGRiNzM2N2RlM2JlOWE2MTRiNmZlODExNzkxNTJhZjI3YWE1MmFkMzIxOWRlMjc3ZGI5ODE4YTA2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGRlOTQyMTdlOTA4MjQ5ODQzZWViNGUwYjk5YjEyNmNlMDhhZDA3ZWM5YmU5ZDYzOTgwM2IyNDgxYTlhOTE4YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGE1ZDVjYWJjMzc2ZjQ0YzlmOTBiZGUwYTRmZmY5ZDhlNTZlNjU0ZTMyYTU1ZGMwYmFiNjQ5ZGY5YzMzZjI0ZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0079da85e4fe4bccbb173008386721da",
+      "statement": "`learner_details` needs no separate `tenant_id` FK: its only references are the composite `(learner_id, tenant_id)` → `learners`, the primary key `learner_id`, and the plain `tenant_id` column, which is what makes the composite the whole school-coherence guarantee.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L69-L100",
+          "version": "repo-lines-v1:sha256:881f820b608904b93553e3e0342f590a1538ce1a959690a7110a74e4dd8d924d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3ZTFmMTBhNjc3MzA5YTdhMGU4MGRiMjMzZjg1ZmVjZTAxOGVkZTRiNGMyOWViNWE2OWUxMDMxMTA0NjMwYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhODVlNWQ0NDc1Y2YwYWFkNTI4ZWE4ODc3YzU4MzFmNmM2MGU5MGM3ZDRjNGM4M2VhMmY3NGVjOGQ0NzlmMWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyYmU1NWVjY2U4M2ZmNmQ1NzA2NzM1YzM4NzE0NGQxYjk2M2JhOGI5ZmI2N2M2YmQ5OWQ5ZjlmY2JhMDExMTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_581869a219b24bab9488b8ddf2ded27b",
+      "statement": "The `compliance-evidence` bucket's 50 MiB limit is set by the canonical migration's idempotent `insert … on conflict (id) do update` and mirrored in `supabase/config.toml`; it is not applied by the migration runner from config, so a fresh `db reset` reproduces both from the two files.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/config.toml#L119-L119",
+          "version": "repo-lines-v1:sha256:47b5ce88bb326fdeb55e9b2961a11e6576ec516bb20f606fe2472bbd18a3c7c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdiNWNlODhiYjMyNmZkZWI1NWU5YjI5NjFhMTFlNjU3NmVjNTE2YmIyMGY2MDZmZTI0NzJiYmQxOGEzYzdjMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdiNWNlODhiYjMyNmZkZWI1NWU5YjI5NjFhMTFlNjU3NmVjNTE2YmIyMGY2MDZmZTI0NzJiYmQxOGEzYzdjMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzBhNGQ5ODI2YmY0ZGYyYjI1MTRhNzE3ODQ1ZWNkNTZkMGVmZDlhOTNmMGMzMDRkNjhhMmY2OTYxZmNmN2Y0MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTY4Yjg5NWM1YWQzYjgyZTRjNDkzNjM1OWNlZmRhYzBmOTU2YTFmYWVhYzk5NjI1Mzk3ODkxMTg3ZjNmNzA2YSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L837-L841",
+          "version": "repo-lines-v1:sha256:d6a5d48d6a8a191438913fcdd02d39c17bd33a3611296809c4cd32c1f9d8fd42:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ1MTllOTNjM2MyOGI1MzA3MGNkYmFjNmJjZjRjMjRiMzEyZjcwMzgwNDRmYTdmMzUwYzRjMTQyMzAyNzBhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWMxNTdlMGQ1Mjg3NjE2YWUyNjc1MzEyNTUxZDg0NTI5MWI5OGY3YTlkM2E4NWRjOWIyNTAwNzIzZWM0NGQ2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDRkMTYwNWU4YjdlOTY1NTBiMmNkMDQ5YjMyYjE4MTUwNGRhZWFmZGQ3YmU0ZGY1N2M1ZmE2ZmRhZGRhN2E5MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjIxMjg2MTNkN2Q0NzQyNTdiOWI1ZGY4ZWQ1ODFlNWY4OTNjMDQxNjk5MjJiNDVmZTkyMDBjNjQ4Y2UzOWM1YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_74f61bdee969463aa9e8a942841ba282",
+      "statement": "`database.types.ts` carries 19 table keys — the 18-table pre-billing shape including the three ADR-006 tables and `platform_admins`, plus `learner_details` — and seven enum aliases; the seven billing tables and `billing_type` are the whole of what it omits.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L70-L707",
+          "version": "repo-lines-v1:sha256:749f8d725d2779da4a6d880242878efa054b007527828c6780de76d1d54c847d:eyJzZWxlY3RlZExpbmVDb3VudCI6NjM4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0ODI3NThiMDA0NGNjZTY3NTI3NDIzNDdkZmQ4ZmMxNTk4OGZkYjczN2E3MTk3ZjFlZGIzNzQ5MTQ3ZmUxYjc5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhZDllMTI1NDY0MjU1NzZkM2RlYWU4YzliOWRiZjEyOGQ1ZDZkZGFmNWQ3ZmU4NTc5MzQ5MjdkZWZmYTNiOWRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzNjg3MzkwNDU3NzViNjkyMTBiODkyYWM4M2ZiNDZmMWUzMTBjY2I4YjkxYjUwNWEzM2U0OWYzZTE2N2MzNjg4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MiwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkYjQ0NjJkMDcyMmZkZmMwNmJhN2JmZTVjMjEwOWU4YTNkZWQ2NDdlNzBjY2E2ODE1NTcwYTllODMxNWQwZDNiIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_962289cad79f43a68523fb224548c418",
+      "statement": "The lint ban on importing raw row types is enforced by an `import/no-restricted-paths` zone aimed at `app/**`, `shared/**`, `modules/*/ui/**` and `modules/*/domain/**`, whose message tells the importer to use `shared/types` or a module `domain/` type instead — which is why only data layers may import `database.types.ts`.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L26-L34",
+          "version": "repo-lines-v1:sha256:c9e7717fea445b7bf4df38b4c27ac6b4b8ea9b6bd4a30c972905e5870e7345cd:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjQwYzI1MTNkMTc2MmMyZTFmMTE1NWZkY2ZiZjg0YzVlNTFjNGE4YjQ3NTllNTdkN2Y1MTY4NzFlZWU0NzE1ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzExZTFlZDgwZDJhMjU0NmQwODlhNjZiMjY0MTVkMGEyYzVlOWNiYjkwODY2ZmVlZmEzMmQ1Y2ZlOWM2NTc5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWYxNWRjMDc1MTIxNmYwNjE5ZWU1YmNhYjZkMzRhN2VlZjgyZjNmNDE5MGNmNzA1ZjYyMGQyNDI3NTY1NTZkMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDYwODU1NTU1YjM3ODBiYzMzOTA4NWZmOWQ3NDI2MzAwNDFmNDJhOGVjZjc1MWI4M2IzNDg4M2YwNGFkNWIxOSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-19T03:55:05.435Z"
   }
 }

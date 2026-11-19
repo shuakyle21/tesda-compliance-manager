@@ -3,9 +3,6 @@ type: workflow
 title: "Workflow: Report Assembly and XLSX/T2MIS Export"
 description: "How a report becomes a file: the trainer redirect, the paged roster join, the EGACE and employment rollups, the column mapping to the T2MIS terminal layout, the single XLSX writer boundary, and the legibility and copy rules an export must honour."
 tags: ["reports", "export", "t2mis", "xlsx", "roster", "sync-failed", "trainer-role", "fr-15", "fr-10"]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-79e2020a0930b43798845956
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx

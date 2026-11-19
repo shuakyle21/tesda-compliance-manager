@@ -3,9 +3,6 @@ type: module
 title: Learner Import and the CSV Reconcile Path
 description: The FR-10 learner CSV intake pipeline — the pure RFC 4180 parser boundary, row validation into a draft, ULI-keyed reconciliation against the batch's existing roster, the explicit insert/update write plan and its discriminated outcome — plus the honest status (an overlay UI that is not wired, and a write path no live database has run).
 tags: [import-export, csv, learner-intake, reconciliation, uli, write-path, validation, fr-10]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-6c5e30490a0c4602d7931405
     resource: repo://docs/adr/ADR-001-billing-and-domain-model.md

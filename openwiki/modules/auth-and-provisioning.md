@@ -3,9 +3,6 @@ type: module-boundary
 title: Auth, Session Gate and Service-Role Provisioning
 description: How the auth module turns Clerk identity into a gate — the four helpers, requireAuthenticatedUser as the one check, redirect sanitization, session_exists handling — and the signed Clerk webhook that is the sole service-role path, provisioning profiles as viewer and deactivating on delete.
 tags: [auth, clerk, provisioning, webhook, gate, service-role, invitation]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
     resource: repo://app/(dashboard)/layout.tsx

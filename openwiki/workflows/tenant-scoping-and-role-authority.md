@@ -3,9 +3,6 @@ type: "Workflow"
 title: "Workflow: Resolving School Scope and Acting Role"
 description: "The ordered per-request decision that picks one school and then one acting role through the layout gate, the cached scope resolve, the trainer redirect inside requireScope, and the presentation-only ?role= override — plus the accurate-looking wrong answers the order prevents."
 tags: [workflow, tenancy, authorization, rls, routing, failure-modes]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
     resource: repo://app/(dashboard)/layout.tsx

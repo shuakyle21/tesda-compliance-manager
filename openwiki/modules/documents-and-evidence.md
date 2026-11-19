@@ -3,9 +3,6 @@ type: module-reference
 title: Documents and Evidence
 description: How FR-06 models the per-program requirement catalog, the per-batch document map, the untracked-versus-missing distinction (ADR-004), the blocker rules, and the evidence bucket's path-derived authorization.
 tags: [documents, compliance, evidence, storage, adr-004, rls, module]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-b2197972d3af51fefd258a4a
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx

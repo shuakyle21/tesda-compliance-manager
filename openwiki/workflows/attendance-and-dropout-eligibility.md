@@ -3,9 +3,6 @@ type: workflow
 title: "Workflow: Attendance and Dropout Eligibility (ADR-007)"
 description: "The ADR-007 dropout rule end to end: the two independent triggers, the floored 20% threshold resolved from the program rule and nullable tenant override, why the denominator is a per-batch snapshot, and what is still unbuilt because modules/attendance/ is a README stub."
 tags: ["attendance", "dropout", "eligibility", "adr-007", "attendance-records", "max-absence-percent", "excused", "locked-domain-facts", "not-built"]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-8f796c53c61a2ef746e1465c
     resource: repo://app/(dashboard)/trainer/classes/%5BbatchId%5D/attendance/page.tsx

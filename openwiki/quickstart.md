@@ -3,9 +3,6 @@ type: Quickstart
 title: "Quickstart — Task Routing, Invariants and the Verification Loop"
 description: "Entry point before changing TVI-CAMS: which page owns a given task, the invariants that gate every change by rule number and enforcement level, the ordered typecheck → lint → test loop and what each step can and cannot prove, and the live-database permission gate."
 tags: [quickstart, routing, invariants, verification, workflow]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example

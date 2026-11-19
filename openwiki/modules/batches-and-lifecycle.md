@@ -3,9 +3,6 @@ type: module
 title: Batches, Lifecycle, Urgency and Alerts
 description: The batches module (FR-03/04/05) — the reference fetch → map → derive contract every entity copies, the batch snapshot and its mapper, the RQM-code rule and its Server Action, computed-on-read urgency and the needs-attention queue, the cross-school overview, the KPI derivation and the trainer trim.
 tags: [batches, lifecycle, urgency, alerts, rqm-code, snapshots, mapper, kpi, needs-attention, trainer-dto, fr-03, fr-04, fr-05]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-b20398739f9d1bb1e83b20b2
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx

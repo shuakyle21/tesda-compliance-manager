@@ -3,9 +3,6 @@ type: module-group
 title: Analytics, Activity Log, Settings and App Shell
 description: One scope for the supporting modules — analytics charting the shared batch snapshot, the activity append/contract pair and its two consumers, the toast-only settings overlay, and the shell chrome whose nav is curated from trusted role and the platform-admin axis.
 tags: [modules, analytics, activity-log, audit, settings, app-shell, navigation, enum-bridge]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-18T03:56:44.398Z
 sources:
   - id: openwiki-source-8b8ccbee2926d1d4e2880059
     resource: repo://app/(dashboard)/activity-log/page.tsx
