@@ -25,7 +25,7 @@ P_PERSON=ffffffff-0000-4000-8000-0000000000c3
 
 # Every call the script makes for itself (probes, cleanup, gate release) is
 # capped at 5 seconds, so a stuck connection cannot hang the failure path.
-QUICK=(timeout 5 "${PSQL[@]}")
+QUICK=(timeout --signal=KILL 5 "${PSQL[@]}")
 
 cleanup() {
   "${QUICK[@]}" <<SQL >/dev/null 2>&1
@@ -76,8 +76,13 @@ SQL
 # it is not mistaken for a trigger failure.
 wait_until_blocked() { # <app name> <condition on pg_stat_activity columns>
   local deadline=$((SECONDS + 10))
+  local remaining n
   while [ "$SECONDS" -lt "$deadline" ]; do
-    n=$("${QUICK[@]}" -c "select count(*) from pg_stat_activity a where a.datname = current_database() and a.application_name = '$1' and $2")
+    remaining=$((deadline - SECONDS))
+    [ "$remaining" -gt 0 ] || return 1
+    [ "$remaining" -le 5 ] || remaining=5
+    n=$(timeout --signal=KILL "$remaining" "${PSQL[@]}" -c "select count(*) from pg_stat_activity a where a.datname = current_database() and a.application_name = '$1' and $2")
+    [ "$SECONDS" -lt "$deadline" ] || return 1
     [ "$n" = 1 ] && return 0
     sleep 0.1
   done
