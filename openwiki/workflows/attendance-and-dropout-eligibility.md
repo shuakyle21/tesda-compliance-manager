@@ -1,8 +1,8 @@
 ---
 type: workflow
 title: "Workflow: Attendance and Dropout Eligibility (ADR-007)"
-description: "The ADR-007 dropout rule end to end: the two independent triggers, the floored 20% threshold resolved from the program rule and nullable tenant override, why the denominator is a per-batch snapshot, and what is still unbuilt because modules/attendance/ is a README stub."
-tags: ["attendance", "dropout", "eligibility", "adr-007", "attendance-records", "max-absence-percent", "excused", "locked-domain-facts", "not-built"]
+description: "The ADR-007 dropout rule end to end: the two independent triggers, the floored 20% threshold resolved from the program rule and nullable tenant override, why the denominator is a per-batch snapshot, where the unexcused streak and its as-of date must be computed, and what is still unbuilt because modules/attendance/ is a README stub."
+tags: ["attendance", "dropout", "eligibility", "adr-007", "attendance-records", "max-absence-percent", "excused", "unexcused-streak", "locked-domain-facts", "not-built"]
 sources:
   - id: openwiki-source-8f796c53c61a2ef746e1465c
     resource: repo://app/(dashboard)/trainer/classes/%5BbatchId%5D/attendance/page.tsx
@@ -44,11 +44,16 @@ sources:
     resource: repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql
   - id: openwiki-source-79c2984b4ebc22667b81e541
     resource: repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql
+  - id: openwiki-source-acb73c82b90d7c0325351e5f
+    resource: repo://supabase/migrations/README.md
   - id: openwiki-source-2020074c6fdeab02aae020b7
     resource: repo://tests/unit/batches.test.ts
   - id: openwiki-source-4b1944144311805b722ef6ef
     resource: repo://tests/unit/dashboard-domain.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
 ---
 
 # Workflow: Attendance and Dropout Eligibility (ADR-007)
@@ -61,7 +66,8 @@ dropout rule is locked, stored, and **evaluated by nothing**: `modules/attendanc
 `domain/eligibility.ts` to extend, only a design to implement from scratch. Its README is
 explicit ("No code yet") and lists all three directories as planned.
 
-That split is the whole page: the chain that exists, then the rule that has to be built.
+That split is the whole page: the rule that is locked and stored, then the evaluation that
+has to be built.
 
 ## The rule, and the three ways to get it wrong
 
@@ -70,13 +76,16 @@ That split is the whole page: the chain that exists, then the rule that has to b
 **20% of the batch's `total_sessions`** — allowed absences `⌊total_sessions × percent ÷ 100⌋`,
 the `(n+1)`th absence disqualifying — **or (b)** the scholar accumulates **3 consecutive
 unexcused absences**, whichever trips first. It is a locked domain fact in `RULES.md`,
-unnumbered, beside the progress formula. The retired rule was a flat `absences ≥ 5` (stored
-`max_absences = 4`) and a *payment* exclusion; do not quote it.
+unnumbered, in the list closed by "not rules about code, but constants that code must not
+contradict". The retired rule was a flat `absences ≥ 5` (stored `max_absences = 4`) and a
+*payment* exclusion; do not quote it.
 
 - **Nothing is a constant.** `total_sessions` is the denominator and is `nominal hours ÷ 8`
   snapshotted at batch creation (E2/D3), frozen so it never moves with the calendar. A
   45-session batch allows 9 absences; a 20-session batch allows 4. A batch with a null
-  `total_sessions` cannot be evaluated at all.
+  `total_sessions` cannot be evaluated at all — so the threshold is not a property of the
+  program alone, and re-snapshotting or correcting `total_sessions` silently re-marks every
+  scholar in that batch.
 - **The comparison is strict.** `absences > allowed`, so exactly 20% is still eligible and
   the next absence drops — the same `actual > allowed` shape the old rule used, with
   `allowed` derived per batch instead of hardcoded.
@@ -89,6 +98,24 @@ still runs off the raw per-scholar absence count on the final tranche, independe
 threshold (Elig-6), so a scholar can accrue a deduction for sessions attended before a
 dropout took effect.
 
+```mermaid
+flowchart TD
+  START["evaluate(scholar rows<br/>ordered by attendance_date, excused, total_sessions, percent)"] --> TS{"total_sessions<br/>recorded?"}
+  TS -->|no| NA["unavailable — never 'eligible'"]
+  TS -->|yes| PCT{"unexcused+excused absences<br/>&gt; floor(total_sessions × percent / 100)?"}
+  PCT -->|yes| DROP["dropped (trigger a)"]
+  PCT -->|no| WALK["walk recorded rows in date order"]
+  WALK --> RUN{"row present?"}
+  RUN -->|"present = true"| R0["streak = 0"]
+  RUN -->|"present = false, excused = true"| R0
+  RUN -->|"present = false, excused = false"| R1["streak += 1"]
+  R1 --> HIT{"streak ≥ 3?"}
+  HIT -->|yes| DROP
+  HIT -->|no| NEXT["next row — an unmarked date<br/>between rows does NOT reset"]
+  NEXT --> WALK
+  R0 --> NEXT
+```
+
 ## Two trigger mechanics that decide the shape of the code
 
 **The streak counts consecutive *recorded* rows, ordered by `attendance_date` (Elig-4).** No
@@ -98,12 +125,28 @@ row only; a calendar gap between two absences does not reset it. Reading an unma
 as an absence trips the 3-consecutive rule on schedule alone. ADR-004's "absent key ≠
 evidence" caution is the same idea applied to documents.
 
+That ordering is also the one place a green unit suite still fails in production: the tuple
+must be sorted by `attendance_date`, and a `.order()` left off the fetch (or applied to the
+wrong embed) is invisible to fixtures, which arrive pre-sorted. A trainer re-marking an old
+date is an UPDATE on that date's row, so the row set reshuffles under any implementation that
+caches order.
+
+**The as-of date decides the walk's ceiling, and it is not UTC.** A streak must be evaluated
+over rows on or before the day being asked about, or a dropped scholar's later marking
+retroactively un-fires the trigger. The repository's established "today" is the Manila
+calendar day: `todayInManila()` in `modules/batches/data/learners.ts` formats through
+`Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' })` and the resulting ISO string
+becomes the roster's `asOf`, with a comment recording that a UTC date is a day behind in the
+schools' timezone until 08:00. Today that day-paced clock only reaches learner *ages*; an
+eligibility evaluator must adopt it and take the as-of as an injected parameter so the domain
+stays pure — no `new Date()` inside the rule.
+
 **`attendance_records.excused` is the only thing that keeps an excused absence out of the
 streak** (Elig-3). It is meaningful only where `present = false`, and the migration defaults
 it to `false`: an absence nobody marked counts as unexcused, so forgetting to mark cannot
 excuse a scholar. The reverse default is the subtler failure and understates dropout risk for
 every scholar at once. `excused` affects trigger (b) only — the percentage trigger counts
-absences, excused or not.
+absences, excused or not. The tree above renders exactly that asymmetry.
 
 **Dropout is a signal, not a write (Elig-5).** Crossing either threshold surfaces an
 at-risk state; flipping `learners.is_active = false` stays a manual registrar action, per JJ1
@@ -125,7 +168,9 @@ override:
 
 Mark this as **needs confirmation**: no code resolves either column today (below), so the
 precedence above is what the ADR, the migration comments and the nullable override shape
-describe, not what a shipped function does.
+describe, not what a shipped function does. Note also that the floor is load-bearing at small
+batch sizes: on a 1–4 session batch `⌊total × percent ÷ 100⌋` is **0**, so the first absence
+drops the scholar while the 3-consecutive trigger is still unreachable.
 
 ## What exists today
 
@@ -135,7 +180,8 @@ whose batch query embeds `attendance_records(attendance_date, present)`. Its rea
 is true — and returns `null` unless both halves exist: a snapshotted `total_sessions` and at
 least one attendance row. The `null` matters mechanically, because PostgREST answers an
 empty embed with `[]`, never `null`; without the guard, "attendance not recorded here" would
-read as a real "0 sessions held". `totalSessions` comes straight off the snapshot.
+read as a real "0 sessions held". `totalSessions` comes straight off the snapshot with an
+`orZero`-style fallback resolved per field.
 
 `excused` and `notes` are **not** in that embed, and the embed is batch-level: nothing reads
 one row per learner, so the rule's input does not exist yet.
@@ -160,16 +206,18 @@ an `orZero` default, not from attendance. Progress therefore gates billing readi
 even though a batch with no attendance rows still charts a number. See
 [Billing](/openwiki/modules/billing.md) for the gate itself.
 
-```mermaid
+<!-- openwiki: mermaid parse failed and this diagram was converted to a text fence so it does not break rendering. Fix the diagram source and restore the mermaid fence. Parser error: Parse error on line 10: ... CLOCK[todayInManila()<br/>injected as-o Expecting 'SQE', 'DOUBLECIRCLEEND', 'PE', '-)', 'STADIUMEND', 'SUBROUTINEEND', 'PIPE', 'CYLINDEREND', 'DIAMOND_STOP', 'TAGEND', 'TRAPEND', 'INVTRAPEND', 'UNICODE_TEXT', 'TEXT', 'TAGSTART', got 'PS' -->
+```text
 flowchart LR
   DB[(attendance_records<br/>present · excused · attendance_date)]
   DB -->|"embed: date + present only, batch-level"| CS["completedSessions()<br/>distinct attended dates"]
   BATCH[(batches.total_sessions<br/>snapshot)] --> CS
   CS --> SP["sessionProgress() / KPI average"]
   STORED[(batches.progress_percent<br/>hand-typed)] --> PP[progressPct] --> GATE[billingGate]
-  DB -.->|"per-learner absences · excused"| ELIG["attendance/domain/eligibility.ts<br/>NOT BUILT"]
+  DB -.->|"per-learner absences · excused · ordered dates"| ELIG["attendance/domain/eligibility.ts<br/>NOT BUILT"]
   BATCH -.->|"floor(total * pct / 100)"| ELIG
   RULES[(program_billing_rules.max_absence_percent<br/>tenant_settings override)] -.-> ELIG
+  CLOCK[todayInManila()<br/>injected as-of] -.-> ELIG
   ELIG -.->|"signal only (Elig-5)"| MAN["registrar flips<br/>learners.is_active"]
 ```
 
@@ -187,11 +235,16 @@ It shipped as a new file because Supabase keys applied migrations on the version
 editing a recorded file changes the repository and never the database, leaving the repo
 claiming `max_absence_percent` while the live column stayed `max_absences`. Migrations run in
 filename order, so the additive file is correct either way — `RULES.md` rule 20's standing
-pattern. Ledger and apply procedure: [Data Model and RLS](/openwiki/architecture/data-model-and-rls.md)
+additive requirement. Two operational details are worth carrying: the migration was recorded
+under a version that differed from its original filename and `supabase/migrations/README.md`
+says to rename the file to the recorded version rather than leave a filename no ledger row
+matches, and that same README records each ADR-007 column as present live, verified by name.
+Ledger and apply procedure: [Data Model and RLS](/openwiki/architecture/data-model-and-rls.md)
 and [Live Supabase and Migrations](/openwiki/operations/live-supabase-and-migrations.md).
 
 Rows stay editable in place, with no lock flag, even after billing (ADR-001 **X2**). The
-existing `attendance_records` policies encode it: INSERT and UPDATE admit
+`attendance_records` policies from `20260910120000` encode it: the INSERT and UPDATE policies
+("Assigned trainers can record attendance" / "… correct attendance") admit
 `can_trainer_write_batch(batch_id)` **or** `can_manage_tenant(tenant_id)`, DELETE is
 `can_manage_tenant` only — a trainer corrects by updating `present`/`excused`, not by deleting
 evidence. The same rows already cover `excused`; ADR-007 adds no policies. Each correction
@@ -203,15 +256,17 @@ write path has to author its own event or the audit trail quietly stops.
 Order is forced by the data:
 
 1. **A per-learner attendance read** in `modules/attendance/data/`, the fetch→map→derive
-   contract of rule 17. Extend the select with `excused`, or the streak trigger reads zeros.
+   contract of rule 17. Extend the select with `excused`, and order by `attendance_date` at
+   the database rather than in the component — an unordered result is a silent streak bug.
 2. **`modules/attendance/domain/eligibility.ts`**, pure over injected rows (rule 14): the
    floor, the ordered unexcused streak that survives unmarked gaps, and a `null` result when
    `total_sessions` is missing — mirroring `sessionProgress()` rather than inventing a second
-   unavailable style.
+   unavailable style. The as-of date goes in as a parameter, sourced from `todayInManila()`.
 3. **Types.** `database.types.ts` carries neither new column and `attendance_records` is not
-   typed at all — it exists in code only as an inline embed shape. Rule 20 wants regeneration
-   first, but the file is hand-maintained and carries columns ahead of their records, so until
-   it is regenerated a hand-written wrapper must treat both columns as possibly absent.
+   typed at all — it exists in code only as an inline embed shape — while `learners` does
+   carry `is_active`. Rule 20 wants regeneration first, but the file is hand-maintained and
+   carries columns ahead of their records, so until it is regenerated a hand-written wrapper
+   must treat both columns as possibly absent.
 4. **The signal surface**, showing "not recorded" distinctly from "0 absences" (rule 23: text
    + icon, never colour alone; an unsourced metric renders "—" plus what is missing, never 0).
 5. **Marking UI** on `/trainer/classes/[batchId]/attendance`. The table is unique on
@@ -223,7 +278,8 @@ There is no test to inherit on the eligibility side: the existing pins are all p
 cases; `tests/unit/dashboard-domain.test.ts` fixes the `null`/cap behaviour and the KPI
 average). Nothing touches `excused`, `max_absence_percent` or a dropout boundary. The ADR's
 own worked example — 45 sessions, 9 allowed, the 10th dropping — belongs in a fixture beside a
-2-consecutive-then-marked case and an unmarked-gap case.
+2-consecutive-then-marked case, an unmarked-gap case, a shuffle-proof out-of-order row set,
+and a scholar marked past the as-of date.
 
 ## Boundaries of this page
 
@@ -232,10 +288,9 @@ own worked example — 45 sessions, 9 allowed, the 10th dropping — belongs in 
 role authority are [Tenant Scoping and Role Authority](/openwiki/workflows/tenant-scoping-and-role-authority.md);
 the FF2 deduction and tranche thresholds are [Billing](/openwiki/modules/billing.md); batch
 lifecycle, `total_sessions` and the snapshot rules are
-[Batches and Lifecycle](/openwiki/modules/batches-and-lifecycle.md). Shell, settings and
-analytics surfaces are
+[Batches and Lifecycle](/openwiki/modules/batches-and-lifecycle.md); the as-of date's existing
+consumer is [Reports, EGACE and the T2MIS Export](/openwiki/modules/reports-and-t2mis-export.md).
+Shell, settings and analytics surfaces are
 [Analytics, Activity, Settings and Shell](/openwiki/modules/analytics-activity-settings-and-shell.md);
 start here for orientation: [Quickstart](/openwiki/quickstart.md). The ADR index, with
-ADR-007's supersession of ADR-001's `Elig` row, is
-<!-- openwiki: broken internal link [/openwiki/modules/overview-and-adr-index.md] file "/openwiki/modules/overview-and-adr-index.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-[Modules, Overview and the ADR Index](/openwiki/modules/overview-and-adr-index.md).
+ADR-007's supersession of ADR-001's `Elig` row, is [Modules and the ADR Index](/openwiki/modules/index.md).

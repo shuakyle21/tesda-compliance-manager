@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:37eb58bc5e5042954e630a9184f6a40c551a9c8c64fe53dbc304d68192df6ea0",
+  "pageVersion": "sha256:7ca2f86f9566e3b764bee14ae004102983c951c820624a67908c46bdae21d3b8",
   "claims": [
     {
       "id": "claim_2451e47bfaa74c17ab764a2de4103019",
@@ -1705,10 +1705,112 @@
           "version": "repo-lines-v1:sha256:c9e7717fea445b7bf4df38b4c27ac6b4b8ea9b6bd4a30c972905e5870e7345cd:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjQwYzI1MTNkMTc2MmMyZTFmMTE1NWZkY2ZiZjg0YzVlNTFjNGE4YjQ3NTllNTdkN2Y1MTY4NzFlZWU0NzE1ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzExZTFlZDgwZDJhMjU0NmQwODlhNjZiMjY0MTVkMGEyYzVlOWNiYjkwODY2ZmVlZmEzMmQ1Y2ZlOWM2NTc5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWYxNWRjMDc1MTIxNmYwNjE5ZWU1YmNhYjZkMzRhN2VlZjgyZjNmNDE5MGNmNzA1ZjYyMGQyNDI3NTY1NTZkMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDYwODU1NTU1YjM3ODBiYzMzOTA4NWZmOWQ3NDI2MzAwNDFmNDJhOGVjZjc1MWI4M2IzNDg4M2YwNGFkNWIxOSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_b394ebef433843928b3d2a817eee3fde",
+      "statement": "`database.types.ts` is not blocked from regeneration by `billing_deadline`: the ledger's 2026-11-11 block says the column is live, so a generator run would emit it, and the two deliberate `create_school` divergences could be re-applied by hand afterwards. What still holds the regenerate is that the file is a partial hand approximation of already-applied objects and regeneration is a whole-file replacement rather than an incremental patch.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L1-L36",
+          "version": "repo-lines-v1:sha256:821fc6bab881d55b3478677f29b775a749bad6e4db04dc22de265f2866485982:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhOTY1ZjE1ZGZhMDYzNmVlMTQwNjFkZGFiYWZlM2I5YzkwZmYwM2Q3MTE0OWJmMmQ5NDZiMDI4NDZmYWIxNDYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L106-L126",
+          "version": "repo-lines-v1:sha256:35292bbd3b35bd494b4e8f99f6b964fbebc4ef640c038781978a6fd2ac162dcd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4OWVkYjhkZDE5MmY5Yzk2NjY0MjcxYmJhNWNhMjIwOGU1ZGVmNWM1OWE4NTQ3ZTZlZWI0YTk2N2ExMTViZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmZWQyNTc5MzI0MTZkYjQ3MGJiZGE1ZmVhNTY5Y2Q4ZDhhZTNjNTk4ZWY4ZmNiNzZhYjYwODQ5YTRkNTE1MDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3NTBkMjI4MTA3NjdmNGYwZTUxNGViNWY2NzQ1NTdiYzdhZjYwYTc5MDQ0NjgyMTUxODJiODdmNTZlMDZiM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1415641a271b401a87b55b196ca41a1f",
+      "statement": "The real price of the unregenerated type file is everything the two hand checks were never asked to cover — the seven billing tables, `billing_type`, the ADR-007 columns, and the missing `batches` columns — so a regenerate wants that list recorded first. The six `as unknown as` join casts (two in `learners.ts`, one each in `activity.ts`, `batches.ts`, `tenancy.ts`, `users.ts`) trace to the `Relationships: []` stub; `learners.ts` blanks withheld `learner_details` cells in `mapLearnerRow`, not at the cast.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L30-L35",
+          "version": "repo-lines-v1:sha256:833013106a14893d706ff1aa403b43e71e26c26505fe7b5a0d4c2d69e95762b1:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRjMTMzOGQ1ZjkxZDE2MWU1MTY3MTIwNTJjY2Y5ZTIxMjMxNDY2OGU1Y2ZlZDkzYjJmNWM4ZWZmMmUwNGFjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjE2MmE1ODRiM2I4OWUzMmMyYzNhMGMyOTNjNWM5ZjQ2YzZhZGI1NDc5OTc2NmJiZTY3ZTQ5MWE4MWEyYzk3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODRjOGNjODhiMjRlMWRlMzkzNzY3ZDZjMmUzNmYzOTZhM2NiMzkwNDA5Y2ViMjM3YWQ1NGQ4ODdkMTEyODBhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjVkNmJlYmI2YjYxODc3MDk5NzA4OTdmNjdjNTkwZTY0MDU5ZmYxYjU3MzBiZjRjNTViNTA2NzI4NDNiZDFhNyJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L58-L69",
+          "version": "repo-lines-v1:sha256:665e998f0d2f0a24d021bbdf01e3c961a18f3d123939fda2166bc8b93e8960c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1NTFkOTUzNTY0ZGQyMWJlYzFhM2IxNTVjNDhkNTU5Yzk2NmEzMWYxYjNiMmU4Y2ExZWMwM2FiZGRlNzU4YjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2MTZlOWM0ZDMzYTQxYjcxMjBiODM1YzdlNDkyZWQ2MmFmMzgxOTIyNGZiZjQ3OWQ5MmNlODU1NWFiZTQ5OGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3MGUyNmY3ZWRiZWRjZGQxYTMzMjRiZDk4YWJiYzMwN2E5ODQ1ZWFiOGY3ZDdiZTM0YzU3YzQ2Mjk3NTc4YjkifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts",
+          "version": "repo-file-v1:sha256:8b4f68a4eb9c0834d679cfe3f695252c77f5b63cd4c6b75963940848c52f0475"
+        }
+      ]
+    },
+    {
+      "id": "claim_2b6a2b12c6914e2f82e04a79e4f3af13",
+      "statement": "The deny on `platform_admins` comes from RLS-with-no-policies together with the absent `authenticated` grant, not from a probed privilege state: Supabase's shipped default privileges would grant every new `public` table to `anon` and `authenticated` anyway, so the grant is belt-and-braces while the no-policy RLS is the boundary. Enrolling a platform admin is a statement gated by RULES §10 rule 36.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md",
+          "version": "repo-file-v1:sha256:6a577cf79fd88fea6ece9333fe49317e6b6e51dcb97dd44fdba53dcdd629ed70"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L65-L90",
+          "version": "repo-lines-v1:sha256:adbb5dcc08128b760feedbe031eaf4a79101586073d1e80379d0ef69edb10fac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2YzNkOGQ4ZGMyNjliZGY3YThlOTU4NGZjZTFlNzdhNjc3YzI0M2Y5YzVlZTU3NzMxZmJlYTIzZmY1OWUzMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwNTNjZDcxOWZmODQ5NmY5N2RkY2NjN2M1MmQ1NDIyMTU3MmFkMTU1MjIyYjZjOGM4MDc4ZTdhNTI5ZDRiYmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhOTUwZTA3ODI2YzlhZTUzNjNhMzA4MThhOWE3OTMyNDljYzJiMzcwNWE5ZmI1ZGU1ODY5OGNmNjQ2ZmJlZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyZTJjMTViZTJkNzExMzM5NjcyZTJjYmZmMjlmNWRmNDUxNWRhMzhhNTY4ZGMwNmE5YzgzNDI3ZmIzZjMxYzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_71bca7dcf0f042f0bc322d05ee10ba08",
+      "statement": "Row 10's read side is exercised by a shipped screen — the report route calls `getTenantRosterSnapshot`, which pages the roster and embeds `learner_details` — while the per-batch fetch `getBatchLearnersSnapshot` has no caller. The write side is the untested half: no route calls the importer, so no `learner_details` write has run against tenant data and the import/export tests build rows in memory.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L24-L68",
+          "version": "repo-lines-v1:sha256:37e111e1784d6825e0d7a807a614d675324f3efb34b0d6ade5fa44e264292923:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZWMxNzY1ZWNhYjUyYTdhYmE1NmNlZmEyZjgyYTAwN2FiZDVhNmU2MDMyYjliM2MyYTg4OTJkZGJlOTlhZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0MmNmOGQwNzVlNzkyMTdiM2YxYjUyOGY2YTU1NmE2ZjY3MGJjZmFjMjM0MmJiMDI3YmFlODQ4MzMxZTA3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2N2U2ZDU5NmIxZjEzZjM5YzI0ZTY2NmE3MTA2YTkwN2NmNjhhMjUyNDU3NTZiNTI0MjU3MTZkMWJmMzFlMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1MTNlZDFmZDAzMDhkMzg5YzIyOTdkOTBhMmU5YzgxNDdmNDFkNzZhNmZiMGEyNDUzODllNDA5ODQ1ZWQ5YjEifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L134-L135",
+          "version": "repo-lines-v1:sha256:5fa7bf3d5f6ba46a65032058645c77282b46f80d0c67fdeca1a965d64aa798e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ5YmVhNDU0MTlmOGNhZGI2ZTZhYjM2NzkyNThhN2EyOGQ2NjlmMjVjY2NjZTM5YjA2ZDI3MWVjMWY4ZjgyYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzBkMzQwYjQxM2RjNTE4MmU1NGU0MTJiZmVmYWQ3MjUyNzMzNzEyZDE4ZjU3ODI5NmUwZGE2M2ZiMjY0Zjg2YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGY2Nzk1YmYzZDA5YTNkN2VhMDJhOTFhZjRkMWNmMjA1MTg0NTAxNWQ1NWUyYWZkYjE5NDgyMDFkYjU3ZjM1MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjIxNzM4YTJkNDY3MTJjNmM2NDFkNDcxZDY3ZDA5YzE4ZmU2OTc5OTAzNjZlY2RlM2M4MTQzZDVmM2UyZTI0MSJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L265-L280",
+          "version": "repo-lines-v1:sha256:280c382792a974f89bd829e8e2d61c4dd0d793fe731b9e1a06144a903c9314e1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1ZGVlYzQwMWIzMjc3YmY4MWEwOTcwODAzZWFiYmM1MmFhYzVjOWQyNTQwZjIyMzdkMGQ3Zjk2MDAxNDA5YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2OWM3ZDg2NjU5Y2FjMzM4Y2MxYzZjOTFhYTFlNTA5NzU1OGFhOWM5MjU0NWNmMWFiN2IxNjlhNjJlZmQyM2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjZDIzNGFjZjkzNWNiNTk1YTkxODEzYTEzNmRiZjVjYmY4NTNiZDEwYzI1OTMwNDQ4OWJiMDhjNTVkMDViZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmNmVlMWQyNGYzNDc5N2FjYjMzZWU1OWYzOTQ0ZDY4NGFmOWJiNWM5MzY5ZWU1OTZmZWVkNjYyOTMwNGQ3ZmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f95fd2091c2d47e3ac1a858a9665f2e5",
+      "statement": "`create_school` is `security invoker` and its `tenants` INSERT is the only authorisation inside it: the registry SELECT policies are tenant-scoped and the school being written has no members yet, so `p_qualifications` resolves against `qualifications`' global active-row SELECT, and the function's other accesses are read-only and already granted to every authenticated caller.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L190-L196",
+          "version": "repo-lines-v1:sha256:fc5393167b99e0995976d77b2c8a0fe4959e8dd90b8ad39ba87e79d4aa6aadaf:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2FiNGVkNTdiMTkxOTBlYTAyMmUxYTY4Mjc4YzkyY2U2YzUzM2UyNjdiYjA4N2IxODkzMjg5NTY0NWRlZDY3MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmVmOTJiOGI3NzRiY2U3YmQ2MTM2OWE1MmFjOWMzYjQ3Mzg0MDkyOGYyZTNhNGNmMDQ3YmQwMjQyODdjYzQ1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWFmMGNjNGQ0MjQ3NzAzNGU4MWU4MWE4ZGRiMGU5ZWMxM2QzYWY2NTMxNzdmMjU5MzhmZjlmNzMxYWIxMGZjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzg4MmE3ZmIxMDA5MTBhODAxMjdiOGQ5NzY2ZTRjY2EzNjUzNzQ3MGIxZTNjMmUzM2JmZTI2NGUxYzMzMWI1OSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L405-L443",
+          "version": "repo-lines-v1:sha256:a5acee9f53f3679293789ce8a9d460ba7e62498f55055f1d61a4c13c30e6df87:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0MGQ0MjEzMzczODNkZTQ0ODFjYTgwNmQ5NTY1NjFmN2U5OWRiM2UxNmJkMTIyNjg1YzMwMTU1YTI3ZTAwOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMDlmZjE3ZWI5MGQwODc1NmEzNWRkMzc1NzNhNTg4YmYxYzQxNDE3NWM5N2YzYjNjYWNmYTRlZjIxYWMwNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmMTRmYTVmZGJhZTYzNzE2ZDIyYjg5NmQyN2I2ZTM3NGM1YjA1OTM2ODRhMzFmYzBhYzIwMjgyNjhmOGIwYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1MWMzYmI3ZDNjOWVkYWNhMmMxYWZkYTY0YTUyYmMyN2I4ZDU2M2ViYTVkYzhkZjgxZmFkMDgzYzhkMTk0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7fa2d34c1f6241db8da1b48164134870",
+      "statement": "`can_read_batch` has never been replaced since the canonical migration, so unlike `can_trainer_write_batch` it was not widened by row 8: a co-trainer added only through `batch_trainer_assignments` can write and correct the batch, and cannot read its roster or attendance. Its relation also differs by role — `can_access_tenant` makes it tenant-wide for `admin`/`coordinator` and stricter than a bare pointer for `trainer` — and it gates `batches`, `learners`, the LAMR tables, attendance reads and the tenant half of the `documents` read.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L408-L428",
+          "version": "repo-lines-v1:sha256:078c2a672763605515909f154845ab424087a58a96b669e79a3f6a62229b72bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNzNiMjdkYjIyOTg4NWViYjQ1MjQ1YWE0YjcyMTkxYmQxNjI2ZDc5MzA3NGZlYzg1MzIwOGJiZWQyOGE4MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZGIyNzBjMmU4N2NkNTE4MGZlZjQ4YTU0OWIzNzdiMDkyNzY0NzY3ZjhlZTYxNTkyMTc5MmNjMWFjYzY1MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiNDJhMTUwYWFkNTM2N2M1ZDE4NmFjZWYwZDI3OTU5MTg4NTIwMTU3Njc0M2M2NjFhMzQyNGE3ZDdkNzM0NTQifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L468-L472",
+          "version": "repo-lines-v1:sha256:773b9daa3075a51c4e728c4c055f19dbc29fa3aca0ca161131c01c20cedf4c48:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTI4OWJlMTlkY2Q1NGMwZjhjZmM5NGNiNDhmMjI3MGQ0YWU0YmE3YWI5ZTFhY2ZiZTdhOWYyYTUyZTEwYmRiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzdlNTY1OWM4Yjk2NzU1NGVmMDkwMGE5YjJmNWI3ZWJkZGJhNzVjZjJlNjJiYWEyZDcxZmE1MGYzYjE3ZjU4OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODM5YjcwMDAwZGRjN2UyYzY2M2M0OTBlMWQ4NjFlZGM1NDk0ZDUxZDhiYTQyOTk4NjBlNTQzMWYxZjg1MjMxNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTFhMWJhMTg4YTJhMDNjYzExYzcwZjdkYmY0MTBhYzYzOTM3ZGU4ZDAwMDQ5NDlkZmE3M2Y5NzRlNjhkNWU4ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f72da418224f4a3bbf4d2630289c4aef",
+      "statement": "The `documents` audience enum gates the trainer path on all three of SELECT, INSERT and UPDATE, and a trainer's read runs through `can_trainer_write_batch` rather than `can_read_batch` — visible exactly when they could have submitted it — which is why the row-8 assignment widener reaches trainer document reads and a read-only trainer view would still need the pointer.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L577-L619",
+          "version": "repo-lines-v1:sha256:7d9ca659a6298b984bf4815eef985f3a406d4dee6ed223d70eb0dbcc085bc13c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzNWU3NDQ5MjE0OWRhY2I3MzQzZmIyNjEyNDg1ODJjNTNjZjQxZjczNGE5NThhYjQwZDhmMzgxNjUyZWI2NzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkOTE5YWZlMmYxODY0MzViZGFmMTE4MDEwNGMwZDhlYTg0MzA0YTJhNzA4YzE3YjMxNGE5YjA4ZmEzZmUzYWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmNWYxZGY5ZGY3YzI2ZDQzNGU4N2MwOGRlNjAzMjRhN2YzYjA1ZDUwNDc3ZDc4NWYzZmY4Y2U3NjJiYTA1ODEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-19T03:55:05.435Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

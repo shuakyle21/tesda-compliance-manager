@@ -1,8 +1,10 @@
 ---
-type: module-reference
-title: Documents and Evidence
-description: How FR-06 models the per-program requirement catalog, the per-batch document map, the untracked-versus-missing distinction (ADR-004), the blocker rules, and the evidence bucket's path-derived authorization.
-tags: [documents, compliance, evidence, storage, adr-004, rls, module]
+type: "Reference"
+title: "Documents and Evidence"
+openwiki_generated: true
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
 sources:
   - id: openwiki-source-b2197972d3af51fefd258a4a
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx
@@ -12,6 +14,10 @@ sources:
     resource: repo://eslint.config.mjs
   - id: openwiki-source-fa1460427741e716baf8631a
     resource: repo://modules/batches/data/batches.ts
+  - id: openwiki-source-9a24e697708df788c06f44e3
+    resource: repo://modules/billing/data/billing.ts
+  - id: openwiki-source-24135802ec9b42acc8123951
+    resource: repo://modules/billing/domain/packets.ts
   - id: openwiki-source-fed00d96acb205744511b2bb
     resource: repo://modules/documents/data/documents.ts
   - id: openwiki-source-05b5b2c042bb4f3b47496b1f
@@ -38,8 +44,9 @@ sources:
     resource: repo://tests/unit/documents.test.ts
   - id: openwiki-source-4029f22d57710f525e978978
     resource: repo://tests/unit/evidence-path.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
 ---
+
 
 # Documents and Evidence
 
@@ -53,26 +60,41 @@ A batch embeds `documents: Record<string, DocRecord>` keyed by `document_key`, p
 `documentRequirements`. `DocStatus` is a four-member union — `verified`, `submitted`, `pending`,
 `missing` — that mirrors the DB `document_status` enum.
 See [Data Model and RLS](/openwiki/architecture/data-model-and-rls.md) for the column and policy
-detail behind both, and
-[Module Boundaries and Data Patterns](/openwiki/architecture/module-boundaries-and-data-pattern.md)
-for why the domain rules below must stay I/O-free.
+detail behind both.
+
+## Who may clear a blocker
+
+A blocker is not cleared by a UI affordance. `ON_FILE_STATUSES` in
+`modules/documents/domain/compliance.ts` is exactly `verified` and `submitted`, so a blocker stops
+blocking two ways: a row arrives with status `submitted` (evidence attached and recorded), or a row
+reaches `verified` (an admin accepts it). `pending` and `missing` block.
+
+The database decides who may produce either transition, and the two are different populations.
+The `documents` policies pair a trainer path with a management path: an admin or coordinator writes
+through `can_manage_tenant`, while a trainer writes only inside a batch they are assigned to **and**
+only when the requirement's `audience` is `trainer`/`all` — and only their own submission
+(`submitted_by = current_profile_id()`). A viewer never appears in a write predicate at all.
+Trainer-facing DTOs also omit the server-side fields a viewer is denied (RULES rule 5), and a viewer
+is server-denied rather than hidden (rule 4). The policy map is the data-model page's; what matters
+here is that **the module exposes no write path of its own** — `Documents.ts` and the screen only
+read, and the verification the screen offers is a local override (below).
 
 ## The two data layers and the obligation to keep them in sync
 
-Two independent paths produce that map:
+Two independent paths produce `Batch.documents`:
 
 - `modules/documents/data/documents.ts` — `getBatchDocumentsSnapshot(batchId, requirements)` plus
   its `mapDocumentRows`. Used by any caller that already holds the catalog; nothing calls it yet.
 - `modules/batches/data/batches.ts` — `mapDocumentsMap(rows,
-  scholarship_programs.program_document_requirements)`, fed by the embedded select in
-  `getBatchesSnapshot`. This is the path the `/documents` screen actually takes.
+  program_document_requirements)`, fed by the embedded select in `getBatchesSnapshot`. This is the
+  path the `/documents` screen actually takes.
 
 `mapDocumentRow`, the `MISSING_DOC` constant, the `DOCUMENT_ICONS` map and the backfill loop are
 **duplicated** between the two files. The duplication is not sloppiness: `eslint.config.mjs` makes
-every module's `data/` private to that module (`import/no-restricted-paths`), so `batches.ts` cannot
-import `documents.ts`. The cost is a standing obligation — a change to the backfill, the timestamp
-preference, the `source` label or an icon must land in both files or the two producers of
-`Batch.documents` drift.
+every module's `data/` private to that module (one `import/no-restricted-paths` zone per entry in its
+`domains` array), so `batches.ts` cannot import `documents.ts`. The cost is a standing obligation — a
+change to the backfill, the timestamp preference, the `source` label or an icon must land in both
+files or the two producers of `Batch.documents` drift. Only `app/` may cross that boundary freely.
 
 Both backfill every key in the batch's **own** program catalog to `MISSING_DOC`
 (`status: 'missing'`) before overlaying real rows. So "no submitted row" is decided at the data layer,
@@ -85,7 +107,9 @@ batch's catalog never listed — the only remaining absence, and the one the dom
 must this batch carry" is a data question, never a hardcoded list. `getDocumentRequirementsSnapshot`
 returns it in `sort_order`; its snapshot type deliberately has **no** `no-tenant-access` member,
 because the catalog is reference data — a caller attached to no school still reads the same TWSP/CFSP
-requirements, and an empty catalog therefore means "unseeded", never "you have no access".
+requirements, and an empty catalog therefore means "unseeded", never "you have no access". The
+`documents` rows themselves are tenant-and-audience scoped by RLS instead: a trainer's query simply
+never receives admin- or coordinator-only rows, and the data layer does not re-filter by role in JS.
 
 The catalog is also *configured data*, not a closed enum. `mapRequirementRow` resolves a display icon
 from a `Partial` key map with a generic fallback, and `buildEvidencePath` shape-validates
@@ -143,12 +167,25 @@ flowchart TD
 
 *The same absence measures as "not judged" and gates as "not satisfied" — the ADR-004 asymmetry.*
 
+Where the gate lands: `deriveDocReadiness` in `modules/billing/data/billing.ts` counts
+`isDocOnFile` over critical, supporting-stage requirements only, and keeps its denominator at the
+full supporting set — so an untracked batch reads 0 of n and the readiness gate stays shut.
+`buildPacket` does the same per pre-billing requirement and turns each unsatisfied one into a named
+`blocker` line. Billing keeps the top of the design; the gate details live on
+[Billing](/openwiki/modules/billing.md).
+
+## The blocking strip
+
 `blockingDocuments` / `blockerCount` / `blockingDocumentNames` build the named strip on top of D4.
 They return only `label`s, because FR-06 AC-1 forbids rendering a raw `document_key`, and the blocker
 vocabulary is its own `DocBlockerReason` (`untracked` / `missing` / `pending`) rather than a subset of
 `DocStatus`. `blockingDocuments` partitions criticals first rather than sorting, and an empty catalog
 yields an empty summary — asking about nothing is not a problem, unlike measuring nothing, which is
 unknown.
+
+`blockerReasonFor` is the private decision point all three share, so `blockerCount` cannot drift from
+`blockingDocuments().count` (a test asserts they agree across fixtures). The strip is **written but
+unrendered**: no component imports any of the three, which is the open wiring job.
 
 ## The matrix screen
 
@@ -168,37 +205,57 @@ State ladder per cell: `verified` and `submitted` open `FilePreviewModal`; `pend
 raise an "Attach document" toast for writers; `na`/untracked is inert. Verification is an **admin-only
 override in local state** — `{ status: 'verified', verifiedBy, verifiedDate }` keyed `batchId:key` —
 and is refused when the profile has no display name, so a record is never attributed to nobody. No
-write reaches the database from this screen.
+write reaches the database from this screen, so a verification lost to a reload costs no gate
+anything: `submitted` already opened it.
 
 The route applies `withTenantAccess` to the batch snapshot before picking a batch, and a
 `no-tenant-access` read renders `NoTenantAccessState` rather than the ordinary empty state — an
 all-blank matrix would read as "your batches are missing everything" instead of "you have no school".
-Guard order in general is the data-pattern page's; the one local rule is that `documents` uses the
-resolved `profiles.role`, never `?role=`.
+The role passed to the island is the trusted `profiles.role`, never `?role=`; guard order in general
+is the data-pattern page's.
 
 ## Evidence storage
 
 The pure half lives in `modules/documents/domain/evidencePath.ts`; `modules/documents/data/evidence.ts`
-is the Storage I/O around it. Nothing calls either yet — the screen's upload control is a toast — so
-treat both as written and unexercised.
+is the Storage I/O around it. The same `data/`-privacy rule keeps them apart, and both are
+**unexercised**: no component imports the upload, signed-URL or file-validation functions.
 
-**Path convention:** `{tenant_id}/{batch_id}/{document_key}/{filename}`. This is a security boundary,
-not formatting. The `compliance-evidence` bucket's policies authorize select, insert and update with
+**Path convention:** `{tenant_id}/{batch_id}/{document_key}/{filename}`. The key is composed from the
+loaded tenant, batch and requirement; the browser contributes only the file name. This is a security
+boundary, not formatting. The bucket's policies authorize select, insert and update with
 `app_private.can_access_tenant((storage.foldername(name))[1]::uuid)` — Postgres splits the object name
-and hands **segment 1** to the membership function, so `segment 1 IS the tenant check`. A `filename`
-containing a `/` does not produce a weird name; it shifts every segment and relocates the object into a
-folder whose first segment is no longer the caller's tenant. A tenant the caller also belongs to is
-then not denied at all.
+and hands **segment 1** to the membership function, so segment 1 *is* the tenant check. A `filename`
+containing a `/` does not produce a weird name; it shifts every segment and relocates the object into
+a folder whose first segment is no longer the caller's tenant. A tenant the tenant the caller also
+belongs to is then not denied at all.
 
-The path must therefore be **derived from identity, never accepted from the client**: the browser
-supplies the file name, but tenant, batch and key come from the loaded batch, and the server re-derives
-the key from three anchors. `buildEvidencePath` validates in a fixed order — tenant id, batch id,
-document key, filename — so the outermost problem is the one reported. Ids are anchored UUID v1–v8
-regexes (they are interpolated *before* Postgres casts them); `document_key` is
-`^[a-z0-9][a-z0-9_-]{0,63}$`; filenames reject separators, C0/C1 control characters, bare `.`/`..`,
-percent-encoded separators (`%2f`, `%5c`, `%2e%2e`) that clients decode in transit, surrounding
-whitespace, and length over 200. That guard is also what keeps the `documents_batch_id_document_key_key`
-upsert key unambiguous once a file name is appended to it.
+```mermaid
+sequenceDiagram
+    participant U as Browser
+    participant P as buildEvidencePath (domain)
+    participant D as uploadEvidence (data)
+    participant S as Supabase Storage
+    participant PG as RLS on storage.objects
+    U->>P: filename only (ids come from the loaded batch)
+    P-->>D: path or a rejection reason
+    alt rejected
+        D-->>U: rejected, no bytes sent
+    else valid
+        D->>S: upload key, upsert false
+        S->>PG: policy checks foldername(name)[1] against can_access_tenant
+        PG-->>S: allow or deny
+        S-->>D: url or error
+        D-->>U: ok path / sync-failed (opaque)
+    end
+```
+
+`buildEvidencePath` validates in a fixed order — tenant id, batch id, document key, filename — so the
+outermost problem is the one reported. Ids are anchored UUID v1–v8 regexes (they are interpolated
+*before* Postgres casts them); `document_key` is `^[a-z0-9][a-z0-9_-]{0,63}$`; filenames reject
+separators, C0/C1 control characters, bare `.`/`..`, percent-encoded separators (`%2f`, `%5c`,
+`%2e%2e`) that clients decode in transit, surrounding whitespace, and length over 200. That guard is
+also what keeps the `documents_batch_id_document_key_key` upsert key unambiguous once a file name is
+appended to it.
 
 Every entry point returns a discriminated result instead of throwing, because FR-06 needs *invalid
 type*, *upload rejected* and *upload failed* to stay three distinguishable states;
@@ -208,10 +265,10 @@ check runs first.
 
 `validateEvidenceFile` enforces `EVIDENCE_MAX_BYTES` (52 428 800) inclusively, rejects
 non-finite/≤0 sizes, normalizes MIME parameters and case, and tests size before type so an oversized
-file is not blamed on its format. The constant must stay in step with the bucket's own
-`file_size_limit`; the test asserts the literal.
+file is not blamed on its format. The bucket's own `file_size_limit` is the same number, so a client
+believing in a larger limit produces uploads Storage silently refuses.
 
-Bucket policy facts that shape the code:
+Failure and policy facts that shape the code:
 
 - The bucket is **private** (`public = false`). Every read is a signed URL —
   `getSignedEvidenceUrl` defaults to 300 s, and no public-URL path may be added.
@@ -221,18 +278,19 @@ Bucket policy facts that shape the code:
   one gated on `can_manage_tenant` (tighter than its `can_access_tenant` siblings, because reading and
   uploading are ordinary trainer work and destroying evidence is not). `evidence.ts` still exposes no
   `deleteEvidence`; the policy is the seam.
+- Every call returns `unconfigured` when Supabase is unset and an opaque `sync-failed` message when
+  Storage refuses or throws; a reply with no URL and no error is also a failure.
+- `storage_path` is unconstrained `text`, so `getSignedEvidenceUrl` re-parses the stored key back
+  through `buildEvidencePath` and rejoins the trailing segments with `/`. Rejoining rather than taking
+  segment 4 makes a key with extra segments fail `isSafeFilename` instead of validating a shorter path
+  than the one that gets signed.
 
-`getSignedEvidenceUrl` re-parses the stored path back through `buildEvidencePath` and rejoins the
-trailing segments with `/`. `documents.storage_path` is unconstrained `text`, so a hand-edited row could
-carry anything; rejoining rather than taking segment 4 makes a key with extra segments fail
-`isSafeFilename` instead of validating a shorter path than the one that gets signed.
-
-Every call returns `unconfigured` when Supabase is unset and `sync-failed` — with an opaque message
-that never reaches the screen — when Storage refuses or throws; a reply with no URL and no error is
-also a failure. Note the surfaces ahead of this code: `getSignedEvidenceUrl` is never called, so
-`FilePreviewModal` treats any non-null `file.url` as present, derives a fake `name.pdf`, and renders a
-simulated page. Today `mapDocumentRow` sets `url` to `storage_path` (a bare object key) or
-`external_url`, so the uploaded-file path is untested end to end.
+The last known divergence is at the UI seam: `mapDocumentRow` sets `url` to `storage_path` (a bare
+object key) or `external_url`, and it never populates a URL at all unless a `storage_path` is set
+*and* the row is not `missing`. `FilePreviewModal` thus treats any non-null `url` as present, appends
+`.pdf` to the label, and renders a simulated page — no signed URL is ever minted. Seeded
+`storage_path`s are deliberately NULL (a dead link is worse than a visibly absent one), so the
+uploaded-file path is untested end to end.
 
 ## Failure modes worth knowing
 
@@ -246,6 +304,11 @@ simulated page. Today `mapDocumentRow` sets `url` to `storage_path` (a bare obje
 - **Fixing only one copy of the duplicated mapper or icon table.** The two producers of
   `Batch.documents` then disagree about what "no row" means.
 
+## LAMR
+
+`modules/lamr` is a README stub (FR-08); LAMR appears here only as a seeded catalog key, listed as
+`lamr` in the test fixtures and the icon map.
+
 ## Tests
 
 `tests/unit/doc-compliance.test.ts` (D1–D4, `null`-not-zero, `requirementCatalogOf` union order,
@@ -257,5 +320,6 @@ mocked or uncovered, so a green suite is not proof of the bucket round trip. RLS
 are unverified pending the Clerk/Supabase auth toggles.
 
 The end-to-end flow these pieces serve is in
-[Document Compliance and Evidence](/openwiki/workflows/document-compliance-and-evidence.md); the gate
-that depends on `isDocOnFile` is in [Billing](/openwiki/modules/billing.md).
+[Document Compliance and Evidence](/openwiki/workflows/document-compliance-and-evidence.md); the
+batch side of the same catalog — lifecycle, rename, alerting — is in
+[Batches and Lifecycle](/openwiki/modules/batches-and-lifecycle.md).

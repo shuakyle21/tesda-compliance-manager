@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:944a5a4feb6e91fb795515b433205d80faf31ea1e0fdc2614a08a0dfce7b1fd7",
+  "pageVersion": "sha256:229bdf1011e168617b2a21dd94e48e9180aa54de3d9b081466006c098d881269",
   "claims": [
     {
       "id": "claim_737a5d3688c3427ca37f8019809eb686",
@@ -384,7 +384,7 @@
         },
         {
           "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L83-L119",
-          "version": "repo-lines-v1:sha256:611bcfd9d9b80ca17e6efa688b1fb5907e55250e6284d0c084adb63d82710a6c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4MDQ4NTc3MzU3YTgwNDQxMjRhMWRhY2JhZmNiY2E3ODQ5YjU0NmZkOTAxYjg1MjBhMjlhMWY5MGMzN2QyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhODQ0MDU5NjA0MDJlNzI0YTM3NjVmODg2YmM5YzU2M2M3NDQ3YmU5MjliZjk5NjM4YWQ4NmJjNWI3MzZkMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2ZTc4YzcxMjMwZjY0Njk0ZDEwZmM1NWZmNzRhMjU3MWE4Yzg4MTBhOTRkYjI0ODJlYmUyY2U3ZGEyYWU3ZjEifQ"
+          "version": "repo-lines-v1:sha256:4867af63c657c4b13552f2dc1cfe3b6cde19862d19f46ca061894c7daa2a02d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4MDQ4NTc3MzU3YTgwNDQxMjRhMWRhY2JhZmNiY2E3ODQ5YjU0NmZkOTAxYjg1MjBhMjlhMWY5MGMzN2QyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhODQ0MDU5NjA0MDJlNzI0YTM3NjVmODg2YmM5YzU2M2M3NDQ3YmU5MjliZjk5NjM4YWQ4NmJjNWI3MzZkMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2ZTc4YzcxMjMwZjY0Njk0ZDEwZmM1NWZmNzRhMjU3MWE4Yzg4MTBhOTRkYjI0ODJlYmUyY2U3ZGEyYWU3ZjEifQ"
         }
       ]
     },
@@ -439,10 +439,170 @@
           "version": "repo-lines-v1:sha256:4f50de92902f55ab3c9cc82b0d8c3b5be98bb4c9c3624e11e52b236fc293c106:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWRjMmNlYjZiMjhjOTZmY2Y5NDJhYjk3MDdkMzk5NWI2ZGYzN2IzMzEyZmUxYWFmYWY2N2NkYjQ2ZDcwMTk5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDNlYjNhNzIyMDhjMWY0ZGJlMTViMTk4MTBmOWJlODE3OWJmNDdhMGUzOTY3ZGU0MGQyNmFiY2U1YTNlNjI4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODg3ZjI3OTQzOTUzYTY0YTNmMTBhNzA4YjQ4OWEzYmU5NTNkODYxZTUxMTliYjk0NDFhMTk1MjBmMGY4YzI2NyJ9"
         }
       ]
+    },
+    {
+      "id": "claim_b6d05a314a4d4528ad87b66ca57f67af",
+      "statement": "The route applies preview overrides before the empty guard: `?state=denied` returns its own state, then `syncFailed && batches.length === 0` returns the retry state ahead of the empty and `no-tenant-access` branches (RULES.md rule 19), and only an `ok` non-empty snapshot falls through to BillingQueueView's inline sync-failed banner.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L63-L67",
+          "version": "repo-lines-v1:sha256:f86d9c6163383682e63bbf31a1ca3b9b684ce38d45ec1007d2138454bd8cb182:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5MDM1ZDQ5OGM1MmQzZjAwMWQ2N2U2ZDAyZjExNTkzNWI1YTYwYTEyOTQ3Y2QwNzMyZTgwOTgwYTdmMDI1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTA5MGIyZThlYTg5ZDliNWU5MjM3ZDU3OGIwZGY3NjBhYTllNGIxMTJjYTQxOWI0NDNiMjFhODQ4NjIyMDhjYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjAwNjJkOTcwOTI3Y2Y2NzFmOGVmNThkYzhkMzU1YWM2NTQyZWQ0NjIxMWZlYzAyZmFkNDAyYjFmMWVhNTA1ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTBjOWIxNGNjNWU4NDM5YWQ4NGMwYTJiMzFiYTMxZTU4NzhiMTQ3NzRhOGJiYzI4MzZiMTY5MjUwYjM1MzYyNiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L83-L172",
+          "version": "repo-lines-v1:sha256:c2226a3e3002e04d4b90f81406db0df308c9da3dceaf4480a8e2df432cd211ab:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4MDQ4NTc3MzU3YTgwNDQxMjRhMWRhY2JhZmNiY2E3ODQ5YjU0NmZkOTAxYjg1MjBhMjlhMWY5MGMzN2QyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhODQ0MDU5NjA0MDJlNzI0YTM3NjVmODg2YmM5YzU2M2M3NDQ3YmU5MjliZjk5NjM4YWQ4NmJjNWI3MzZkMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f8038928f2a54535b00d04f9f142df06",
+      "statement": "`billingRole` comes from `toOfficeRole(await resolveRouteRole(params, dbRole))` and runs after the trainer redirect, so a real trainer adding `?role=admin` still lands on `/trainer`; any non-office resolved role, including a previewed `trainer`, narrows to read-only `viewer`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L51-L67",
+          "version": "repo-lines-v1:sha256:d2b59051b94abdff51944c40ca7fd73ac0a1bf9cc89a009cc0b3b03955efa594:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWIyYWZmODFmZmZjZmYwZmIzNmFkZjJiZGI3Njk3ZTVkY2JhMDE4MzRkN2ExMGQ4ZjU2ZGQwZjliZWJmNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlMjhhMGIyMWMzYjNmZTVjYTU0NTYyMDFmOTYzYmRmNDM5NzQ2ZmMyMTA4YmYxNjllNDZlOTY2Y2ZiMTM3OTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhNWFmMTdmZDlmZDI0OWEwYjU3ZGRjMDcwZDBlMjVmYzU5MjRmM2M1ZjU0YTllZjQzOGYyMTU5ZThlOTI0NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MGUzOTI3ZTY3NGE3OGJmMTI1MmYxMTk2MzQ0NWFlYzc0NzFjNTY2YWY4MGM3NTUwM2M3YjI0MzU5N2U5MzgifQ"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L80-L114",
+          "version": "repo-lines-v1:sha256:1633b80371a358d237d8b8d8e2dfa27de536033d96f8a89c80fb5d6a1ac1fde6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3ODVlYmYxNWZlNDUzNmFlYzBkY2VmZmE1Mzg3ODAxOGMyNTI5NWQ5NmVhM2YyZmM0MWNhYzYzNmNmOThjMTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5MWVhN2IyOGMyZDc1YWNjODY1YWFhMDg4ZmM1MjFjMWNiMjZiOWYzMDUwZmJhMjI4Mjc2NzY5NDNhNDljMTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmMjk4Y2YxZGMwNTIxODcyYjY4NWQ2Yzc1YWVjMDkyZWMxNTEwYmQ2MzcwNWY5MDk4NTg1ZGRlMGQ5Yzc2Y2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c4b5f1b04b145f88cf8f9042de5ecae",
+      "statement": "BillingQueueView derives `canWrite` as `role !== 'viewer'`, which hides the Generate and Preview controls and shows a read-only banner for a viewer; RLS remains the boundary.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L116-L133",
+          "version": "repo-lines-v1:sha256:a9806b24e93b26c8a6d7c9f04f667b8c2b159f80344524a7b7ffd7c209c73473:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MTE0ZjQwMWRhMTk1NDUyMzljY2I1ZGNkYmYwMzA2ODY1MDNjMDk2YTRmYmRhMWNmNDA1MTFhNWU0OGYzMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjMjVjYjdjZjJkZmMyNjhiMTk3MmJjNDk0NWI3Y2ZhZTY0OWNkMzM3MjQ0OTAxMGE5MGZkMmZhMTU5ZjM5MTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3YTVhZjdmMDVhN2VjNTIxMzE5ZGQwOTk2OTFiMGJjM2M1ODBlNDA5ZjIyZGViNGMxMjE3NjhhZDFlNzlhZjUifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L433-L448",
+          "version": "repo-lines-v1:sha256:c7942bf79a1ea00505effbd0d73a6b06c443268d3493d139ce56c6722caf8347:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5MjYyYmNjOTA1OWNlODZmYzVmYzI0OWFhNTAxZmIwMWU4ZDMzYTY2MTk1OTE0OTEyYjcyOGNkNTk1YmQ4NDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViNGI5Y2NiYmQ5YTViNDgwZGNlYjExNDg1NDYwYmFjYTE4ZDc1OTVkYjE4ODE4NjQ3MjA2MTEyZDBjODM0MTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmYzE3MTA0N2E2YWI4YTAyNTY5NjZkMzEwNGE2MWVhNmI5NDk4YzY1MDMyZDhmOWY0N2RmMmUyNzNiMzhiMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3NjIyM2U4ZjAwM2MwZTcyMmEyYjMyNmJlNjc2NmMxYWRiNzc1MjIxYjJjNTc5MTY2MTEyODkyOWI0ZjczZGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3107d257d0574492a7f56c1fadad4173",
+      "statement": "Both the header's Generate action and the detail panel's Preview action open the statement modal only for a card whose `gate.ready` is true, the header falling back to the first generable card — the packet state chip never decides generability.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L103-L113",
+          "version": "repo-lines-v1:sha256:97e312aac4c093b62b1ddd3270f7c05b47b4f848ee178af0771a507aecd3a412:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyZjM3NzJjNjdmZWU0ODkyMGI5NjljMTFhZmZlMjQ3ZDJhMDg2NDdmZDc5ZGFkMzg1OGFiZjc5YzRmNzk3MGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NWEyYzI4MGRmZjkyZGI3ZDIwMDY2ZDQ3ZGRmNmI5OWVmZGM3NzViM2FiMjliODM0NGYzNWM4ZDBkZjhlNjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZGFhYzM0YWFjMDkyMTFlZGE1OTNlMmZlNDRkNmNiNDc2NTE2ZGM4ZTAyMDZjMmM3MzE0YTdjY2VlNzMwZDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhMjhmODY5NGVhZGYyOTc3NGMzYzc4Njk3N2MzNWI2NGZjYzFhY2UzMGZmNmE0MTgzZjY2NGQ3ZmNmZjA2ZmQifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L379-L389",
+          "version": "repo-lines-v1:sha256:e411b3e45fe06d57495566803d294cc405615ec5b7c3dc2eb042e5f8f4e1edca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkOWMwODczMTQyNzQ5NDQyZGI1YTEzYjkyZjVlNjcwMDI4YzUwMDA2YjEzZThjMzI1NzRlMGY4OTE1YTJjZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3MTk2ZmFhNTAxOTkxZmNlNGJhNzkyNmQyNGM2OWQwZjlkYTU1MmMyNTBjNDYwN2I3MGVhNzI2ODE0NGEwMTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2ZTdiY2YxYWJhNzk0Mjk0ZDA3YjQ1ZTM1ZDhkNjg5ODU2NjdhYzJmODQxMzJmNjE1YmI5M2IyYmY3Njg3NmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUxNjhkNGQ0Y2JhMDE3MDVhZDdjOGI3ZWRiMjJmOTk2MTYxODM4YmY2ZWQzMTMwNjU5NjBmZTFkMjlmODYwZWEifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L420-L446",
+          "version": "repo-lines-v1:sha256:0953a9622be374d5ceb19059c5e75f0ddeffdbecc7321f5af71f6b91e029e8cd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NGQwYzE1OWViNGJjOGFlMDhiMWFkYjhjMTAyNWZlMGRiYmY3NDg0YzlhYzA5NWM0YTM4MTZmYjlkZDY5YWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiMTA2M2M0ZGVhNjhhMzgxNjYxMTBiYWQyZDMzOGI0ZDcyZTAyZDM3YmUwODE1YTc4NDUxZTk5MzMyZDZkZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2MjMyMzhmMjE3YjBlOTVkNzdhOGMyNTAyYmU5ZjgyMDZhZTlmNDY2YjFjZWU5OWU1NzFlOTQ1ZjIyMDNkMTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczN2Q3ZjQ4ZjAwZDBmMGJjOGU4MTc4MTM1YTg2MDYwNTVhNmE2OTVjMGRmNzQxNjJjMjAwMTM3OTI0ZmM4YmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cfd431d96d2942a59f9b46b1ddf0c364",
+      "statement": "The route still passes an empty `documentRequirements` array even though `Batch` now carries document requirements from the embedded `scholarship_programs.program_document_requirements` select, so both the gate and every packet blocker stay closed on live data until billing reads the field.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L123-L137",
+          "version": "repo-lines-v1:sha256:272f7a44c3f3e48b90c0f30965efa36e04cabbf0fe26722b5a43805cc3ff2ee3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3ZDVhZjY4NTM2MTRkMjUyZWY0MTc5MmRhZmYzMGU4YjE5OGE2OTJiZmM4MTQ1ODYxYjIyY2UwMGNlZWRiMzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZTNkYjg4YTIyMWQxZjQ5MzA0MzlhMmY2NDRmNTg4NTI0ZTYzZGVmZTY4NWVmNDU4MGEzNzk3ZTJlMzA0MmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2ZTc4YzcxMjMwZjY0Njk0ZDEwZmM1NWZmNzRhMjU3MWE4Yzg4MTBhOTRkYjI0ODJlYmUyY2U3ZGEyYWU3ZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1OTg4YWUwMGQ4MjU2NjFhNWI2NjRmYTM4NmQ1MzY3MmE4YjhlMDg0MzFlNTE0MDU5ZmUzMzkwZTUyZmI0ZmQifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx#L34-L34",
+          "version": "repo-lines-v1:sha256:b0ba9df30c5098027eef2cabde3c73ce6e5bc449c9c2bbd2d492bab6598dec41:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjBiYTlkZjMwYzUwOTgwMjdlZWYyY2FiZGUzYzczY2U2ZTViYzQ0OWM5YzJiYmQyZDQ5MmJhYjY1OThkZWM0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjBiYTlkZjMwYzUwOTgwMjdlZWYyY2FiZGUzYzczY2U2ZTViYzQ0OWM5YzJiYmQyZDQ5MmJhYjY1OThkZWM0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWYwOTMyMWI0MTAxMDNmNWVmNTAxMzFkNDYxYTc0ZmFhYzcxYTc3MzFjY2ZkNTA1YmFkNGU4M2MxNzI4ZmQ4ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWE2YTM4MWIzYTgwMjAwNTgyZDMwZjhiMzc4NWQ3MmE5OWExZTY3MTRmYjdmMjc1Mjg2MmE4ZTc3ZDgyNDI4MiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L264-L269",
+          "version": "repo-lines-v1:sha256:64ee51ae40304fe57e0157e4f37ff6dab5d60a40f6767484c5a9b7e51346628a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTRlOGFkMDVhMWRkZWIyMDdlNjA4MTM4NjViZWJlYmRiYTIzYzEwOWE5NjU0Mjk3ZDNhZWMxNTE4MGNiMjQ4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdkMTRkZGE0ODA1NWVlYjA2ZDgyZGQzZjZhY2Y3OGNhYzM1MGI4MzljNTE3OWNmYjNiMGU1MWQyMWM1ODIzNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzNjMTczNzY2MDI4Zjg1NGMwZmYyNWMxNTVmMTg3ZTM0MTRmOGUyODcwMmEzYmU0MWYxZWNjOTYyMGRhNzBjZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGRlMmI1NjY2MTIxMmUyODIwNTRiNDVmNjZkMzM5NzgxMTMyYjlhNDZhMjYzMjA4MWNiOWI1ZDkwMDg2MTliZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c3dda3612624924b89660fe2f8ce889",
+      "statement": "A packet's due date is derived from the recorded `batches.billing_deadline` (via `daysToBilling`), not from the tranche schedules ADR-003 P5 names; ADR-008 BD5 sanctions this and leaves reconciling the two to a future ADR.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L34-L35",
+          "version": "repo-lines-v1:sha256:5c1ca6dc8058cf26ca65282fdce0cfc1d0bd92260f35bcf869fb4eafe0658d4f:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjM3MGRkYjk2ZmRlNzM4YTJkODNkOWM3ZTYxNTRiMmFiN2M4MTJjZDUzNzU4NDA5MzQ3ZWRlYjgyYTg3MTYwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTMxODg4OTc3ZmQ1MDFiYWM0YTNkMGYyODg2OTRmMGIyYTRjM2Q2YzZkZjYzMWI1YzEzNjUxZGEyMWRlYjlhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzk5ODQ3OTIyOTFjZjJjNWFjZGIxZDBjYjJkYTVlN2JlMzAzNDE2MjVhNmI4Mzc1ZjgzNGU2MTUyMzc4YTZhMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTM5NmYwYzc2MmVkYjc3NDg5N2NjYTM1NThmYjIxZjczZjk3MjMxYTNkYjYzZTlkZjE1OWZmZDIzMGZmYzdiNiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L258-L262",
+          "version": "repo-lines-v1:sha256:62c1f1f4823f9b693ca7401e58bbc7bc4bac18e1f6b9ef4ecdb957d08ce9455f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY0YjM4NmEyMGUwY2VhZWUwZGNjNmQ2Yzc2NTAzMTZkM2I1ODQ0NDFiYjRjMzIxN2YxOTgyNmEzMjliZjI3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIyNmIyMTJjNTRmNjBhNTMwYTkwMGIxODA3ZDhhZDM3MjEwNWRlZjczNzUwNjlhZDc0ODFlYzdkOGY2NjRlZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTgyNzRhZDIxMTA0MzdkODYzNjU0MjYxNzIyZWZmMjlmNWQwYjQxM2I3ZjdkODAyOTg0MWUzM2NmZjg3ZjJlYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODY2N2I1ZjI5ZGNiYmI1YmM3ODQ4MmQ3MmZiMmJmZjg2MDVmYWNlMjU3MmQ4N2I0ZTVmYzRhODQwNzI1YjQxZCJ9"
+        },
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L164-L181",
+          "version": "repo-lines-v1:sha256:280d091812a59755d506e6c5ed53d277686e16cfe5242958b40f2aae25a781de:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5YmQ5YTBiYjRmMDQzYjAzYWFiODI4ZjliODNmNTkyMzk0YTBhNDMxYjlhM2NiNzg4MDgwNWU2NzEwYWM3ZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fe549b2a517d438cb6b900670aa536a1",
+      "statement": "`buildPacket` derives three of the five states only: `settled` when the batch is completed, `ready` when no blockers remain, else `draft`; nothing in the module produces `generated` or `submitted`, and a reload re-derives the state rather than reading a store.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L141-L181",
+          "version": "repo-lines-v1:sha256:598e56f904fad79341b3c6a4647f7361e907a1a9c6e9a3e00619d44069e647fa:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzOWY5ZDZmM2E2MTIzNDM1Yjg4NTUyNzYyOWEyYzliMWU5Nzk1Y2NhMjkzYWFiNWJjOThlYTk4Mzk1NjQzMTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYzU5NzY3YjYwNjdkYjgwYTY4OTcxZGRmN2Q5ZDIwMjA5NGRiMDM4NTMzMzFmZDVkNGFmN2Y3OTY5ZmU3MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_26bf9003503c4a22b2579cdbf9692651",
+      "statement": "The queue's closing copy is the rule surface: the preview footer reads 'Internal working copy · TESDA SIS and BSRS remain authoritative', and closing the preview toasts that nothing was saved or submitted to TESDA — ADR-003 P3 keeps TESDA authoritative.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-003-billing-packet-queue.md#L43-L43",
+          "version": "repo-lines-v1:sha256:283883fdde1bfe5541deee14497b780ddfeb9b76bf166143995f80525610dd54:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjgzODgzZmRkZTFiZmU1NTQxZGVlZTE0NDk3Yjc4MGRkZmViOWI3NmJmMTY2MTQzOTk1ZjgwNTI1NjEwZGQ1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjgzODgzZmRkZTFiZmU1NTQxZGVlZTE0NDk3Yjc4MGRkZmViOWI3NmJmMTY2MTQzOTk1ZjgwNTI1NjEwZGQ1NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmVlYzcwNjUxZTAwMmQ2YzUxOTcwZGQxNWRmMzU4MjY3YjhiZGIwYTk4Y2YzMjdjYWFmMjRjOTA4ZmUwNzJiYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjg2ZmEzNzc5YmQ0MzU3ODBmNWIxZTFhNGEwYmM1MWI2NGFkY2U0MGYwMWI5ZGZmODAyNzFhYWU3MjdkZWI0YiJ9"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L424-L477",
+          "version": "repo-lines-v1:sha256:f708cf3d09702d7c50c8f1246ce6da71f5a0ea6ca420a4f489d59ff612a63656:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmMGZkYzUzMGYzNzczNThiNTRmN2ZjYTgyMzE4OGIwYjNlNGNlZDZjN2FhMGQxNTBlM2NmMzc1MDJhYmMxMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiN2QzN2ViYjU4NmI3ZDA3NTQ5MDg4ODMyZWYxYjhiMDkzNDBmODk5MjBmN2UyODEyZmNmYjM4ZWFjMmFkNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkNmRlYTBiODFhYTZkNTg0ZTJmNmM3MDBkNzcwODEyZTUxYWUyYjFiZGJlM2MyYjgwNjAzNGI4ZjJjYTBlMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwYTI4NzVlMGI5MDU1YTc1OGY4NDMwNjAyMWJhNGYzNjg1YzYyYTIwMGM1MDA4YjA3MTZmOGQyYjM5NDhlNTAifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingStatementModal.tsx#L166-L174",
+          "version": "repo-lines-v1:sha256:be67bafc519ea09e0b8696bc7875ebaeaa949ca8077d3abfc89beaa5d230b059:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmE1ZTQ2YzkyN2YzMjkzOGMxZDk0NzVkMzBiMGQ1NjQ4MzZhY2EwY2UzYzRjNGEzZjJlNThiNzkzMmMzZDdlMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGUwMDYzOTk3NmZhNzYzMWE1ZGJkMjdlM2U0Y2MyMjdiYjRjMzcxYzc1NWU2NWU3OWQ0OWRkMzAwZWQ4ZjQzYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzM3ZGE4NWRkODNjMzUyNzE5OTAwY2QxYWM3ZmY3MDY5Y2JkYzRiMGE2ZWM1NWZkM2MxODEzNTdlODBlNWU5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGMyY2JiOWEzM2M0ZDI1MDdiYjhlNTY0MDA0YTU0YWY5MTZjNTNmY2NlNTZmMjMyZjhiZWRiM2ZmYjcxMmNlOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e736a7be771c4c50b07bd77f4ccfc858",
+      "statement": "The mapper derives `totalDays` from `row.total_sessions ?? 0` as a compatibility alias, so a batch with a null session count yields a ₱0 TSF packet amount (`totalDays × ₱160 × scholars`) even though its statement's training period has a real source; the `documentRequirements` catalog gap is the successor to the TES-34 TODO rather than a missing field.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L279-L283",
+          "version": "repo-lines-v1:sha256:cee654e09f0863861363dab5d9e5c5ae78db3130a9a380e852787e406d078c31:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2RiNTU1NjJlOTc2NjE1MjczNGQxZGI2N2YxNTc2ZjE1YWI4Y2QwZjVjNjY4Y2Q5ZmI4MjRiYmY2OWViOTBmMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDQ3NTQwN2UyNDY3YjNjMjNlN2YyMzdmYjNmOWEyZTE5OTU1MmU4ZDNlNDdjMTNmZDJlMjJhNjJkNTg3MWQ1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTJmNjA0YzM2OTc5OTY3N2EyZDNhZWRjZDBkYTlkYjc5NDUxYzczYjFlZDQzOTgzZjE4MzdhMzRmZmIwNWM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjA4MDI4ZDcwYTJjOGUxMGRiZmJiMDhmMjA5M2Y3YTY0NmZlNGFjOTc5YzA1OWNmMmIxOGI3NDFiNGQ0Mjg4NCJ9"
+        },
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L68-L77",
+          "version": "repo-lines-v1:sha256:645220d4ad8a9591ac82ab60f6182e9f7fea81b36b192a1809eb7db53a0b9022:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlODk3MGUyYmJhMzQ3NzE3NTlhOWU5ZDZmNjIxYmVlZjY2NTYxZGY4NDM3NjVkYmE3ODUyN2Y4NTYxZWRkZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlOWEyOGFlMGUzOTIyNDlhMzBlNzEyNDkwNzM3ZTUzOTVlN2FjNzc4YjE3MTgyZWUzNjI5ZDVjMGQ2MTY2MjkifQ"
+        },
+        {
+          "resource": "repo://modules/billing/ui/BillingQueueView.tsx#L472-L477",
+          "version": "repo-lines-v1:sha256:6f351fc0629191c13d2d445a8fa8a6ae68f2750637709f7f0a70fd911d915f9a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzEyN2JkNzU3MDc1MzBjMzJkZGMwZmNkYjYwNTFkYjAzMTQwNWUyNDIzZWMyMTBiMjcyMWVlZjY4ZmVkY2MwYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI3ZDM3ZWJiNTg2YjdkMDc1NDkwODg4MzJlZjFiOGIwOTM0MGY4OTkyMGY3ZTI4MTJmY2ZiMzhlYWMyYWQ0YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTA5Y2JiZmRiNjMwOWMwYzFhNmYzNDAzOTdkMWQzMTE3ZmVmNDI0NDM3Y2YyODZlNTRkYjYxOTNiYmRlZmYzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTBhMjg3NWUwYjkwNTVhNzU4Zjg0MzA2MDIxYmE0ZjM2ODVjNjJhMjAwYzUwMDhiMDcxNmY4ZDJiMzk0OGU1MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0c01761399ef4321a934f596b0603a74",
+      "statement": "Screenshot of packets: `buildPackets` sends one packet per batch through `buildPacket`, whose condition set is `pre_billing_stages` (aou/ntp/tip/train), the readiness threshold, and unsatisfied critical pre-billing documents — three packet states are derived only by `batch.status`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/data/billing.ts#L27-L59",
+          "version": "repo-lines-v1:sha256:71679eb695351559079db8cb8e5e1d1d67488cdae070247ac3fc60df3b02776d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmMmFiNWJjMDM4MmRlOWYzNDU1YThlYWExZDdiNjdmOThjZWQ3Y2Y1NjJmYjRhMTg2NDg4YmNiMjQyZjFjZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1NzQ5YjhhOTdjZDhiZjA4MmZjYzI4YzkxNGRjMWQ4YTYzOWY4MGM4MWJjYjRkNTU0MjlmMjE3Y2VjOGY1MTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5N2MwNGE4Y2E2YmQ2NTY1OThkYzdiNjRmZDBkMzk4ZTM4ZDE5MGJmYjBhYmQ3ZGY2OTU0NWUxOTM0NWIyYmMifQ"
+        },
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L141-L166",
+          "version": "repo-lines-v1:sha256:5bc95514b691d03273bedd9e46e49205d68a1e69bcdfbbb41c8c4b4ac61531d7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzOWY5ZDZmM2E2MTIzNDM1Yjg4NTUyNzYyOWEyYzliMWU5Nzk1Y2NhMjkzYWFiNWJjOThlYTk4Mzk1NjQzMTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyYzU5NzY3YjYwNjdkYjgwYTY4OTcxZGRmN2Q5ZDIwMjA5NGRiMDM4NTMzMzFmZDVkNGFmN2Y3OTY5ZmU3MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1MWViMjgxMjYzYmJjYmFkNDMxYTIyOTkxNWZmNDBiOGU4ZDg0NmJhOWVjNjRiYmI1ODNhYjk1OGJhZDMzYTUifQ"
+        },
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L20-L29",
+          "version": "repo-lines-v1:sha256:02b57b7161cdfe0d9424ba0a3607906563cbfd7b4b819bdd897b48537f37d90c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjMzBiNmZiNjg4MGU4MTNjM2I3Y2UyYjEyN2RhZmUxNTQ5YWZjMWMxNzRkZWI4MDNkNTVmMmViNzRmYjc2YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyOGJhMzEzOWY4MWE5MWEzODk0ODlkZDFkMzE1OTg1YzE0YjgzZTY1ZGEwOTI4YTk5OGViOWVjMDQ1MWZkYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxYzU2NzJjMWU3NDQxNmZmZDIwNzA1Yzg5MzFhMjJkZThhMjg5MmZhZTQ4MjY5ZmVhMDg3ZGFlOTJjZGY4NmIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

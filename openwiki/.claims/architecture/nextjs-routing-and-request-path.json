@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:bc12d582908b6a7f1f8ff6eefb1d36a9deb15beae79e023d3d48ca7adcea6e2e",
+  "pageVersion": "sha256:c9f95626618f80aeb4b6593ae79f570de5137b8bf55449a82eb7d0f95bda261c",
   "claims": [
     {
       "id": "claim_f05fdeb46da34086b89b610ff879ab14",
@@ -597,10 +597,294 @@
           "version": "repo-lines-v1:sha256:3cf88dda2befa6d49f62bded10d6556f23a2aac317d0241807a39e81cb00d72b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyZmM5NTFlOTljYWQwYTUyNmQ4YzNkMjdiZDc1ZTYxMWU3OWMwOTViZTRkOGEwYjk1ZjMzN2Y3NmU2N2E1NTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_62afeeed22614e86a26f3e1bbdf920ea",
+      "statement": "The guard model is spatial: a route is protected only by the route group it sits inside. The `(dashboard)` layout is the sole authentication gate and cannot be substituted by config, because `proxy.ts` sets no route matcher for protection.",
+      "evidence": [
+        {
+          "resource": "repo://CLAUDE.md",
+          "version": "repo-file-v1:sha256:099cfb0612cf712e2330b04186f24c979185e8879a16a0a5b9f20a952736bb3f"
+        },
+        {
+          "resource": "repo://e2e/auth.spec.ts#L4-L15",
+          "version": "repo-lines-v1:sha256:dafedbb231477ec9a20f880bd678bed1afce5e6e082e43cb64b5b4333fb1e4f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5MjhkMTQzNzM3NDIxYjFhMmExM2U3OWI0MGU0NWU1Y2QwNTNhZmFkNjU3NWE2YWE5ZTBlYTdhMzgxYmRkYjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MjQ2NWM4YTI1MjhlZWFlZDY5MDA4M2UxMGFkZGMxZjY1ZGNmNDhhODczYzAxOGQ4N2NhMTBjNTFkNmU0MmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://proxy.ts#L4-L16",
+          "version": "repo-lines-v1:sha256:d585a07058ee863912697a2ab11f881bfbd27de5fc38599649f3ff607d56fe66:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlZGE3MDg1MDMxZjQ5MDY1NDE4YTc1NmYyYTNkNDEzNTkzNTgyNzJiYmFlMmU5NjJmNTBjNTc1ZmE5NWIyN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjN2FmZmNjNjQwNTMzNjJjMmU0OTFiZjI5NzEyMjVhNjdmODU5ZDQ5NTNjYjk5MjNiMGU4OWUzNmZjMjFjMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dce4f2ff626543b5bf9226694a6b7f37",
+      "statement": "`app/api-docs/page.tsx`, `/sign-in`, `/sign-up` and `app/api/*` all sit outside the `(dashboard)` group and are unguarded by it. Each picks its own gate: api-docs calls `requireAuthenticatedUser()`, sign-in is open by necessity and sanitizes `redirect_url` through `sanitizeRedirectUrl`, and each API route answers for itself (`401` in openapi.json, webhook signature verification, open health probe).",
+      "evidence": [
+        {
+          "resource": "repo://app/api-docs/page.tsx#L1-L7",
+          "version": "repo-lines-v1:sha256:46a7db553abbbb4ed58e8aa992bd44e6e688ca0e78c8c55594c91267891f7e71:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjYwZGQ1MDVjMDhhYjBjMjEyNTlmODZiYjM5ODY2ZjgyYWI0YzI2MDYxZjUxNzM0YjZhYWI1MWU3ODc0MjI5MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://app/sign-in/%5B%5B...sign-in%5D%5D/sign-in-page.tsx#L42-L42",
+          "version": "repo-lines-v1:sha256:0700b9d7b4fe009afb6adfaee75871bfedfa3d6d2ae110fa2a4fedbbfd518e1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDcwMGI5ZDdiNGZlMDA5YWZiNmFkZmFlZTc1ODcxYmZlZGZhM2Q2ZDJhZTExMGZhMmE0ZmVkYmJmZDUxOGUxZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDcwMGI5ZDdiNGZlMDA5YWZiNmFkZmFlZTc1ODcxYmZlZGZhM2Q2ZDJhZTExMGZhMmE0ZmVkYmJmZDUxOGUxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDBjYTNmMjgwNjRkNDQ0YzhiMmJiZWI2YjhiODQyYTM1MTdjMjgxN2ExN2RjZGUyYTNhODBkNzhkMThhODI2ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODJmNTc0NGRmZDY1ZTZiNzA3NWE2M2EwMzY2ZjMyMmJjNDNjZjQ0ZjYyMjA4N2RkNWU5ZTlkNmQ5OGFkMDkxMyJ9"
+        },
+        {
+          "resource": "repo://modules/auth/domain/redirectUrl.ts",
+          "version": "repo-file-v1:sha256:29d859b3e89daae3165fc8298e22b54ac043a3f3656055c9f4131bcb124567c7"
+        },
+        {
+          "resource": "repo://tests/unit/redirect-url.test.ts",
+          "version": "repo-file-v1:sha256:e3a03c2e79cc4d9b167dffa8f14e36793e0086f5d729fbd232e8df6188450cdb"
+        }
+      ]
+    },
+    {
+      "id": "claim_2faf4f1340e3440b8c7474e32efe1376",
+      "statement": "A Server Action is a separate POST target that inherits nothing from the page that rendered its form, so each action carries its own authority check: it re-resolves the tenant from the URL code in the `FormData` (never a tenant id from the form), resolves the role with `resolveTrustedRole`, and treats those checks as defence in depth above the RLS write policy that finally denies an unauthorized caller.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/actions.ts#L82-L82",
+          "version": "repo-lines-v1:sha256:2d019f057190a5b9107ac24b2aca631dee252296877e50978844a07f3fff76a6:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQwMTlmMDU3MTkwYTViOTEwN2FjMjRiMmFjYTYzMWRlZTI1MjI5Njg3N2U1MDk3ODg0NGEwN2YzZmZmNzZhNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQwMTlmMDU3MTkwYTViOTEwN2FjMjRiMmFjYTYzMWRlZTI1MjI5Njg3N2U1MDk3ODg0NGEwN2YzZmZmNzZhNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJjNDc4YTI1ZDVlY2VkZjEzYjUzZjA3YjBiNjg4ZTZiNDk3M2IyOTNhZDZjNGNkOGI5ODdiNzc0MTNhMzNkNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDU1N2U0MWQzZjA1OTZiY2IxMTU1MDY3ZTc0N2Y1Y2EwNWM4MTkyODA1ODIxYjkyN2U4ZjJiZGNjY2M2NzhkMyJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L100-L108",
+          "version": "repo-lines-v1:sha256:74f112a3d56acc691891246aadaa1227eff610c8eb4f2a4707b03013d3d8810d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjA0MDE2ZDBiYzk3ZTI3NTNjYTkzYzYwMGM3Y2M1Mzg4N2M1MjYxNmJlYjEyNTIyNjJlMTE0NGZiMGEwZjA1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI0MTcyYWMzYzdkOGJiYTYyNzRlZDZlNzM4YTk1NDgxMzg5YWY5MDlkNzE5ZGNhZGM4MWFkOWRlZmY5MGEyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzhlZjA2NGU2YWQzMDBlODZlM2VmYzNhMWE0YjcwODJkYzkxNjA0YWU5ZmY2YmYwYTQxZTlmNzFhNGMxOGU2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzU3MmU4Y2NiZWE0Y2ZiMjliOTk2YjBkZjc3Y2MwMWY0Nzk1ZGZmMWQyOWE0YzM0MGNjNWQ2NWEyZTIxNDgxYSJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L13-L20",
+          "version": "repo-lines-v1:sha256:cab4c95e2368f73826ae741217f58edd00eac9a487e33f1b523e56300aa60af3:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjE4OGJlZGIwNWRkYzMwMjQzYTg4ZDk3ZTU4YjIzYjUzY2E0YzQ3ZGI5ZGU3YWMzNWI4NjEwZTg2OTRkOGUxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTg1YzI3ZDQ2MzlmMTAyMDBjYjgxOWY2NzdkYjlkYWExNTMzZGE0MWMxYjE5NTY3NDY0ZmIzNDAwNTU4MzQ0ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzE4YzU3MGUxYjE5YjM5MDFkNDEzMTU1NTU0ZGFjMzUwZDFjMmRjNDZiZWM3Yzk3OWM0NTAxMzliMmJmMDZmNCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/users/new/actions.ts#L56-L75",
+          "version": "repo-lines-v1:sha256:3f3f78f5f1c6c4cd32690cd89c95dec2e6ae1ce49140d811317280b03b1eebff:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhNjhjOTE4MDYyZTBjMDVjNTk1MWQ5YTg4OWJmYTNhMWI3MTI4NjBhZjYzYWEzYjA0YzE1ZDQ2NWE1Y2E0MjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMjg1ODczNzFhNzk0OWM5OGZlYTIzZDRhNjU0NzY3OWIyYjYyMmRlYmY5MGRiYTNlZjFiNWQyODg4ZTJmY2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4YTEyMjYxYTQ1YWRmZjZjOTc0MjY4NWRkOGJiN2JkOGY5OGFjYjIxN2RjYWY3ZGEyNTc4YzkwNDFmOTZhOTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViYTE0ZDg1ZWQ1ZTBhNjQ4YzMwNmI1ZDkyNzg4ODE1ZDYzMGFiZDA4YmMxY2YwZjU2ZTczNjM5YjlkNzJmZDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb55e41df8744b39a4a81e65cbcc683b",
+      "statement": "`?state=` is a preview override for guard states only. Its correctness rests on guard ordering: a forced `denied` wins first, a real failure with zero rows is checked before the empty state (RULES rule 19), and a forced `sync-failed` on a non-empty snapshot falls through to the inline banner instead of replacing the screen.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L83-L105",
+          "version": "repo-lines-v1:sha256:1b18d06cc08dec4c16b91d59cfeaa54cf0c1b4782686e12758a6d78b2cf8a934:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4MDQ4NTc3MzU3YTgwNDQxMjRhMWRhY2JhZmNiY2E3ODQ5YjU0NmZkOTAxYjg1MjBhMjlhMWY5MGMzN2QyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxYTkyNzY4YmZkNTBiODZhZGUyMzVlZWI0MzNkNzM4NjQyNGMzNzkxM2NjNTRiODYwMDQwMTNjNzJkZGI3OTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhODQ0MDU5NjA0MDJlNzI0YTM3NjVmODg2YmM5YzU2M2M3NDQ3YmU5MjliZjk5NjM4YWQ4NmJjNWI3MzZkMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2YjE4MDYzNDE1ZGJmMzU1ZWNjYTI3NTNlNzVjZjRkOTg3ZTAyNGViNzYxMzE1Mjc5ZGU2NGQyOWJiMWZjOGQifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L136-L171",
+          "version": "repo-lines-v1:sha256:bb7fdb41f5cc129c626ed608fb45a5f02fc0ecd8e12dfe92eb3cfd9221defaa1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyZmE0Mjk1MDIxYmVhYTcyYmQxNjI3MzYxMmY2ODJmYjMwZDNjOGE2MTAwNjAwYjI3YzJkZjE5ZmI1NDY4MTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_55f6f5aa70964c418649e12255f7e55d",
+      "statement": "`?role=` is presentation-only. `resolveRouteRole` lets it win, but every redirect, authority check and Server Action gate uses `resolveTrustedRole` on `profiles.role` instead, so `?role=admin` does not let a real trainer past the office redirect — in `requireScope` or in billing, which re-derives the trusted role and redirects before the fetch.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L51-L67",
+          "version": "repo-lines-v1:sha256:d2b59051b94abdff51944c40ca7fd73ac0a1bf9cc89a009cc0b3b03955efa594:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWIyYWZmODFmZmZjZmYwZmIzNmFkZjJiZGI3Njk3ZTVkY2JhMDE4MzRkN2ExMGQ4ZjU2ZGQwZjliZWJmNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlMjhhMGIyMWMzYjNmZTVjYTU0NTYyMDFmOTYzYmRmNDM5NzQ2ZmMyMTA4YmYxNjllNDZlOTY2Y2ZiMTM3OTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhNWFmMTdmZDlmZDI0OWEwYjU3ZGRjMDcwZDBlMjVmYzU5MjRmM2M1ZjU0YTllZjQzOGYyMTU5ZThlOTI0NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3MGUzOTI3ZTY3NGE3OGJmMTI1MmYxMTk2MzQ0NWFlYzc0NzFjNTY2YWY4MGM3NTUwM2M3YjI0MzU5N2U5MzgifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L68-L76",
+          "version": "repo-lines-v1:sha256:4372d69e295b30fa61920f5ee24307316d0b59d2cda60789c7db7a8a8be3250f:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTVkNTRlMmY3MDk5ZTY5YWU0OWFjZTVjODM4NmYwNzI0NTYzYzA0ZWExNjY0ZGIxNzFkMTQ0MzM2OTc2ZDQ0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmYxZDJlMzQ5OWY3ZjRhNjNmZWNmMmQ5YmM1YWVjN2QzZGFkZjU2MDYwNDEyOTQ5N2JjMTIxZmFkNjk1ZGNlZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzY0ODM5OGJlNTU2OTQ1MjlmMTdkZDkyYWMzNTUzM2RhZDZiODI4NzllZjUzZTNmMTEwMDY0YWE4OTI3OGUxMyJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L58-L65",
+          "version": "repo-lines-v1:sha256:fd0901918b559a178c1e4b8d48c4e1f7ce46549f63cb1313b756244492daa69e:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjNhNjkzYjYxZGYyNDYwMDY4YWY1ZTU5MDJhZWRlNjZiZGI2YTMzMGFjYWZlNTI1M2Y2NTZjMjc2OTZkNGU3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWFmN2M2N2UwNGMyOTcyODZmOTI4MmRhMGZlYTVkNGI0NjMxZmY2NTU5Y2FhM2U3MTZiNmZlY2IwN2U4YzNkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODViYzUzZGUxOTBkNjIwN2RkNzEzNDE3M2VkZDAxMzE5MzQ2YzQ3OGU5ZmNiOGI4NTY5NWZjYmQyZWU4YzYzZiJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L97-L115",
+          "version": "repo-lines-v1:sha256:70053d009e1217e2556994ca1360c6df436e957308fa9cac4a0679ae2cdad6b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyZGM1YmQzN2Q3ZDg1Y2EzMmZkNDY2ZmUxNGFhMmNjZmQ0ZDJmMzUwMDIyN2U2ZDljZWM4NTBlYWI4ZjU2MmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_340831439f814d598d2132a5b4e0ec8d",
+      "statement": "Because `resolveRouteRole` falls through to `resolveTrustedRole`, a `?role=`-driven build keeps looking correct while every gate actually reads `profiles.role`; the regression only appears when someone gates a redirect on the preview value.",
+      "evidence": [
+        {
+          "resource": "repo://modules/auth/data/role.ts#L107-L115",
+          "version": "repo-lines-v1:sha256:8609f242ecf5dc27a7e0141b88ecb89573475e3be217159afa27222cb62f6cdc:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmVkMGZkOWY3NDVlNjQ2YjhkMjVhMDQ1YzljZjEwZGZlMzk0YzAzZmRlZWY3N2RlYWNkOWJhMjAyNjkyMmQwMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmMzZWMwNzk1YzM0YjA1ZDM1YTFlMjJjMTNkZDExZTlmYTBhZGY1NGQ0MTFkZTBlZGJmMzhlODM5NzEwMmZjZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L58-L62",
+          "version": "repo-lines-v1:sha256:71e421f4f0cf184cf8c0feedcd6b313ca11c068ccf74be54d7c8de8d47e8e17f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjNhNjkzYjYxZGYyNDYwMDY4YWY1ZTU5MDJhZWRlNjZiZGI2YTMzMGFjYWZlNTI1M2Y2NTZjMjc2OTZkNGU3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWFmN2M2N2UwNGMyOTcyODZmOTI4MmRhMGZlYTVkNGI0NjMxZmY2NTU5Y2FhM2U3MTZiNmZlY2IwN2U4YzNkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjY4NTI2MDljMjk5YTU5NWRjYTY0NmIwNWY0NjNlM2MxZmI3YTdhNWQ5MGVhZGUyZWQ3NTE1ZDU0ZTc5ZDIyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ddfd0264107c49e7ba132e84a17ee40e",
+      "statement": "`/schools/new` and `/users/new` are unscoped but not ungated: both sit directly under `(dashboard)/` so a trainer route's nav can still reach them, and each resolves its own authority server-side (`isPlatformAdmin()` and `resolveTrustedRole` respectively) rather than trusting the router's `isTrainerRoute` flag.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L100-L121",
+          "version": "repo-lines-v1:sha256:405a4609f183d8889bd38366dab29a80eebbbb468426bb9d4ce22dce5f2676aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3ZDNiZjMxNWQ1NmNiZWNhNGVhYTcyYjYzZDJjYzY5ZDE2YTA3MmM1OWVlMjc2ODM5MzBlM2U1MDY5NTA4NjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjODYzYjdiNjI0NWNjNTc5M2Q3ZjgwYWU5Y2IzMjY0MzBmYzIxODRkNGYxZmIwODc4MmM1ZWQyZjYwYjdjY2MifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/users/new/page.tsx#L92-L109",
+          "version": "repo-lines-v1:sha256:ee18f17c16c0c3490c0dd53fb40980504794ffad3c28891f74658f610f730fd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3ZjFiYjIzMWE3MjRhYWE5MDk5YWY5ZTdjMmFmYjM0MjU3OTViY2RmZTY5ZDYwYzRlMjcwYmU0YzNiN2I1ODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwNDg1NDQwMTQyYjI5Y2NlYTA3ODllYzE1YjQ1MzY3MzllNWYwMDliNDI5N2Q3ZWY2MzJkOTYxM2ZiNjViMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4NjdjNGNlNGEwMmNkOWNjYThmM2FjZWRiMzQxNTViNTgwNjA0OTllNjc5OTM2ZjQ5ZjQ4ZWQ1OTUzNWYxZWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4f45443c68ee4fc094a547e9d73d79d1",
+      "statement": "`/trainer/**` is unscoped on purpose (ADR-001 K1-redirect): trainer routes address by batch and the assignment row carries the tenant. `Sidebar.resolveOperations` and `Topbar` express the trainer variant as explicit `!isTrainerRoute` conditions so the two cannot drift apart later.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-001-billing-and-domain-model.md#L166-L166",
+          "version": "repo-lines-v1:sha256:ab0a3e80d9173438f8426855ca14af7ed8b2e8dde7aaefc770158151e436b3e2:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWIwYTNlODBkOTE3MzQzOGY4NDI2ODU1Y2ExNGFmN2VkOGIyZThkZGU3YWFlZmM3NzAxNTgxNTFlNDM2YjNlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWIwYTNlODBkOTE3MzQzOGY4NDI2ODU1Y2ExNGFmN2VkOGIyZThkZGU3YWFlZmM3NzAxNTgxNTFlNDM2YjNlMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODQ3MzQ0NjcxMzZkOGNlNWMyZGFhYjMwNmQ3ODViYmE3MzIxZDVjZDU2MTI4Y2IxNDk3MTBmZGZiZTU3ZTk4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGI1NzUwMTkwNDI3NDVjNjhjY2EyMGYyNGI4YWU1MGVhNzgyNDY3OWE1YTE3MDNmZTljNGJmNjA0Zjg0NDE1MiJ9"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L126-L135",
+          "version": "repo-lines-v1:sha256:853f423f6f6844aebbd7a1e8843c5bd17692210664a967dbeb9b0321997e52c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliYzIzMmVjNWMzNWM2MDM2ODliMmIxZTk5ZGFhZGJkMDMyMmE5YWYzOGI1YzI3ODM0NWQ3ZmZkZTlhY2IyYWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwNDM5Y2Y1MjQ5NTY4YmVlM2MwYjZiZjJiZGIzNDc5YjM2OTQ0MGI0OTdlYmE5NzRjNWQ5N2Y4ODdlZGMzNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiZTQ4YjViZTk5YTdhYjhkMzMyN2YxNzA4ZjM2MTZhOTlhMWU2ODA3ZjA5MDRhM2YwMTczMmQ0MWM3YzAxZjQifQ"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Topbar.tsx#L37-L51",
+          "version": "repo-lines-v1:sha256:34668e2be436702eea82a2471a2a4dba04870933bc5a8a8bfb74fa496e219384:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwY2IyYmU1YTNlZjUzZGU4ODI5N2VhZTA1NjdjN2NlYjE5YzA1M2M5MjBkYmY3ZTkyZTE3ZGU1OTIzZmYyYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2YzA1OWMyMmZhZjk5NGZhZGUxMDI3N2JhNGI0Njk0N2QzNjIxZmQyODNiMzhiYmM2ODQ2MGEyNWM0M2YxYWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4YWViMjljZDQ2Nzk1YTdiZThlMGQzMGUwYmMyZTU3OTlmMWQwNzFkZGE5ZDM4ZGFkODBlZjE5ZDk4OWY3NTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjM5OTAwYTdlMzA0M2FlOGEzNmI2NzIxYjZiNzJhZGExYTUxMzZmNTAwNjAzZmMxMjAwYmUwZWRkNWNhZWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f09520722ab041e7bdf025fb3d26db1c",
+      "statement": "Next 16 passes `params` and `searchParams` as Promises. Every route here awaits them, and a synchronous read that still type-checks fails at runtime as an undefined tenant id rather than a crash.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L73-L79",
+          "version": "repo-lines-v1:sha256:658eba62018d9729894626ec8d079ab7ad18505b4ca3a406ddf8258a61061a21:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDVjMTZjOGExZjcxZGEzZjcxMmI3YzkwYjc3ZGQ1MTg2NjUyNzcyZDQ3NzdiY2FlZDM3MTE2MzNiMDJiM2NmYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjdlODc5YTI0MGRiMWZiZTU0YmUyY2I3MWE5ZWQ1ZDAyZTMwN2IwMGRiOGRiYjE5NzA2YjkzYzg1ZTc1ZGU5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjcyYzQyMTM0Y2UxYWM5OWU5YmM1ZTFiN2NiMmM5ZTkzNzg1OTM3NzA2MWY0NjRkOTUyMzY1MmFkNmRjNDQzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzg4NzBlOWJiYmE3ZDc4ZWE0YzYwNmU3ZWI0YjM0NDNlOGNkOWEwNzU4ODU0ZGJkYzc4ZTYzMzQ5MWI0ZDczOCJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L18-L26",
+          "version": "repo-lines-v1:sha256:39ca672a235b68e87c01e77fdc382d4c9446dac45e114bd99b0179f5f8872b60:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDA3MDhiMjY0NDQ1OTJhNWM3MWI0OTQyMmIxY2NkNjNkNDExMDRmYzk0NGUxZjYwZWQ2N2JmNmM3NGI1OTc2ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWEzZjc1MjA2NWQ3Zjg1MjM1ZTBmYmJmMWZjYzk3NzczNjk2NzAzZTdjMGYyMGI3OTQ2MTVkNjM4N2ZhNGFmNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmRlOWY4ZGVlMjM4YTNiMzQ5MDE1MjhjNzQwN2UyYzE5OTUxNGZiMTk2NTlkYTNlYjdhYjQ0NmQ5MTNjOTE4NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDJhNzBhZjQxMDlkMTgzZjkzM2ExN2E0MjhiN2ZlNDRlNGI0Zjg1ZmE0N2Q4MTU4MWJlNGNjODZmODJkNzM3MyJ9"
+        },
+        {
+          "resource": "repo://package.json#L46-L52",
+          "version": "repo-lines-v1:sha256:4f96f47145dba831e85bd81653090f57f59aa721d33c8971e2372b928ed35d02:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZiZWQzODQ5MTBmOTgxZTg5NjkyNDBmOTI0YjNiNjA2MWQyMjU2OTZiNzQwYzEwMWI5NjZkNjMwMjM2YmZmOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFjMDkwYzc0MGRkYzdmMzA5ZjJhODM0NmQyZmJhYWE5NzkyNWU2MGQ3ZTNjMDA5NmM5YjUzY2QzZDIwOGVkYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDA0ZmVlYmQ2YzVjMTg5N2VlZGM2MTg4MDVkYzI4YjNlMjAwZDllOTc2ZDllNzRmYzJiYWY1ZDlkMzIzM2I4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzUyY2JjNTUzZDk2N2JiODBkMzg0OTFmNGFhMGE3MzU2ZWM2YTY5ZTAyZTBiNDM4YjM4Y2Q1MDZhOTYzYzYxNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea7ba89fbd1a4d5684ddd82c7a34ee73",
+      "statement": "Client islands drive Server Actions through `useActionState` and derive their UI from the returned state during render (`RqmCodeEditor`, `CreateUserForm`, `CreateSchoolForm`); a hand-rolled `useState` + `onSubmit` handler loses the pending state and the re-render that follows `revalidatePath`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/ui/RqmCodeEditor.tsx#L61-L79",
+          "version": "repo-lines-v1:sha256:a5d654c4fdbc92486ecb9680bd450d396324620f071aed5e25bfde3fe6a3adc6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjMDNkMDcwNWI3YmYwMmM5M2IyMjllM2QyYWU1ZmU0NzZjMmExNThiMjBiNzk2Njg1NjE5MzVhZmY2MmQ2Y2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzYjI1ZDRlM2U3NmEzZThmMTJjZGY0MmY0MGI5ZDA1MjAzNzgyMGU2NGNhMzU4NGM3YmY4NjkwMDY0NDhhNzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NjEzNTdhMThmODhlY2ZhZTRiOTFhZjk5MzU5MGVlMjBkMjc3MjIxNGRmOTM3MDIyMDkwODQ2NmM0NzQ5OWUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/ui/CreateSchoolForm.tsx#L102-L102",
+          "version": "repo-lines-v1:sha256:9e85fd30e209a13c2333abc08d6713b5f777a15985ce068ed5784a5dc05b2f07:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWU4NWZkMzBlMjA5YTEzYzIzMzNhYmMwOGQ2NzEzYjVmNzc3YTE1OTg1Y2UwNjhlZDU3ODRhNWRjMDViMmYwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWU4NWZkMzBlMjA5YTEzYzIzMzNhYmMwOGQ2NzEzYjVmNzc3YTE1OTg1Y2UwNjhlZDU3ODRhNWRjMDViMmYwNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDRjOTEyNGQ3YTVmMmFiYmUxZTBlYzU1ZWY1OTJhZDU5ZjUyYzE2MWJhYzE5N2E0OGE4ZGI3NTQxMTBjZDQxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTEzMzZjMzViNWIxYzg1MzEwZTEwNDQ0ZWRjNTkyZjVjNDVlZTNkM2UzNWViYTFhNjE1ODM2ZTc5MTIyM2VjNiJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/ui/CreateUserForm.tsx#L102-L102",
+          "version": "repo-lines-v1:sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTllMDM0ZDgyOTRiNGY3MTFhNGQ3NWUyMzRhODhlNjg0MjFmN2E4MDEwM2UzNWYxMTgxOGIwNzVhYzg1ZjkyZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM0MTYzNTliZTQ0MDc1M2Q4NTBhZDM1ZDRlOTg0MDVhMDk0ODA0ZDBmYTU1M2YwOThhNWQyNDRlMTk1ZWM1NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_19fd4e14e8574453b88a6281c85f9dbc",
+      "statement": "`next.config.ts` contributes nothing to routing: it holds only `turbopack.root` and `experimental.agentUpgrade`, with no `redirects()`, `rewrites()` or `basePath`, so every legacy path is a real route file rather than a config entry. `pnpm dev` runs `next dev --webpack` while `next build` is Turbopack, a dev/build behaviour split.",
+      "evidence": [
+        {
+          "resource": "repo://next.config.ts#L1-L12",
+          "version": "repo-lines-v1:sha256:2fd85de2fc32354b780ce1da7e224b2b3cd86e518319f54870cbd0da1855e5ee:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmNjc5MjcwYWFiZDgyN2Q4Nzk0NWM5ZmJiYzQ3OGIxODM5NGQyZTFmZDU3MTZjMzY1ZTJiNWUyYjExYmVkZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjYmMxN2NhOGY3MzU5NDc2NzgzMGEzNmVlZWFjNGNlNWZlYTVkZDM4Nzg1NWVhNzRmNDUxOTE5MTk1ZDVjMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://package.json#L10-L14",
+          "version": "repo-lines-v1:sha256:3e04a7f2d624b4f4c4a5930e96c92aebf3087e80fa5cecdaccfdf29414ef61d7:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUxYjE4YzA3NWE2NDg3NTJkYTc4NjI3NzY4NjdiMmQ2YTI1MjQ1NWVlNzY5NDQ2MzNmZDUwMDkyM2IyMTBiMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTA5ZWUyYWJiZmRlNjc1ZWM2YmE2ZDQxOGMxM2QzM2M0ZDhiOGI2NWNiYTY5NWY1N2NkNjViODMyYWQwOWI3YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTg3ZTk3NjU1MTNjMWU3YmJlNzc5MDExMTI3Yjg4ZDNmNjUyZWY0MWM1YmE1MWRiNDAxODA5YTc4Mjc0OGM5MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f69970d928af4041a4d62d1de069e9ba",
+      "statement": "The `(dashboard)` layout runs `getProfileSnapshot()` and `isPlatformAdmin()` in one `Promise.all` and derives `isAdmin`, the user name, tenant list and default school from it. A failed profile read yields `null` role and an empty tenant list, so the shell renders a smaller, honest menu — hiding rather than denying.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L12-L36",
+          "version": "repo-lines-v1:sha256:ec19ab017ce61767dc22a75013024f2c9ac88c61a9196fc91d4822cbe56fc258:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzMTc0ZDMxNWNhNTNhZDNjNjYxNTlkNGFkY2FlYmRhYzAwMTEwYzY5YzM4YzM4MTRiOTgxZWZmZWU5NzM3MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhMDBjNWVjOTZkMzRiYWI4ZjdiYzBiM2ZmMGNiMmZmMDc0YjJkODEwNzkwMWU1MTRlZWNlMmU5NmVjNjdmOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZmMwYmYxMjZjNzhiOGY3Yzc4MDhiMzZhMzM4MzVkMzMzZDM2M2RkZTMxNjllMWZiYmNmYWVkNjhlNjRhMzEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L49-L60",
+          "version": "repo-lines-v1:sha256:9a570cc7aa8b18b5863ae04769936608798bd300d504d7f1d9ef80adea915053:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MjE2ZThlOWMwYTFhNjhkMDZjMmZiYWE1ZmQyMTM5NDgyYjhlZmQwYTE5MzE1YjkxNWU2Y2NlODQ5ZDg5ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkYTU5M2ViODNjNzlmZTljNmQyNjhkMWMxYjg3ODdhMDkyODEwODYyYjIxZmU4YTFkMTYyZjRmMWQxZjMxMWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzZGJmNzI3NGRjZmE2MjhhNDBlMDVkNzFiNGZkN2Y0YTM2OTA1YWU4YjA5NDMxMDE3ZTZiYjg3NTBjZGYyNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczZDhmYThkNzgyZjY5YjBhYjYzNGY5ZTc4ODBhMWQ1NTc1Y2M2N2VlNThhOGE4MGE5MGJjNDdlMjQ4OGI4ZjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6810355e1e05499eb650a313cba3e420",
+      "statement": "The `(dashboard)` layout renders no KPI row, because a root layout does not re-render on client-side navigation and a row placed there kept the previous school's numbers after a school switch.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L44-L47",
+          "version": "repo-lines-v1:sha256:b4c0894da663888b2c48dc4997923dfaf8b1b852bfdad6ab3315257b76363ed7:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZlNzM0ZjI5OWE2ZGVjNThjY2U5MzFjMTEyYTVhYTllNDYxNjJkY2Q5NTdlMzFiZTkxZDQwOTFhNDk2MThkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjk2ZDgxYjMzMjhiNGM4ZWRlZWJkYzlkN2E5YTAxMTY4NDNhYjUyMWJkOTYxNGQxZGZiNjczMWZlZDI1ODVhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzk3ZjRhOThkNDBmMTA5ZjE5YTFlZTM0YzAyOWQ5ZTBhZmYyOTQyN2I2ZmYyYjNjMDdiZGI2MGJmZjY4ZDVmNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDJjNTY1NTdkMGViYjhmMjc2M2ZkODVmZGI5YzE0ZjE5YzA4OGQyZTcxYmY1ZjRmMmZiOTM3NTg2ZDA4Y2IyMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e35b0343a2f94376bf62f336ba1b01bc",
+      "statement": "The `(dashboard)` layout reads `x-pathname` with `?? ''`, so a missing or blank header silently means \"office route\": `isTrainerRoute` is false and every trainer-only nav omission lapses. The path is also invisible to client islands, which resolve the active school from `usePathname()`, so server and client can disagree.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L14-L16",
+          "version": "repo-lines-v1:sha256:60810d4f7e9c869fe195cf3368c20b669f327dbc83d20370ebc16137ff495702:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWUzMjlhNThlNmEzODJjNzc1MTlkZTI5Zjc0Yjk5NTRjYzFiMWE1MWRjN2RjYTQxYTkwYmMxMzVhMGNmMjI2MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTdmNjU1OTkxNGNkNGE5ZjI0ZGExY2ZkNGViNDJlOWYyNjVlMDg2NTgzZTJhMzdlOGQzZjgxZDI2YTU2NjE2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmQ0ZDBjNDM2NDkxYjQxMzEyMWM3ZDcyZmJhZmQ1ZDkxMWU0YzQwYTYzYzQ3NTBlZmIzOTQzZjQxYTJmNjQxMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjc5MjBjYzI1NzMxNzRmNDhjMDA4MDBiZWU2NjFiZGU3OTdlZDI0MDRmMDYyMTZjMDkwZTI5OTUwOGY5OGVkNiJ9"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L17-L23",
+          "version": "repo-lines-v1:sha256:184aa9d6a1f264044bfa74caff37035314632b1eb06b7ac8c0b8838bd5f1d2e7:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM0N2JkNWIwZDJmYmE0OWE5YTkyY2I2ZTdlMGVhYzM2YWJkMzg4ZTRlY2I2ZjIwNDEwN2M3Mzg3NzY3NmZjNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTVmZjVmMWE0ZDc4YWQ1ZDliOTkyZTRjOTQ2ZmYwYTY3NTYxNzU3YTA3NDg1MjRkM2E1NjdiMjE0NTg2MTQ1ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDA2NzlmYjk5ZTIzYzEwNzQzYTdhNTU4MjMzYmUxOWZhN2FmODgyMzdjNzI4MzUyZTliZWQ5NmE4ODg3OWUxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDI0MmFjYTliYjA0NDdlMWE4ZjFhMzg0OTUwNjhlN2I2ZWE5ZDc3N2U2YTE1NmM3OTI3OWVlYzZhMjUyOTNjYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_72b670c82cff4df6b169a34ebd8378bb",
+      "statement": "The segment layout owns and renders all four non-`ok` `RouteScope` arms, so pages contribute nothing beneath them and `requireScope` deliberately returns `null` instead of throwing `notFound()`: layouts and pages render in parallel and a thrown 404 could beat the friendlier state, while security never depended on the choice.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L74-L75",
+          "version": "repo-lines-v1:sha256:9e3b5154a47c27bbc4b89661897eafebc6d3fcb7c01115da45feb4aad37d592d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzMDhkNzY4ZjA1ZGViODAzODRlZTlkMWMyZWVjOTFlOGI5ODYxYTRhOGQ4MzIxYTQwMWRhYzA1NTk3OWUwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIwZmM4MmI4MzRkNzcwYWNlNWJlYjZjMGMwY2IxMTVhYjI3NzRhNTAwYzgxMDc4MWYwM2Q3ZGQxOTUwMDE0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWQxZDEzZjY2ZDhkN2Q4OWM5MTBlOWRjMzIwZWJhZDA1YTFkNzg1OWYyZTBjM2YxZmM0NTYzMWI1ZmVjZjA1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDc2MTRkZmRkNDNlMzQ1NTU1MzU2YWM3ZTQ0NTdiM2Q0YjM2ZjE4Njg4N2YyODUxOTU0N2FiYTIzMTUxZGMyMyJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L26-L49",
+          "version": "repo-lines-v1:sha256:16a8ba3aacef1ccd9d2682589015ad5a86a1b753375609339eb2e9e123750f24:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhM2Y3NTIwNjVkN2Y4NTIzNWUwZmJiZjFmY2M5Nzc3MzY5NjcwM2U3YzBmMjBiNzk0NjE1ZDYzODdmYTRhZjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ZmEzZDNmZjc5OWM0MWE5MDVjYWJiOGZkYjNlZWNjN2U0OWMwMjQ3YzUzNGU0NDIxMDE3ZDYyZmQ1MmQxMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L54-L76",
+          "version": "repo-lines-v1:sha256:08f7bab475c99f532f56e280736120fb274be7c198f14f333332da2cce56cfa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjliN2MwNTNhZDQ2MTEyMzI5OWNlNGFlNzdiMWJhZDZjYjlmYTJiMDc2N2JiZjAxN2ZmNjRhZjI1NzFmYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_667f6845dc0a464fb082a5fa4045af23",
+      "statement": "`app/(dashboard)/t/loading.tsx` sits above `[tenantCode]/layout.tsx` on purpose, because a loading file does not cover its own folder's layout and one inside the segment leaves the school switch blank.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/loading.tsx#L1-L7",
+          "version": "repo-lines-v1:sha256:3d53375c74ff009a72a5edd555e627bf50849085a6aa974cdf2cf388383ce415:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ0ZjQ0MDFhYWY0YTQzNjFkYTM4N2QyMjQ4NTU2ZmVjNzE2ODE0MzUyOWI3NjE5Yzc5YjU3ZGMyNmIyM2I3ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9bb80bd5051140a29457c2eafb4c3a64",
+      "statement": "`legacyRoute(section)` builds one-line stubs for the retired unscoped paths; `redirectToDefaultScope` re-appends every search param, repeated keys included, through `URLSearchParams` so `?batch=`/`?state=`/`?role=` survive the hop to `/t/<default school>/<section>`, and only \"no school\" or \"could not verify\" render.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/legacy-redirect.tsx#L16-L33",
+          "version": "repo-lines-v1:sha256:ffc1449aea17797a78112583c68d5a720840f842ff6e627f79a7191fcb977f50:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZmYyMDMzYmEyYjZmMjExMjExMDQ0MDY3MTI3NzgwYjViMDlhYjhhYjUxYTI0YzNmM2Q1MjA4NTA0ODdhODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzODg2MWE2Y2JmMjRiYTA4ZTAzNWZmMWQ4Mzk0MWQ4MWQzMDE0YzllMGJkYWJjZTBlNzY4ZWJlNGJkNGU5OTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L85-L99",
+          "version": "repo-lines-v1:sha256:e3f1b275936dd82506a54a849424a611423056d0a86914d71197dfea94f8bea6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMmUyZWU5MzFhMjEzYjFiNjI0ZTJhNmE3NzMyZTM1NThiMTg0ZTdhZDA3ZDA4ZjliNzdhNTY1NjYwZGY1YTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NGZkZmZhYmYwNzkwNTNjYWIzZWY4NzBhZTBmMDI0NDNkZDlhM2UxYmZjZTgzMTBjYmQ2OTQzY2VmNzBhNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzZmU1MWMxZmU0ZDdjOWI5YTcwMWZjZmU3MmExMTJhYzUwODZmMzQ4ZWQyOWIzZTUzODg2MmM3M2U4MjQzNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_54b2299fc2934521b6cd39ca57966a88",
+      "statement": "`/dashboard` dispatches on `profile.role` — trainer to `/trainer`, admin to `/overview` — and otherwise falls through to the legacy scoped redirect for the caller's default school.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L16-L24",
+          "version": "repo-lines-v1:sha256:39567066ff8157a6cfd000e19ec98e7108bbb653087cb357d845c2fdd4452d31:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGEzMjlmODA4OGRmY2FmNjY1YWRiZWQ1MzhjMjE4YWEwZjA1YjY0NDg1NTFlOTIwODk2Mzk0YmU2NGI2ZWM2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU4MTk2ZDc1MWM0YjdkMWQ3MmIzZjNiYzM1YzE5Y2ZkMmI0MmYwYmJmY2EwY2VjNDExYWRkNTAyZjhjMTliNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTViYTFhY2RhYmY2ZmMyYWQzOWJjNzQ2ZmFhZGE4YjU4ZjQ1ODc2OGMzMmE1M2JmZjUyMzdlMTI0Zjg1MjAwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-19T03:55:05.435Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

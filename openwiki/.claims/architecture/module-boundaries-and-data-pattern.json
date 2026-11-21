@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0cee6663ac438c4778b162f0002e32ec93967c9559b73b7a0bea153de3d8ab64",
+  "pageVersion": "sha256:a2712bde632ca327b370366537f37ebddc4b2d405fd824cca770d4f5fa060e45",
   "claims": [
     {
       "id": "claim_b261aa00374b4985868752f47201bd09",
@@ -1615,10 +1615,446 @@
           "version": "repo-lines-v1:sha256:902f2f2847a8c9cf8cddea70eea6ed36e8ee59c8567582858e0e5e91d1f39516:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTAyZjJmMjg0N2E4YzljZjhjZGRlYTcwZWVhNmVkMzZlOGVlNTljODU2NzU4Mjg1OGUwZTVlOTFkMWYzOTUxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTAyZjJmMjg0N2E4YzljZjhjZGRlYTcwZWVhNmVkMzZlOGVlNTljODU2NzU4Mjg1OGUwZTVlOTFkMWYzOTUxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTg4NWIwYjViOTAwZmM3MTZjNzlhN2FkMWYyMWI0Mjc1MWJkYTljYWZiMTA1ZGJjYmIzZThlZmY1MmEzMGYxYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI1Mjc4ZWIzMWVmMzVkMTM4ZmNkNDkwYWQxMzI3YjRiNDA3ZmFjZjc1YjBkNzU2Y2RiMTQxMzk3ODZiMWY2NiJ9"
         }
       ]
+    },
+    {
+      "id": "claim_5adda0a979e24a87a88260c0315d3d2c",
+      "statement": "The ESLint `data/`-privacy zones are written with a non-negated `modules/!(${d})/**` target and a `from` of `./modules/${d}/data/**`, so a same-module `data/` → sibling `data/` import lints clean; the rule is cross-module only.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L38-L44",
+          "version": "repo-lines-v1:sha256:303316133cc2c24d30f2b04dd7ba50bf5dbe0a67dc08dea17e4d59839bdbc9cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDY4ZTE1NWFhNjIzNWI0Zjg4ZWQ1MjYwYjVhZjI0MDZlMTZlMTI4Y2E4NTk0NjhjMDQwZDcxYjk3NTRmYzZkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I1N2RlYmE4YzlhZmMyY2JiZmM0ZTExNWMzMzk3ZDJlZmIzMzBmYzhiNDIyMmNjODcxZmUxYzlhNTAwNjNhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDYwODU1NTU1YjM3ODBiYzMzOTA4NWZmOWQ3NDI2MzAwNDFmNDJhOGVjZjc1MWI4M2IzNDg4M2YwNGFkNWIxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ2ODU4YjBiNzMxMTgxY2IzNTk1N2VlYWIwOTc3ZWE1YzA2YjIzMDJjNWJjNTI0YmMzN2RiMWRhODE4YTBkOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7249568839084f5993410d4fa810ff34",
+      "statement": "The config comment states `app/` Server Components may still fetch from any module's `data/`, and this holds because no zone is generated with `app/**` as a target — while `app/**` *is* a target of the `database.types.ts` zone.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L29-L44",
+          "version": "repo-lines-v1:sha256:f50b6d246cb0df739ac3c6d31489a02f2dea8d6c2532b8bc66704deb97ddd753:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmOGExOGE4ZmJlMjIyMzdlMTg1OGRkZWNiODc3NzI2NWYwYTgwYzlhN2RiYTY4Y2Y5Y2Q1NjMwMjZkMGM2OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiNTdkZWJhOGM5YWZjMmNiYmZjNGUxMTVjMzM5N2QyZWZiMzMwZmM4YjQyMjJjYzg3MWZlMWM5YTUwMDYzYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1YjQxZjE1YWU4NzQ0ODMyZjIzNGM3Y2QzZGQ5OWVkZjhkNzM2YTg4NzVlZjI1ZjgwZDM4YjQxNWU1OTE1ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkNjg1OGIwYjczMTE4MWNiMzU5NTdlZWFiMDk3N2VhNWMwNmIyMzAyYzViYzUyNGJjMzdkYjFkYTgxOGEwZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_57983ab04cc24e5ab18d2fb148b08e01",
+      "statement": "No `import/no-restricted-paths` zone pairs `./shared/**` with `lib/supabase/server.ts`; only `database.types.ts` is zoned against `shared/`, so a `shared/` file that imported a Supabase client would lint clean.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L29-L36",
+          "version": "repo-lines-v1:sha256:7e43ef8ebf2f6c346801e36cf9c16dbc387f46225b8a207a71dba42e8a9f5600:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY4YTE4YThmYmUyMjIzN2UxODU4ZGRlY2I4Nzc3MjY1ZjBhODBjOWE3ZGJhNjhjZjljZDU2MzAyNmQwYzY5ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWQ5ZjYxMDY5YmU4ZDU3ZTg3YTEzM2MyNmRiZmQ1MjQ4OWQxMWJkYWQ4NjYzNmQ1N2VkMTNjOTk4ZTg1MGIzOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTViNDFmMTVhZTg3NDQ4MzJmMjM0YzdjZDNkZDk5ZWRmOGQ3MzZhODg3NWVmMjVmODBkMzhiNDE1ZTU5MTU4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTIzYzExZGU0N2NiNTAzYzBiMGJkZjA0NTVmZmJjODZmOWQ4MGQ4NWJkMDQ0NDNmZGIxZDJjMzMyYTQxZGIwZSJ9"
+        },
+        {
+          "resource": "repo://shared/README.md#L3-L3",
+          "version": "repo-lines-v1:sha256:4da61379037dc28d60457707ef21a2f9bed711945b08d590b4149f52640be574:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRhNjEzNzkwMzdkYzI4ZDYwNDU3NzA3ZWYyMWEyZjliZWQ3MTE5NDViMDhkNTkwYjQxNDlmNTI2NDBiZTU3NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRhNjEzNzkwMzdkYzI4ZDYwNDU3NzA3ZWYyMWEyZjliZWQ3MTE5NDViMDhkNTkwYjQxNDlmNTI2NDBiZTU3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWY1Y2Y1MTcyZmM2YTM3ZDQ1MGEyMDljNzk5YTJiYTIwYTMzMTExZTVjMjcxZjE5ZmQzYTFlZWU5OTllMDZhNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzkwMjEyYzkwNzJlNzJiYzlmM2I4OTgxOGM2YzBjNGM1YjMyZGFiM2NjY2IyMDBhNWQzZDA1N2FmNjE0YzliOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb54844b07a74e94a757ba9d638f2710",
+      "statement": "The generated zone list enumerates fourteen module names (`auth`, `tenancy`, `batches`, `documents`, `attendance`, `lamr`, `billing`, `import-export`, `analytics`, `activity`, `notifications`, `settings`, `reports`, `shell`), and a folder under `modules/` absent from that array gets no `data/`-privacy zone at all.",
+      "evidence": [
+        {
+          "resource": "repo://eslint.config.mjs#L5-L11",
+          "version": "repo-lines-v1:sha256:291a0e05c972c2f3a2ba73c138ea3ea0e070997cb85a276ac8a6418058addd34:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjg4ZmZmMDgzMDFhMmE4ZjA4OTRlNmI5MjlmZjczNWZmYTU0ZDFlZGRmYTBkMjU4MzQ1ZTg4NmZkMGUyZDJhNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjAyZDJjMGQ2ZGM1ZTc0ZDkyZmExNGI5MWRiZWEyNjQwOTBiZWIzNWZkYjkxODhkOWIzNDExODFkY2U5ZjRjZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGY4NDI0NDViNDI3YmQ0NDhkZTAyNWY3MzkwMjg4OWE3MTM5OGNkMmZlYTYwNWE1NWUzNjNjZTI1ZGJhZGM4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGJjNWFkYzdmMWM5ZjA2MGE4YjQ3M2ExNjJjYTRmMTlkYzBkZTVmY2IxZTBiODBkNzVmYTRlMjE4NjMyNWJlOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3f5c7cdce08149b2a667f8a867053171",
+      "statement": "Every Supabase-fetching data function guards with `if (!isSupabaseConfigured()) return { status: 'unconfigured' }` above the `try` block, so no client is constructed without env vars and a missing env never surfaces as a query failure.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L330-L334",
+          "version": "repo-lines-v1:sha256:8a4a8ae724dddeb6e818d8564f62629201597ece94d6e90b95290d49a5fad721:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZiMWNhZjcwNDIyY2M3MzM5OTA2NTFjMmQzNWM0NzIxMWE4ZjIyMmQzYmU3NGQ0NzM1OGI4NzlkNzAwNTRiNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGVkNGFkOThjMTdkNDYzYmU4MzM5MmU1YTRmMTU0YjY5NDgzM2JiOWYwNDUxOWViMDY1YTg1YzlkMTdhY2Y0NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODQ5MjRhMzY4ODljNGNhMzY3MTY2NGMzZDFiYWZkNjcxY2M2Zjk4MDg3ZTgxZTk1ZWJkYmMyNjM1NmNiMjAyYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNThmMTg5MjIxZTE4Mjc3YmJmZTUzN2MzMWFmMGY4NGIyZTk5ZmY3OTJkYjY1ZWJmOWZjNzIwYmNmZmM3YTM3ZCJ9"
+        },
+        {
+          "resource": "repo://modules/documents/data/documents.ts#L152-L152",
+          "version": "repo-lines-v1:sha256:70d340b413dc5182e54e412bfefad7252733712d18f578296e0da63fb264f86a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzBkMzQwYjQxM2RjNTE4MmU1NGU0MTJiZmVmYWQ3MjUyNzMzNzEyZDE4ZjU3ODI5NmUwZGE2M2ZiMjY0Zjg2YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzBkMzQwYjQxM2RjNTE4MmU1NGU0MTJiZmVmYWQ3MjUyNzMzNzEyZDE4ZjU3ODI5NmUwZGE2M2ZiMjY0Zjg2YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODJiNWI5OTQ1OWUwMmJjNjAyNDA2ZTYxNGM1YzNiMjI5NmU2OGUwZTNmNjg5YTQ3NTBiNTQ3NTQ4NzdhMzk4ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjIxNzM4YTJkNDY3MTJjNmM2NDFkNDcxZDY3ZDA5YzE4ZmU2OTc5OTAzNjZlY2RlM2M4MTQzZDVmM2UyZTI0MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_504dacc4333a42bd9f2d1f72f27acd9f",
+      "statement": "`lib/supabase/server.ts` throws `NO_CLERK_TOKEN_MESSAGE` from its `accessToken` callback when Clerk issues no token, deliberately so the caller's catch maps a broken auth chain to `sync-failed` instead of an anonymous read that returns zero rows.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/server.ts#L47-L58",
+          "version": "repo-lines-v1:sha256:20cc3ccf0006c574d9482b642c5a872253759a635e8b6c03eae731bf7afd778b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExMDdhZjVmNzRiOTRiYzI5M2NmM2QwMWQ0OWZiZGI2NmZjOWQ4ZjdlNTVhMTdhZTlmZmQxODQ1NTJlMGM3YmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2MmVjNGQwM2VjMDQ2ZTI3YTgzMzU4ZjY3ZTk4YTE1ODc4NGJjZGNhNDNlYjUxMWI5ZGJiMDhmOTJiNTdmMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNjN2YyY2I4MzQxOGI3NTBmM2NlZTU4MGY5YWMwMDJjYzkyM2E5ODA2ODYxNzMzMjllYzBhOWIwNWI0MDIzNTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0cd2aeb668714659899eed8ed054b6e4",
+      "statement": "The `accessToken` throw lands in each data function's `catch`, which returns `sync-failed` carrying `err instanceof Error ? err.message : 'unknown error'` — the message, not `String(err)`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L351-L354",
+          "version": "repo-lines-v1:sha256:0f6587d348a9c9838da6f02b7fda7acccdc3a8bc57eeb8f7eb623f984cf6f310:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTBjOTM0ZjVjZjU4YzBmYjc2ODA0OGU1OTUwZGY1YjZkZTI1Zjk5M2U3OTNhM2QxYWE5YzczNmYzNDVmZGM1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTA1Y2I3ZDc0YjMzN2IxMzVlZTZjOTllN2QyN2Y1YWM1ZGYzMWViYjkxMGJjMjJiYjg4ZmMzOGY0MWE3OGU0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGEzOTY4ZGZkODU1NWE1MTIyZjE2NGQzMGYwYjY4ZDhmZGM5NmY1ZGIzMzAzMDNjYzFmYzY0Yzc5ODdlY2I3OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fbab66e4f8a04fb89b31012253d2bbd0",
+      "statement": "`selectBatchesForDisplay` returns `snapshot.batches` only for `ok` and `[]` for every other status including `no-tenant-access`, so the caller must inspect `status` before choosing an empty-state screen.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L311-L314",
+          "version": "repo-lines-v1:sha256:abfcd65be61dc544cfc69ab59a8932cbaf3110ba03050ed3907b73522ee66c26:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjRiNTA2ZWQ1ZjI0MzQzNmFlYzRlODk2MTFmYTEwNmRjYmYyZTFmM2Q2Njg2OTVjNzU1N2IxZmM1MGY2YjdmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjE5ZWNjMDYxMDY2ZmZkOThlNWZjMGY0ZTBhMzMwZTJkMWY2YmI0MjhjM2U4OGZiMTdmMGE0MTQzOTc0OWIxNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGFjZTAyODE2NDU2NjhhOWQzNzAyNTAzNjM2NjhiYmNmMjQwODU0NTY4OGRmZmRkYzZkYTUyMjBiMDIyOGMxYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_388bab093de1434089494e117a6ae60f",
+      "statement": "`getBatches()` narrows the snapshot and throws for every non-`ok` status, including `no-tenant-access`, so a caller of it gets no access state for free.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L357-L363",
+          "version": "repo-lines-v1:sha256:8aff55bf2e477b5afdce3ba78cea544ea38c7fda372802c8cd27648de5764387:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU3YWNlNTNlMjg4MWRiOGRmZmY4OGE5OTk4MDBmMDg0N2RhMTIwYzE0MGEwYWFiZDJmMWM4NzE0Y2JmMzYyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWIxZWExNWEwZjdiMWQ3NzQxYzA5MmRlODAyZDM5ZmRhNDQzNGVjZjA1Zjk0MzU4YzZmMzY5Y2E5MTE2ZTIyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmI3ZmM4NGM0ODVhY2YxOTU2YTMwYTZkMzdjYzNlNDE2YzExYWI5ZTE4YWU0YWJiMGU2MmQwZWEzOTIwYWI2MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9fe035557bb0446384acea8b5a6cdfaf",
+      "statement": "`withTenantAccess` returns `no-tenant-access` only when the verdict is `none` **and** the snapshot status is `ok`, passing `sync-failed` and `unconfigured` through untouched and treating `unknown` as a no-op.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L53-L58",
+          "version": "repo-lines-v1:sha256:313c3475fa093d96a3eb97d6bba5c2321c1b950be7400caaa43fdc7eb8a4af50:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDFlODgxMzFjMTk4N2I0YTIzNTc5MmY5NzI4MmUxZmViYzVjNWU3YTkyZTVmODJjMTQxNTA0OTFkYThmYzliYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWFkYWU1YmZlNjQ3MmNmNzRhODJkZTRkNGI0ZmJiZTZkMGRjMGFiZmI5YjAxYWNhZDM2NDY1NTA5ZjUzN2IxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ccb2a6dedd014ad1b617653b075028fc",
+      "statement": "`deriveTenantAccess` yields `unknown` for `sync-failed` and `unconfigured`, which matters because a route using it can produce `unknown` (a no-op at the fold) whereas `tenantAccessOf` is total over `granted`/`none`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L163-L170",
+          "version": "repo-lines-v1:sha256:ddf722109428d729ac06d0a955efad4d1b6f439dc666986cbda8c3ceac4c6eab:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDkxMTdiYzhkMDUzNjc3ZTYzMDdmZWQ5M2U0NGQ4N2FkZjdlNzY0ZjdmOTFmNjNhZjM3NzFlNDdmYmNhZWFhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE1ZTk0NmQxZmY4MDA4YjBlMDMwZjVjNTczYTRmZjczODE4N2FkZmYwNTdjN2U3NDYyYzI5MjVmZjZjNmZkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2I1MmFmMDRkMmViMTBhN2I5NzY4NWJkOTcyYjAwMTNmZTI4NTkzZGYxZjljMGVkYzAyNmIxZjBmNTBmOWQ3MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTI0OWY4NzRlOWU3YjJkZWMxYWZkZTEzNzdjM2UwOWFjYTMwYjA2MmEyMGNhMzk1OGVhYzU0NjY2NzE1NDk4YSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L34-L36",
+          "version": "repo-lines-v1:sha256:f5207237d2f95334b6550daa35613b93c32349977a0fe58e6021bf06fc984569:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQwMzM1ZWRhNTM1NzY5NDFkZWUzNGMxYzNkNDhlYmY1NDI5ZGFlZGM1NzhhZDQ2YmJiMThkOTgyOWM1ODcyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTU2Y2MyNGNhMDhiZmY4ZGU5NThhZDRhZGFkZDA5YWEzYzVjZjVhZGU0YTU3ZjMwYTFjYzI0MTAzYmQzMWUzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGRkYTY5MWM0MjI5YzRiYThjM2E3YTdmMmUzZTc0ZGE1OWE5NzJhNDVjY2JjMmEyYTJlZTJkYjE5ZDNkZjlkZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_dd113db892ed44a9b8b368d44cf96a08",
+      "statement": "`tests/unit/tenant-access.test.ts` pins the fold's silent failure modes: `not-found` must read as `none`, `sync-failed`/`unconfigured` as `unknown`, and an `ok` snapshot must survive a `granted` or `unknown` verdict while a real failure survives `none`.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L60-L98",
+          "version": "repo-lines-v1:sha256:4398bdf049b3cbb2667e96d10a4564545bfdab9cd8455bce7ea364bbe8dee936:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTRhOGIxM2NkZmNmNzEyNjU4ZjIxNmNjYmVlYWUyOTQzZmRlYjAwZjFjNzY3NmQwMWY5NjI3ZDk4MGQxMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2831d70433594e41ac1379b6cba4acee",
+      "statement": "`requireScope` redirects a caller whose `profile.role` is `trainer` to `/trainer` and returns `null` for every non-`ok` scope, leaving the `/t/[tenantCode]` segment layout to render the reason from `resolveRouteScope`'s statuses.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L67-L76",
+          "version": "repo-lines-v1:sha256:dbc87d95c7b66cc7cfa97087d75698721dca511a5b2229f0c1c774c7e3b9a533:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1ZWE4ZTVmZWYzMjc5NTI0ZTQ5YjQ5Mjc1MjAyMTg1NzdmZjMyNDg1Yzg3NjNiMThlOTJlNmIxNTIxODFlN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NDgzOThiZTU1Njk0NTI5ZjE3ZGQ5MmFjMzU1MzNkYWQ2YjgyODc5ZWY1M2UzZjExMDA2NGFhODkyNzhlMTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1418a6dbc36d4782840069442912751e",
+      "statement": "The `/t/[tenantCode]` layout branches `ok` → `no-tenant-access` → `unknown` → `not-a-member`, giving only `unknown` a temporary-failure retry state so it is never folded into `no-tenant-access`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L26-L49",
+          "version": "repo-lines-v1:sha256:16a8ba3aacef1ccd9d2682589015ad5a86a1b753375609339eb2e9e123750f24:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhM2Y3NTIwNjVkN2Y4NTIzNWUwZmJiZjFmY2M5Nzc3MzY5NjcwM2U3YzBmMjBiNzk0NjE1ZDYzODdmYTRhZjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ZmEzZDNmZjc5OWM0MWE5MDVjYWJiOGZkYjNlZWNjN2U0OWMwMjQ3YzUzNGU0NDIxMDE3ZDYyZmQ1MmQxMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_81d0641f871f4bd98ca2a2b1967d1683",
+      "statement": "`batch-cards` tests the sync-failed banner before `NoTenantAccessState` and `EmptyState`, and keeps the banner inside the zero-row branch so a populated-but-stale screen retains its rows.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L41-L63",
+          "version": "repo-lines-v1:sha256:4f6def33dac0b94bc98b47791f8f49066d1f62fc26d53745271d599d2218d757:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5MTM5MjYwYTBmOWQzYzAwMDJlZjk2OWZmMGI3ZTIwOTUzNzM0NDIwOWI2MTk3OTQyYzE2NGNjMWE4NDA1ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjhjMTA4NWY5NWExYWZhYmU1ZDE1MmFkNThkYjlkYzI2MzM2YzEyMThlMmI4NDBhZTdhZDgyNmEwZDU3NDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3YjkzYjdjNzM3ZGQxMzllNzIxNzdjMTQ0NmZhNTg4ZGVlYWQ1NTBiZTJmOTc1ZjAyYTUwODhlZWQwM2UxMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MjkwMmU4MzY5MzNjYWIyYWI4YzM1YTBhZWE1ZTQxYzg2YzAyZjQyNmJmZGMzZjVhNTJjYmU2ODEyNWVmYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_406c56b3c00c4036a6fe7eddfefd9cb1",
+      "statement": "`dashboard`'s `guardState` orders the `?state=denied` preview, then `syncFailed && batchCount === 0`, then `noTenantAccess || forcedState === 'no-tenant-access'`, then `empty` — the same failure-before-empty precedence.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L141-L171",
+          "version": "repo-lines-v1:sha256:7b5b8c8ca405858edbcb4725e7775fc79dabdf41ec148c4ddbaba7eb35e19af9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NzNmZDQ5ZjIzZDdiZTNhNDVjOTJkZmYwM2NiNWMzNzA3MzgzNTMxNjI5MmFhNjc3YTBhYTdjMTUxNjU0NjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmOGYzMDMwY2UwMzY3NzM2YjIxOGQ5YTJiNDQxYzVjZmQ3MmQ2ZDU0ZTE2NDRmOGEwMzU0NjFhNWJmZTc5ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyZmE0Mjk1MDIxYmVhYTcyYmQxNjI3MzYxMmY2ODJmYjMwZDNjOGE2MTAwNjAwYjI3YzJkZjE5ZmI1NDY4MTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d36787ec0c05422889ca1d88a2ee3bf3",
+      "statement": "The `billing` route returns its denied preview first, then a `syncFailed && batches.length === 0` retry state, then the access state, deriving `syncFailed` from `snapshot.status === 'sync-failed' || forcedState === 'sync-failed'`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L83-L158",
+          "version": "repo-lines-v1:sha256:bc624a1ebbe176f981792e77319b3955b8178594064687f22dd64449cbd42c97:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4MDQ4NTc3MzU3YTgwNDQxMjRhMWRhY2JhZmNiY2E3ODQ5YjU0NmZkOTAxYjg1MjBhMjlhMWY5MGMzN2QyOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjhjMTA4NWY5NWExYWZhYmU1ZDE1MmFkNThkYjlkYzI2MzM2YzEyMThlMmI4NDBhZTdhZDgyNmEwZDU3NDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhODQ0MDU5NjA0MDJlNzI0YTM3NjVmODg2YmM5YzU2M2M3NDQ3YmU5MjliZjk5NjM4YWQ4NmJjNWI3MzZkMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MjkwMmU4MzY5MzNjYWIyYWI4YzM1YTBhZWE1ZTQxYzg2YzAyZjQyNmJmZGMzZjVhNTJjYmU2ODEyNWVmYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_944ee87d09ce4ec7ae57bb2c8a85a3ea",
+      "statement": "The `report` route redirects on `resolveTrustedRole` before either snapshot exists, folds the derived verdict into the batch snapshot, and ORs the batch and roster snapshot statuses into one `syncFailed` so a failed roster still raises the banner.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L56-L90",
+          "version": "repo-lines-v1:sha256:7d1c1b4a4e7c5b1b28d50ba4d4895ef9a4696a39029f0a9dac243285bdbb67eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmNmVkYTMwMTcyYWY1MDM3ZTlmZmE0ZTJiYjk0MDNjOGM0OWQyOTMwNDc1NmY2MDYyZGU0Y2IwN2ZlZTQwYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjhjMTA4NWY5NWExYWZhYmU1ZDE1MmFkNThkYjlkYzI2MzM2YzEyMThlMmI4NDBhZTdhZDgyNmEwZDU3NDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4MWFiZWEzYmNjZWI4YTI5ZjRiZjg4ZGU4MDI1YWNlNTNmMzczYzkyNzJlOTdiYTQ5NDRlOTFlNDY1NjQ3Y2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MjkwMmU4MzY5MzNjYWIyYWI4YzM1YTBhZWE1ZTQxYzg2YzAyZjQyNmJmZGMzZjVhNTJjYmU2ODEyNWVmYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ebf5d27dc43495c8836c60dc791c0b7",
+      "statement": "`documents` returns `NoTenantAccessState` as its own early return before rendering the matrix, because an all-blank grid would read as every document missing rather than as no attachment to a school.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx#L39-L53",
+          "version": "repo-lines-v1:sha256:5544fb313711c5b38dec3916b23a8d110a42d0c4c97d2d096aafce877743ecd9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwYzMyZTg4MGEwZjE3YzRlMWM2NWQzZWZhMWI0YjFmNGU2NWFhYzhlMGEwMTBjZDJlZmZlZGJjODcxZGI0ZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3YWQ2YTdiYWFkYjcwODAzNDU3NGVlMDQwY2I4ZjA1ZTc5OTVjZTUwNDk0ZTIyZjUyMDZlOWEwYTE2N2ZiZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMzdlNTVjNTRhNDhhMGNlZmMwYzY2ZmRmOTQ5OWY0OTdmYTc0NzViNzkxMGQ5ZTgzMTE0MGUwNjhkNTc0ZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiOGI2MDBhNWI0NDhiMWU0ZDAyZGYwOTc0NmVkM2NhMzE3MmY3NWM0YWFiYjAxZGRlMDgwZTM2Y2FiMDc0YjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5d5d798c1b6646ceabaa14d91e435afc",
+      "statement": "`analytics` departs from the fold-first shape: it renders the sync-failed callout and the access state as independent conditions and gates the chart grid on `snapshot.status !== 'no-tenant-access' && !(syncFailed && batches.length === 0)`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/analytics/page.tsx#L37-L49",
+          "version": "repo-lines-v1:sha256:1f23209f1722bdb8802aa61909edd06b0d93943aab7e5a42f849740985c097f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAwODc0NTgxYThjNWFmY2I4YWJlN2VmNTUxYWU3NWVlYjM3ZmQwYmVjOWM0YTA3MDQyYjU5M2UzYWMyYzg3ZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YjhjMTA4NWY5NWExYWZhYmU1ZDE1MmFkNThkYjlkYzI2MzM2YzEyMThlMmI4NDBhZTdhZDgyNmEwZDU3NDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzYmRhNmI3ZDVjZjBmZWFmODIzMzJiMTMyNjliMjcwNDkyYTU1MDNmYTA2OWZlMjcwMzYyMThmMDQ5ODY3YzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwODY3YTYzODc0ZDM0YTJhMDAyNGMzYWRjYzdjNzExMmM2NjUyMzNiNzZhODQ1YTYxNmNmYjNmZmQzNDQ1OTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8d97335fe8fb4625a34a5bdf7192bb2e",
+      "statement": "`resolveTenantAccess` returns `unknown` when `getAuthUserId()` fails rather than `none`, and neither it nor `resolveRouteScope` wraps itself in `cache()` — the cache sits on the reads they call.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-access.ts#L22-L36",
+          "version": "repo-lines-v1:sha256:15367cb3d0ceaf3a7912733adb7c7a3ce416a079a7a91cf2e1cc1af142aa3070:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhYTQ0YjZkN2M2MTBkMWYzYmIxNzUzZjhlN2M5NjY5OWFkNWI1Y2ZmNzFkNGMwZTNjODllODMxMzhlMTRiMWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0NDM1YTIyODk1ZWFmNjQ2YTQ5MThlMDJkZTg4MjgwMGFkOWEzYTRkMjE2YTllYWE4MWJkMzBmMDc0YTYxYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L38-L51",
+          "version": "repo-lines-v1:sha256:5ca7a56b097b66dbe5f5cd6f8b99aa11bd98b6d4cc63cf6dcae1ff0772814cb6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNDNiNWYwNzU3NWZhN2NiMjhlYWQ4OGNjZjZlOGI4ZWJhODM4ZjQ1M2ZhYzYwNzA0NmY1N2U3Y2M1MDA4Y2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0NDIwY2ZlNjg3ZTAxN2IzYzJmMjk1YTBjYWEzMTNiZGE0YjI0MmQ5OWUyZTlkNjEwN2ZiMGUwM2EyNzRlMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0OWY1MDJmYWQ4ZTk1ZTljN2U0MmIyZDYyYTEzMDRjYWY1OTI2ODA1Yjg2OGNiNzkxYTg4YTgwMDdiZDgwNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YjdkNzgzMmE4MTQwYTJhYjMwYTJjYTI0OTk2NzEyYTc0NjIyMzFhOWYwMmMyYTA5N2YzNjI5NjZkNzQzYjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_803cb4d7f41d47dca8fe8c74d8ea8a3f",
+      "statement": "`resolveTenantAccess` has no caller under `app/`; routes either hold `profile` from `requireScope` and use `tenantAccessOf`, or hold a profile snapshot and use `deriveTenantAccess`.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/documents/page.tsx#L26-L26",
+          "version": "repo-lines-v1:sha256:49935ac09010e0a81fe0563c762c5c57713242bf8ad164707d3703f24cc18889:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDk5MzVhYzA5MDEwZTBhODFmZTA1NjNjNzYyYzVjNTc3MTMyNDJiZjhhZDE2NDcwN2QzNzAzZjI0Y2MxODg4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDk5MzVhYzA5MDEwZTBhODFmZTA1NjNjNzYyYzVjNTc3MTMyNDJiZjhhZDE2NDcwN2QzNzAzZjI0Y2MxODg4OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Y4NTFiY2U3NDc5YTI2NzM0ZmJmNzcyYzhjYjUxNmYxYmNhMjE4NmRkNjRiNzBiM2I4NDNjYzJkOWEwOTU1ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTY5ZTY1MGNiZDBkN2E0MGVkYjU2NjkzNmFlOTEyMDBhZmY2ZmQwNzczZDA3N2ZmNDQ1MzY5YjE5OThmNzRlMyJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-access.ts#L22-L22",
+          "version": "repo-lines-v1:sha256:6aa44b6d7c610d1f3bb1753f8e7c96699ad5b5cff71d4c0e3c89e83138e14b1b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmFhNDRiNmQ3YzYxMGQxZjNiYjE3NTNmOGU3Yzk2Njk5YWQ1YjVjZmY3MWQ0YzBlM2M4OWU4MzEzOGUxNGIxYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmFhNDRiNmQ3YzYxMGQxZjNiYjE3NTNmOGU3Yzk2Njk5YWQ1YjVjZmY3MWQ0YzBlM2M4OWU4MzEzOGUxNGIxYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDQ0MzVhMjI4OTVlYWY2NDZhNDkxOGUwMmRlODgyODAwYWQ5YTNhNGQyMTZhOWVhYTgxYmQzMGYwNzRhNjFjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWJjNWJlZDQwM2YyMDA3ZjY4YmUxMWRmZDFmYWE2OWY3OTZlYTcxM2I5NDEyNWFmZTZlMzYxYmVmMmRlOTA5OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_700e2baa7e444759a1b8db11e11c6ab1",
+      "statement": "`setBatchRqmCodeAction` returns `SAVE_FAILED` for an `unknown` scope resolution and `DENIED` for any other non-`ok` resolution, so an unreadable profile is never reported as a refusal.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L100-L108",
+          "version": "repo-lines-v1:sha256:74f112a3d56acc691891246aadaa1227eff610c8eb4f2a4707b03013d3d8810d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjA0MDE2ZDBiYzk3ZTI3NTNjYTkzYzYwMGM3Y2M1Mzg4N2M1MjYxNmJlYjEyNTIyNjJlMTE0NGZiMGEwZjA1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI0MTcyYWMzYzdkOGJiYTYyNzRlZDZlNzM4YTk1NDgxMzg5YWY5MDlkNzE5ZGNhZGM4MWFkOWRlZmY5MGEyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzhlZjA2NGU2YWQzMDBlODZlM2VmYzNhMWE0YjcwODJkYzkxNjA0YWU5ZmY2YmYwYTQxZTlmNzFhNGMxOGU2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzU3MmU4Y2NiZWE0Y2ZiMjliOTk2YjBkZjc3Y2MwMWY0Nzk1ZGZmMWQyOWE0YzM0MGNjNWQ2NWEyZTIxNDgxYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_aaea1f189d35440ba16713b9bb2ec696",
+      "statement": "`failureState` maps `duplicate` to the form's `invalid` with copy naming the already-taken code, and `conflict-or-denied` to an `error` whose copy offers both the concurrent-edit and permission readings.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L73-L89",
+          "version": "repo-lines-v1:sha256:0032e1e139c193a49a8337e6d0b594fe77cf622350b242faecbcae8fc8992f93:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwNTNjZTMyZTQ2Y2VkNzIzYjc3N2RkNjE4ZTIwMmRmYzRmOThmMzA1YTlmZGI3MzZhM2Y5NzE2NzQyNWMxNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkMTY1OWIyNzMyZTc3NDI5YmIzMmNmMjE3ZjQ0MTkzY2FkY2EyYmE4NzNlOWFlMTQ5MWU0NmI2ZDIzOTY5NjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmN2MzMTkzOTliNDBjMWE3ZjJmZDA5MWQ2YjY1ZmJiMDU4N2ZhNmE3OWY5MWNiMjU1NjlhN2FhM2IzNjE2YWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_424b5ff842c34cc3a3a6a9bd051fe62f",
+      "statement": "`duplicate` originates in the data function from Postgres `23505`, not from a pre-check, and a `select('id')` returning no row becomes `conflict-or-denied` because a stored-value guard and an RLS refusal are deliberately indistinguishable.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L393-L413",
+          "version": "repo-lines-v1:sha256:bfd8be3d37c68565b0fd087a4e41d5a1366248147d2478eca29f01c6b104220c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5MDg1MmJkNzRmZDY0N2NjN2Q0ZmMxMTE0NTI3OTAxNWYzY2VmNzMyYTM1ZjUyOGJmNjdiMGJlODFjM2ZkOTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJiZTRlMjU3ZDE1MWE3MWFjY2QxMzNkYWJmNzljZWRkNTM3MzNlZTVlYTViNjg3N2E5ZDAyYTc4OGRlYzk0NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ODFhYzJhYjg5MWZjYTZkMmY3NjY2NjU4ZGJkMDIzZDA3MjFjZDY2M2VhYzMyNDFiYzY2ZGY3MDc3NGY3NmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_393f3138b5d74743b22fc131d42ebd02",
+      "statement": "`setBatchRqmCodeAction` skips the activity append when the value is unchanged and still returns `saved`, and a failed append degrades to `logFailed` on the success state.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L118-L136",
+          "version": "repo-lines-v1:sha256:d1e6a6007bb77755bb49f2814d60164c1b65925ccec44133649a09d3408185b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxM2VmMDg2NzZjM2VlNGZmZjAyZWRlYjI3MTlkOTRjZGU4YzMyOWQ3YzA0Zjk5ZjcxZDNlOGJkNjNjOWYxMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1ZjdjYjk1ZTUyMTA4MTA4YjBlOTk1Y2Y5OGM3MTViMzk2MTdkYzZlOWVhNmQwZjQwMTZlNTI1NzhkNzBiNDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNkZTk4Mzg2OWJlYTRhZWY1M2FmMGY1ZDYxM2M4MGVjOTU1MmQ5NzYyZDQ4NGZjMTgyMDExNDhjOWQ4MDg5ODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0bbcbcb62e354e14b60d196ca1a9e64e",
+      "statement": "`DB_TO_UI_STAGE` maps both `completed` and `blocked` to `null`, and `deriveLifecycle` resolves those differently — `completed` as the full pipeline length (all done), `blocked` as `-1` (nothing active).",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L131-L193",
+          "version": "repo-lines-v1:sha256:0033c65a5e7064e12f36a653740c60bf8ac7c846f6b3b7659adbacd3be2ff409:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1MjI1YTk4MGJhM2E2MGUwMzQ1OGQ2MDg4ZjIxNTViM2FlMmFhNGJjMGM0OWZmOGRkYzk1OTBiNzk1NDY2MDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIwNjAxOTBhYmQ0ZTc1NzhhN2Y2OTMzMGM0YWYwODhjZTIwZmY5ZjY1ZDk4ZmJkNGI0YjRlOTE5NWNjYzdjOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmY2E0NTk3YzEzNzRiNzQzZjZmYjFhNWI5YzBiZmUwYWI4OTdlMDBjODM3NzhiODNjN2FhZDRmODBlNGY1YzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_907ac0a2636048389624ec977fac32b8",
+      "statement": "The `entre` stage is a member of `UI_PIPELINE` between `train` and `assess` while being absent from `DB_TO_UI_STAGE`, so it renders `done` for every batch past `training` even though the comment above the map says it is omitted from derived pipelines.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L125-L159",
+          "version": "repo-lines-v1:sha256:a35fe05db5c56c1d5cf36c61a0595c81c2ab867c013a3e2e762336499bf62b82:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YmEyYjU5OTY3MzJlNzEzOTBkM2UwY2M1YjliZmRmZTU4YWUzZDZkMzgzY2VhYTMyNzRiMzc1OTY1NWRlYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOWVlOGY2N2QyMjA4OGIyNGJhOGQxMWQxNzA2YWE0NDAzYmVmMTU2ZWZhMGQ3NmZlYjA2OWUwYjE5MDJiYjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxN2EwODk5YzkwZjhkYTc2OGZjOGYyOTUyMDU2YjIxNTExNDUxMzg5ZWNmZWFiMDFkOGIzYWFlNDg1ZDZmODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_31de38758c2a488c96790dd3f09c40e2",
+      "statement": "`normalizeStatus` is a hand-written ternary mapping DB `blocked` to UI `pending`, carrying a `TODO(contract)` to align the two status unions instead.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L161-L169",
+          "version": "repo-lines-v1:sha256:c0557dcdaf15212cb6574b5b2ce8f537e6c6cc677423be86aa4f9fae8c792bd1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDYzYWExZGU2ZDBiMWM2YjQ1ZDY2Y2MwZGU5NDg3MjQ2YjY2YjA5ZjFmOTNlNzdlN2UxNGUyMDEyODViMGRlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZhOTU1ODNlODdhZTQwODU3MzljOTc3ZDg0YWQ5NjA1ZDBkYmQzNjdhOWI1ODQ1YjYwODk3YjVjZjkzN2FhZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_71be500977634e0ab7b174204f894a9f",
+      "statement": "`CreateUserFormState` lives in `modules/tenancy/domain/userAccess.ts` and separates `assigned`, `invited` and `duplicate` from `denied`, `unconfigured` and `failed`, so an admin cannot read an invitation or a duplicate as a completed grant.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/userAccess.ts#L166-L184",
+          "version": "repo-lines-v1:sha256:f8163c3002c0ab8c2e32e06aec00ae21f3b382d53a83ac8bc185374b1b614882:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiY2I2OGVjMWNlODJkMzZiZDJjNWRjYTEyOWZhMmU2NjMyMzMwN2Q0ZmU3ZTYwNjE5NTIwZGZkOGZiNmU3OTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1YTdhNTg5MzBlYzhjMzNmNjZmYWY2Nzg1Mzk1MTQwNjIzOGY3ZTE2OThlYWI5YTVmZmYyYzNiOWNkOTRlYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczYTM4MDIxNzE0NjBhYThhOGVkMzMxNWJiOTc2NjU0NTRhNmFmYWQ3OTIyMWQxZDk2ODlmODRiMTY2ZTgyMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhYmI4ZTUwYTg2YzM1MDYxMjcxMTI2YjE2YmE1NmM1OTgyYWM1OTBiYmQ1ZmI0ZmE5YjhlMjNkY2U3MzY3NWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_25abee9d9e4a4e4a928d0995cb9be16d",
+      "statement": "`isPlatformAdmin()` folds both failure statuses to `false`, and its docblock forbids using it on the route or in the action, where `sync-failed` and `denied` need different screens.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/platform.ts#L56-L68",
+          "version": "repo-lines-v1:sha256:ba9d60e14d94ab7e8a4c57f05189107a0af56c3904807c61c9376a8f08af64fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViMWVhMTVhMGY3YjFkNzc0MWMwOTJkZTgwMmQzOWZkYTQ0MzRlY2YwNWY5NDM1OGM2ZjM2OWNhOTExNmUyMmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7eaf22fab7a8494c81fc5c6d4fc4ec1e",
+      "statement": "`getBatchesSnapshot` is `cache()`-wrapped and keyed on its optional `tenantId`, so the unscoped call and a school-scoped call are separate cache entries.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L324-L344",
+          "version": "repo-lines-v1:sha256:8e8acd1f95e2f2f7738f08bfb8b98753fe4ca9d336fe1f6bccc4c3f02986c435:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZTU2NzkyY2RlOTc1M2JhNDJmOGY5MzZlMThkZmQ2ZDIwODAzMzY2MDVlOGFjMTg0ZjhkNDkxNDY3M2FhNDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwYzU3MTUxNWVkZTI4MTAyOTFjYWY4M2I4YzNiNjJjZjRlOTA4MGNiOGVjMTFiOWNkNWI1NDAzNDRlNmY1NmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9f8694ebadf249ffb7cd36368e5118f8",
+      "statement": "The dashboard layout runs the profile snapshot and the platform-admin check in one `Promise.all` and derives `isAdmin` from `resolveTrustedRole(dbRole)`, never from the platform flag, which stays a separate axis.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L24-L43",
+          "version": "repo-lines-v1:sha256:a012b52df811efd4e988c367140c0e2a5136f9cc03134e12f57e6e8d69cf25a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkMjg5MTAwNDlhZDQ5NDI3ZjNkMTMyNDQ3YWU2YjEyNGUzNWRjODUyOGQ0MzVlY2ZlNjYzMzlmOTA0NmI2MjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZTVjOWJmOTYyNTBkYTc0MGQ2OTM4ZDBhNjY3OTY1OGJiZWJiMjUxM2FmNjViM2IxN2E4ZmY3MWJkZTcwMGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxYzAxMTlkZWFiODEwNzM1ZTYyMjM2ZmJiOTJmNzY0NzM0ZWY2OWMxYjZhYzI4ZmNmMzczZjExOGI2ZTAwMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlY2U2ODAwZmE0NGYyZDI1MGRmMTUyM2I1ODNiYmE2ZDhiNmExMWE3Nzk4NjI5MWY4NDYxYTYyM2MyN2VhYTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2b19d657c7d94dae902c94e4af935b37",
+      "statement": "`tests/unit/batches.test.ts` derives its fixture type from `Parameters<typeof mapBatchRow>[0]` because the join-row type is module-private.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L7-L9",
+          "version": "repo-lines-v1:sha256:87d12ced3b5375b6f8bd3d690d0309de6e946de7d0c37975273396ec2572684b:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTVhODRhODAwNzg1MzNhNGFlYTJmMDNlZmQxNTE5MjNmZDU4NTYyNmIzYmI0ZmIyM2MyYjE4NzUzZmQ1ZWMzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDI2ZGVlMTcyZmRkMGFiNDg3YzgzOGM4YmMwMTg2YTE4MjhkNGI1NTkyYWQ4ODVhMjk0ZTE1NmI1NGZjZDkwOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjY5MjQyOTQ0Zjc0Nzc5NDU4OTMzZGYzMjAyODJiNjBlZTJkMTQ1YWQ5YTMxOTAyY2M1NWFlNTJmNmZhZDIwNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJjYjdjNzRiNmVlY2QwZmM3Zjg0OGJiZTQ4NmRiY2M4NjM5NWUxN2E0ODQ4N2I4ZTRmOTVmZTEyZDcwOTI1NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d074034cb7541849a68f6fd7d0a93f9",
+      "statement": "No unit test renders a page component or pins a page's guard-clause order; `display-role.test.ts` and `tenant-scope.test.ts` reference the dashboard page and `profiles.role` authority but not the clause sequence.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/display-role.test.ts",
+          "version": "repo-file-v1:sha256:c1b2a9a2d0ccb3a70e2394c1e30042fccb2d433333c6b0112f7b3e0eceffd5bd"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L45-L53",
+          "version": "repo-lines-v1:sha256:a9559d46f87d6204f61853071900d8a6b49d269a9114718ceb2590606de19d3d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRjYjgyZThlMzBkNGI0YzM4ZDJlYTJiNTMyNTVhMzhjODZiNDU2MjMyNWJiNDRjNDZkYmIyYTAwN2UzYWI3MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc3OWQxMThkNmUzY2JmNDUwNTM5NzQ4ZGVlN2E0MzA3YWNiZTY0NDZjYmEyOTdmMjc2MGZhNWQwYmJhMWJjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0535607e12ef418580b574e67696fc4d",
+      "statement": "`shared/types.ts`'s header still describes the types as a contract with the removed mock data and says no Supabase binding exists, while every mapper now binds them to generated rows.",
+      "evidence": [
+        {
+          "resource": "repo://shared/types.ts#L1-L9",
+          "version": "repo-lines-v1:sha256:d5a841f2ceba8a303d458c44f191260daa589de3c2e8f40da4a1027eb81d5388:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODVkNjkyNzY5YzMxZGRlODg3MWE3ZTYwYWFjZGM5MmQwYTU4MTczM2QxZTNjMTZhMDNkOTdmMWQyNThhN2IxMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b1789d196498408b91156ab042b7f20d",
+      "statement": "`isSupabaseConfigured`'s docblock still calls a false return a \"silent mock fallback\" although the data layers now return an `unconfigured` snapshot instead of fixtures.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/server.ts#L12-L22",
+          "version": "repo-lines-v1:sha256:49aad6b80388564ce998cfe8d65a5024e2b7d662aa5eb980f064e275c102aaaa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjM2U2MmFhMjY5NTFhZmUyMjNmMzFiMjYzMTQ4MGRjNTY1YzZkOTRiNDM3MmE3NDVmZmY4MzU3YzgxMDIxNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4NGFhZWM4MjdhZWY2ODQ2MGQ5YmFhYTlkNDZiNmRhMjgxN2EzNjhjZTMzNDM5OTNkNjNhOWIyMjc5ZmMzNGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b09bb081714b48b5a4a50897d738009b",
+      "statement": "`dashboard/page.tsx` re-tests `profile.role === 'trainer'` with its own redirect after `requireScope` has already redirected, making that third check redundant.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L74-L77",
+          "version": "repo-lines-v1:sha256:9acab7c0ed3b52dc2c7b430c8724129a803dd3f06710e738ecad55ba94a8f8e5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzMDhkNzY4ZjA1ZGViODAzODRlZTlkMWMyZWVjOTFlOGI5ODYxYTRhOGQ4MzIxYTQwMWRhYzA1NTk3OWUwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmVmMWFkNDg4ZDgwN2FjMDhlMzA5ZTU0MDk1NDA5ZWEyNGI0Nzc4NTg3YTc2YzhhNWI0NzIxZjMwMDYyZjBhOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWQxZDEzZjY2ZDhkN2Q4OWM5MTBlOWRjMzIwZWJhZDA1YTFkNzg1OWYyZTBjM2YxZmM0NTYzMWI1ZmVjZjA1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzQ4MzQzMDM1NTUzM2RhMjFmMTYxZjE2MWE5ZTExNTBhYTM1YzllZGI2MDQ1YTFjYmIwZTZjMWViNTI2M2NkYiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L74-L74",
+          "version": "repo-lines-v1:sha256:819985dedfb1c5f21454d58c5e72b04189daeddc8168d9b9d363e5e503b45797:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODE5OTg1ZGVkZmIxYzVmMjE0NTRkNThjNWU3MmIwNDE4OWRhZWRkYzgxNjhkOWI5ZDM2M2U1ZTUwM2I0NTc5NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODE5OTg1ZGVkZmIxYzVmMjE0NTRkNThjNWU3MmIwNDE4OWRhZWRkYzgxNjhkOWI5ZDM2M2U1ZTUwM2I0NTc5NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWE3MGYyMzg0ZjBiY2JmZGMxNmUzYzIzZTFhNGMwZWJmZjE0ZWRiOGIxZDY1NTQzM2E2MTc1ZjExYTNiZjQyMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDU5NGU0M2JiNjk3ZmViNTk0ZWEyNmQ5ZTI2NTJhMGZkMWNiZjU2NTU5NTQwMDQ5NTA0ODFiNmRlNTRjZjE1YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a95a4caa42294c6ba222766a7e544b72",
+      "statement": "`ActivitySnapshot`'s `ok` carries only `events` and `hasMore`, so the activity feed exposes no freshness pair while `BatchesSnapshot` carries `dataAsOf` and `fetchedAt`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/activity/data/activity.ts#L97-L101",
+          "version": "repo-lines-v1:sha256:4b68bb22269f570724005765bb1d28cf128cac7080a6636fa378a004da8c7102:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGFlYThlODcxZTBkN2EwNGRlNjM4ODNjMTVmYTA5NGU4NTQzZDMxYzI1MzU3OTBmYjA4NGIyNDE4NGY1MGVhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDcxOTQ2ODRjNTU4YzI4OGZhOTZjMzgzZGM0MmM1NDA0MGIzMGI0NWFkMGM5YTBmMWVhN2ExZGQ0MDdkMWE4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWYxYTVhZDUzMmMxYzgwMTU4OGRjZDRkOTcxNzVmZDg5MzFjMjNhMjg1NzQzNGFkYjZiN2IyYzgyZGNmMmY2MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2VmOTczNjBjN2ZlOTA0YThhZDRjMWZlZGNmYjQyZGMxMjNiMTViYmE4YmFmOTA5MmZlMmVhYmIxZGYxYTM1ZiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L300-L309",
+          "version": "repo-lines-v1:sha256:8ca5315f61c00a2a2c752547f53e7069960efb8df26ac4989a5599304fd90b19:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMTJiOGM3ZmMzYmUyYTgyZmY2OWRjNWQwMmRiMDc3NTU1YmU2ZTIxOTQ2YmJiMWU3YmM1M2NlM2QyYzIyMjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MTk0Njg0YzU1OGMyODhmYTk2YzM4M2RjNDJjNTQwNDBiMzBiNDVhZDBjOWEwZjFlYTdhMWRkNDA3ZDFhODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY2NDQ3MTE5MTYwNGEyYjVmOTQ2N2NmZTUyNjM1NGEwOGUzMWZjZDEwMDVlMjEzYTlmMzQ3NjFmYmViN2I2NzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlZmI2Zjc1ZDJjNzZmYTJjZDU5MGU2Y2ZlZDUyMmQwMWIwN2I3MWZmNzc4OTg1OGQ1ZWQzZGJhOTdjZWQ0NjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_46ce890da3fa41d6b189fa28d7cc62ca",
+      "statement": "`ui/` layers reach `shared/ui/` primitives such as `Icon`, `StatusBadge`, `ProgressBar` and `EmptyState`, which is the sanctioned cross-edge from a module to leaf shared code.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/ui/TableView.tsx#L11-L18",
+          "version": "repo-lines-v1:sha256:2edf60e8763fd2d1722d2cdc3133ffe50f461b1589d3b114a96cab8990df4ae3:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQzYmVkNzIzZDEyNzY5ZTExZmNhYzA0MzE1NGFiNjZhZTYzNGRkOTZlODhlYjFkNTA1ZDI1N2UwZjAyNWY5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkwMDliMGFkZWM0N2NjMTc4OGYxNDg4MzdjOGIyZjZiM2U5ZDBjNjI3NmIzZTQwOGRlMGNkYWE0OGI0YmE5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDIwYzY2OTlhNjJmMDQwODBjNzQxYjQyNjU5MmRiNjgwNTFkMGZhNTgxMGMxMzYwMDViYjBlODY4OGQ0YTRmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTA1NjQ3YTBiNTQwOTVkNTYyYjVjZWVkMjE4YmUxYTkxZWE3NmQ2ZTAxYTUxM2QwMTFhNjZlYzUwMjZjMDI5ZiJ9"
+        },
+        {
+          "resource": "repo://modules/documents/ui/DocumentsView.tsx#L14-L19",
+          "version": "repo-lines-v1:sha256:e14e75e1eb04e7255489c7d84c396a3877788ee7c9a3dbed664b2ea742214ced:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQzYmVkNzIzZDEyNzY5ZTExZmNhYzA0MzE1NGFiNjZhZTYzNGRkOTZlODhlYjFkNTA1ZDI1N2UwZjAyNWY5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFiY2EwOTZmOTJhYTExNzEwOWFlOWRiOTc3NjRjNzY5NzU5ZDQ3ZTZjMWEyMzQ3MzZhZjdiYThjMWM4YzRkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTMzZTY0MmYzY2Y2M2ZjY2RhY2U1ZjEwNzI2ZmJiZmZhZmY1NTQ5YTRiMGI4YmIxZTY1ZDhiMTE0MjM4M2EwMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWY0M2RjMDBkYmZiYWYyMjQ0YmI2YWE0NzcxMTRjYjUwYzRkYjFlMmQ2MTI1MmJjZDFkM2Q4MmQxYWNmZTE0YyJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-19T03:55:05.435Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

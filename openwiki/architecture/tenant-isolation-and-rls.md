@@ -1,11 +1,11 @@
 ---
 type: Architecture
-title: Tenant Isolation and the RLS Boundary at Runtime
-description: What tenant isolation means once a caller is signed in — the RLS-scoped read that carries identity, scope selection versus authorization, the no-tenant-access verdict and its fold, and the standing risk that a JS tenant check silently replaces RLS.
+title: Tenant Isolation — Scope Selection on Top of RLS
+description: Why RLS alone is not the isolation story at runtime — the anon client that carries identity, URL tenant selection validated against memberships, why queries still filter tenant_id, the service-role escape hatch, and the failure modes where JS filtering or a service client leaks rows across schools.
 tags: [security, rls, tenancy, authorization, failure-modes, invariants]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-19T03:55:05.435Z
+    at: 2026-11-21T03:38:28.236Z
 sources:
   - id: openwiki-source-c6dae8084d42ad61957f6c24
     resource: repo://app/(dashboard)/overview/page.tsx
@@ -33,6 +33,8 @@ sources:
     resource: repo://lib/supabase/server.ts
   - id: openwiki-source-4afc6c67d0142492979e14f5
     resource: repo://lib/supabase/service.ts
+  - id: openwiki-source-2aff630ed0688d80b1b707c8
+    resource: repo://modules/auth/data/provisioning.ts
   - id: openwiki-source-3da0446fc6c5da744a43e0a3
     resource: repo://modules/auth/data/role.ts
   - id: openwiki-source-fa1460427741e716baf8631a
@@ -59,6 +61,8 @@ sources:
     resource: repo://supabase/migrations/20260904120000_add_user_admin_write_policies.sql
   - id: openwiki-source-fc8bca54fd802af39662de6c
     resource: repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql
+  - id: openwiki-source-13117a840913dd27670d0422
+    resource: repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql
   - id: openwiki-source-10f9f8c998debff047489862
     resource: repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql
   - id: openwiki-source-4b1944144311805b722ef6ef
@@ -71,112 +75,61 @@ sources:
     resource: repo://tests/unit/tenant-access.test.ts
   - id: openwiki-source-15e8a5a27099d775d1c019e1
     resource: repo://tests/unit/tenant-scope.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-19T03:55:05.435Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
 ---
 
-# Tenant Isolation and the RLS Boundary at Runtime
+# Tenant Isolation — Scope Selection on Top of RLS
 
-This page is the runtime half of the isolation model: what actually carries a caller's identity into Postgres, what the application layer is allowed to decide on its own, and where the app must *deny* rather than merely hide. The schema, the `app_private` helper bodies and the per-table policy map live on [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md); this page links them rather than reproducing them.
+Isolation has two halves. The boundary is Postgres RLS: which rows a caller may see is decided by policy, never by application code. The half this page owns is **selection** — how a signed-in caller is pointed at one school inside the set RLS already allows, why the query still carries `tenant_id` afterwards, and where the two mechanisms can be confused for each other.
 
-Two invariants frame everything below, both `[review]`-enforced in `RULES.md` §1 (rules 1 and 2) and both locked by ADR-001: **RLS is the boundary and UI hiding is usability** (rule 1), and **a JS tenant check used as access control is a bug even when it returns the right answer** (rule 2). Neither fails `pnpm lint`, `pnpm exec tsc --noEmit`, or any test. That is why they are written down.
+The policy bodies, the `app_private` helpers and the per-table policy map live on [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md); the request path itself is [Next.js Routing and the Request Path](/openwiki/architecture/nextjs-routing-and-request-path.md). Three invariants frame everything below, all `[review]`-enforced in `RULES.md` §1 and all locked by ADR-001: RLS is the boundary and UI hiding is usability (rule 1), a JS tenant check used as access control is a bug even when it returns the right answer (rule 2), and the service-role key must never reach client code (rule 3). None fails `pnpm lint`, `pnpm exec tsc --noEmit`, or any test.
 
-The evidence base is thinner than the model deserves. There is **one hosted project and no staging**, so rule 35's real-Supabase RLS tests cannot simply be run, and rule 36 (`[deny]`) puts any statement against that project behind an explicit permission ask. `tests/integration/` and `tests/security/` do not exist. Every authorization statement on this page is therefore *read out of the migrations and the route code*; the unit suite pins the JS verdicts, never a policy. A migration file is the intent, and a read the app performs today is the only proof the chain is wired.
+## The two clients, and which one a departure means
 
-## Identity reaches Postgres as a session, not a claim the app passes
+`lib/supabase/server.ts` is the default and the only client an ordinary read or write may use. It holds the anon key plus the caller's Clerk session via the `accessToken` callback — invoked with no template argument because `app_private.current_clerk_user_id()` needs only `auth.jwt() ->> 'sub'` and looks profile, role and memberships up in the database. The callback is re-invoked on expiry rather than being a static header, and it **throws** `NO_CLERK_TOKEN_MESSAGE` when `getToken()` returns `null`: RLS answers an anonymous query with zero rows *and no error*, which a compliance tool cannot distinguish from "this user has nothing". At the data layer the throw lands in the existing `catch` as `sync-failed` ([`getProfileSnapshot`](/modules/tenancy/data/tenancy.ts#L148-L151)); [`tests/unit/supabase-server.test.ts`](/tests/unit/supabase-server.test.ts#L114-L124) pins the throw against a silent `anon` client.
 
-`lib/supabase/server.ts` is the whole bridge, and it is an **anon-key** client — never the service-role key, which is confined to `lib/supabase/service.ts` for the one path with no session (the Clerk webhook). The `accessToken` callback re-invokes `getToken()` so a long-lived client never reuses an expired token, and it is called **with no template argument** because the schema needs no custom claims: `app_private.current_clerk_user_id()` reads `auth.jwt() ->> 'sub'` and then *looks the profile, role and memberships up in the database*, so nothing outside the session can widen access. Also see [Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md) for why each helper is `security definer` with `search_path = ''`.
+`lib/supabase/service.ts` is the **escape hatch**: `createSupabaseServiceClient()` builds a client from `SUPABASE_SERVICE_ROLE_KEY`, which **bypasses RLS entirely**. No policy evaluates, so the client's own `where` clauses are the only thing narrowing rows — the one place in the app where an absent tenant filter is a leak rather than a wide-but-correct read. Its contract is written into its header: use it only for trusted server-to-server work with no Clerk session, import it only from server-only code, and never prefix the key `NEXT_PUBLIC_`. There is exactly one importer today, [`modules/auth/data/provisioning.ts`](/modules/auth/data/provisioning.ts#L58-L166), reached only through the Clerk webhook; `eslint.config.mjs` encodes no rule for it, so "no service client in a page" is a review obligation, not a lint one. What the webhook writes — profile rows, `is_active = false` on delete — is on [User Provisioning and Membership](/openwiki/workflows/user-provisioning-and-membership.md).
 
-The load-bearing part is the **throw**. A missing token returns `null` from `getToken()`, and the client throws `NO_CLERK_TOKEN_MESSAGE` rather than building an unauthenticated client: RLS answers an anonymous query with zero rows *and no error*, a state indistinguishable from "this user has nothing" in a compliance tool. The sentinel is exported, `/api/debug/auth-check` matches it, and at the data layer the throw lands in the existing `catch` as `sync-failed` ([`getProfileSnapshot`](/modules/tenancy/data/tenancy.ts#L148-L151)). [`tests/unit/supabase-server.test.ts`](/tests/unit/supabase-server.test.ts#L99-L124) pins both the sentinel and the no-static-header rule, so drifting the message silently breaks the diagnostic.
-
-Deactivation rides the same chain: `app_private.current_profile_id()` selects on `profiles.is_active = true` ([migration](/supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L355-L365)), so what the Clerk `user.deleted` webhook writes drops access at the next request with no revocation list to maintain.
+The service role also forfeits the "could not check" signal. On the Clerk-scoped client an empty membership list means "none this admin can see"; under the service role it means none, full stop, which is why `ensure_profile_tenant_membership` can set `is_default: true` from an atomic zero-membership gate where the admin UI cannot ([`provisioning.ts`](/modules/auth/data/provisioning.ts#L124-L129), [migration](/supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql#L1-L29)).
 
 ## Selection is not authorization
 
-Rule 2 bans a JS tenant check **used as access control**, even when it returns the right answer. The failure mode is not a leak today, it is drift: a query written as if RLS did not exist silently keeps working when a policy is widened, and the person reviewing the policy no longer has a reader who can see the consequence. The one sanctioned shape is a filter taken from a validated `TenantScope`:
+Rule 2 bans a JS tenant check **used as** access control. The failure mode is not a leak today but drift: a query written as if RLS did not exist keeps working when a policy is widened, and the reviewer of that policy has lost the reader who could see the consequence. The one sanctioned shape is a filter taken from a validated `TenantScope`:
 
 ```ts
 scopeForCode(profile, code)   // → TenantScope | null, built ONLY from profile.tenants
 supabase.from('batches').eq('tenant_id', scope.tenantId)   // selection, on top of RLS
 ```
 
-`tenant_id = scope.tenantId` with a scope in hand is allowed. It picks one of the schools RLS already allows and grants nothing else; the route that stops validating is the one that regresses. [`modules/tenancy/domain/scope.ts`](/modules/tenancy/domain/scope.ts) builds a scope from `profile.tenants` alone — itself an RLS-scoped read of `profile_tenant_memberships` (row policy `can_access_tenant(tenant_id)`) — and compares codes case-insensitively, so a foreign or unknown URL code yields `null` and **never a fallback to "all schools"**. [`tests/unit/tenant-scope.test.ts`](/tests/unit/tenant-scope.test.ts) pins that one-way door plus the `resolveTrustedRole` half of the role boundary.
+[`modules/tenancy/domain/scope.ts`](/modules/tenancy/domain/scope.ts#L1-L57) is where the validation lives, and it is deliberately pure — it reads `profile.tenants`, itself an RLS-scoped read of `profile_tenant_memberships` under `can_access_tenant(tenant_id)` ([policy](/supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L494-L498)), and matches codes case-insensitively. A foreign or unknown code yields `null`, **never a fallback to "all schools"**. `defaultScope` is the only fallback path and it is used for *redirects*, not in-place broadening. [`tests/unit/tenant-scope.test.ts`](/tests/unit/tenant-scope.test.ts#L24-L43) pins all four properties — membership-only construction, the default ordering (flagged membership, then first, then none), and path round-tripping.
 
-`tenant_id` never appears in `app/` code at all: every page hands `scope.tenantId` down to a module `data/` function, and the only place the filter is written is the query itself ([`getBatchesSnapshot`](/modules/batches/data/batches.ts#L339-L344) and `setBatchRqmCode`, both annotated "not authorization"). Copying the `.eq` into a route, or filtering a returned array by tenant in JS, is the drift the rule describes.
-
-<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-The scope is resolved once per request by the tenant segment's layout, which turns a non-`ok` scope into a rendered state rather than a 404 ([`layout.tsx`](/app/(dashboard)/t/[tenantCode]/layout.tsx#L26-L49)) — the routing arm is on [Next.js Routing and the Request Path](/openwiki/architecture/nextjs-routing-and-request-path.md). What matters here is what the server action behind a write does with it. [`t/[tenantCode]/actions.ts`](/app/(dashboard)/t/[tenantCode]/actions.ts#L13-L20) names both layers explicitly: the school comes from the URL code re-resolved on the server — **no tenant id is ever read from the form** — the role comes from `profiles.role` via `resolveTrustedRole`, and then the action states that both checks are "defence in depth and usability; the boundary is the `batches` UPDATE policy, which for anyone else matches zero rows". That zero-row update surfaces as one status, `conflict-or-denied`, deliberately shared with a concurrent edit (see [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md)).
-
-Two related scoping facts worth knowing before touching a fetch:
-
-- **An unscoped client is safe only because a policy narrows it.** `getBatchesSnapshot(tenantId?)` appends the filter only when an id is passed. `/trainer` and `/overview` pass none; both are correct for the same reason — RLS already narrowed the rows (`can_read_batch` to a trainer's assignments, `can_access_tenant` to an admin's memberships).
-- **`/overview` is the one office screen that must not be scoped by path.** It reads every school the caller belongs to and groups every figure by school, so nothing is summed under one school's name — the audit I1 shape. It groups on `profile.tenants` in application code to *label* the result; the set of rows is still RLS's.
-
-## The empty read: a verdict, and the fold that uses it
-
-RLS is *good* at silence, which is the one thing the UI cannot read. A caller with zero memberships gets an empty, successful read from every tenant-scoped table — correct, and far too easy to render as "No assigned batches — import one", an action they cannot perform. [`modules/tenancy/domain/access.ts`](/modules/tenancy/domain/access.ts) exists to name the difference:
-
-| Verdict | Meaning | Render |
-| --- | --- | --- |
-| `granted` | at least one membership | ordinary empty states are true |
-| `none` | no membership | `NoTenantAccessState` |
-| `unknown` | could not check | nothing changes |
-
-No query produces this verdict — RLS reports `none` as success — so it is derived from the profile snapshot by [`deriveTenantAccess`](/modules/tenancy/data/tenancy.ts#L158-L178), with `not-found` → `none` (a signed-in user with no profile row is unassigned too) and `sync-failed`/`unconfigured` → `unknown`. `unknown` must never render as `none`: falling through would tell a fully provisioned coordinator they were never assigned a school.
-
-The verdict is applied by route code calling `withTenantAccess(snapshot, access)`, whose precedence is exact:
-
-```ts
-access === 'none' && snapshot.status === 'ok' ? { status: 'no-tenant-access' } : snapshot
-```
-
-It replaces **only** an `ok` snapshot. A `sync-failed` or `unconfigured` passes through untouched, because "you belong to no school" is a tidier story than "the fetch broke" and would bury the rule-19 banner; `unknown` changes nothing because an unverified verdict must not rewrite a successful read. [`tests/unit/tenant-access.test.ts`](/tests/unit/tenant-access.test.ts) pins both rules precisely because a refactor to `status === 'ok' ? … : …` would look like a simplification.
-
-`withTenantAccess` lives in `domain/`, not in the route fold, because another module's `data/` is private (rule 8) and the fold must be callable from `app/` *and* from any module — [`access.ts`](/modules/tenancy/domain/access.ts#L16-L17) states that in its own header.
-
-<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-The correct order is resolve scope → derive access → fold → *then* the screen's guard ladder, which checks failure before emptiness. The dashboard's `guardState` puts `syncFailed && batchCount === 0` ahead of both the `no-tenant-access` arm and the empty arm for the same reason ([dashboard/page.tsx](/app/(dashboard)/t/[tenantCode]/dashboard/page.tsx#L136-L171)); a failed fetch yields zero rows and would otherwise satisfy a misleading empty state. Billing and report reach the same precedence by a different mechanism — a `syncFailed && batches.length === 0` early return placed before the `no-tenant-access` branch — and for the same reason: a real failure is never masked by the tidier explanation.
+`tenant_id` never appears in `app/` code. Pages hand `scope.tenantId` to a module's `data/` function and the filter is written only in the query, under a comment saying so ([`getBatchesSnapshot`](/modules/batches/data/batches.ts#L339-L344), [`setBatchRqmCode`](/modules/batches/data/batches.ts#L378-L399)). Copying the `.eq` into a route, or filtering a returned array by tenant in JS, is the drift the rule describes.
 
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-Those two routes are also the newer shape and the one to copy. Each already holds a profile snapshot because it needs `profiles.role` for the trainer redirect, so it derives the verdict from *that* snapshot (`profileSnapshot ? deriveTenantAccess(profileSnapshot) : 'unknown'` — a `null` snapshot yields `unknown`, never `none`) instead of reading membership a second time, and passes the result to the same fold ([billing/page.tsx](/app/(dashboard)/t/[tenantCode]/(sections)/billing/page.tsx#L69-L74), [report/page.tsx](/app/(dashboard)/t/[tenantCode]/(sections)/report/page.tsx#L60-L65)). The bare `if (!resolved) return null` right after `requireScope` survives only because the layout has already rendered the non-`ok` states, and pages render in parallel with it — so the `null` never reaches a guard ladder. [Next.js Routing and the Request Path](/openwiki/architecture/nextjs-routing-and-request-path.md) owns that hand-off.
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+`app/(dashboard)/tenant-scope.ts` is the composition point, not a new rule: it lives in `app/` because it joins `modules/auth` identity to `modules/tenancy` profile data and no module may import another's `data/`. `resolveRouteScope` is `cache()`-wrapped so a layout and its page share one profile read per request, and it collapses the profile snapshot into a `RouteScope` verdict — `unknown` stays distinct from `no-tenant-access`, and a non-member keeps the caller's `defaultScope` as a `fallback` for the link rather than a substitute scope ([`tenant-scope.ts`](/app/(dashboard)/tenant-scope.ts#L38-L52)). The segment layout turns each non-`ok` verdict into a rendered state instead of a 404 ([`layout.tsx`](/app/(dashboard)/t/[tenantCode]/layout.tsx#L26-L49)). Pages use `requireScope`, which returns `null` for any non-`ok` verdict, so **a page with no scope has no tenant id to query with** — security never rests on the null. `requireScope` is also where trainer-screens redirect to `/trainer`, in the page path rather than the layout because a layout does not re-run on every navigation ([`tenant-scope.ts`](/app/(dashboard)/tenant-scope.ts#L54-L76)).
 
-Where the verdict comes from, screen by screen, is the pattern to keep straight:
-
-| Source | Screens | Why |
-| --- | --- | --- |
-| `tenantAccessOf(profile)` off the validated scope | dashboard, batch-cards, table-view, documents, analytics, activity-log | the scope already carries the profile; no second read |
-| `deriveTenantAccess` on a snapshot the route already holds | billing, report | the snapshot exists for the trainer redirect; a missing one maps to `unknown` by hand |
-| `resolveTenantAccess()` | `/overview`, legacy redirects | no scope and no snapshot in hand |
-
-All three converge on `deriveTenantAccess`/`tenantAccessOf` in `domain/`, so the `not-found → none` and `unknown ≠ none` rules hold no matter which door a route comes through. The six scoped sections all route through `requireScope`, which is also where the segment's trainer redirect lives — copy that call, not `resolveRouteScope`.
-
-## Viewer read-only: server denial, not a hidden control
-
-Rule 4 is stated as *server-denied*, and "the button is gone" does not satisfy it — a viewer can replay the request. Viewer is read-only because no policy at all admits it to a write: `can_manage_tenant()` requires `current_role() in ('admin','coordinator')`, `can_trainer_write_batch()` requires `trainer` **and** assignment to the row's batch, and the admin-only policies in `20260904120000_add_user_admin_write_policies.sql` test `current_role() = 'admin'` directly. Billing and report are additionally office-only at the route (redirects keyed on `resolveTrustedRole`); the database is what stops a replayed write. The role is resolved from `profiles.role` only, never Clerk metadata — `resolveTrustedRole(null)` answers `null` rather than falling back to the Clerk user object that the test mocks as `admin` ([tenant-scope.test.ts](/tests/unit/tenant-scope.test.ts#L45-L52)). The trusted-versus-preview split belongs to [Tenant Scoping and Role Authority](/openwiki/workflows/tenant-scoping-and-role-authority.md).
-
-## Trainer trimming: server omission, and its RLS half
-
-Rule 5 has two enforcement halves and they are not interchangeable. The **RLS half** is `can_read_batch()`, which narrows a trainer to `b.trainer_profile_id = current_profile_id()`; `learner_details` (contact, birth date, employer, salary) reads only for `admin`/`coordinator`/`viewer` because **RLS filters rows, not columns**. The **omission half** is narrow here and does not work the way the neighbouring pages describe: nothing is called `hideBilling`.
+What a write does with the scope matters more than what a read does. [`t/[tenantCode]/actions.ts`](/app/(dashboard)/t/[tenantCode]/actions.ts#L91-L116) re-resolves the school from the URL code **on the server** — no tenant id is ever read from the form — then takes the role from `profiles.role` via `resolveTrustedRole`, and states that both are "defence in depth and usability; the boundary is the `batches` UPDATE policy, which for anyone else matches zero rows". That zero-row update surfaces as one status, `conflict-or-denied`, shared deliberately with a concurrent edit ([`setBatchRqmCode`](/modules/batches/data/batches.ts#L411-L412)); the layer pattern is on [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md).
 
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-Every office screen still re-checks `profile.role === 'trainer'` and redirects, because RLS narrows a trainer's rows but does not omit the billing fields the batch record carries — `requireScope` performs that check for the whole segment ([tenant-scope.ts](/app/(dashboard)/tenant-scope.ts#L68-L76)), so a page that skips it hands a trainer a full office payload. `/trainer` itself fetches with **no** scope and passes the display rows through `deriveTrainerMetrics`, which **strips the billing keys from the object itself** rather than typing them away (rule 5) — [`tests/unit/dashboard-domain.test.ts`](/tests/unit/dashboard-domain.test.ts#L120-L129) asserts the four keys are absent and that no billing date survives `JSON.stringify`. [`MetricsRow`](/modules/shell/ui/MetricsRow.tsx#L12-L25) is a thin placement wrapper used by the trainer dashboard alone and takes `TrainerDashboardMetrics`; [`KpiSummary`](/modules/batches/ui/KpiSummary.tsx#L132-L155) is shared, so the school dashboard passes `billing={metrics}` and renders `NextBillingCard`, while the trainer row passes nothing and **does not emit the element at all**. A missing prop, not a boolean flag and not CSS — the shape to plan for when adding a card.
+A scope *can* be redundant and still be right. `getBatchesSnapshot(tenantId?)` appends the filter only when an id is passed; `/overview` and `/trainer` pass none and are correct because a policy already narrowed the rows. `/overview` is the one office screen that must not be scoped by path — it reads every school the caller belongs to and groups the figures by school so nothing is summed under one school's name (the audit I1 shape), labelling the groups from `profile.tenants` while the row set stays RLS's ([`overview/page.tsx`](/app/(dashboard)/overview/page.tsx#L1-L45)).
 
-The rest of the trainer boundary is redirects keyed on `resolveTrustedRole`, never the `?role=` preview: `/billing` and `/report` both `redirect('/trainer')` before fetching, and `/overview` sends anyone who is not an admin to `/dashboard`. `/trainer` sits outside the tenant segment precisely because a trainer's slice is not "one school" — and because the KPI row there is gated on `metrics`, a failed snapshot renders no row at all rather than a zeroed one.
+## The boundary a service client steps outside
 
-## Where this goes wrong
+Three failure modes follow directly from the two-client split. Each compiles, lints and passes the suite:
 
-Each of these compiles, lints, and passes the suite:
+- **A tenant filter copied out of a `data/` function into a route.** Harmless while the policy holds, and the moment a policy widens, two spellings of the filter exist and neither is authoritative.
+- **A service client in a page.** The page now reads across every school in the database, so a missing `tenant_id` filter silently becomes a cross-school read with no policy to catch it, and `null` memberships no longer read as "could not check".
+- **A membership check re-implemented in JS** ("is the code in `profile.tenants`?") instead of `scopeForCode`, so the case-folding and the never-broaden rule get re-derived per route and diverge.
 
-- A `tenant_id` filter added to make a screen parent-scoped while a policy still allows a wider read — it hides the drift until the policy is widened.
-- A guard ladder that checks "empty" first, or a `null`-for-everything early return that collapses `no-tenant-access` into "render nothing".
-- `deriveTenantAccess` normalising `sync-failed` to `none`, or `withTenantAccess` applied to a non-`ok` snapshot (a refactor to `status === 'ok' ? … : …` looks like a simplification).
-- Routing a new scoped page past `requireScope` (bare `resolveRouteScope`, or a direct `getProfileSnapshot`) and dropping the `profile === 'trainer'` redirect with it.
-- A trainer redirect gated on `resolveRouteRole`, so `?role=admin` skips `/billing`.
-- `accessToken: async () => getToken()` with no null check — one genuinely empty-looking page per expired session, with no error anywhere.
-- Billing figures passed as `{}`-defaulted props to `KpiSummary` on a trainer screen, so the card renders with "—" and the payload still carries them.
+## Proving it
+
+The evidence base is thinner than the model deserves: there is one hosted project and no staging, `tests/integration/` and `tests/security/` do not exist, and rule 35's real-Supabase isolation cases sit behind rule 36's `[deny]` permission ask. Every authorization statement in the wiki is therefore read out of the migrations and the route code; the unit suite pins the JS half only — scope construction, `resolveTrustedRole`'s `profiles.role`-only authority, and the no-token throw. Treat a migration as intent and an executed read as the only proof the chain is wired. [Verification and Test Strategy](/openwiki/operations/verification-and-test-strategy.md) owns the gap and the trap of trusting a green check.
 
 ## Extending safely
 
-- **Adding a tenant-scoped read:** enable RLS on the table, write the policy through an `app_private` helper, and check the caller lacks a pre-filter that would *do the policy's job*. Put the scope in the URL before the query when the screen is per-school; leave it out only when a policy already narrows the row set.
-- **Adding a scoped screen:** derive the verdict from whatever the route already holds, fold it, and put the failure arm first. It must be in `SCOPED_SECTIONS` before its query is written — a screen that reads every school under one school's name was audit I1.
-- **Proving any of it:** write the RLS cases into `tests/integration/` against real Supabase (rule 35, no mocks) and budget for rule 36's ask before touching the hosted project. Until that lands, the migration is canonical and the unit suite proves only the JavaScript.
+- **Adding a tenant-scoped read:** enable RLS, write the policy through an `app_private` helper, then ask whether your pre-filter does the policy's job. Put the school in the URL when the screen is per-school; omit it only when a policy already narrows the rows.
+- **Adding a scoped screen:** take `/t/[tenantCode]` and call `requireScope` — never `resolveRouteScope` directly, or you drop the trainer redirect. Add the section to `SCOPED_SECTIONS` before writing the query; a screen that reads every school under one school's name was audit I1.
+- **Needing the service role:** first check the caller actually has no session to scope by. If they do, a policy is the cheaper answer, and the filter you would have written in JS belongs in the query either way.
+- **Proving any of it:** write the two-users-two-tenants case into `tests/integration/` against real Supabase (rule 35, no mocks) and budget for rule 36's ask. Until then, the migration is canonical.

@@ -26,6 +26,8 @@ sources:
     resource: repo://modules/reports/ui/exportXlsx.ts
   - id: openwiki-source-7cb0b5f9c6ed9ed4128872a0
     resource: repo://modules/shell/ui/Sidebar.tsx
+  - id: openwiki-source-f7ae5e0747518115ed202c7e
+    resource: repo://RULES.md
   - id: openwiki-source-10f9f8c998debff047489862
     resource: repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql
   - id: openwiki-source-d779956f2a715b2e3f40cf22
@@ -35,6 +37,9 @@ sources:
   - id: openwiki-source-9643403557bfc8e75aa7f9e4
     resource: repo://tests/unit/t2mis.test.ts
 generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
 ---
 
 # Learner Import and the CSV Reconcile Path

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:dc2597156a375e3d89e73cf193471e9970de24933701cef297d88c4fc846b353",
+  "pageVersion": "sha256:0d79b32928e1ac50998cc6782890fe4176f5ffc7b552858b9233d5cdd6748d10",
   "claims": [
     {
       "id": "claim_3da86a224c694356bf364986c8531316",
@@ -503,10 +503,24 @@
           "version": "repo-lines-v1:sha256:fa0aa597ac48a2bdd0a84fcde91840bf3c2ed93381e6300dfa35c8d054daa6d8:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDIxZmFmYzhiNzA0NzdlNmRlOTRmMGE1NGFlNWI0YTA2NGViZjhiNzZlZGQwOGU1OTgyNGZkMWIyOWQ0OGE0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjMyN2I2ZTNhYjlhOTRmMGRlYjA1NzE1YzdiMGVjYTMyZjA5YjljNTNmYTNlZTUyNGQ0Y2M2MmVhZmZiOTU5MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzFmMTkzZTBmNjQwNTVhZDhhNWE2ODZhZGNhODk1ZmZmMjNhNGNhNWFiNmRhOGJlNTlkYzZjMmQzMjBkZmE5YSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_cca415e463774f1b98ee21845fbe8cc7",
+      "statement": "The report dataset is unfiltered by batch `status`, so completed and historical cohorts stay in the screen and the workbook export; filtering to active batches would drop the graduates EGACE and the employment follow-up exist to report.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx#L9-L14",
+          "version": "repo-lines-v1:sha256:7b9ff461e6fef5ded13c6b1c9c35ac052b29d42e26fdb8636ca62fec261dff5e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTA1MzZlNDgzNzZmNWI3NmY3NDk1YzA4NWViM2ZlZTk1MWMwMTllODFkMWM0ZDI4NDJiN2QxYmIwOGY1NDNmNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2M1YjBjNTAzODQzODYwYmIyZjQzNjU4ZTY2NzI4ZWYwYzVlMTdjMzg0MzljYTM2ZmQwZTZiNTYwNDdjYjM2MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTQzOThmODc3MWE4MjRlZWQwOTg5NzAyODFhOGQ3YWNjMjA0OGFmMzVlYWRiMDVmOGE3NTBmNjE2Mjc2YTI2ZCJ9"
+        },
+        {
+          "resource": "repo://modules/reports/README.md#L1-L3",
+          "version": "repo-lines-v1:sha256:adbd8587c77e891c2f7ed977095fc77ebd7835a60ac93488fdd6589b25951170:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzgyZjU5OWM4Y2QyOTBlOGI4MDMxODViZGE4NTc2MTkyNzYxNGI5YWE2MmQ4ZDM5MDFhMDM2ZDkyODAzZjA0NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODExYmI2YzNjMjBmZDNlNmE0ODU5YWEyMTY3MTEyNmUwMDQwYTQyODc2ODJmOTJjZjk4NTk0YTA2ZTczM2I1OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTY0NzAzN2FhMTg0ODkzMTgwMGJkYzBkYjhiZTI4ZTdkMDU3NGM2MTY2NGUwZTM2MDQzN2NjNjI3MGY1YjE5MiJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

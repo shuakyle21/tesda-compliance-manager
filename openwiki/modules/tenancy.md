@@ -24,8 +24,12 @@ sources:
     resource: repo://docs/adr/ADR-006-platform-admin-and-school-registry.md
   - id: openwiki-source-2fda883e9b76745f69f487f7
     resource: repo://eslint.config.mjs
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
   - id: openwiki-source-7cb0b5f9c6ed9ed4128872a0
     resource: repo://modules/shell/ui/Sidebar.tsx
+  - id: openwiki-source-a73ad3d1378cdffc9904678c
+    resource: repo://modules/shell/ui/Topbar.tsx
   - id: openwiki-source-3f1f3f4919f6d868d27df2e3
     resource: repo://modules/tenancy/data/platform.ts
   - id: openwiki-source-2e2d8e1af455c1b26b721663
@@ -36,6 +40,8 @@ sources:
     resource: repo://modules/tenancy/data/users.ts
   - id: openwiki-source-4a6c5a1d0a57f700524b0a69
     resource: repo://modules/tenancy/domain/access.ts
+  - id: openwiki-source-5be4fd1a47d9a6f2741928aa
+    resource: repo://modules/tenancy/domain/profile.ts
   - id: openwiki-source-6a8e8eb585b473f51007f9ea
     resource: repo://modules/tenancy/domain/schoolDraft.ts
   - id: openwiki-source-b5e9a80328ba1dcd462db5c3
@@ -54,7 +60,10 @@ sources:
     resource: repo://tests/unit/tenant-scope.test.ts
   - id: openwiki-source-fe5bad314b3fc436410eb4b1
     resource: repo://tests/unit/user-access.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
 ---
 
 # Tenancy, the School Registry and Tenant Scope
@@ -63,25 +72,37 @@ generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
 
 Two rules frame every decision below. Rule 1 and rule 2 put authorization in Postgres and allow a `tenant_id = scope.tenantId` filter only as scope *selection*; rule 30 is the ADR-006 boundary that keeps the platform admin inside the school registry.
 
+## How the rest of the app borrows the membership fact
+
+The module's most important export is not a screen. Membership is tenancy's fact, every entity contract needs it, and no other module may import tenancy's `data/` — so the fact crosses the boundary three ways and only three:
+
+- **The verdict, borrowed through `domain/`.** `domain/access.ts` exports the `TenantAccess` union, `tenantAccessOf(profile)` and `withTenantAccess`. Pages holding a scope call `tenantAccessOf`; routes holding a snapshot call `deriveTenantAccess` in the data layer. Either result is folded into a foreign snapshot.
+- **The scope type, borrowed through `domain/`.** `TenantScope` is passed to `getBatchesSnapshot`-style readers, which add `tenant_id` on top of RLS.
+- **The profile read, reached only through `app/`.** `getProfileSnapshot` has no module-to-module caller; `app/(dashboard)/layout.tsx`, `tenant-scope.ts`, `tenant-access.ts`, `/users/new` and `/profile` are the joins (rule 8, lint-enforced by the per-module `import/no-restricted-paths` zones in `eslint.config.mjs`).
+
+Two of the module's exports are dead ends, worth knowing before grepping for callers. `profile.ts`'s `hasTenantMembership` has no caller: the membership question is asked through `tenantAccessOf`, and scope selection asks `profile.tenants` directly. `scope.ts`'s `isScopedSection` has no caller either — the guarantee comes from the `ScopedSection` type at each call site, not a runtime check.
+
 ## Which school a screen is about
 
-Tenant context lives in the URL path segment (`/t/<code>/<section>`) — a locked domain fact, because before it existed every office screen read every school the caller belonged to and a multi-school user saw three schools' batches summed under one school's name (audit I1, recorded in the module header).
+Tenant context lives in the URL path segment (`/t/<code>/<section>`) — a locked domain fact (`RULES.md` "Locked domain facts"), because before it existed every office screen read every school the caller belonged to and a multi-school user saw three schools' batches summed under one school's name (audit I1, recorded in the module header).
 
 `scopeForCode(profile, code)` builds a `TenantScope` only from `profile.tenants`, itself an RLS-scoped read of `profile_tenant_memberships`. An unknown *or foreign* code therefore yields `null`, never a scope. Code matching is case-insensitive on both sides — the wanted code is lowercased and each membership's `code` is lowercased per comparison, so `/t/akb` finds `AKB` — and `scopedPath` lowercases on the way out, so a link and its match always agree.
 
 `defaultScope` picks the `is_default` membership, falls back to the first, and returns `null` with none. ADR-005's one-membership-per-profile decision makes that fallback resolve to the single row, and the fallback is what lets an admin grant written with `is_default: false` still land a single-school person in their school.
 
-`SCOPED_SECTIONS` is the single list of code that lives under `/t/<code>`. It is a compile-time anchor, not a mirror of the directory tree: `ScopedSection` is derived from it, the Sidebar's workspace rows name a section rather than an href, and `legacyRoute(section)` types each old unscoped route's target. Two consequences bite. **A section added outside the list is reachable but unscoped** — a section added outside the list is reachable but unlisted — `(sections)` already holds none of them automatically, and a page under `dashboard/` rather than inside the group earns no legacy redirect and no nav row. And `isScopedSection` is currently exported but called by nothing: the guarantee comes from the `ScopedSection` type at each call site, not from a runtime check.
+`SCOPED_SECTIONS` is the single list of code that lives under `/t/<code>`. It is a compile-time anchor, not a mirror of the directory tree: `ScopedSection` is derived from it, the Sidebar's workspace rows and `Topbar`'s activity-log link both go through `scopedPath` with a `ScopedSection`, and `legacyRoute(section)` types each old unscoped route's target. Two consequences bite. **A section added outside the list is reachable but unscoped** — `(sections)` holds nothing automatically, and a page added outside the group earns no legacy redirect and no nav row.
 
-Route composition lives in `app/(dashboard)/tenant-scope.ts`, not in the module, because it joins `modules/auth` identity to `modules/tenancy`'s profile and only `app/` may import two private `data/` layers (rule 8). `resolveRouteScope` is `cache()`-wrapped and the `/t/[tenantCode]` layout renders each non-`ok` state; the four arms, `requireScope()` and the trainer redirect are documented in [Next.js Routing and the Request Path](/openwiki/architecture/nextjs-routing-and-request-path.md). One detail belongs here: a foreign code yields `not-a-member` with a `fallback` scope, **never an all-schools scope** — `redirectToDefaultScope` is the only thing that forwards to a default, and only for a legacy unscoped path. `resolveTenantAccess()` in the sibling `app/(dashboard)/tenant-access.ts` is the same composition for the verdict alone; both files are `cache()`-backed so a layout and its page pay one profile read.
+`parseScopedPath` is the read side of the same rule and is the module's most-called export: the Shell's Sidebar and Topbar resolve the active school and the activity link from it. It accepts a bare `/t/<code>` and defaults the section to `dashboard`, which is what makes the segment root a valid landing. Route composition lives in `app/(dashboard)/tenant-scope.ts`, not in the module, because it joins `modules/auth` identity to `modules/tenancy`'s profile (rule 8). `resolveRouteScope` is `cache()`-wrapped and the `/t/[tenantCode]` layout renders each non-`ok` state; the four arms, `requireScope()` and the trainer redirect are documented in [Next.js Routing and the Request Path](/openwiki/architecture/nextjs-routing-and-request-path.md). One detail belongs here: a foreign code yields `not-a-member` with a `fallback` scope, **never an all-schools scope** — `redirectToDefaultScope` is the only thing that forwards to a default, and only for a legacy unscoped path. `resolveTenantAccess()` in the sibling `app/(dashboard)/tenant-access.ts` is the same composition for the verdict alone; both files ride on `cache()` at the reads they call — `tenant-scope.ts` caches its own `getSignedInProfile` — so a layout and its page pay one profile read.
 
 ## Why the verdict is `domain/` and not `data/`
 
 `domain/access.ts` names the difference between "this table is empty" and "this caller is attached to no tenant". Every tenant-scoped table reports the second as a *successful empty read*, so without the verdict a fully-provisioned-looking "No batches — import one" is offered to someone who cannot perform it.
 
-It lives in `domain/` because another module's `data/` is private (rule 8, lint-enforced by the per-module `import/no-restricted-paths` zones in `eslint.config.mjs`): every module's snapshot contract has to fold this verdict, and none of them may import tenancy's `data/`. Rule 14 keeps it I/O-free.
+It lives in `domain/` because another module's `data/` is private (rule 8): every module's snapshot contract has to fold this verdict, and none of them may import tenancy's `data/`. Rule 14 keeps it I/O-free.
 
 `TenantAccess` is `granted` | `none` | `unknown`. `deriveTenantAccess` reads it off a profile snapshot with a deliberate mapping: `not-found` → `none` (a signed-in person with no profile row has no membership either way, and the honest message is the same one), `sync-failed` and `unconfigured` → `unknown`. `withTenantAccess` then replaces **only** an `ok` snapshot; `sync-failed` and `unconfigured` pass through untouched, and `unknown` changes nothing. The failure this prevents is silent and documented in `tests/unit/tenant-access.test.ts`: "you belong to no school" is a tidier story than "the fetch broke", so a fold that rewrote failures would bury a real error behind a plausible one. Screens render `shared/ui/NoTenantAccessState` for the folded state.
+
+The asymmetry between the two verdict helpers is the trap. `tenantAccessOf` takes a `Profile` and so can never return `unknown` — a caller that has a profile has already read one. Only `deriveTenantAccess` sees the fetch's own outcome. A page replacing the latter with the former, to "avoid a snapshot", silently upgrades every unreadable profile to `none`.
 
 ## The profile snapshot and its four states
 
@@ -97,7 +118,7 @@ Its snapshot is the standard union plus one: `ok`, `not-found` (authenticated bu
 
 `findUserByEmail` is where an access bug would be quietest, since `assignUserAccess` changes the role of whatever row comes back. Three defenses stack: `escapeLikePattern` escapes `\`, `%` and `_` for the `ILIKE` (backslash first, or it escapes its own output; `_` is a legal character in real addresses and matches any single character); a comment records that PostgREST rewrites `*` before Postgres could escape it; and an exact normalized-equality re-check turns any residue into `not-registered`, which falls through to the invitation path rather than granting the wrong person. `not-registered` stays ambiguous by design — distinguishing "nobody has that address" from "they belong to another school" would leak other tenants' membership.
 
-`assignUserAccess` runs the role UPDATE **before** the membership INSERT — the safer half to stop after — and treats zero updated rows as `denied`, because an RLS-blocked UPDATE is not an error in PostgREST. On INSERT failure it compensates with a best-effort `restorePriorRole`, since policies 1 and 2 of migration `20260904120000` are keyed on `current_role() = 'admin'` and match profiles belonging to no tenant: a half-applied promotion could read and set roles across the whole unassigned pool. This is compensation, not a transaction (PostgREST exposes none; real atomicity would take a `security invoker` function), and a failed restore leaves the state as it would have been, logged.
+`assignUserAccess` runs the role UPDATE **before** the membership INSERT — the safer half to stop after — and treats zero updated rows as `denied`, because an RLS-blocked UPDATE is not an error in PostgREST (the policy's `using` clause simply excludes the row). On INSERT failure it compensates with a best-effort `restorePriorRole`, since policies 1 and 2 of migration `20260904120000` are keyed on `current_role() = 'admin'` and match profiles belonging to no tenant: a half-applied promotion could read and set roles across the whole unassigned pool. This is compensation, not a transaction (PostgREST exposes none; real atomicity would take a `security invoker` function), and a failed restore leaves the state as it would have been, logged. `writeFailureSnapshot` draws the `42501` → `denied` line once for both statements so neither can report a refusal as a broken connection.
 
 The INSERT always writes `is_default: false`. `user.tenantIds` comes from that same RLS-scoped join, so an admin of school A sees an *empty* membership list for someone at school B; trusting it would write a second default, nothing in the schema forbids one, and `mapProfileRow` would then pick whichever flagged row comes back first — landing turns on row order. Writing `false` costs nothing because `mapProfileRow` falls back to `memberships[0]`. The only writer of `true` is the invitation path in `modules/auth/data/provisioning.ts`, where the profile is brand new and the service-role client can see it genuinely has no other membership.
 
@@ -122,17 +143,18 @@ Hiding the sidebar row is usability, the route and RLS are the control. `/school
 
 `/schools/new` is the one write path outside a tenant, and unscoped for a structural reason: a school with no members cannot satisfy a membership-scoped `tenants` policy, so there is no tenant to scope to yet. The registry read the form depends on is public reference data — `listQualifications` filters `is_active` rather than a tenant.
 
-`data/schools.ts` writes through the `create_school` RPC, which is `security invoker`: RLS evaluates every statement inside, the caller gets a policy violation rather than a privilege, and the two statements still land atomically — a school with no programs cannot run a batch and would leave nothing on screen to say so. The client stays anon-key throughout; the service-role client belongs only to the webhook. Failures are separated because they need different screens: `42501` → `denied`, `23505` → `duplicate-code` (`tenants.code` is the one unique constraint a typist can hit), anything else → `sync-failed`, and a null return from the `returns uuid` function is a failure rather than a success.
+`data/schools.ts` writes through the `create_school` RPC, which is `security invoker`: RLS evaluates every statement inside, the caller gets a policy violation rather than a privilege, and the two statements still land atomically — a school with no programs cannot run a batch and would leave nothing on screen to say so. The client stays anon-key throughout; the service-role client belongs only to the webhook. Failures are separated because they need different screens: `42501` → `denied`, `23505` → `duplicate-code` (`tenants.code` is the one unique constraint a typist can hit), anything else → `sync-failed`, and a null return from the `returns uuid` function is a failure rather than a success. The later `(tenant_id, qualification_id)` collision is not left to Postgres at all — the draft validator catches it first.
 
-`domain/schoolDraft.ts` is the pure validator ahead of any write; `tests/unit/school-draft.test.ts` pins the decisions that are easy to tidy into something wrong. It normalizes the code to uppercase with whitespace stripped — `akb` beside `AKB` would be two schools reading as one and the unique constraint would not catch it — rejects a code outside `[A-Z0-9]{2,12}` and a non-numeric provider code, and leaves a blank COPR number valid, since a school is routinely entered while its certificate is still being issued. Programs are checked in the draft's own index space: blank rows are skipped as untouched spares, a partial row without a qualification is flagged, a duplicate qualification is caught before the `(tenant_id, qualification_id)` constraint produces an unactionable error, and an unknown id becomes "Choose a qualification from the list" instead of a foreign-key failure. Zero programs is an error. The row index matters — a check against the compacted command list would flag an innocent row and report only the first offender.
+`domain/schoolDraft.ts` is the pure validator ahead of any write; `tests/unit/school-draft.test.ts` pins the decisions that are easy to tidy into something wrong. It normalizes the code to uppercase with whitespace stripped — `akb` beside `AKB` would be two schools reading as one and the unique constraint would not catch it — rejects a code outside `[A-Z0-9]{2,12}` and a non-numeric provider code, and leaves a blank COPR number valid, since a school is routinely entered while its certificate is still being issued (COPR shape is never checked at all: the format moves by issuing year and office, and rejecting a printed number would block exactly the school the screen exists to onboard). Programs are checked in the draft's own index space: blank rows are skipped as untouched spares, a partial row without a qualification is flagged, a duplicate qualification is caught before the constraint produces an unactionable error, and an unknown id becomes "Choose a qualification from the list" instead of a foreign-key failure. Zero programs is an error. The row index matters — a check against the compacted `rows` list flags an innocent row and reports only the first offender.
 
-`app/(dashboard)/schools/new/actions.ts` sequences authorization, the qualification list, validation, then the write, returning a discriminated form state rather than throwing (a thrown digest strands the operator). A signed-out, non-admin or failed-check caller gets `denied`/`failed`/`unconfigured`, not a form. `duplicate-code` stays distinct from `failed` because it is the one failure the operator can fix. Because the action re-validates against the live list, a page rendered before the registry changed still cannot submit a foreign id.
+`app/(dashboard)/schools/new/actions.ts` sequences authorization, the qualification list, validation, then the write, returning a discriminated form state rather than throwing (a thrown digest strands the operator). `authorizePlatformAdmin` returns `denied` for a signed-out or non-operator caller, and keeps `unconfigured` and `failed` distinct from `denied` — an operator who cannot be checked is not an operator who was refused. `duplicate-code` stays distinct from `failed` because it is the one failure the operator can fix. Because the action re-validates against the live list, a page rendered before the registry changed still cannot submit a foreign id.
 
 One state stops at the page: an empty `qualifications` registry makes the form unsubmittable, because a school must record at least one program. And ADR-006 records "deliberately not done": no `/schools` list, no edit or deactivate flow, no way to enrol a new program at an existing school.
 
 ## Failure modes in one place
 
 - **Folding too eagerly.** `withTenantAccess` must replace only `ok`; rewriting a `sync-failed` snapshot hides the failure behind the tidier story, and `unknown` must never behave like `none`.
+- **Swapping the verdict helper.** `tenantAccessOf` cannot produce `unknown`; put it where `deriveTenantAccess` belongs and every unreadable profile reads as "you have no school".
 - **A scope treated as authorization.** A scope that is `null` gives the page nothing to query with, but RLS still decides.
 - **An unescaped email lookup.** `_` in an address matches a stranger, and the stranger gets the role and the school.
 - **A second default membership.** Writing `is_default: true` from an RLS-scoped list produces a row-order-dependent wrong-school landing.
