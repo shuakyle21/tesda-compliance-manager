@@ -213,6 +213,20 @@ old state is the Critical finding.
 
 ## 9. Decisions only you can make
 
+**Decided by the owner on 2026-11-21.** These settle the intent only. Each item they touch
+still needs its own approval before work starts.
+
+- Roles are per school. Item 3.1 (move `role` to the membership row) is the target design, and
+  question 2 is answered by it: a person in two schools holds a separate role in each.
+- Trainers must never see money or billing data (question 3). Rule 5 is a hard requirement, so
+  F-08 stays High and item 3.3 is a priority.
+- A batch with billing history is archived, never deleted (question 5, item 3.4).
+- No staging Supabase project before Wave 2 (question 8). Item 3.6 is deferred. Wave 2 changes
+  are tested on a local stack only, and the owner applies each migration to the hosted project.
+- Sign-up is invitation-only (question 10, item 0.5).
+
+Questions 1, 4, 6, 7 and 9 are still open.
+
 | # | Question | Recommendation |
 |---|---|---|
 | 1 | May school admins browse the list of unassigned users, or only look up one exact email? | Exact email only |
