@@ -1,8 +1,53 @@
 ---
 type: workflow
 title: "Workflow: From Invitation to Seated Member"
-description: The end-to-end path by which a person gains access — an admin-authored Clerk invitation carrying a namespaced role/school grant, the insert-only webhook insert that applies it, the RLS-gated seating of an existing user, the platform admin's first-member path, and deactivation on user.deleted.
-tags: [workflow, provisioning, invitation, membership, rls, platform-admin, deactivation, clerk]
+description: The end-to-end path by which a person gains access — an admin-authored Clerk invitation carrying a namespaced role/school grant, the insert-only webhook insert that applies it, the RLS-gated seating of an existing user, the platform admin's first-member path, deactivation on user.deleted, and the tenantless state the route folds into the no-tenant-access screen.
+tags: [workflow, provisioning, invitation, membership, rls, platform-admin, deactivation, clerk, no-tenant-access]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
+sources:
+  - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
+    resource: repo://app/(dashboard)/layout.tsx
+  - id: openwiki-source-7ded6d9e4b97a5fd4dd6e34e
+    resource: repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx
+  - id: openwiki-source-20d1ca31256bf756f33f5462
+    resource: repo://app/(dashboard)/tenant-scope.ts
+  - id: openwiki-source-6e6cc525e98e274ad6c10b29
+    resource: repo://app/(dashboard)/users/new/actions.ts
+  - id: openwiki-source-c03196c12ed34c5537bd329f
+    resource: repo://app/(dashboard)/users/new/page.tsx
+  - id: openwiki-source-c0ad955c03733d7d70ef6ec6
+    resource: repo://app/api/webhooks/clerk/route.ts
+  - id: openwiki-source-852d3a9765c4d719dcd1ae2c
+    resource: repo://docs/adr/ADR-006-platform-admin-and-school-registry.md
+  - id: openwiki-source-485aa6e8f0db9dbe43144a50
+    resource: repo://modules/auth/data/invitations.ts
+  - id: openwiki-source-2aff630ed0688d80b1b707c8
+    resource: repo://modules/auth/data/provisioning.ts
+  - id: openwiki-source-3da0446fc6c5da744a43e0a3
+    resource: repo://modules/auth/data/role.ts
+  - id: openwiki-source-ea48dab7d1c137cf2f1308ae
+    resource: repo://modules/auth/domain/invitationMetadata.ts
+  - id: openwiki-source-6d398bd6713150c971d852b0
+    resource: repo://modules/tenancy/data/tenancy.ts
+  - id: openwiki-source-5b30b77204ee0533570c731e
+    resource: repo://modules/tenancy/data/users.ts
+  - id: openwiki-source-4a6c5a1d0a57f700524b0a69
+    resource: repo://modules/tenancy/domain/access.ts
+  - id: openwiki-source-8e7d5d9b6492b85170c2d1cd
+    resource: repo://modules/tenancy/ui/CreateUserForm.tsx
+  - id: openwiki-source-03656dd9cbbc89345a506c19
+    resource: repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql
+  - id: openwiki-source-fc8bca54fd802af39662de6c
+    resource: repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql
+  - id: openwiki-source-13117a840913dd27670d0422
+    resource: repo://supabase/migrations/20260906120000_ensure_invitation_membership_atomic.sql
+  - id: openwiki-source-c25ad52388e27abc8c91b43f
+    resource: repo://tests/unit/auth-provisioning.test.ts
+  - id: openwiki-source-fe5bad314b3fc436410eb4b1
+    resource: repo://tests/unit/user-access.test.ts
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
 ---
 
 # Workflow: From Invitation to Seated Member
@@ -10,8 +55,8 @@ tags: [workflow, provisioning, invitation, membership, rls, platform-admin, deac
 Access in this app is a two-part fact: a `profiles` row (identity exists) and a
 `profile_tenant_memberships` row (identity can see a school). Neither alone reads anything —
 `app_private.can_access_tenant()` resolves purely from the memberships table, so a profile with no
-membership sees zero rows everywhere. This page follows the path from "nobody" to "seated member"
-and back out again.
+membership sees zero rows everywhere. This page follows the path from "nobody" to "seated member",
+back out again, and what the app does with the person who is authenticated but belongs to nothing.
 
 Two constraints shape it before any code does:
 
@@ -22,7 +67,7 @@ Two constraints shape it before any code does:
 2. **Every admission decision is RLS's.** The admin screens carry role checks, but
    [migration `20260904120000`](/supabase/migrations/20260904120000_add_user_admin_write_policies.sql)
    and [migration `20260906114735`](/supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql)
-   are the boundary (rule 1, `RULES.md` §1). [Tenant Isolation and
+   are the boundary (rule 1). [Tenant Isolation and
    RLS](/openwiki/architecture/tenant-isolation-and-rls.md) owns the policies themselves; this page
    only says where they bite.
 
@@ -64,19 +109,26 @@ tenantless.*
 
 | Entry point | Actor | What it can do |
 | --- | --- | --- |
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 | [`/users/new`](/app/(dashboard)/users/new/page.tsx) → [`createUserAction`](/app/(dashboard)/users/new/actions.ts) | tenant `admin` | seat an existing user, or invite a stranger |
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
 | [`/schools/new`](/app/(dashboard)/schools/new/actions.ts) | platform admin | create a school, then seat its first member by hand |
 | [`app/api/webhooks/clerk/route.ts`](/app/api/webhooks/clerk/route.ts) | Clerk | insert a profile, repair a membership, deactivate |
 
 `/users/new` renders *empty states* for every guard it cannot satisfy — no session, no profile,
-`unconfigured`, `sync-failed`, non-admin, and an admin who belongs to no school — so a denied
-operator never gets a form whose only outcome is a denial. The sidebar hides the row for non-admins
-as usability only ([`modules/shell/ui/Sidebar.tsx`](/modules/shell/ui/Sidebar.tsx#L97-L135)).
+`unconfigured`, `sync-failed`, non-admin, and an admin who belongs to no school
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+([page.tsx L58-L131](/app/(dashboard)/users/new/page.tsx#L58-L131)) — so a denied operator never
+gets a form whose only outcome is a denial. The sidebar hides the row for non-admins as usability
+only ([`modules/shell/ui/Sidebar.tsx`](/modules/shell/ui/Sidebar.tsx#L97-L135)).
 
 The action's gate is `resolveTrustedRole(profile.role)`, **never** `resolveRouteRole`, because the
-latter honours a `?role=` preview override and the invitation branch has no RLS behind it at all.
-Every rejection is a discriminated form state rather than a throw, so the admin sees which field or
-which guard failed instead of an opaque digest.
+latter honours a `?role=` preview override and the invitation branch has no RLS behind it at all
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+([actions.ts L71-L75](/app/(dashboard)/users/new/actions.ts#L71-L75)). Every rejection is a
+discriminated form state rather than a throw, so the admin sees which field or which guard failed
+instead of an opaque digest.
 
 ## Step 1 — an assignment, resolved by lookup
 
@@ -189,6 +241,7 @@ The RPC is granted to `service_role` only — no session exists in the webhook, 
 invoker` sits on the service role and RLS in the function never evaluates, which is safe only because
 nothing but the webhook can reach it. `public.create_school` is the deliberate mirror image: also
 `security invoker`, but granted to `authenticated`, so RLS *does* fire inside it
+<!-- openwiki: broken internal link [/docs/adr/ADR-006-platform-admin-and-school-registry.md#L144-L154] heading anchor "L144-L154" does not exist in "/docs/adr/ADR-006-platform-admin-and-school-registry.md". Fix the href or restore the target, then delete this comment. -->
 ([ADR-006 P6](/docs/adr/ADR-006-platform-admin-and-school-registry.md#L144-L154)).
 
 ## Step 5 — seating an existing member, with compensation
@@ -209,13 +262,17 @@ role UPDATE runs first because it is the safer half to stop after. If the member
 fails, `restorePriorRole` compensates
 ([users.ts L279-L323](/modules/tenancy/data/users.ts#L279-L323)). That matters beyond tidiness —
 policies 1 and 2 are keyed on `current_role()` and match profiles with *no* tenant, so a half-applied
-promotion to `admin` can read and re-role the whole unassigned pool with no membership at all.
+promotion to `admin` can read and re-role the whole unassigned pool with no membership at all. The
+restore is best effort and cannot itself be rolled back; a failed restore is logged and leaves the
+state exactly as it would have been without the attempt.
 
 The same RLS asymmetry forces `is_default: false` here. The admin client's membership read is scoped,
-so an empty list means "none *this admin can see*", and trusting it would write a second default row.
-`mapProfileRow` falls back to `memberships[0]` when nothing is flagged, so a single-school member
-still lands somewhere; `true` is written only on the webhook path, where the service role can see the
-whole truth.
+so an empty list means "none *this admin can see*", and trusting it would write a second default row
+— the schema permits more than one. `mapProfileRow` falls back to `memberships[0]` when nothing is
+flagged
+([tenancy.ts L80-L97](/modules/tenancy/data/tenancy.ts#L80-L97)), so a single-school member still
+lands somewhere; `true` is written only on the webhook path, where the service role can see the whole
+truth.
 
 Already-member is detected up front and returns `assigned` with `alreadyMember: true` so the banner
 can say only the role changed instead of claiming a new grant.
@@ -228,7 +285,10 @@ predicates that both remain load-bearing: `profile_id <> current_profile_id()` (
 others, never themselves — otherwise one INSERT hands them everything `can_access_tenant()` gates)
 and `not exists (… memberships for that tenant)`, so a school can only be staffed while empty. The
 second predicate is racy under concurrent inserts; that is tolerable because the first holds anyway
-and the worst case is two seated members rather than one.
+and the worst case is two seated members rather than one
+([20260906114735 L297-L349](/supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L297-L349)).
+Guard 2's subquery is itself RLS-filtered, so narrowing the sibling "Platform admins can read tenant
+memberships" SELECT policy silently weakens the INSERT policy.
 
 There is no DELETE counterpart: revoking is the school admin's operation, and the operator seats the
 first admin and steps back out. `/schools/new` does not perform a seating — it only calls
@@ -239,22 +299,38 @@ Read the policies in [Tenant Isolation and RLS](/openwiki/architecture/tenant-is
 before changing either. Granting `is_platform_admin()` a compliance table, or letting the operator
 seat itself into a tenant, is a boundary change that needs its own ADR (rule 30; ADR-006 P3).
 
-## Step 7 — deactivation
+## Step 7 — the tenantless state and how the route folds it
 
-`user.deleted` calls `deactivateProfileFromClerkUser`, which sets `is_active = false` and never
-deletes ([provisioning.ts L148-L167](/modules/auth/data/provisioning.ts#L148-L167)). Every FK into
-`profiles.id` is what a hard delete would cascade or orphan: `profile_tenant_memberships` cascades,
-`platform_admins` cascades, while `batches.trainer_profile_id`, `documents.submitted_by`,
-`lamr_entries.marked_by` and `activity_log.profile_id` go `set null` — the actor trail behind batch,
-document and activity history thins toward blank.
+The workflow's payoff is the state it produces for a self sign-up that no admin has reached: a
+profile, a `viewer` role, and no membership. Every RLS-scoped read then returns a *successful* empty
+set, so the data itself cannot say "you belong to nothing" — rule 19's other states look identical.
 
-Deactivation is complete for authorization because `app_private.current_profile_id()` filters
-`is_active = true`, so every `current_role()` and `can_access_tenant()` predicate fails at the next
-request while the memberships and all referenced history stay intact. It is not a sign-out: the
-layout still renders, and only RLS denies.
+Two helpers convert a profile read into a verdict instead of a query. `tenantAccessOf(profile)` is
+pure and used by a page that already holds a scope; `deriveTenantAccess(profileSnapshot)` maps
+`not-found` to `none` (a signed-in person with no profile row has no membership either way) and
+`sync-failed`/`unconfigured` to `unknown`
+([tenancy.ts L158-L178](/modules/tenancy/data/tenancy.ts#L158-L178)). `withTenantAccess` is the only
+writer of the fourth state and replaces **only** an `ok` snapshot, so a real fetch failure is never
+dressed up as "no school"
+([`modules/tenancy/domain/access.ts`](/modules/tenancy/domain/access.ts#L53-L58)).
 
-An admin can equally set `is_active` on a seat without a Clerk delete, since it is not in the
-webhook's update column list.
+The route-level joins that feed it live in `app/` because they compose two modules' private `data/`:
+`resolveTenantAccess()` for a verdict on its own, and `resolveRouteScope()`, which collapses the
+profile snapshot into `ok` | `not-a-member` | `no-tenant-access` | `unknown`. The `/t/[tenantCode]`
+segment layout renders the three non-`ok` arms, and every office page folds the verdict with its own
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+fetch ([`tenant-scope.ts` L46-L52](/app/(dashboard)/tenant-scope.ts#L46-L52),
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+[`layout.tsx` L26-L49](/app/(dashboard)/t/[tenantCode]/layout.tsx#L26-L49)). The dashboard layout
+does not police it at all: on a failed read it just passes a `null` role and an empty tenant list to
+the shell, which renders a smaller, honest menu
+<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
+([`layout.tsx` L24-L35](/app/(dashboard)/layout.tsx#L24-L35)).
+
+Ordering is the fragile part — a `sync-failed` and a `no-tenant-access` both look like zero rows —
+and [Module Boundaries and the Data Layer
+Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md#guard-ordering) owns the fixed
+guard order. The one rule that belongs here: the fold must run on the profile read, never on the rows.
 
 ## Failure modes
 
@@ -272,16 +348,20 @@ webhook's update column list.
   why the two predicates must be counted, not just the policy's presence.
 - **Viewer granted a membership.** Read-only is enforced server-side by the write policies, not by
   hiding buttons (rule 4).
+- **Tenantless user told "no batches".** RLS answers empty; without the fold the screen would claim
+  the school has no data. Guard order is the only defence.
 
 ## Tests and their limits
 
 [`tests/unit/auth-provisioning.test.ts`](/tests/unit/auth-provisioning.test.ts) pins the RPC name and
 arguments, the accepted `23505`, and the logged-then-rethrown other error.
 [`tests/unit/user-access.test.ts`](/tests/unit/user-access.test.ts) pins the assignable role set
-(`owner` excluded, no DB enum value), the `ILIKE` escaping, and the all-or-nothing grant parse. The
-RLS half — the admin write policies and both seating predicates — has no unit coverage and rests on
-real Supabase; until those isolation tests exist it must be checked by reading the migration
-(rule 35).
+(`owner` excluded, no DB enum value), the `ILIKE` escaping, and the all-or-nothing grant parse.
+[`tests/unit/tenant-access.test.ts`](/tests/unit/tenant-access.test.ts) pins the `not-found` → `none`
+mapping and that the fold never rewrites a failure — the assertions that keep the tenantless state
+honest. The RLS half — the admin write policies and both seating predicates — has no unit coverage
+and rests on real Supabase; until those isolation tests exist it must be checked by reading the
+migration (rule 35 — RLS tests run against real Supabase, no mocks).
 
 Related: [Auth and Provisioning](/openwiki/modules/auth-and-provisioning.md) for the identity half,
 [Tenancy](/openwiki/modules/tenancy.md) for the seat model, [Tenant Scoping and Role

@@ -125,9 +125,6 @@ sources:
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
 generated: { by: "openwiki/0.5.0", at: "2026-11-19T03:55:05.435Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-19T03:55:05.435Z
 ---
 
 # Architecture Overview

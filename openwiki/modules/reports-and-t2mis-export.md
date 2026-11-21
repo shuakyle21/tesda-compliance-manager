@@ -54,7 +54,10 @@ sources:
     resource: repo://tests/unit/reports-domain.test.ts
   - id: openwiki-source-9643403557bfc8e75aa7f9e4
     resource: repo://tests/unit/t2mis.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
 ---
 
 # Reports, EGACE and the T2MIS Export
@@ -67,20 +70,22 @@ this app. Two things are easy to get wrong about it:
   the browser downloads it.
 - **The workbook is split across two modules on purpose.** The 48-column **layout** is
   [`modules/import-export/domain/t2mis.ts`](/modules/import-export/domain/t2mis.ts) — the same
-  header contract the import side parses — while the **writer** lives here in
-  `domain/xlsx.ts` and the **cell filling** in `ui/exportXlsx.ts`. Reaching a sibling module's
-  `domain/` is the legal direction under rule 8; a `data/`-to-`data/` import would have been
-  blocked. Details of the layout belong to
-  [CSV import and the T2MIS layout](/openwiki/modules/import-export.md); this page covers who
-  fills the cells, the writing, and the screen around it.
+  header contract the import side parses — while the **writer** lives here in `domain/xlsx.ts` and
+  the **cell filling** in `ui/exportXlsx.ts`. Reaching a sibling module's `domain/` is the one
+  direction RULES rule 8 permits; a `data/`-to-`data/` import would be blocked (rule 7). Details of
+  the layout belong to [CSV import and the T2MIS layout](/openwiki/modules/import-export.md); this
+  page covers who fills the cells, the writing, and the screen around it.
 
-The module has **no `data/` layer**. Its route fetches through `modules/batches/data` and the
-folder holds only `domain/` and `ui/`, so there is no report-scoped snapshot type and nothing here
-to follow the fetch → map → derive contract with. Rate "no report data layer" as a decision, not
-drift: every number is derived from the shared batch snapshot plus the roster, and
-`modules/reports/README.md` still lists `data/` as *planned* rather than missing. The agreed home
-for a genuinely new export unit is `ui/exportXlsx.ts` — the first real-tooling export here — not a
-new module.
+The module has **no `data/` layer**. It holds only `domain/` and `ui/`, so there is no
+report-scoped snapshot type and nothing here to follow the fetch → map → derive contract with.
+Rate "no report data layer" as a decision, not drift: every number is derived from the shared
+batch snapshot plus the roster, and `modules/reports/README.md` still lists `data/` as *planned*
+rather than missing. The README's `Contents` list has drifted — it names only `ui/ReportView.tsx`
+and the two domain helpers, omitting `domain/xlsx.ts`, `ui/exportXlsx.ts`, the summary strip, the
+cohort list, the employment table and the toolbar, and it still gives the old
+`app/(dashboard)/report/page.tsx` path — so treat the file tree as the inventory and the README as
+intent. The agreed home for a genuinely new export unit is `ui/exportXlsx.ts` — the first
+real-tooling export here — not a new module.
 
 ## The report route
 
@@ -141,7 +146,7 @@ The roster is fetched here and nowhere else because it carries **contact, addres
 data that sits in `learner_details`, a one-to-one table existing precisely because RLS filters rows
 and not columns (`20261111120000`, whose own comment cites rules 1 and 5). Its read policy names
 `admin`, `coordinator` and `viewer` and omits `trainer` entirely, so **RLS returns no
-`learner_details` row to a trainer** and `mapLearnerRow` blanks all 25 detail cells via `orEmpty`.
+`learner_details` row to a trainer** and `mapLearnerRow` blanks every detail cell via `orEmpty`.
 That is the second reason for the redirect, and why the overall rule-5 trainer DTO trim and the
 report screen agree: even if a trainer reached the page, the cells they came for would be empty.
 
@@ -170,26 +175,35 @@ day a mapper does.
 - **Zero denominators give `0`, not `NaN%`.**
 
 **A `—` is not a zero.** A metric with no source renders an em dash plus what is missing, never `0`
-(rule 23). `EgaceOutcomesTable` takes a `hasOutcomes` prop and dashes every non-`enrolled` cell
-while `!b.egace`, again across the whole TOTAL row while `hasOutcomes` is false (each dash carrying
-an `sr-only` "Not recorded yet"), and switches the footnote to "…aren't recorded in TVI-CAMS yet";
-`EgaceSummaryStrip` shows `—` plus "Not recorded yet" off the same flag and the same `i > 0` stage
-index. A recorded real `0` still prints `0`, greyed — the distinction comes from the batch's
-`egace` block, not from the value. `tests/unit/reports-domain.test.ts` pins the limit of that:
-`egaceVal` alone returns `0` for both "0 employed" and "employment not tracked". Adding a live
-`egace` mapper means deciding which stages are *blank* versus genuinely zero — do not just point
-the mapper at a column.
+(rule 23). Note the two levels at which that is decided:
 
-The table is also where the only dates on this screen are printed: `formatDate(b.trainingStart) ??
-'—'`, which always carries the year (rule 23).
+- **Per row** the dash keys off the batch: any stage but `enrolled` renders `—` plus an `sr-only`
+  "Not recorded yet" while that batch has no `egace` block. A recorded real `0` still prints `0`,
+  greyed — the distinction comes from the `egace` block, not the value.
+- **The TOTAL row** is gated by a *portfolio-wide* `hasOutcomes` (`hasEgaceOutcomes`, passed down
+  from `ReportView`), not by "every batch lacks outcomes". So a mixed portfolio containing one
+  recorded batch prints a real summed total next to per-row dashes.
+- **The footnote is conditional rather than replaced.** When `hasOutcomes` it states the three
+  conversion rates and appends "Batches without recorded outcomes show a dash and are left out of
+  the rates" off `rows.some(b => !b.egace)`, so the reason for the dash and for the narrowed rate
+  denominator is printed on the same screen. Only when nothing is recorded does it say the stages
+  "aren't recorded in TVI-CAMS yet."
+- `EgaceSummaryStrip` shows `—` plus "Not recorded yet" off the same aggregate flag and `i > 0`.
+
+`tests/unit/reports-domain.test.ts` pins the limit of the value-level approach: `egaceVal` alone
+returns `0` for both "0 employed" and "employment not tracked". Adding a live `egace` mapper means
+deciding which stages are *blank* versus genuinely zero — do not just point the mapper at a column.
+
+The table is also where the only dates on this screen are printed, start and end through
+`formatDate(...) ?? '—'`, which always carry the year (rule 23).
 
 ## Employment follow-up
 
 `domain/employment.ts` selects the same three ways:
 
 - **Cohorts** are batches with an `employmentFollowUp` record. Like `egace`, nothing live sets it
-  yet, so the section renders its "No cohorts are due" state rather than failing. `followUpDue` is
-  metadata and does not gate selection.
+  yet, so the section falls to the table's "No cohorts are due" line rather than failing (the
+  cohort strip returns `null` when empty). `followUpDue` is metadata and does not gate selection.
 - **Scholars** are the ones with `assessmentResult === 'Competent'` — certified, i.e. the
   population the ~6-month follow-up obligation applies to.
 - **Totals** roll up `certified`, `employed` (wage *and* self-employed), `awaiting` and
@@ -201,7 +215,12 @@ The table is also where the only dates on this screen are printed: `formatDate(b
 Live data hits that bucket because `employmentStatus` on the mapped `ScholarRow` is a hardcoded
 `''` (`TODO(contract)` — post-training outcome has no column). So today every certified scholar
 appears as certified-but-unclassified: `employmentRate` is `0`, and the table prints `—` for the
-empty status badge and for occupation/employer/salary of anyone not employed.
+empty status badge (`r.s.employmentStatus || '—'`) and, for anyone not wage- or self-employed,
+dashes occupation and employer, with salary dashed on a falsy value; only that employed branch
+prints the occupation/employer pair, so an uncaptured row cannot show a stale occupation. Note the
+field this page reads is *not* the T2MIS terminal-report `Date Of Employment` /
+`Employment Status Before the Training` pair — that is the pre-training and date side, fed from
+`learner_details`, while the post-training classification has no column at all.
 
 ## The XLSX writer
 
@@ -211,15 +230,16 @@ so the XML parts are readable in the bytes — over the five minimal OOXML parts
 `xl/worksheets/sheet1.xml`). `buildXlsx(headers, rows, sheetName)` returns a `Blob` typed
 `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, row 1 the header, data from
 row 2, all cells `inlineStr` (no shared-strings part), the sheet name escaped then truncated to
-Excel's 28-character limit. It was moved out of the view component so it is unit-testable (rule 35)
-and importable from the module's public surface (rule 8).
+Excel's 28-character limit. It was moved out of the view component so it is unit-testable and
+importable by a sibling module's `ui/` without pulling in React — the rule-8 direction RULES
+permits, and the reason `import-export`'s own import code could reuse it.
 
 What a hand-rolled writer can get wrong, and what `tests/unit/report-xlsx.test.ts` pins instead:
 
 | Failure mode | The test that fails first |
 | --- | --- |
 | A CRC-32 that disagrees with the IEEE polynomial | classic check vector `crc32('123456789') === 0xCBF43926`, and `0` for an empty payload |
-| A zip Excel cannot open (lost local header or EOCD) | `PK\x03\x04` on the first four bytes, `PK\x05\x06` closing the archive |
+| A zip Excel cannot open (lost local header or EOCD) | `PK\x03\x04` at the start, `PK\x05\x06` closing the archive |
 | A part renamed or dropped | all five part paths still present |
 | Rows numbered from 0 | `<row r="1">`, `r="2"`, `r="3"` and `A1`/`B3` cell refs |
 | Unescaped `&`, `<`, `>`, `"` corrupting the sheet | inline value escaped to `&amp; &lt;w&gt; &quot;q&quot;` |
@@ -314,3 +334,6 @@ fold and the combined `syncFailed` are asserted only by types.
   ledger before touching it.
 - The six states (rule 24) are load-bearing on this screen; the `unconfigured` callout is the one
   still missing.
+- The dataset is unfiltered by `status`, so completed cohorts stay in the report and in the
+  workbook. Filtering to active batches would silently drop the very graduates EGACE and the
+  employment follow-up are about.

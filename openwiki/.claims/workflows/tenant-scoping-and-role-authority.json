@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:2bfd13c281d8e56efaca9c47e2d16c51929bf1947ca3c7fa8bf2f04b7c9ddc38",
+  "pageVersion": "sha256:f73ca53137379bc620ed531e6a2a0842828aca4cc0eede103b71143f7e4a0fab",
   "claims": [
     {
       "id": "claim_f8aa70f71bf344588d7e00824041e074",
@@ -131,20 +131,6 @@
       ]
     },
     {
-      "id": "claim_5aeeed338fa846278cfe071aa713d104",
-      "statement": "`?role=` is currently wired only into billing; the school dashboard resolves no preview role, redirecting on `profile.role === 'trainer'` and narrowing with `toOfficeRole(profile.role)`.",
-      "evidence": [
-        {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L61-L67",
-          "version": "repo-lines-v1:sha256:61a1d499cf2ad3e86b502e6c1c387d190430576aefa949f8f175a0b179fe1964:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWJiYTRjNDcyYWFjNThmNTBmMjUxMjdiN2ZjOGVlYjI4Y2E0OGU0MjNiZmYxNDI4NGYzZGFiZTk4NWZiM2M4MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGUyOGEwYjIxYzNiM2ZlNWNhNTQ1NjIwMWY5NjNiZGY0Mzk3NDZmYzIxMDhiZjE2OWU0NmU5NjZjZmIxMzc5MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2FhNjAzNGE2MjJjZmY2MDU3NTUxM2I1ZTE1OGRlODAyZjhlMGRiMTk4ODJkYTc1ZjJkMDNjNGQxYmU3NDQ2MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzcwZTM5MjdlNjc0YTc4YmYxMjUyZjExOTYzNDQ1YWVjNzQ3MWM1NjZhZjgwYzc1NTAzYzdiMjQzNTk3ZTkzOCJ9"
-        },
-        {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx#L73-L79",
-          "version": "repo-lines-v1:sha256:658eba62018d9729894626ec8d079ab7ad18505b4ca3a406ddf8258a61061a21:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDVjMTZjOGExZjcxZGEzZjcxMmI3YzkwYjc3ZGQ1MTg2NjUyNzcyZDQ3NzdiY2FlZDM3MTE2MzNiMDJiM2NmYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjdlODc5YTI0MGRiMWZiZTU0YmUyY2I3MWE5ZWQ1ZDAyZTMwN2IwMGRiOGRiYjE5NzA2YjkzYzg1ZTc1ZGU5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjcyYzQyMTM0Y2UxYWM5OWU5YmM1ZTFiN2NiMmM5ZTkzNzg1OTM3NzA2MWY0NjRkOTUyMzY1MmFkNmRjNDQzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzg4NzBlOWJiYmE3ZDc4ZWE0YzYwNmU3ZWI0YjM0NDNlOGNkOWEwNzU4ODU0ZGJkYzc4ZTYzMzQ5MWI0ZDczOCJ9"
-        }
-      ]
-    },
-    {
       "id": "claim_6a07545eea6641cfb3d2753fb4aed813",
       "statement": "`toOfficeRole` narrows every non-office role — an unparsed string, `null`, `trainer` — to read-only `viewer`, and `tests/unit/display-role.test.ts` pins that as a least-privilege rule rather than a cosmetic default.",
       "evidence": [
@@ -155,16 +141,6 @@
         {
           "resource": "repo://tests/unit/display-role.test.ts#L22-L40",
           "version": "repo-lines-v1:sha256:731261bedd9844f39ca96647a1eb9a6eb55a9381164b2239933feddb5099b2e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhZGZkMjZjYzc0NGZhZmUwNzc4NzZiMGQ2YWIwY2Q3ZTYyMTUzNGNlNTVmM2EyZDJiZTg5ZjMxZDg5NDFmZWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwY2Y0Nzg4ZTkwYjQzOGYyMDk5NjM0ZmQ1YTc5OGQ3YzcxOGE4NjQwOWMzNTFkNjkwY2VlZDA5MGYwM2Q4YzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5MjA4M2Q2MTkwNzE2Y2IzZTVlYWQwMDgyZDQ2MzAwMjVhZTZlNDE4YjhhZTg0ZGQ2ZTQ4NTQxZDNkMjQ4OTMifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_afcba9190f5d4d53af870e2753414255",
-      "statement": "Billing resolves the trainer redirect on `resolveTrustedRole` before fetching batches, and only afterwards computes `toOfficeRole(resolveRouteRole(...))` to pick a render variant — so a preview can change the variant but not the redirect.",
-      "evidence": [
-        {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L51-L74",
-          "version": "repo-lines-v1:sha256:8964ad9fd61eb403c1a2aefa03f3223201ae9c2d874b7e3ae4aaa3b73bdc28d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNWIyYWZmODFmZmZjZmYwZmIzNmFkZjJiZGI3Njk3ZTVkY2JhMDE4MzRkN2ExMGQ4ZjU2ZGQwZjliZWJmNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxNmRiNDhiZDI4YWY3ZTRkZWQ0MTcwYTI4MTkzZjljNzUwZjk3YjY3MzllYjFhYmZkZDM4OWM4ZTYyZjMzYWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhNWFmMTdmZDlmZDI0OWEwYjU3ZGRjMDcwZDBlMjVmYzU5MjRmM2M1ZjU0YTllZjQzOGYyMTU5ZThlOTI0NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyZWJiZjVhNjY3Mzk2YjA1NDBhMzM0NWI0ODhkM2MyMmJiZGY0MjhhZjFlZTE4N2MxZWU4YWMzNzBhMWNjNTkifQ"
         }
       ]
     },
@@ -319,10 +295,138 @@
           "version": "repo-lines-v1:sha256:6046e54b0d4a2a97ce34f8939981c261a854b1192651f129e8ded01d502f4f77:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQwMzM1ZWRhNTM1NzY5NDFkZWUzNGMxYzNkNDhlYmY1NDI5ZGFlZGM1NzhhZDQ2YmJiMThkOTgyOWM1ODcyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmJhM2JkNDIyMTgxOTY5ZGZjZDEzZTc3MjlhYTNkNDdjY2I2ZDQ1OGFkOGQ3NmJiNmIzNWRjNDUzMTFlMWY0NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTU2Y2MyNGNhMDhiZmY4ZGU5NThhZDRhZGFkZDA5YWEzYzVjZjVhZGU0YTU3ZjMwYTFjYzI0MTAzYmQzMWUzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDdjODM2ZGRlNTNkZmI3MWQyZGJmM2I0ZDJhMTVmMjc4YzA2MjQ0YzJkNjFjZWFmZDk4MTA0YzZlYTUxMDYzOSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_74e2625d1f944ceeab287cf39f11bd85",
+      "statement": "`app_private.current_role()` — the function every role-checking policy calls — selects `profiles.role` from the row that `app_private.current_profile_id()` resolves from the JWT `sub`, so a role decision made on any other column can disagree with the database that enforces it; Clerk is identity only.",
+      "evidence": [
+        {
+          "resource": "repo://CLAUDE.md#L69-L69",
+          "version": "repo-lines-v1:sha256:8213834c0669e0f60499829c4400fac1f4f6af40c8fb3aa27daa93455874f0c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODIxMzgzNGMwNjY5ZTBmNjA0OTk4MjljNDQwMGZhYzFmNGY2YWY0MGM4ZmIzYWEyN2RhYTkzNDU1ODc0ZjBjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODIxMzgzNGMwNjY5ZTBmNjA0OTk4MjljNDQwMGZhYzFmNGY2YWY0MGM4ZmIzYWEyN2RhYTkzNDU1ODc0ZjBjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzQ1OWMwOWExZmNmNjcyZGZhM2JiM2UxZGExZGQxY2I5NDIyZjFlNTYyMjBjZmY0NzYxZDU0ZjhjNTI4NWY4YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGY0NzlkYjk0ZWU0Y2VjNDM5NmU1Y2U2YTkwNmI5OTE5NDExYTEyNjBmMDBkMGE3ZTE1ZmUzNWNmMjlkMDZhMiJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L45-L65",
+          "version": "repo-lines-v1:sha256:3f7ae4c1bfdf3c1c6424f8b59ed9ffc26d38070605ce31d4f6c450cee2cac00e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyYzkxNWE0MGFlMzY3NDc0MDRlMDE2YTEwMjMyNjgxYWMwYjIwZWNiNjU2Y2QyZWU4YWZkY2MxMGFhMGYwNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1YmM1M2RlMTkwZDYyMDdkZDcxMzQxNzNlZGQwMTMxOTM0NmM0NzhlOWZjYjhiODU2OTVmY2JkMmVlOGM2M2YifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L339-L378",
+          "version": "repo-lines-v1:sha256:71cc2de9268eeb84b3203bc67d61663f48168af7f5efffda6e0546d44792cb4b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjNTM2ZGVjMjY5YTY1MjYzNjkyYzkzY2MwN2Q3NGJmNjdiMzRhNmEyNjRhZjcyYzY3OWYwNDQwZTkwMzc5ODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMWNjMTg1MDRiYzczOGViZmViMjcwMTM2MzU3MDc5MjE4ZjBlNjZiOTczZmMwOWFhNTcyY2U3NjRkZWM3OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwNDgwYTIyYmY4ODE0NDM4MTYxMGE2MWJjN2UzMTY1MzE3ZTgyNjZmZDA3ZGU3MzZjZmEyODdkY2IzZDdiOGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4afb61a8ad684428a02235993c294d71",
+      "statement": "The single `batches` UPDATE policy is `can_manage_tenant` on both `using` and `with check`, i.e. admin/coordinator of the tenant only, so a viewer write matches zero rows — visible in the UI as `conflict-or-denied` rather than as a silent success.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L73-L89",
+          "version": "repo-lines-v1:sha256:0032e1e139c193a49a8337e6d0b594fe77cf622350b242faecbcae8fc8992f93:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwNTNjZTMyZTQ2Y2VkNzIzYjc3N2RkNjE4ZTIwMmRmYzRmOThmMzA1YTlmZGI3MzZhM2Y5NzE2NzQyNWMxNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkMTY1OWIyNzMyZTc3NDI5YmIzMmNmMjE3ZjQ0MTkzY2FkY2EyYmE4NzNlOWFlMTQ5MWU0NmI2ZDIzOTY5NjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmN2MzMTkzOTliNDBjMWE3ZjJmZDA5MWQ2YjY1ZmJiMDU4N2ZhNmE3OWY5MWNiMjU1NjlhN2FhM2IzNjE2YWIifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L397-L406",
+          "version": "repo-lines-v1:sha256:2921075255308028e6d40e63d1b029ca0ae4856264ab37493bf3dca7056c5e40:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzZWNlZDg0ZWQzMGViZjUyZDUzMzk1MGExNmQ0YzQ5NjJhNzQ1MDhkNjhhZWM4OGZlODNkZTJiMDk4NTk0NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5YzU2Mjc0ZGRkZjc3ZGNlNzlmMjA0NWZhYTQ5ODUxZjBlMDNiMjNhNDRjYzNhOTU3Mjk0YzMxZGI1YTYyOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjYTJmZmEwN2VjNjkyMmM5MjkxYmFjM2JmMzYwMzVlYTUzNWNhYTc3YWNjNjJiZGEwMTE4Zjk1YTc0MDlkMzkifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L551-L556",
+          "version": "repo-lines-v1:sha256:4881ed1cf9b17200e5880ddcef18219f0af9e94c6aca18db615b89b0132a63d3:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjc5ZDY0MTI5MDU1MDE1MDJiMzg1NmQ1ZDM4NzU2Y2YwY2M5YmQ1NzdlYTM0MTc3YmQyMDU5MDI2YWQ3MDFiZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY2ZjliZTU2NTA4MmI4ODRlYWIxZDRlODZlMjQwOTU1YTQ2NGY3NzNjOWUwZTAwY2M0YTBmZDYxOGVmODIxYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGY0ZWEzNmRmNDFkOTgyMzNhODllY2Y1OTcwMWQ5YWMwOWYwMGI5ZjJjMTE4NWE2ODM3YWI2NzI2NzljOTViZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmYyYTFiNmJhN2UyYjZmZGUzNjI1NDhhZjA0ZTgwM2M1OWFlNWY4NWQ2NTUxMGVkODUzOWRlOTM2ZjFkMDE3NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fc56593b89724d869d49e1458e3a69ca",
+      "statement": "The tenant Server Action re-resolves the school from the `tenantCode` form field against the caller's own memberships (never taking a tenant id from the form), requires a trusted `admin`/`coordinator` via `resolveTrustedRole`, and returns a save failure for `unknown` while returning `denied` for any other non-`ok` scope outcome.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts#L91-L113",
+          "version": "repo-lines-v1:sha256:b2b979e93e6988c65d13587b716301f42461c355dc5e4e15924e8b93af92cb5f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZGExOWViYTU1NTM4MTVjM2RhMmVmNTIzZjhiNmI4ZTc4ZGZhMWQxYmVhN2FhZjAzNzgzNDBjZTEyOTY2NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyOWNhZGE2OTkyY2E4ODZjMDJkZDU2NmQ1Y2UyM2FmZjRlMDkyNjVmOTFmMTY3ZDYzOGQ3NDdmY2FlYWVlODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1Y2QxMWZiN2JmOTExMzNiNTYxY2NhYTllY2RkNDQ2MjE5YjMwM2M5ZjUxZmQ2ZTgxZWVhZDYwOTkyMDAxOTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c68dae76fcdf430ebb5232197fc922c9",
+      "statement": "`batch-cards/page.tsx` renders the RQM editor only for a trusted `admin`/`coordinator` and passes it into the client view, so `viewer` and any unresolved role get a read-only card — usability only, since the action re-checks and the `batches` UPDATE policy refuses the write.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L34-L40",
+          "version": "repo-lines-v1:sha256:9cf099d15ba13f9cc16a557f398b28508a30f0d5ac703dd492af0cd9367cab83:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGZjOTViNWE2NzkxMGVhZDIyZTU0MTdjMDIzZjIwYWVhZmIwMzRjZmY3ZmQ0ZGYwMGQ5OTliYTc2NjU1YmNhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRlNzg1YWZhMzc3ZWQzZWJhODJmZDFiZGE5NDFlNzUzNGFhMjVkMjIxMjg4MWMwYjBhZjUxMjQwODg3OWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTNmY2MzYzFjZTY2Y2U5YTE5NjQ3NjBjYjExZGNkZWQ5ZDQwZDhiMjA2MzY3MmI3Njg5YmQ2MTJmNGU1YzExZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWFlMzBjOGU3Y2ZjM2ZhM2E2NjdkMDk4NTQ2ZjI1OTA0YzU2NGJiYmIxMTllMDlmNWZhYzZiNmE2MWMyMmM3NyJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/batch-cards/page.tsx#L68-L68",
+          "version": "repo-lines-v1:sha256:000e013b8082571f03de8db4f3c73d254110ef113bb82c6da73981a814891ce9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDAwZTAxM2I4MDgyNTcxZjAzZGU4ZGI0ZjNjNzNkMjU0MTEwZWYxMTNiYjgyYzZkYTczOTgxYTgxNDg5MWNlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDAwZTAxM2I4MDgyNTcxZjAzZGU4ZGI0ZjNjNzNkMjU0MTEwZWYxMTNiYjgyYzZkYTczOTgxYTgxNDg5MWNlOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWRiM2U3Y2QwYzNhNjIzMDQ3NjY4MTYxZDEwNGU5OWQ4NjIwOWNhM2U3NzU0YTI1YjExOWE0OTA3ODc4MDQyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a39b11b4c4d7460d89b35abb6a409a3a",
+      "statement": "`deriveTrainerMetrics` strips `nextBilling`, `openBillingObligations`, `billingDeadlinesMissing` and `overdueBilling` out of the shared summary by destructuring, so billing keys are absent from the object a trainer's page serializes, not merely unrendered.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/domain/metrics.ts#L67-L84",
+          "version": "repo-lines-v1:sha256:70edfbd46cc49f2007081da3451fcde80f1f6e37cad8e3925a76f3993b1413e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c5b903dcb4bd4ed28c246886485a9c6e",
+      "statement": "`trainer/page.tsx` calls the unscoped `getBatchesSnapshot()` and lets RLS's `can_read_batch` limit it to batches assigned to the caller — no tenant scope, no billing fields, and no role check of its own.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/trainer/page.tsx#L1-L21",
+          "version": "repo-lines-v1:sha256:8321e08e821368a75643bf5a8036f9e94db0b4cb834d3a75b93b5f2df61a7a2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1NjQwMWE3YWVlYjAyNGNkNTJiODdhMjBiMGY3NzQ5YTk3NTA0MzhkZDlhMjhlMDcyZTJlMTIyZWRlYjI5NzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBiMmE0MmVlMTMyNzUzNWQwMzg0Y2ZiZjU1ODU1ZmJiYzBkNzdiZGZiY2ZkZTFhMGM0Yjg2MjBiOGM3MjQyNGEifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L408-L428",
+          "version": "repo-lines-v1:sha256:078c2a672763605515909f154845ab424087a58a96b669e79a3f6a62229b72bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNzNiMjdkYjIyOTg4NWViYjQ1MjQ1YWE0YjcyMTkxYmQxNjI2ZDc5MzA3NGZlYzg1MzIwOGJiZWQyOGE4MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZGIyNzBjMmU4N2NkNTE4MGZlZjQ4YTU0OWIzNzdiMDkyNzY0NzY3ZjhlZTYxNTkyMTc5MmNjMWFjYzY1MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiNDJhMTUwYWFkNTM2N2M1ZDE4NmFjZWYwZDI3OTU5MTg4NTIwMTU3Njc0M2M2NjFhMzQyNGE3ZDdkNzM0NTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5c8318411129440dbf8898724e87d804",
+      "statement": "`resolveDisplayRole` has no live caller in `app/`: the only page resolving a preview role is billing, which calls `resolveRouteRole` then `toOfficeRole`, so `resolveDisplayRole` survives as the tested composition of those two halves rather than part of the request path.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx#L61-L67",
+          "version": "repo-lines-v1:sha256:61a1d499cf2ad3e86b502e6c1c387d190430576aefa949f8f175a0b179fe1964:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWJiYTRjNDcyYWFjNThmNTBmMjUxMjdiN2ZjOGVlYjI4Y2E0OGU0MjNiZmYxNDI4NGYzZGFiZTk4NWZiM2M4MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGUyOGEwYjIxYzNiM2ZlNWNhNTQ1NjIwMWY5NjNiZGY0Mzk3NDZmYzIxMDhiZjE2OWU0NmU5NjZjZmIxMzc5MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2FhNjAzNGE2MjJjZmY2MDU3NTUxM2I1ZTE1OGRlODAyZjhlMGRiMTk4ODJkYTc1ZjJkMDNjNGQxYmU3NDQ2MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzcwZTM5MjdlNjc0YTc4YmYxMjUyZjExOTYzNDQ1YWVjNzQ3MWM1NjZhZjgwYzc1NTAzYzdiMjQzNTk3ZTkzOCJ9"
+        },
+        {
+          "resource": "repo://modules/auth/data/role.ts#L67-L83",
+          "version": "repo-lines-v1:sha256:57ff49e61fc8b200f0a46b29aa94bd7807a4eb0403193804b9cdffa9c4f9709b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhNjFjNThiOGNjY2YyMmY2MDQzMzVhNzI2YTZjODdmY2NkZTE5OTA4NmUyY2NhYzk5Y2JiYzYyMDQyNzg1NDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjYjlkZThhMDZjYmIzNzZkODQ0NDEwNzUyZDAzZjQyM2FhOGYzZmE1MDhiOWVlN2E1MWI2OTM1N2NlYzQzNjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2fb4377a42244d57847ebd2c1bc0e91f",
+      "statement": "`Profile.role` is typed as the shared `UserRole` that `modules/auth/data/role.ts` resolves against, so a second role vocabulary cannot appear without a type error; the profile module also carries `hasTenantMembership` for membership-by-id questions.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/profile.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:ab921e607792fe9a272e59794b312c7c3273d748c40a691595d9d103ced14f4f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0NTc0NmQyZWM4ZTdiZjEyNTIwMGFlOGQxMDZlY2I3MTQ5YjkxMzM0ZTJjOWYxM2I4NzM0ZjExNjJkM2QwMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_57cc460bd8aa429791c6160ef17059ec",
+      "statement": "`/dashboard` dispatches on `profile.role` alone before falling through to the scoped legacy redirect — trainers to `/trainer`, admins to `/overview` — so the trusted column, not a resolver, decides each role's landing route.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/dashboard/page.tsx#L1-L24",
+          "version": "repo-lines-v1:sha256:2cfdf7bf5da82dab46866887fb337ec85402cee071236b1ff9b07ac09bf5a219:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ODE5NmQ3NTFjNGI3ZDFkNzJiM2YzYmMzNWMxOWNmZDJiNDJmMGJiZmNhMGNlYzQxMWFkZDUwMmY4YzE5YjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_54d78dd918144474b4fed35d798fcf6c",
+      "statement": "`/overview` gates on `(await resolveTrustedRole(profile.role)) !== 'admin'` and redirects anyone else to `/dashboard`, treating `unknown` as a rendered retry state instead — an `unknown` profile never falls through to `none`'s redirect.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/overview/page.tsx#L22-L32",
+          "version": "repo-lines-v1:sha256:e826a0df7003a90235b7af9c0f323c05c3d69e7a728c4607ac978b0194b7d131:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNWEzYzI1OWNjODBiMDFjNjgwOWViYTZhYjMwMGU0MjdiMjBmZTRmZDRiMmVhODJlOGIzZGEzMzJiNDI4ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExN2E5MWQ0MTQ1ODhiNTJkNDI0YzQ4NTE1MGJhMjgwOTk4MjcxMzFhOTQwZTRmYjlkMmQ3M2ExY2UzYWI4ZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllOTUyZjI1ZDQzNTA0MTMxODAyNjMwOTYwOWMyY2JiMzgxOGM3NWU3Yzc2MTI5ZGQ4ZTVmNWEyMjYwOGExZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4YWIxY2M5ZGRmNzE4YjgxNzQwOTJjNDI5MTA0ZjRjM2Y1MDA3NzU2ODExODI2ZjgxOGZjMWUwYTk3YjgyMmMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

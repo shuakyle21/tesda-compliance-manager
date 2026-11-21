@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:cb932efd4bccaacc8b5fd34392bb693e7422a0bf1860e25c21c2224610bb9ce1",
+  "pageVersion": "sha256:e93115ec7bd10904e287a13d2671c6bff419c8f1fedf2200c49db3b48a930dd5",
   "claims": [
     {
       "id": "claim_9a83964e1a614b02a8ab689d0d75af0a",
@@ -32,7 +32,7 @@
     },
     {
       "id": "claim_bc61c72814324e0bae9c53fbb17327bd",
-      "statement": "`SCOPED_SECTIONS` is the single compile-time list of code that lives under `/t/<code>` — `ScopedSection`, the Sidebar's section-named workspace rows and `legacyRoute` all derive from it — but nothing enumerates the route directory, so a section added outside the list is reachable yet earns no legacy redirect and no nav row, and `isScopedSection` currently has no caller.",
+      "statement": "`SCOPED_SECTIONS` is the single compile-time list of code that lives under `/t/<code>` — `ScopedSection`, the Sidebar's section-named workspace rows and `legacyRoute` all derive from it — but nothing enumerates the route directory, so a section added outside the list is reachable yet earns no legacy redirect and no nav row.",
       "evidence": [
         {
           "resource": "repo://app/(dashboard)/legacy-redirect.tsx#L16-L34",
@@ -53,8 +53,8 @@
       "statement": "Route composition for the scope lives in `app/(dashboard)/tenant-scope.ts` rather than the module because it joins `modules/auth` identity to tenancy's profile and only `app/` may import two private `data/` layers (rule 8); `resolveRouteScope` returns a `not-a-member` state with a fallback school instead of ever falling back to all schools.",
       "evidence": [
         {
-          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L40-L49",
-          "version": "repo-lines-v1:sha256:2bab0f21132768697d5f1b5c4ee91073199740e37dbb712c44e829b1277d6721:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MjE2ZThlOWMwYTFhNjhkMDZjMmZiYWE1ZmQyMTM5NDgyYjhlZmQwYTE5MzE1YjkxNWU2Y2NlODQ5ZDg5ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmYmNjYzE4MTdlZThiNTUwY2JlNzNlNjMzNjdlYmI3YTkyMWIzODA2OGFlYWYzZmE2OTY1ZDkxYTgyZDUzNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+          "resource": "repo://RULES.md#L41-L42",
+          "version": "repo-lines-v1:sha256:5f034bc284a9888b9a6b7cb639f998478d24eaf0338e5d53d152f5f41214e045:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNjNTU2ZWZjODIxYjExNzgwNzY3ZGUyMzgzN2E2ODYxMzhmMWU3NGVhMzEwOWJmNjdlZmRlZGMxZmI5NzBiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDgyM2E4ZDM4ODU0ZTFiYjBiZWE3YmU5ZDJiODY1OWQzMzFhNDA5NThmYjlmY2MxZjYxZTE2NWQyMmYwOTVjZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGM3YjY1NDBiZDJiNGVhNjE2YmU2OGI4NjliYjRmNWU0ZDVhNWEzZmYxYWEwY2Y4OGFiNmFjM2IwNzUxNTZmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmIzMDY3MGQyN2Y4ODFlYTU4NTFlM2ZlNzY2ZTBiMzBhYWFhYjY5MDhhZTk4ZjdhNjVhNzg4NWQ3ZTk5MGVhZiJ9"
         },
         {
           "resource": "repo://app/(dashboard)/tenant-scope.ts#L1-L52",
@@ -107,8 +107,8 @@
           "version": "repo-lines-v1:sha256:86dd1ce3592521b058bafdb0631bbd2c2498323d8738407ead3aad2b25172941:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNjMzNzFjYjFmNDZhMzNlN2IxZWRmMzdmMDRlZGE3NjI1YWM1YmVmNmY3ZmYyMmIxMTE0ODI2MmIxZjEyMWEifQ"
         },
         {
-          "resource": "repo://modules/tenancy/data/tenancy.ts#L132-L146",
-          "version": "repo-lines-v1:sha256:ced77e76c96e622e0fd41492ebd61d862fe40f067d318e0455e11c6f466fab17:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ODcwYzNiNTlhMjRlNjAwMTUyOWM2MTQzODc4MWQzZDVlMzAyM2M1Y2Q3Mjc3ZDlkMDZiYzMxNWQ2ZGViZjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhMzM5NTQ4YjZlNTRlNzk0ODc4NDFhNDMyZjJiZGNhOWNkNTEwZjBlNWQyYTY0NjE0ZjZmN2M1Mzg1NzIxYTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhMDMwMDA1MmM3YzFjZDNkMGY1MzAzYmVlMGFkMTljYWU1OGViY2E3ZWYzYjM3NzM1YTllZTM5ZGQ4OTZjNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1ZGQ3MGYwMzRiMmZmYWJiMDY4NTk0ZjY2ZTVjNzE2NGRkZGQyMmMzOTY5ODcwYjEzN2U0OWYwYmFkMjQ0MTIifQ"
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L126-L143",
+          "version": "repo-lines-v1:sha256:64a8fb8826ada7d7d0c726f2d52057a2b974d1c968af2ac2f348a2a2443ed32d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxOWVjYzA2MTA2NmZmZDk4ZTVmYzBmNGUwYTMzMGUyZDFmNmJiNDI4YzNlODhmYjE3ZjBhNDE0Mzk3NDliMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwYWNjNDczYzFhZmQ3NjA5MmY2OTVkNTg4ZmMyOTc2YmYyNjUzZTM3NTQxN2Y1ODg4ZDY4Mzk4NTAyMzIxYWIifQ"
         }
       ]
     },
@@ -171,8 +171,8 @@
           "version": "repo-lines-v1:sha256:6dbdee60ef5838efc6ca75b8afee12a65eb7fc9cfd44a915005fb5ddc3d15473:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhODI2ZWY5OThmYWJlNjI0MDA2OTI2OGE1Y2JlZmQwMjQzYmQ1Yjc1OThhYzA3NDNlNTM5MjNjZjUxZjQ1ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTI0NDAyZWFlMWE4YjkxNzQ0NDZjZWZjMGQ4NDYxMTU1NTk3Yzc4NGViYTBjODJhZTFlOWJiM2QzZDU4MzgifQ"
         },
         {
-          "resource": "repo://tests/unit/user-access.test.ts#L192-L211",
-          "version": "repo-lines-v1:sha256:fb894d38ffd0a0d74b36ec994d3798d4e847fa72f7e01be52bd40ae4ae901451:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+          "resource": "repo://tests/unit/user-access.test.ts#L192-L212",
+          "version": "repo-lines-v1:sha256:bfcfc1d232eb9d170421647dcaa3e57bfde700de30dd809edff9b24c1d489c46:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -195,8 +195,8 @@
       "statement": "The membership INSERT always writes `is_default: false` because the membership read policy is tenant-scoped, so an empty list for someone at another school must not be read as \"no memberships\" and produce a second default that makes landing depend on row order.",
       "evidence": [
         {
-          "resource": "repo://modules/tenancy/data/tenancy.ts#L80-L96",
-          "version": "repo-lines-v1:sha256:9d9b751d8443c8283226d39e778a729faccdf60570aa79ea23741d05bd835940:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYzY0NTk5ZGU1OWE2Mzg4MGQxMWY0N2JlZmEyYjdmMjYwZDYwMGZjNTVlMzAxZDI5NDNjYjA0NDYxODQ0MDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZjU2YjM3ZjEwMzkzOTQzOTc4OWZmNzRmZTAyNzVkNzhjOTA1Mjc1ZDJiZWRkNWI4YTJkMGRjYjE3ZjE1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkZDVlYTM0ZjQxNzIyMWI0MDM5NmViNTE0YmQzYjMwNDQ2OWUwZmYyMmUzNTNkNjNlYjI3MmJhMDAzYzQyYzcifQ"
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L74-L96",
+          "version": "repo-lines-v1:sha256:56f488511f1af57b677cd857423957f079dd282c2f5843f9a2ee92c0177c6307:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3NTJmYzA4ZTcyN2RiODA2MTk4N2NjZjEyYTQzNjQzNDQ4ODcxODRmMWQ4MTZmMmZjMzY3YTMyOTU5OGU4ODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmJmNDgwMjU1M2ZmYmU2ZTNjZDlhOTgxYTdkY2Y0MjM2ODE1NzZlNTNlNzY1MDBjMTgxN2U4MmZlZDMzMGUifQ"
         },
         {
           "resource": "repo://modules/tenancy/data/users.ts#L279-L303",
@@ -505,10 +505,118 @@
           "version": "repo-lines-v1:sha256:2208e9cad49aa9d9e4f8045a668c626f53957a50e0d0dcfe4c30f2cbfa99729d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxNmNkMWYzMjUwZjQ4MGVhNjM3NDIyNjFiOGM2NGE0NDRiYzIwMGI2MTllNDdjN2UyMzg4MmNmMDMwNzQwN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MzRlNTkyYzEyMzEyNDVlMTE4MmNiODk0MzI1ZGU2MGVjYmY5ODU3ODA5NjI5ODE5YWQ3MDNmOWI5MWZmOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVmMTU3NmUzN2M3YTNiNTFkZDNhOGU4M2YzODM2MzVjNDljZjYwYzQ5YTZhOTZkYjdkNTRmZmNhN2I1OGVkMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4MTdmYmI3M2M5MmIzNmQ1ZTQ4OTZmZjUxYzFiNThlZWMzMzBiYmU5NjFiYTA1ZmM2MjA1Zjg2N2VhMWJjZjYifQ"
         }
       ]
+    },
+    {
+      "id": "claim_84840fdc6dc94bf8af8c07a574a3736f",
+      "statement": "The membership fact crosses the module boundary only through `domain/` — the `TenantAccess` verdict and `withTenantAccess` fold, and the `TenantScope` type passed to reader queries — while the profile read itself is reached only from `app/` joins, so no module can re-derive membership from tenancy's private `data/` layer (rule 8).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L41-L42",
+          "version": "repo-lines-v1:sha256:5f034bc284a9888b9a6b7cb639f998478d24eaf0338e5d53d152f5f41214e045:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNjNTU2ZWZjODIxYjExNzgwNzY3ZGUyMzgzN2E2ODYxMzhmMWU3NGVhMzEwOWJmNjdlZmRlZGMxZmI5NzBiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDgyM2E4ZDM4ODU0ZTFiYjBiZWE3YmU5ZDJiODY1OWQzMzFhNDA5NThmYjlmY2MxZjYxZTE2NWQyMmYwOTVjZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGM3YjY1NDBiZDJiNGVhNjE2YmU2OGI4NjliYjRmNWU0ZDVhNWEzZmYxYWEwY2Y4OGFiNmFjM2IwNzUxNTZmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmIzMDY3MGQyN2Y4ODFlYTU4NTFlM2ZlNzY2ZTBiMzBhYWFhYjY5MDhhZTk4ZjdhNjVhNzg4NWQ3ZTk5MGVhZiJ9"
+        },
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L24-L35",
+          "version": "repo-lines-v1:sha256:5da07ec8be2724f22021a86de98cce6e470654e2cd7bd6e4252b7ccd41391c03:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkMjg5MTAwNDlhZDQ5NDI3ZjNkMTMyNDQ3YWU2YjEyNGUzNWRjODUyOGQ0MzVlY2ZlNjYzMzlmOTA0NmI2MjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiNWFiMjIwZmU0YjdlNDQ4YmE0ZmI0M2FjYjQ4OTUwOTc3ZGJhZDU3Njg4ZGRhNTU3MDIyYjA0Y2ViYWY0ZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxYzAxMTlkZWFiODEwNzM1ZTYyMjM2ZmJiOTJmNzY0NzM0ZWY2OWMxYjZhYzI4ZmNmMzczZjExOGI2ZTAwMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViMmFlNTllNjZjNzExMDI0YzBhNjYwZjJkOGI0NzdmOGFjNTkzM2VkMjBlYTAwNmZmNTdlY2ZmZjQwMjFmMGYifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L290-L309",
+          "version": "repo-lines-v1:sha256:11786170d91a282ca575eb9c138b80b615583211b75b90968ca117ddf01ca9ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3MTk0Njg0YzU1OGMyODhmYTk2YzM4M2RjNDJjNTQwNDBiMzBiNDVhZDBjOWEwZjFlYTdhMWRkNDA3ZDFhODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlZmI2Zjc1ZDJjNzZmYTJjZDU5MGU2Y2ZlZDUyMmQwMWIwN2I3MWZmNzc4OTg1OGQ1ZWQzZGJhOTdjZWQ0NjEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L38-L57",
+          "version": "repo-lines-v1:sha256:dcaa97bab55028561d83be538c28d6c2cbae463e98a46456426ed470695f0361:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxZWNhNDljYzI2ZGQ4MTg5NTZhMWQ0ZGI5NDVhYWVlOGI3MDNmZmZjOWNkZTJmOGVlZTYyM2NiMDQ5YzM4NDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDhmNjE4ODM0MWVhYjBkYWM4NTFhNTY5ZWVlMWE3NDdjMDkzMGIwMjVmNDcyZWViNjA2ZjFmODVlODRiZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhZTFlNTUwNzE3ODA4MTkzYmY1ODQ3NzZkNTM4ZjA3ZDMwMjEzMGEzODlkNDBkNzY3MDA5MzhlNjE5ZjEwZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L19-L23",
+          "version": "repo-lines-v1:sha256:3000014e436648c50903b6965088e9dceb7c8c8c241fdce14bda1fab1896aa1e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDRkY2Q0ZjJkMmUxZTZkMTUxZTdlNzRhNTJjODk3MWMxODJhYTI3N2QzYTUxZmRkYmI0ODZiOWQxZDYyMjJkMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTkxYzFiZDRiYTliMzY1OTA3Yzg5NTNhNGQzMjgxMGMwZjM0ODQyNmEzMzYyZWQwZmU3ODA5ZjM5ZjM2Yjk2NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzcwNTE1YmRkYTI2NDFlNjcxNmQ2MmIwOTQ5MmNlZjJkYzFhZDBjZDc0NGQ2NGIxMDg5ODY3OGEwMmZjNDk4YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c31a8edfe464b458f17d8cb295d2910",
+      "statement": "`tenantAccessOf` takes an already-read `Profile` and therefore can never return `unknown`, so a caller that substitutes it for `deriveTenantAccess` (which takes a snapshot and can) silently renders every unreadable profile as \"no school\".",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L157-L177",
+          "version": "repo-lines-v1:sha256:bc89280a7aaf40abfbd2fe693ac578225de492e902f79df276d84bcc71c693e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhMDFmNjAwZmQ1ZmMyZTdlZmJmYzE4ZGMwN2FiZDAyZTE3ZjFiYzE1NmZiYTgwNDA1ZjIyMDYyYThjODRjNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L33-L36",
+          "version": "repo-lines-v1:sha256:4d559d9e484964fc10fd9e6006c4b5818151b692d6d29c99ca54d19afae097b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzdkYWE1Njc4NDVmMDdkYmMzMWUyOWNkYTE5YThkYjg0NThkNzNlMzc5ZTUyYzZiOGZjMGUyMDA3MDQ3ZWJiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODhhYzNkYTI5ZjlmODI4MjYxY2Y4Zjk4NDQzNzBiZDkyZTRlOTE2MTRmZDgwNzMwYzQ4NDFiYmY4YTUxNTdkYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGRkYTY5MWM0MjI5YzRiYThjM2E3YTdmMmUzZTc0ZGE1OWE5NzJhNDVjY2JjMmEyYTJlZTJkYjE5ZDNkZjlkZSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L60-L76",
+          "version": "repo-lines-v1:sha256:2eeef7a86155a0e4f273e6d08be67618d0e6c0a542252241761c6514d7dbbe0b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTRhOGIxM2NkZmNmNzEyNjU4ZjIxNmNjYmVlYWUyOTQzZmRlYjAwZjFjNzY3NmQwMWY5NjI3ZDk4MGQxMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJlN2JjODU1NWE1NTAzZjdlNDE5MjM5NTgyODFlMTk4NzIzZmE5ZjIyYTU4ODcyY2M1MjhlYzU5NDk1ZmU0MmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5beebb8cc9694f9b9cdfab4d2e0bda1c",
+      "statement": "`hasTenantMembership` in `domain/profile.ts` and `isScopedSection` in `domain/scope.ts` are exported but called by nothing; membership is asked through `tenantAccessOf` and the scoped-section guarantee comes from the `ScopedSection` type at each call site.",
+      "evidence": [
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L33-L45",
+          "version": "repo-lines-v1:sha256:520ca176c9f09c207354a48209e383ef1d747762d4bdde2b7778e3f0c44b9e00:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2YzVjMzZjOGY4ODYxMzRjZDYzZDQyMGY2MzVhMzE1ZmUwZTdkOTZmZjc1YzEwNjA2NTYyYTZkMGY4OWVlY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkNTY5ZWFmYmM3MGNmOTg0ZGI1MjQ2YmIwZmUwZTUxMGYzMzZmZGY5YTVhY2U1N2ViYWM3NWU3NmJhMThiZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkZjM4MmIzYmMwMmQwMDZiM2Q1MzQwMjQ0YzNmOWNhOWM0ZDY2MDhjNzEyYjQ1MWE3Y2IyNGRlNzVlYzZkMDYifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/profile.ts#L22-L24",
+          "version": "repo-lines-v1:sha256:37ca5c01a68931fdbaedc26d0b71780169928844850522eb0ced3dfaf16f900f:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTQzZWMxNzZlZDQ2MTU0ODAwN2YxM2IwOTBhYWNkMDk2YTAwN2JiM2ZmMTM5MWJlMzk4Yzk1YTRmM2JkN2ZmOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzZmYzFhM2E3ODQyZjNkYWRlNzRkNjVlMTA4N2Q4ZTk1MWYwNDQwYmUyNTllNDFmOTY3NDY0MDNkNTVmODMyMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L38-L40",
+          "version": "repo-lines-v1:sha256:83c7854ca16c08b3ed1b7180230dc7941ca975df8a1c7158f04721bd4132e43a:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWU0N2VlYmRmMjYxYjdjYWI4NjU5YmIwZDllYTEyZjIwNDg4OGYxZWFiMDA5ZTUxZTljNzNiNDhkMTJmOWYwNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWFhNGE0NDQxZGQxMmY5MDJiMTk5ZjlhZDIyMTdjYjRjNTAxOTY0ZjMxODJlZjliOGY5NWQzOWUzZmEyZWE1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmVlM2RhNjZjOGY3NjRlZDZjNWQ4MTZmMzU4ZGNlMGFjNTRmOWFiYzdjYTAxNDE4NGVjOGI3YjI0YjVjMzc1MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7abc076bcae1462f901f79df8f603ae6",
+      "statement": "`parseScopedPath` is the read side of the scoped-URL rule and resolves school and section from the pathname in the Shell's `Sidebar` and `Topbar`, defaulting a bare `/t/<code>` to the `dashboard` section.",
+      "evidence": [
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx#L54-L60",
+          "version": "repo-lines-v1:sha256:d7db4a89d5ad47cc2fbb2910bc8b82f8467e25d7cb505caa36b12e03dd3f536a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRiYmUzMGQxNGVjMDQzMmI1YzkxNmE5MGNlMDE5MWZiMmIwMzk5ZGFjZWU3MThmZWM4Nzg5NTNhNzAxNzU5OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTc3NGE5ZTRkYzY2YTA0MDUyMjUyOWIyMzYyYTExNGEzZTRiOGNmNGI0YjAzNGE3OTc5MDY0MTJhMWI1ZmZmNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNThmMTEyNGZmY2UxOTI1OGRiNWMyMjAyZWFkMDE3Y2Q0YWE2YWUxOWJiNWRkYmUxMDc2MDE3NDUyNDU1Y2VkMCJ9"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Topbar.tsx#L37-L42",
+          "version": "repo-lines-v1:sha256:4032a9b214a613fd0fd6d4996465f6fcab43686c4a46089d74bcc94b3e8992a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzBjYjJiZTVhM2VmNTNkZTg4Mjk3ZWFlMDU2N2M3Y2ViMTljMDUzYzkyMGRiZjdlOTJlMTdkZTU5MjNmZjJjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDljOTgxZGM0YzYzMTI0YWQ1ZWQ3ZDRhZDliMDk1NDQ3NzQyYWE5NTRiYjIxYWFhMzBiMGI0MGYzZThkOGY0NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNThhZWIyOWNkNDY3OTVhN2JlOGUwZDMwZTBiYzJlNTc5OWYxZDA3MWRkYTlkMzhkYWQ4MGVmMTlkOTg5Zjc1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjEzNzA4MWE5MWRjZWM3NjFmMWM4YmY1Y2I0MDYwM2Q0YWM0NTRkYjVlMTk2YjRhNmY5ZGU1MGY1ZDFkOGJlMyJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/scope.ts#L63-L67",
+          "version": "repo-lines-v1:sha256:9cc3268c651bf370fab7642b72734cefe9bdb5fa4d08c5d42c1167981804edcf:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI2OTBlOGM4ZjY1YjNlN2ZjMjcxYmNjOThkN2Y1MTE1MDU1ZDZjMjU1MzhhOWY2YzhkOTM4YTM5ZTA2MDYzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTE3YjczZTc2MTBkMDE1NzVkMmRmMDIxYmVhM2VhMmEwNzE1Njg3MDU2MzBjZDk4MDA3YTk0YmNkNjg1ZTMyYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L36-L42",
+          "version": "repo-lines-v1:sha256:a0f2d55db9488c8fc95876972a08f08e9d67d6fda2cd879560e82760a07acd98:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTQ5MTVjMzQzOTc3MmZkOTRjNmVmNThmZjFkOTI4ZDgyNjA2ZTY1MWI2MTEwNTgyZWM1NWExODc2NWY3NTM3OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmNmNmNkYzIyNzZhM2ZmN2VhNWJhODViNmJlZjRiNzk1N2I4YmI4OTFiMTFmZTVkYmM1YzIyNGFjMTBiMDVlZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzhlMzk3ZWJjNzgzYzJmMjc0MWUzMDIzMTdhZjFjODM0MTM0NTk3MWVmOWJiZGNhZTIwMzNiZjlhNDYzOTFhZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5974b12429dd4209a9e5e6425f6ed7cb",
+      "statement": "The create-school action's `authorizePlatformAdmin` keeps an unchecked operator distinct from a refused one by returning `unconfigured` and `failed` before `denied`, and the page renders each as its own state — an operator who cannot be checked is not an operator who was refused.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/schools/new/actions.ts#L67-L85",
+          "version": "repo-lines-v1:sha256:96f4b3f59123bbb6bced26f11fc7348d1fcf5d6aef7da348100ed055d60546cc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5ZjQyMjA2NWI2YzQyZDQ3Yzg5ZDVjNjlkMTc1MjhmOWU1ODlhNmI2NTg0ZGM1Y2Y3YjE0ZGVmMzM0ZDMxZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlZmNiOTU3YWE5M2M2M2FjMDZiZmQwODg2OWY5NTMxOTJmMWY0ZWM4ZWExMDVhMGYyYWMzNmVkODIxNmQ3ZDAifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/schools/new/page.tsx#L100-L121",
+          "version": "repo-lines-v1:sha256:405a4609f183d8889bd38366dab29a80eebbbb468426bb9d4ce22dce5f2676aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3ZDNiZjMxNWQ1NmNiZWNhNGVhYTcyYjYzZDJjYzY5ZDE2YTA3MmM1OWVlMjc2ODM5MzBlM2U1MDY5NTA4NjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjODYzYjdiNjI0NWNjNTc5M2Q3ZjgwYWU5Y2IzMjY0MzBmYzIxODRkNGYxZmIwODc4MmM1ZWQyZjYwYjdjY2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a3932c0a3d944e6abe0ea2494f0b4dde",
+      "statement": "COPR numbers are recorded as typed and never shape-checked — the format varies by issuing year and regional office, so rejecting a number printed on a real certificate would block exactly the school the screen exists to onboard.",
+      "evidence": [
+        {
+          "resource": "repo://modules/tenancy/domain/schoolDraft.ts#L230-L243",
+          "version": "repo-lines-v1:sha256:0f229d06c6e319a607553c976c0297f47ef08a83943d65a5056b8eff3480cd6c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1MjU2MDY4MzRmNjBhZGMyYzJhOGRmNWU2YmE5MTIwNTQzNTQ1YTEyYjhlNjFjOGVhODY5YWYyNzg3ZDg1MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzM2M4NzE5NTQ4YzYxZjBmYjE1Mzc5MmNiODIzNmVkM2ZmYjQ2M2YzOGEwMGVmMWIwYTc3ZDlhY2IzZTc4MTEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

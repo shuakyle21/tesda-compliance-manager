@@ -1,11 +1,11 @@
 ---
 type: architecture
 title: Routing, Layout Gates and the Request Path
-description: Where a route lives and what guards it — proxy.ts as a non-gating header stamper, the (dashboard) layout as the sole authentication gate, the self-checking routes outside it, the /t/[tenantCode] segment layout's four scope outcomes and why requireScope returns null, the legacy scoped-redirect factory, the /trainer exception, and the trusted-vs-presentation role split that alone may decide a redirect.
-tags: [routing, app-router, middleware, auth-gate, tenant-scope, roles, failure-modes]
+description: The App Router tree as the authorization map — proxy.ts as a non-gating header stamper, the (dashboard) layout as the only authentication gate, the route groups outside it that must gate themselves, the /t/[tenantCode] segment layout's four scope outcomes, Server Actions' own authority check, and the ?state= guard-state preview against the presentation-only ?role= override.
+tags: [routing, app-router, middleware, auth-gate, tenant-scope, server-actions, failure-modes]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-19T03:55:05.435Z
+    at: 2026-11-21T03:38:28.236Z
 sources:
   - id: openwiki-source-4ddc2be5b2adc07e50368090
     resource: repo://app/(dashboard)/batch-cards/page.tsx
@@ -17,10 +17,16 @@ sources:
     resource: repo://app/(dashboard)/legacy-redirect.tsx
   - id: openwiki-source-c6dae8084d42ad61957f6c24
     resource: repo://app/(dashboard)/overview/page.tsx
+  - id: openwiki-source-0555213af97e8aa00bf4b119
+    resource: repo://app/(dashboard)/schools/new/actions.ts
+  - id: openwiki-source-75140e138296a68cc258200e
+    resource: repo://app/(dashboard)/schools/new/page.tsx
   - id: openwiki-source-c30669730475f4aa9f33c2b1
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/billing/page.tsx
   - id: openwiki-source-79e2020a0930b43798845956
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx
+  - id: openwiki-source-ce194fb513f902915fafa99b
+    resource: repo://app/(dashboard)/t/%5BtenantCode%5D/actions.ts
   - id: openwiki-source-fac1d0830b5bfbb903fdd40f
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/dashboard/page.tsx
   - id: openwiki-source-7ded6d9e4b97a5fd4dd6e34e
@@ -31,6 +37,10 @@ sources:
     resource: repo://app/(dashboard)/tenant-access.ts
   - id: openwiki-source-20d1ca31256bf756f33f5462
     resource: repo://app/(dashboard)/tenant-scope.ts
+  - id: openwiki-source-6e6cc525e98e274ad6c10b29
+    resource: repo://app/(dashboard)/users/new/actions.ts
+  - id: openwiki-source-c03196c12ed34c5537bd329f
+    resource: repo://app/(dashboard)/users/new/page.tsx
   - id: openwiki-source-10b3652cdf3b3671bcca6980
     resource: repo://app/api-docs/page.tsx
   - id: openwiki-source-006d9f24c9449e896a1cf6cf
@@ -59,12 +69,22 @@ sources:
     resource: repo://modules/auth/domain/redirectUrl.ts
   - id: openwiki-source-8a957fbe8858dc98cb72f611
     resource: repo://modules/auth/domain/sessionExists.ts
+  - id: openwiki-source-6d9a7943f1ca24910c3bbd3b
+    resource: repo://modules/batches/ui/RqmCodeEditor.tsx
   - id: openwiki-source-7cb0b5f9c6ed9ed4128872a0
     resource: repo://modules/shell/ui/Sidebar.tsx
   - id: openwiki-source-a73ad3d1378cdffc9904678c
     resource: repo://modules/shell/ui/Topbar.tsx
   - id: openwiki-source-b5e9a80328ba1dcd462db5c3
     resource: repo://modules/tenancy/domain/scope.ts
+  - id: openwiki-source-028e25cdf562361e238fc406
+    resource: repo://modules/tenancy/ui/CreateSchoolForm.tsx
+  - id: openwiki-source-8e7d5d9b6492b85170c2d1cd
+    resource: repo://modules/tenancy/ui/CreateUserForm.tsx
+  - id: openwiki-source-50a18d054b596a7ed0eeffb0
+    resource: repo://next.config.ts
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
   - id: openwiki-source-e942cb2f2c6b2538f046eef6
     resource: repo://proxy.ts
   - id: openwiki-source-f7ae5e0747518115ed202c7e
@@ -81,28 +101,24 @@ sources:
     resource: repo://tests/unit/tenant-access.test.ts
   - id: openwiki-source-15e8a5a27099d775d1c019e1
     resource: repo://tests/unit/tenant-scope.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
 ---
 
 # Routing, Layout Gates and the Request Path
 
 Four route responsibilities are separated deliberately, and three of them are *not* the
-middleware. `proxy.ts` stamps one header; `app/(dashboard)/layout.tsx` performs the only
+middleware. [`proxy.ts`](/proxy.ts) stamps one header; the `(dashboard)` layout performs the only
 authentication check; the `/t/[tenantCode]` segment layout renders the only scope state; pages
 fetch through `requireScope()` and never render a scope state themselves. Which of those applies
-<!-- openwiki: broken internal link [/app] file "/app" does not exist. Fix the href or restore the target, then delete this comment. -->
-is decided by *where a file sits* in [`app/`](/app), so the tree is the authorization map, not
-decoration.
+is decided by *where a file sits* in `app/`, so the tree is the authorization map, not decoration.
 
 This page owns the route tree and the request path. RLS as the boundary under all of it is on
 [Supabase Data Model and RLS Policies](/openwiki/architecture/data-model-and-rls.md); the
 end-to-end scoping/role workflow is on
-[Tenant Scoping and Role Authority](/openwiki/workflows/tenant-scoping-and-role-authority.md);
-honest empty states are on
-<!-- openwiki: broken internal link [/openwiki/concepts/error-snapshots-and-honest-empty-states.md] file "/openwiki/concepts/error-snapshots-and-honest-empty-states.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-[Error Snapshots and Honest Empty States](/openwiki/concepts/error-snapshots-and-honest-empty-states.md).
+[Tenant Scoping and Role Authority](/openwiki/workflows/tenant-scoping-and-role-authority.md); the
+machine-facing API routes are on [Auth and Provisioning](/openwiki/modules/auth-and-provisioning.md).
 
-## The request path
+## The tree, and where the gates are
 
 ```mermaid
 flowchart TD
@@ -110,306 +126,218 @@ flowchart TD
     Proxy --> Stamp["stamp x-pathname, NextResponse.next()"]
     Stamp --> Where{"where does the route live?"}
 
-    Where -->|"/sign-in, /sign-up"| Open["no gate — open by necessity"]
-    Where -->|"/api*"| Api["no gate — each route answers for itself"]
-    Where -->|"inside (dashboard) group"| Gate
+    Where -->|"/sign-in, /api*, /api-docs"| Open["outside (dashboard)<br/>own gate, or open by necessity"]
+    Where -->|"inside (dashboard) group"| Gate["(dashboard)/layout.tsx<br/>requireAuthenticatedUser()"]
 
-    Gate["(dashboard)/layout.tsx<br/>requireAuthenticatedUser()"] -->|no session| SignIn["redirect /sign-in"]
-    Gate -->|session| Shell["shell + children"]
+    Gate -->|no session| SignIn["redirect /sign-in"]
+    Gate -->|session| Seg{"path under /t/ ?"}
 
-    Shell --> Scoped{"under /t/school/ ?"}
-    Scoped -->|yes| Seg["t/tenantCode/layout.tsx<br/>resolveRouteScope code"]
-    Scoped -->|no| Page
+    Seg -->|yes| Scope["t/tenantCode/layout.tsx<br/>resolveRouteScope(code)"]
+    Seg -->|no| Page["page, or Server Action POST"]
 
-    Seg -->|ok| Page["page: requireScope() then fetch"]
-    Seg -->|no-tenant-access| S1["NoTenantAccessState"]
-    Seg -->|unknown| S2["could not verify + Try again"]
-    Seg -->|not-a-member| S3["School not available + fallback link"]
+    Scope -->|ok| Page
+    Scope -->|"not-a-member / no-tenant-access / unknown"| State["layout renders it;<br/>page returns null"]
 
-    Page -->|"null scope"| Nothing["renders nothing beneath the layout state"]
-    Page --> Data["module data/ → anon-key client + Clerk token → RLS"]
+    Page --> Action["action: re-resolve code,<br/>resolveTrustedRole, then write"]
 ```
 
-*Each hop of a request, and the one place on it where a real gate and a scope decision exist.*
+*One gate, one scope decision, and one re-check inside the action — never in the middleware.*
 
 The gate is a layout, not the middleware, because Clerk deprecated `createRouteMatcher` in favour
-of checking in the component that renders protected data. That choice carries the whole
-guard model: a route is protected by a group it is *inside*.
+of checking in the component that renders protected data. That choice carries the whole guard
+model: a route is protected by a group it is *inside*.
 
 ## `proxy.ts` gates nothing by design
 
-The middleware is `clerkMiddleware` wrapping a handler whose entire body is to add
-`x-pathname` from `request.nextUrl.pathname` to the forwarded headers and return
-`NextResponse.next()`. No session check, no redirect, no per-path matcher.
+The handler's entire body copies `request.nextUrl.pathname` into an `x-pathname` forwarded header
+and returns `NextResponse.next()`: no session check, no redirect, no per-path matcher. Its
+`matcher` list does real work of a different kind — besides excluding `_next` and static extensions
+it *names* `/__clerk/(.*)` and `/(api|trpc)(.*)`, so Clerk's inbound webhook reaches the app
+through the middleware rather than being short-circuited.
 
-Its `matcher` list does real work of a different kind. Besides the negative pattern that excludes
-`_next` and static extensions, it names `/__clerk/(.*)` and `/(api|trpc)(.*)` — so the middleware
-runs on API routes, and Clerk's inbound webhook at
-[`app/api/webhooks/clerk/route.ts`](/app/api/webhooks/clerk/route.ts) reaches the app through it
-rather than being short-circuited. That route is unauthenticated on purpose: Clerk signs the body
-and the handler verifies it with `verifyWebhook` against `CLERK_WEBHOOK_SIGNING_SECRET`, so no
-middleware exclusion is needed for it to receive requests.
+The header is the middleware's second product, consumed by the `(dashboard)` layout to decide
+`isTrainerRoute` and by the sign-in subtree for its variant choice.
 
-The header is the middleware's second product, consumed by
-<!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-[`app/(dashboard)/layout.tsx`](/app/(dashboard)/layout.tsx) to decide `isTrainerRoute` for the
-shell, and by the sign-in subtree for its own layout.
+**Failure modes.** `clerkMiddleware` sounds like route protection, so anything "relying on the
+middleware" protects nothing. Both consumers read `headers().get('x-pathname') ?? ''`; a blank
+value silently means "office route", so the trainer-only nav omissions lapse — and the server shell
+cannot see the current path the way the `usePathname()` island in
+[`modules/shell/ui/Sidebar.tsx`](/modules/shell/ui/Sidebar.tsx) can, so the two can disagree. The
+header is a hint, never an authority.
 
-**Failure modes.**
+## The `(dashboard)` gate and the groups outside it
 
-- **A gate that looks like one.** `clerkMiddleware` sounds like route protection, and the handler
-  never asks whether a session exists. Anything relying on it redirects nobody.
-- **A missing or empty header.** Both consumers do `headers().get('x-pathname') ?? ''`. A blank
-  value silently means "office route": `isTrainerRoute` is false and every trainer-only nav
-  omission lapses. On the sign-in screen the same blank collapses its variant choice to the
-  office default. The server shell also cannot see the current path the way `usePathname()` can
-  in a client island — [`modules/shell/ui/Sidebar.tsx`](/modules/shell/ui/Sidebar.tsx) resolves
-  the active school from `usePathname()`, so the two can disagree.
-- **The header is a hint, never an authority.** Nothing authorizes on `x-pathname`; a forged or
-  stale value changes presentation only.
+`(dashboard)` does not appear in the URL; it exists to hang one layout over every office screen.
+That layout's first statement is `requireAuthenticatedUser()`, which redirects `/sign-in` when
+[`auth().userId`](/modules/auth/data/auth.ts) is absent and otherwise returns the id as a `string`
+(never nullable, so a caller cannot continue with `null`). [`e2e/auth.spec.ts`](/e2e/auth.spec.ts)
+asserts exactly this and records that the redirect belongs to the layout, not `proxy.ts`.
 
-## The `(dashboard)` gate
+**Everything outside the group is unguarded until the route adds a gate, and each does it its own
+way:**
 
-`(dashboard)` is a route group: it does not appear in the URL, and it exists to hang one layout
-over every office screen. That layout's first statement is `requireAuthenticatedUser()`, which
-redirects `/sign-in` when `auth().userId` is absent and otherwise returns the id.
-[`e2e/auth.spec.ts`](/e2e/auth.spec.ts) asserts exactly this — an anonymous `/dashboard` visit
-must land on `/sign-in` — and its header comment records that the redirect belongs to the layout,
-not to `proxy.ts`, which "only forwards the pathname header".
+- [`app/api-docs/page.tsx`](/app/api-docs/page.tsx) calls `requireAuthenticatedUser()` itself.
+- `/sign-in` and `/sign-up` stay open by necessity — which makes their inputs attacker-controlled;
+  the catch-all passes `redirect_url` through
+  [`sanitizeRedirectUrl`](/modules/auth/domain/redirectUrl.ts), pinned by
+  [`tests/unit/redirect-url.test.ts`](/tests/unit/redirect-url.test.ts).
+- `app/api/*` is reached by machines, where a redirect is the wrong gate: `/api/openapi.json`
+  checks `getAuthUserId()` and answers `401`, the Clerk webhook authenticates by `verifyWebhook`
+  signature, and `/api/health` is open for probes.
 
-`requireAuthenticatedUser()` returns a `string` and never a nullable: callers get the Clerk id or
-the redirect, so a page cannot accidentally continue with `null`. [CLAUDE.md](/CLAUDE.md) states
-the chain as `proxy.ts` → this call → token-attaching client → RLS, in that order.
+A **Server Action needs its own authority check** — it is a separate POST target and inherits
+nothing from the page that rendered the form. [`t/[tenantCode]/actions.ts`](/app/(dashboard)/t/[tenantCode]/actions.ts)
+re-resolves the school from the URL code carried in the `FormData` (never a tenant id from the
+form), resolves the role with `resolveTrustedRole`, rejects anything but admin/coordinator as
+`denied`, and then states that both checks are "defence in depth and usability; the boundary is the
+`batches` UPDATE policy", which for anyone else matches zero rows and surfaces as
+`conflict-or-denied`. `users/new/actions.ts` and `schools/new/actions.ts` share the shape, gated on
+`resolveTrustedRole` and `isPlatformAdmin()` respectively.
 
-### Three consequences worth stating plainly
+The layout itself resolves identity once and hands it down: one `Promise.all` of
+`getProfileSnapshot()` and `isPlatformAdmin()` supplies the admin row, user card and switcher. A
+failed profile read yields `null` role and empty tenant list, so the shell renders a smaller,
+honest menu — hiding, not denying, which is why the route and the action re-check. `isPlatformAdmin`
+is a separate axis read through a `security definer` RPC because the anon client cannot read
+`platform_admins` (ADR-006 P2), and `schools/new` tells `sync-failed` apart from a real denial
+rather than trusting the nav.
 
-- **Outside the group is unguarded until the route adds a gate.**
-  [`app/api-docs/page.tsx`](/app/api-docs/page.tsx) calls `requireAuthenticatedUser()` itself.
-<!-- openwiki: broken internal link [/app/sign-in] file "/app/sign-in" does not exist. Fix the href or restore the target, then delete this comment. -->
-  [`app/sign-in`](/app/sign-in) and `/sign-up` must stay open or sign-in could not be reached, and
-<!-- openwiki: broken internal link [/app/api] file "/app/api" does not exist. Fix the href or restore the target, then delete this comment. -->
-  [`app/api/*`](/app/api) is reached by machines, so each route there answers for itself — just as
-  [openapi.json](/app/api/openapi.json/route.ts) checks `getAuthUserId()` itself and answers
-  `401` with no session.
-
-  The webhook is the exception that cannot use `requireAuthenticatedUser()`: a redirect is wrong
-  for a machine and Clerk's request carries no app session, so `POST /api/webhooks/clerk`
-  authenticates by signature instead — `verifyWebhook` verifies the signed body and answers `400`
-  on failure. `GET /api/health` is unauthenticated on purpose for probes.
-  [auth-check](/app/api/debug/auth-check/route.ts) is deliberately dev-only (`404` in production)
-  because it returns the raw Supabase and token detail that RULES rule 6 keeps out of the UI.
-- **The gate needs a live check each render.** `requireAuthenticatedUser()` is not a one-time
-  middleware pass; anything that lets a signed-in user reach a protected tree without it
-  re-running is a hole, not a cache.
-- **The layout resolves identity once and hands it down.** A single `getProfileSnapshot()` +
-  `isPlatformAdmin()` `Promise.all` supplies the nav's admin row, the user card, the school
-  switcher and its default. All of it is trusted-role and DB-snapshot data, never
-  `resolveRouteRole`, whose `?role=` preview would let any caller conjure the "Add user" row. A
-  failed profile read yields `null` role and empty tenant list rather than throwing, so the shell
-  renders a smaller, honest menu (`isAdmin` false) instead of a larger one. `isPlatformAdmin` is a
-  separate axis read from `platform_admins` through a `security definer` RPC, because that table
-  is deliberately unreadable through the anon client.
-
-### A page still renders under a failed layout
-
-`Postgres` errors do not abort the layout. It renders, with `role: null` and `tenants: []`, and
-the page renders beneath it — possibly fine, possibly into its own failure state. Two visible
-symptoms: `Sidebar`'s `NO_TENANT_NAME`/`NO_TENANT_META` fallbacks render in place of a school
-name rather than a plausible-looking one, and the admin/platform rows disappear — hiding, not
-denying, which is why the route and the Server Action re-check the same role. `isPlatformAdmin`
-is the sharpest case: it is a boolean, so a failed read merely hides "Add school", which is why the
-*route* distinguishes a failed check (`sync-failed`) from a real denial rather than trusting the nav.
-
-The layout also does **not** render a KPI row: a root layout does not re-render on client-side
-navigation, so a row placed here kept the previous school's numbers after a school switch. Only
-the two dashboard pages render one, each from its own path.
-
-**`/schools/new` and `/users/new` are unscoped, but not ungated.** Both live directly under
-`(dashboard)/` so they stay reachable from a trainer route where the nav lists no school row, and
-each resolves its own authority server-side — the router's `isTrainerRoute` flag says nothing
-about them.
+`/schools/new` and `/users/new` are unscoped but not ungated — both sit directly under
+`(dashboard)/` and resolve their authority server-side. The layout renders **no KPI row**: a root
+layout does not re-render on client-side navigation, so a row there kept the previous school's
+numbers after a switch.
 
 ## The scoped segment: `/t/[tenantCode]`
 
-Office screens take the school from the URL path segment (ADR-001 §7 K1), because SSR, shareable
-links and "never dropped" were the point. The segment layout
-[`app/(dashboard)/t/[tenantCode]/layout.tsx`](/app/(dashboard)/t/[tenantCode]/layout.tsx) turns
-that promise into a validated scope *before any page in the segment renders*.
-
-Its four arms are the four variants of `RouteScope`
+Office screens take the school from the URL segment (ADR-001 K1), because SSR, shareable links and
+"never dropped" were the point. The segment layout turns that into a validated scope *before any
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-([`tenant-scope.ts`](/app/(dashboard)/tenant-scope.ts)):
+page renders*, and renders the four [`RouteScope`](/app/(dashboard)/tenant-scope.ts) arms there:
 
 | `resolveRouteScope` arm | Layout renders |
 |---|---|
 | `ok` | `children` |
 | `no-tenant-access` | `NoTenantAccessState` subject `"this school"` |
-| `unknown` | "Couldn't verify your school access" — usually temporary, "Try again" |
+| `unknown` | "Couldn't verify your school access" — usually temporary, "Try again" → `/dashboard` |
 | `not-a-member` | "School not available" — links to `resolved.fallback` when a default school exists |
 
-The `not-a-member` link is the one place the tree answers a wrong code constructively:
-`scopedPath(resolved.fallback.code, 'dashboard')` sends the caller to a school they do belong to
-instead of a dead end. A foreign or unknown code never falls back to "all schools" implicitly —
-the URL always ends up naming one school.
+A foreign or unknown code never falls back to "all schools": `scopedPath(fallback.code, 'dashboard')`
+sends the caller to a school they do belong to, so the URL always ends up naming one.
+[`modules/tenancy/domain/scope.ts`](/modules/tenancy/domain/scope.ts) is the rule underneath — a
+scope exists only for a school in `profile.tenants`, so it is *selection, not authorization*
+(RULES rule 2); RLS still decides.
 
-The rule under all four is in
-[`modules/tenancy/domain/scope.ts`](/modules/tenancy/domain/scope.ts): a scope exists only for a
-school in `profile.tenants`, so it is *selection, not authorization* (RULES rule 2). Queries add
-`tenant_id = scope.tenantId` on top of RLS; RLS still decides. `scopeForCode` lowercases both
-sides, and `defaultScope` takes the flagged `defaultTenantId`, then the first membership, then
-`null` — pinned by [`tests/unit/tenant-scope.test.ts`](/tests/unit/tenant-scope.test.ts).
-
-### Why `requireScope` returns `null` instead of calling `notFound()`
-
-Pages call `requireScope(params)` and `return null` when it yields no scope. `null` means the
-layout is already rendering the correct state — three of the four arms — and the page simply
-contributes nothing.
-
-`notFound()` would have been the reflex. It loses because **layouts and pages render in
-parallel**: a thrown 404 could beat the layout's friendlier `no-tenant-access` explanation to the
-response, and the user gets a generic 404 for "you are not a member of this school". Security does
-not rest on the choice either way — with no scope there is no tenant id left to query with — so
-the friendlier state wins. The same reasoning explains why the segment layout, not `proxy.ts` and
-not a page, renders every non-`ok` arm: it is the only component in the segment guaranteed to run
-and to own a state rather than data.
+**Why `requireScope` returns `null` rather than throwing `notFound()`.** Pages call it and
+`return null` on a non-`ok` scope because the layout already renders that state. Layouts and pages
+render in parallel, so a thrown 404 could beat the layout's friendlier explanation to the response.
+Security does not rest on the choice — with no scope there is no tenant id to query with. The same
+reasoning makes the layout, not a page, the owner of every non-`ok` arm.
 
 `requireScope` is also where a trainer is turned away: once the scope is `ok` it redirects
-`/trainer` before the page fetches, because these screens would otherwise hand full batch DTOs to
-client components, which RULES rule 5 forbids. The check sits in the page path rather than the
-layout because **a layout does not re-run on every navigation** — a trainer already inside the
-shell could move between scoped sections and never be re-checked. The validated scope and profile it
-returns are what a page fetches with.
+`/trainer` before the page fetches, because these screens hand full batch DTOs (billing, BSRS) to
+client components, which RULES rule 5 forbids. It sits in the page path, not the layout, because a
+layout does not re-run on every client-side navigation. Both helpers are `cache()`-wrapped, so the
+layout and the page share one profile read.
 
-The two helpers are `cache()`-wrapped, so the layout's read and the page's read of the same
-`tenantCode` are one profile fetch per request. `getSignedInProfile()` collapses a failed
-identity read to `'unknown'` and a missing row to `'none'` — never the other way round.
-
-**Failure modes.**
-
+**Failure modes.** A cheap navigation reads as broken access unless
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-- **Cheap navigation reads as broken access.** [`app/(dashboard)/t/loading.tsx`](/app/(dashboard)/t/loading.tsx)
-  sits deliberately *above* `[tenantCode]/layout.tsx`, because "a loading file does not cover its
-  own folder's layout" and that layout awaits the scope. Putting a `loading.tsx` inside the
-  segment instead leaves the school switch blank.
-- **A state rendered twice.** A page that handles the four arms itself duplicates the layout and
-  the two can diverge; a page that forgets `if (!resolved) return null` runs with an undefined
-  tenant id.
-- **Naming the wrong absence.** `unknown` rendered as `none` tells a provisioned coordinator they
-  were never assigned a school. The `unknown`-is-not-`none` rule is the same one
-  [`tests/unit/tenant-access.test.ts`](/tests/unit/tenant-access.test.ts) pins for the
-  `withTenantAccess` fold.
+[`t/loading.tsx`](/app/(dashboard)/t/loading.tsx) stays *above* `[tenantCode]/layout.tsx` — a
+loading file does not cover its own folder's layout, and one placed inside the segment leaves the
+school switch blank. A page that handles the arms itself can diverge from the layout; a page that
+forgets `if (!resolved) return null` runs with an undefined tenant id. Naming `unknown` as `none`
+tells a provisioned coordinator they were never assigned a school — the distinction
+`withTenantAccess` keeps.
 
 ### The legacy unscoped paths
 
 `/batch-cards`, `/documents`, `/report`, `/table-view`, `/analytics`, `/activity-log`, `/billing`
-survive for bookmarks and old links as one-line stubs from `legacyRoute(section)` in
+survive for bookmarks as one-line stubs from
 <!-- openwiki: broken internal link [/app/(dashboard] file "/app/(dashboard" does not exist. Fix the href or restore the target, then delete this comment. -->
-[`app/(dashboard)/legacy-redirect.tsx`](/app/(dashboard)/legacy-redirect.tsx).
-`redirectToDefaultScope()` re-encodes the caller's search params onto
-`/t/<default school>/<section>` and redirects; only "no school" and "could not verify" render.
-The redirect keeps `batch=`/`state=`/`role=` intact, so a deep link survives the hop.
+[`legacyRoute(section)`](/app/(dashboard)/legacy-redirect.tsx). `redirectToDefaultScope()`
+re-encodes every search param — repeated keys included, through `URLSearchParams` — onto
+`/t/<default school>/<section>`, which is what keeps `?batch=`/`?state=`/`?role=` intact across the
+hop; a bare-path redirect would silently drop the caller's context. Only "no school" and "could not
+verify" render. `/dashboard` is the same machinery behind a dispatch from `profile.role` — trainers
+to `/trainer`, admins to `/overview`, everyone else falling through.
 
-`/dashboard` is the same machinery with a router in front of it: trainers go to `/trainer`,
-admins to `/overview`, everyone else falls through to the legacy redirect. Both decisions read
-`profile.role` off `getSignedInProfile()`, the trusted read.
+## `?state=` and `?role=`: two overrides, two different powers
 
-**Failure mode.** The hop must not lose the query string. `redirectToDefaultScope` appends every
-param value — repeated keys included — through `URLSearchParams`, so `?batch=DEV-AKB-001` still
-names the batch after landing; a stub that redirects with a bare path hands the caller the
-section's default view and silently drops their context.
+**`?state=` previews a *guard state*, not a role.** Any caller can force `sync-failed`, `stale`,
+`denied`, `empty` or `no-tenant-access` to see a screen's state without breaking data. The
+precedence rule is the load-bearing part: a forced failure must not be masked by a tidier
+explanation, so `denied` wins first, then a real failure with zero rows, then empty — RULES rule
+19's guard ordering, spelled out in the dashboard's `guardState()` and in `billing`'s
+`syncFailed && batches.length === 0` branch. A forced `sync-failed` on a non-empty snapshot falls
+through to the inline banner instead.
 
-`/t/<school>` on its own lands on `dashboard` — `parseScopedPath` defaults the section that way,
-and the unscoped sidebar's `sectionHref` falls back to `/<section>`, so the two trees stay wired
-to each other.
+**`?role=` changes presentation only and never authority.** Two role sources, two jobs:
+`resolveTrustedRole(dbRole)` reads `profiles.role` — the column RLS reads — and nothing else; a user
+with no profile row resolves `null`, not a default (the retired `publicMetadata` fallback once
+showed one admin as ADMIN and VIEWER on the same screen). `resolveRouteRole`/`resolveDisplayRole`
+let `?role=` win, so:
 
-## The `/trainer` subtree
+| Decision | Source |
+|---|---|
+| `/dashboard` dispatch, trainer refusal in `requireScope`, `billing`/`report` re-check, every action gate, `/overview` admin-only, `users/new`, `schools/new` | `profiles.role` |
+| rendered variant (`toOfficeRole`, `resolveDisplayRole`) | `?role=`, then `profiles.role` |
 
-`/trainer/**` is deliberately unscoped (ADR-001 §7 K1-redirect): trainer routes address by batch,
-and `batch_trainer_assignments` carries the tenant, so a trainer never picks a school. The scoped
-sections keep a private copy of the same list, so `isScopedSection` is what tells the two apart.
+`toOfficeRole` collapses everything that is not `admin`/`coordinator`/`viewer` — trainer, `null`,
+`'superuser'` — to read-only `viewer`; [`tests/unit/display-role.test.ts`](/tests/unit/display-role.test.ts)
+pins that least-privilege fallback and the ignoring of an unrecognized value.
 
-The shell is told which subtree it is on through `isTrainerRoute`, derived from the header.
-`Sidebar.resolveOperations` keeps only the Settings op, drops the admin and platform lists, and
-`Topbar` hides the activity bell — activity is per school, and no teacher-owned screen is one.
-Both are listed as guarding *explicitly* rather than by implication, so the conditions cannot
-drift apart later.
+The trap: **`?role=admin` does not make a trainer an admin.** A real trainer adding it to a scoped
+screen is still redirected — by `requireScope`, and again by `billing`, which re-derives the
+trusted role and redirects *before* the fetch so the preview cannot leak financials. The mirror trap
+is the other direction: because `resolveRouteRole` falls through to `profiles.role`, a working
+`?role=` build still looks correct while every gate reads the DB, and only fails when someone gates
+a redirect on the preview value.
 
-## The role split is a redirect rule
+## `/trainer`, and the Next 16 / React 19 conventions
 
-Two role sources, two jobs, and confusing them is a privilege bug.
+`/trainer/**` is unscoped by design (ADR-001 K1-redirect): trainer routes address by batch and the
+assignment row carries the tenant, so a trainer never picks a school. `isScopedSection` keeps the
+two lists apart; `Sidebar.resolveOperations` keeps only Settings and `Topbar` hides the activity
+bell on a trainer route, both as explicit `!isTrainerRoute` conditions so they cannot drift.
 
-`resolveTrustedRole(dbRole)` reads `profiles.role` — the column RLS reads — and nothing else.
-Clerk is identity only; the old `publicMetadata` fallback once showed one admin as ADMIN and
-VIEWER on the same screen. A user with no profile row resolves `null`, not a default.
+The settings carry routing consequences rather than preferences:
 
-`resolveRouteRole`/`resolveDisplayRole` let `?role=` win: any caller can type a role into the URL.
-So `?role=` may pick a *variant* and may never decide a *redirect*:
+- **`params` and `searchParams` are Promises** (`next ^16.4.6`, `react 19.2.4`). Every route here
+  `await`s them; a synchronous read type-checks only if the type is wrong, then yields `undefined`
+  at runtime — the failure mode is an undefined tenant id, not a crash. Server Actions are the
+  exception: they take a `FormData` argument because a form post has no route context.
+- **Server Components by default, client islands on demand** (RULES rule 26) — the layouts and
+  pages are server components, which is why the gate can run per request; `Sidebar.tsx` is the
+  `'use client'` island inside it.
+- **`cache()` is request-scoped dedupe, not persistent caching** — `resolveRouteScope`,
+  `getSignedInProfile` and `getPlatformAdminSnapshot` rely on it so a layout and its page pay one
+  read.
+- **`next.config.ts` deliberately holds almost nothing** — `turbopack.root` and
+  `experimental.agentUpgrade` only, with no `redirects()`, `rewrites()` or `basePath`. Every legacy
+  path is a real route file, so a new screen is a directory rather than a config line. `pnpm dev`
+  runs `next dev --webpack` while the build is Turbopack; check the build before blaming routing.
+- **Client islands bind actions with `useActionState`, not `useState` + `onSubmit`.**
+  `RqmCodeEditor`, `CreateUserForm` and `CreateSchoolForm` destructure `[state, formAction, pending]`
+  and derive their state during render; a hand-rolled handler loses pending state and the re-render
+  after `revalidatePath`. `CLAUDE.md` says not to assume the Next.js you know and to read
+  `node_modules/next/dist/docs/` first.
 
-| Decision | Function | Why the split matters |
-|---|---|---|
-| `/dashboard` dispatch | `profile.role` directly | a trainer must not be routed to an office screen |
-| trainer refusal under `/t/*` | `profile.role` in `requireScope` → `redirect('/trainer')` | `?role=admin` would let a real trainer skip the gate and read billing financials |
-| `billing` and `report` re-check | `resolveTrustedRole(profile.role)` | a second opinion, because the nav is only a hint |
-| `/overview` admin-only | `resolveTrustedRole(profile.role)` → `redirect('/dashboard')` | tenant-scoped role read once, no override |
-| `users/new`, `schools/new` | `resolveTrustedRole` / `isPlatformAdmin()` | the nav row that leads there is only a hint |
-| rendered variants | `toOfficeRole` / `resolveDisplayRole` | a preview only |
+## Extension rules
 
-`toOfficeRole` collapses everything that is not `admin`/`coordinator`/`viewer` —
-trainer, `null`, `'superuser'` — to read-only `viewer`. That least-privilege fallback is the
-safety net if a trainer ever reaches an office screen, and
-[`tests/unit/display-role.test.ts`](/tests/unit/display-role.test.ts) pins it along with
-`resolveDisplayRole` ignoring an unrecognized `?role=` trial value. The tests call these a
-*usability* gate: the real boundary is RLS — `can_manage_tenant` is admin/coordinator only, so a
-viewer write is denied whether or not a button rendered.
-
-**Failure mode.** A trainer's `?role=admin` on billing renders admin chrome while the server
-refuses them — or, worse, the redirect is skipped and trainer DTOs reach an office screen. The
-mirror failure is a `null` role rendering write-enabled UI, which is why the fallback is `viewer`.
-
-## The unguarded entry point: `/sign-in`
-
-`/sign-in` must stay outside the gate, and that makes its own inputs attacker-controlled. The
-`redirect_url` query param is where sign-in resumes afterwards, so an unchecked value is an open
-redirect: the user authenticates against the real app and is handed to an attacker's site. The
-`[[...sign-in]]` catch-all passes it through
-[`sanitizeRedirectUrl`](/modules/auth/domain/redirectUrl.ts) — a pure function that returns `"/"`
-unless the value is a genuine same-origin path — and each rejected shape is a browser
-misresolution, not a cosmetic one: `https://…` is absolute, `//evil.com` is protocol-relative,
-`/\evil.com` normalizes to `//evil.com`, and `javascript:`/`data:` execute. The sanitized value is
-both the signed-in bounce target and the `redirectUrl` handed to Clerk's OAuth start, so there is
-exactly one place to get this right.
-[`tests/unit/redirect-url.test.ts`](/tests/unit/redirect-url.test.ts) pins each trap plus the
-`/batches?tab=2` pass-through and the empty-value fallback.
-
-## Configuration and extension rules
-
-- **A new scoped screen** is a directory under `t/[tenantCode]/(sections)/` plus an entry in
-  `SCOPED_SECTIONS`; a directory without the constant is not a valid legacy target.
-- **A new unscoped screen** goes directly under `(dashboard)/` and must carry its own authority
-  check if it is not readable by everyone in the tenant.
-- **The segment layout is the only place that renders a scope state.** Everything else returns
-  `null`.
-- **A new `/api` route must include its own gate.** Nothing upstream checks it. Follow
-  `/api/openapi.json` (`getAuthUserId()`, `401`) for anything readable by a person; a
-  machine-called route authenticates its caller (signature, shared secret) instead.
-- **A redirect target a caller can influence needs sanitizing.** `redirect_url` goes through
-  `sanitizeRedirectUrl`; the legacy stubs carry params through `URLSearchParams` rather than
-  splicing them into a string.
-- **`proxy.ts` needs no change for a new route.** Only the header stamping applies; an API route
-  that Clerk must reach is already covered by `/(api|trpc)(.*)`.
-- **A page with no `data/` layer needs nothing from this page.** `/trainer/classes` is a
-  placeholder and reaches no scope.
+- A **new scoped screen** is a directory under `t/[tenantCode]/(sections)/` plus a
+  `SCOPED_SECTIONS` entry; a **new unscoped office screen** goes under `(dashboard)/` and carries its
+  own authority check unless everyone in the tenant may read it. Anything decided outside
+  `(dashboard)` gates itself.
+- The segment layout is the only place that renders a scope state; everything else returns `null`.
+- A redirect target a caller can influence needs sanitizing, and a legacy stub carries params
+  through `URLSearchParams` rather than splicing them.
+- `proxy.ts` needs no change for a new route; only the header stamping applies.
 
 ## What the tests cover
 
-[`tests/unit/tenant-scope.test.ts`](/tests/unit/tenant-scope.test.ts) pins scope construction
-(a foreign code yields `null`, the default chain degrades to `null`), the
-`scopedPath`/`parseScopedPath` round trip, and — by mocking `getCurrentUser` to say `admin` —
-that `resolveTrustedRole` still answers from the DB role.
-[`tests/unit/session-exists.test.ts`](/tests/unit/session-exists.test.ts) pins
-`isSessionExistsError` matching `session_exists` anywhere in `errors[]` and ignoring unrelated
-codes and non-array throwals — the sign-in screen's forwarding case, which must not read as a
-failed sign-in. `/trainer` and the segment arms have no direct unit coverage; the e2e suite
-proves the gate and nothing behind it, so the arm outcomes rest on the pure `scopeForCode` /
-`defaultScope` cases. The rest of the verification loop is on
+[`tests/unit/tenant-scope.test.ts`](/tests/unit/tenant-scope.test.ts) pins scope construction and
+the `scopedPath`/`parseScopedPath` round trip;
+[`tests/unit/tenant-access.test.ts`](/tests/unit/tenant-access.test.ts) pins `unknown`-is-not-`none`.
+`/trainer`, the segment arms, the actions and both overrides have no direct coverage — the e2e suite
+proves the gate and nothing behind it, so arm outcomes rest on the pure `scopeForCode`/`defaultScope`
+cases. The rest of the loop is on
 [Verification and Test Strategy](/openwiki/operations/verification-and-test-strategy.md).

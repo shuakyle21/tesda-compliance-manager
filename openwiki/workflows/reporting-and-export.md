@@ -1,15 +1,23 @@
 ---
 type: workflow
 title: "Workflow: Report Assembly and XLSX/T2MIS Export"
-description: "How a report becomes a file: the trainer redirect, the paged roster join, the EGACE and employment rollups, the column mapping to the T2MIS terminal layout, the single XLSX writer boundary, and the legibility and copy rules an export must honour."
-tags: ["reports", "export", "t2mis", "xlsx", "roster", "sync-failed", "trainer-role", "fr-15", "fr-10"]
+description: "How a report becomes a file: the trainer redirect, the paged roster join, the EGACE and employment rollups, the single direction from read to download, the header/filename copy boundary, and the rule that a failure must reach the reader rather than a blank cell."
+tags: ["reports", "export", "t2mis", "xlsx", "roster", "sync-failed", "trainer-role", "copy-boundary", "fr-15", "fr-10"]
 sources:
   - id: openwiki-source-79e2020a0930b43798845956
     resource: repo://app/(dashboard)/t/%5BtenantCode%5D/(sections)/report/page.tsx
+  - id: openwiki-source-20d1ca31256bf756f33f5462
+    resource: repo://app/(dashboard)/tenant-scope.ts
+  - id: openwiki-source-cebb8a381f810b2ffea84318
+    resource: repo://docs/adr/ADR-002-design-prototype-portrays-adr-001-target.md
   - id: openwiki-source-2fda883e9b76745f69f487f7
     resource: repo://eslint.config.mjs
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
   - id: openwiki-source-ad910b8b276ad30bfcde3f16
     resource: repo://modules/batches/data/learners.ts
+  - id: openwiki-source-3b276b9b0a11fce35a33b32e
+    resource: repo://modules/billing/ui/BillingStatementModal.tsx
   - id: openwiki-source-4bbff9da266e44025f34a633
     resource: repo://modules/import-export/domain/learnerImport.ts
   - id: openwiki-source-db11994fd3a6b99fac496ccf
@@ -42,7 +50,10 @@ sources:
     resource: repo://tests/unit/reports-domain.test.ts
   - id: openwiki-source-9643403557bfc8e75aa7f9e4
     resource: repo://tests/unit/t2mis.test.ts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
 ---
 
 # Workflow: Report Assembly and XLSX/T2MIS Export
@@ -70,12 +81,82 @@ Two framings up front:
   because a truncated or half-blanked export fails silently, while an *error* fails loudly and is
   therefore the safer outcome.
 
+## One direction only: read → compose → serialize → download
+
+Nothing in this flow writes, refetches or reconciles. The state is read once by the server route,
+composed into a `Batch[]` tree, handed to a client island, flattened to strings, serialized into
+OOXML bytes, and dropped into an object URL. There is no second read on click of the export button,
+so the refetches that keep screen and file in agreement have to be deliberate clicks (the callout's
+Retry, or a reload).
+
+The byte-level half of the path reads in order:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as Office user
+  participant P as report page (server)
+  participant DB as Supabase under RLS
+  participant V as ReportView (client)
+  participant X as exportXlsx
+  participant W as buildXlsx
+  participant B as Browser
+
+  U->>P: GET /t/code/report
+  P->>DB: profile snapshot (select *, memberships, tenants(*))
+  DB-->>P: profile with role and memberships
+  Note over P: trainer? redirect to /trainer and stop
+  P->>DB: getBatchesSnapshot scoped to the tenant
+  DB-->>P: ok | sync-failed | unconfigured
+  P->>DB: getTenantRosterSnapshot, paged 1000 rows
+  DB-->>P: learner rows plus one facts row per batch
+  P->>P: selectBatchesForDisplay then attachRoster
+  P-->>V: batches, caller's tenants, rosterFailed, asOf
+  U->>V: Export to Excel (T2MIS)
+  V->>X: rows (already sorted) and tenantOf
+  X->>X: buildT2misRows flattens one line per scholar
+  alt zero lines
+    X-->>V: Export unavailable if rosterFailed, else Nothing to export
+  else at least one line
+    X->>W: headers, rows, sheet name
+    W-->>X: Blob of five OOXML parts, zip-store
+    X->>B: createObjectURL, click anchor, revoke after 40s
+    X-->>V: toast with row and batch counts
+  end
+```
+
+The download half of that diagram has no error channel back into the file: once `buildXlsx` returns,
+the only remaining failure mode (a browser refusing the download) still produces the success toast.
+
+### Where "as of" could make the sheet disagree with the screen
+
+Two clocks exist and only one is shown:
+
+| Clock | Where it lives | Does the file carry it? |
+| --- | --- | --- |
+| `fetchedAt` of the batch snapshot, formatted by `formatDateTime` and passed as `asOf` | the screen only — the toolbar meta and the EGACE table sub-heading via `ReportToolbar` and `EgaceOutcomesTable` | **no** |
+| `todayInManila()` | baked into each scholar's `age` at map time | indirectly, as the printed `Age` |
+
+So the file's only date-derived value is the age, computed against the roster's as-of day and frozen
+into the bytes. The consequence a reader has to know: a workbook downloaded on a later day than the
+screen it was built from will print birthdays that have since slipped, and the sheet's own timestamp
+of when it was taken exists only in the toast text (`Excel export ready … N scholar records`) — never
+in the cells, never in the filename. Any staleness rule added here has to put the as-of value *into*
+the workbook rather than depend on the tab it came from.
+
+In-flight state is worse than stale state, because nothing marks it. Batches render from
+`selectBatchesForDisplay`, which returns `[]` for any non-`ok` snapshot (rule 19 — no substitution),
+and `attachRoster` leaves a batch with no roster unchanged. A roster read that fails therefore
+produces a report whose every row is thin — and `buildT2misRows` still flattens those batches to one
+blank-padded line per scholar, so the sheet is *full* of rows with nothing in the learner columns.
+The only thing distinguishing that file from a correct one is the toast, via `rosterFailed`.
+
 ## The path, with its failure points
 
 ```mermaid
 flowchart TD
   A["GET /t/code/report"] --> B["requireScope - URL school vs memberships"]
-  B -->|null| B1["segment layout renders not-a-member / no-school"]
+  B -->|null| B1["segment layout renders not-a-member / no-school / unverifiable"]
   B --> C["getProfileSnapshot then resolveTrustedRole"]
   C -->|trainer| C1["redirect /trainer"]
   C -->|office, viewer, null| D["deriveTenantAccess; getBatchesSnapshot, folded with withTenantAccess"]
@@ -101,6 +182,7 @@ Where each snapshot can break, and what the reader gets:
 
 | Hop | Can fail | What the user sees |
 | --- | --- | --- |
+| `requireScope` | School is not the caller's, or memberships unreadable | The segment layout's own state ("School not available" with a link to a real school, `NoTenantAccessState`, or "Couldn't verify your school access"); the page renders nothing |
 | `getProfileSnapshot` | Non-`ok` profile, or no Clerk id | `dbRole` is `null`, so `resolveTrustedRole(null)` does **not** match `trainer` and no redirect happens — the gate is skipped and the page runs on |
 | `getBatchesSnapshot` | Any query error, or `unconfigured` | `sync-failed` → `SyncFailedCallout` ("this report may be incomplete" + Retry) plus an empty state; `unconfigured` → an empty state and **no callout at all** |
 | Membership fold | Caller in no school (`no-tenant-access`) | `SyncFailedCallout` is skipped and `NoTenantAccessState` replaces the ordinary empty state |
@@ -114,16 +196,18 @@ positive `trainer` verdict.
 
 ## Hop 1 — the trainer gate comes first
 
-`requireScope()` (`app/(dashboard)/tenant-scope.ts`) resolves the URL's school against the caller's
-memberships and returns `null` when the segment layout is already rendering a state, so the page
-returns nothing. The next thing it does — before either read — is `getProfileSnapshot` and
-`resolveTrustedRole`, and a `trainer` is `redirect('/trainer')`.
+`requireScope()` (`app/(dashboard)/tenant-scope.ts`) is `cache()`d over the same profile read the
+segment layout performs, so layout and page agree for one request; it returns `null` whenever the
+layout is already rendering a state. It also redirects on `profiles.role === 'trainer'` itself; the
+page then re-checks through `getProfileSnapshot` + `resolveTrustedRole` and redirects again. The
+second check is not just belt-and-braces: `requireScope` only sees an `ok` scope, so on the page the
+gate can be reached before the profile is trusted, and the page's version is what keeps a trainer off
+a screen whose every `learner_details` cell would be empty.
 
 `resolveTrustedRole` is called on `profiles.role` alone, never `resolveRouteRole`: the route resolver
 honours a `?role=` preview override, so a real trainer asking for `?role=admin` would walk past the
-gate and get a report whose every `learner_details` cell is empty. The redirect is why this workflow is
-office-only — `learner_details` has no trainer read policy. The route's own comment records that no
-redirect existed while the screen still rendered mock data.
+gate. The redirect is why this workflow is office-only — `learner_details` has no trainer read policy.
+The route's own comment records that no redirect existed while the screen still rendered mock data.
 
 The gate is also a cost: the profile snapshot it already holds is reused for `deriveTenantAccess`
 rather than fetched twice, and the verdict is folded in with `withTenantAccess`, which rewrites only
@@ -214,7 +298,7 @@ a header row copied verbatim from the TESDA sheet (down to `'Province '` and two
 cases, pins the `ageOn` birthday boundary, and round-trips a produced row back through `parseLearnerCsv`
 + `validateRows`. Any change to a layout column, the date format, or the parser has to answer to it.
 
-## Hop 5 — packaging and download
+## Hop 5 — packaging, download, and the copy boundary
 
 `buildXlsx(T2MIS_HEADERS, data, 'EGACE-Employment')` emits a **zip-store** archive — no compression —
 over the five minimal OOXML parts. `zipStore` writes each local header and central directory record by
@@ -229,6 +313,23 @@ some browsers.
 EOCD, all five part paths, row 1 as header and data from row 2 with `A1`/`B3` refs, entity escaping,
 `AA1` at column 27, and the truncated sheet name. Between the two test files, a change to the layout, the
 writer, or the join has a red test to answer to.
+
+**The copy boundary.** Nothing in the artifact says "working copy" — the check for rule 27 therefore
+lives in three separate places, and none of them is the workbook:
+
+| Surface | Text | Where it is enforced |
+| --- | --- | --- |
+| Screen tab name | "EGACE Outcomes" / "Employment Report"; view header "official TESDA reporting surface" | `ReportView.tsx`, `ReportToolbar.tsx` |
+| Button label | `Export to Excel (T2MIS)` — a *layout* claim, not an "Export to TESDA" | `ReportToolbar.tsx` |
+| Filename, sheet name, toast | `TESDA-T2MIS-EGACE-Employment-Report.xlsx`, sheet `EGACE-Employment`, "Excel export ready" | `exportXlsx.ts` |
+| Module header | "This is an internal working copy. Producing the file is not a submission." | `t2mis.ts` doc block |
+
+Every string is TESDA-prefixed and TESDA-shaped, so a reader who opens the sheet has no in-file cue that
+it was not filed. The sibling `BillingStatementModal` does carry the cue — "Internal working copy ·
+TESDA SIS and BSRS remain authoritative" — which makes the mismatch between surfaces visible rather than
+hypothetical. ADR-002 is the lock: honesty is carried by copy, and wording that implies official standing
+is a defect, not a cosmetic one. Adding that line to the toolbar meta (or the toast) is the cheapest fix
+and needs no change to the writer.
 
 ## Legibility rules a new export unit must honour
 
@@ -261,6 +362,10 @@ the school has no registered qualification or the join broke. It is also why the
 `rosterFailed` down and `exportXlsx` grades a zero-row build as `Export unavailable` (with a retry)
 rather than `Nothing to export` — the two mean different things.
 
+Where the roster path stops short of that rule is the blank-row case above: once the batch snapshot is
+`ok`, a failed roster still yields a populated, non-zero-row sheet of blank learner columns, and the
+toast reports success with a row count. `rosterFailed` is graded only when there are *no* rows to write.
+
 Reversing the choice is cheap and wrong: swallowing a roster error into an `ok` snapshot with blanks
 hides "the read broke", and failing on a merely missing detail column makes the whole report disappear.
 The comment above the facts query states the rule — *any error fails the snapshot*.
@@ -273,7 +378,7 @@ not got all produce `''`. Migration `20261111120000_add_t2mis_terminal_report_fi
 that enough: it is APPLIED and additive, `sex` is its only `CHECK`, and its header states the empty value
 keeps meaning "not recorded".
 
-## Two known blanks
+## One known blank, and one dead read
 
 1. **The provider catalog does not arrive.** The route seeds `ReportView` only with `resolved.profile.tenants`
    — the schools the *caller* belongs to — and `ReportView`'s prop comment records that no live
@@ -281,10 +386,11 @@ keeps meaning "not recorded".
    therefore resolves through the `??` placeholder: its whole provider block, `Congressional District`
    included, exports blank and its School label renders `—`. `tests/unit/t2mis.test.ts` fills
    `Congressional District` from a hand-built fixture, so the fixture passes where the live route does not.
-2. **`congressional_district` is never selected.** `getProfileSnapshot` fetches with
-   `select('*, profile_tenant_memberships(is_default, tenants(*))')`, so `mapTenantRow`'s
-   `row.congressional_district ?? ''` always yields `''` for a live read. Fixing the first blank without
-   fixing the second still exports an empty column.
+2. **`congressional_district` arrives as an empty string.** `getProfileSnapshot` fetches with
+   `select('*, profile_tenant_memberships(is_default, tenants(*))')`, so nothing is omitted at the query
+   level — the blank comes from `mapTenantRow`'s `congressionalDistrict: row.congressional_district ?? ''`
+   only when the column is absent from the generated row type. This is a types/mapper fix, not a select
+   fix, and it should land with the tenant-catalog gap so the column does not go from one `''` to another.
 
 Both are the blank-versus-missing problem in its quietest form, and either is a one-line change that
 should land with a writer-side expectation, not alone.
@@ -293,11 +399,13 @@ should land with a writer-side expectation, not alone.
 
 - Move the layout only in `import-export/domain/t2mis.ts` and only against the header test; move writer
   behaviour only against `report-xlsx.test.ts`.
-- Keep the redirect on `resolveTrustedRole` and keep it before both fetches.
+- Keep the redirect on `resolveTrustedRole` and keep it before both fetches — and keep
+  `requireScope`'s own trainer redirect, since the page-level check can be skipped on a non-`ok` profile.
 - Keep the roster paged. Replacing the loop with a single `select` re-introduces silent truncation.
 - Keep a roster error `sync-failed`; do not convert it into blanks.
 - Keep the ordering. Building `syncFailed` as a combined flag, rendering the `SyncFailedCallout` *above*
   the empty branch, and checking it before the empty state are what stop a zero-row failure losing its
   banner — rule 19 warns about exactly this guard order.
 - Keep the copy conservative. The file is a working copy; marking a batch `submitted` elsewhere in the app
-  does not make the download a submission to TESDA (rule 27).
+  does not make the download a submission to TESDA (rule 27). "T2MIS-compatible layout" is the honest
+  claim — a column header matching TESDA's sheet says nothing about the file's standing.

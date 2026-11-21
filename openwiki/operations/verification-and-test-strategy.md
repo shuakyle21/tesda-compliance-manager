@@ -1,13 +1,15 @@
 ---
 type: Operations Guide
 title: Verification Loop and Test Strategy
-description: The ordered tsc → lint → test loop, what CI actually runs and what it still skips, why Node 22 is a startup requirement, how specs pin the clock instead of reading it, what the one permission-gated Playwright spec proves, and the boundary the suite never crosses — mocked I/O and a non-existent RLS suite.
+description: The ordered typecheck → lint → test loop, what the CI check job blocks on and what stays outside it, why Node 22 is a startup requirement, how specs pin the clock instead of reading it, and the boundary the suite never crosses — mocked clients and a non-existent RLS suite.
 tags: [testing, verification, vitest, playwright, lint, typecheck, ci, rls]
 sources:
   - id: openwiki-source-5f5b95b3d6a215fa02ceb945
     resource: repo://.env.example
   - id: openwiki-source-164e2da859b5277df81c7d94
     resource: repo://.github/workflows/ci.yml
+  - id: openwiki-source-89a62965cacab8710f57d4cf
+    resource: repo://.github/workflows/qodana.yml
   - id: openwiki-source-7c03237a6b57ffb3e526a51b
     resource: repo://.nvmrc
   - id: openwiki-source-1f0a12ecb6e407c4e68e28d8
@@ -24,12 +26,16 @@ sources:
     resource: repo://e2e/global.setup.ts
   - id: openwiki-source-2fda883e9b76745f69f487f7
     resource: repo://eslint.config.mjs
+  - id: openwiki-source-fa1460427741e716baf8631a
+    resource: repo://modules/batches/data/batches.ts
   - id: openwiki-source-58478215433a32dbc8ee2b3e
     resource: repo://modules/import-export/README.md
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
     resource: repo://package.json
   - id: openwiki-source-5e753d9d77984cb67aae1517
     resource: repo://playwright.config.ts
+  - id: openwiki-source-bf0c465e02a9ab972575ad35
+    resource: repo://qodana.yaml
   - id: openwiki-source-f7ae5e0747518115ed202c7e
     resource: repo://RULES.md
   - id: openwiki-source-d81538d8891efe37053aeccb
@@ -46,17 +52,22 @@ sources:
     resource: repo://tests/unit/supabase-server.test.ts
   - id: openwiki-source-0fd3605db2590862922583b6
     resource: repo://tests/unit/tenant-access.test.ts
+  - id: openwiki-source-15e8a5a27099d775d1c019e1
+    resource: repo://tests/unit/tenant-scope.test.ts
   - id: openwiki-source-98d5ddb014a0fd4d678f6f2a
     resource: repo://tsconfig.json
   - id: openwiki-source-b58f839a189d87a7e1f37d39
     resource: repo://vitest.config.mts
-generated: { by: "openwiki/0.5.0", at: "2026-11-18T03:56:44.398Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-21T03:38:28.236Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-21T03:38:28.236Z
 ---
 
 # Verification Loop and Test Strategy
 
-`RULES.md` §9 is stale in the repository and this page does not fully repeat it. Rule 34 still says
-there is "no test runner yet" and that `pnpm test` is a placeholder; [`package.json`](/package.json)
+`RULES.md` §9 is stale in the repository and this page does not repeat it. Rule 34 still says there
+is "no test runner yet" and that `pnpm test` is a placeholder; [`package.json`](/package.json)
 defines `pnpm test` as `vitest run` over 31 specs in `tests/unit/`, and rules 7–10 are already
 enforced by `import/no-restricted-paths` in [`eslint.config.mjs`](/eslint.config.mjs). Rule 35's
 substance — fixed as-of dates, no mocks for RLS — is live and is what this page documents. Treat
@@ -64,9 +75,8 @@ rule 34 as describing an earlier state.
 
 ## The loop, in order, and what each step defends
 
-Run all three before calling a change done, and let them run locally before every push. The order is
-cheapest-signal first, so an architecture breach is reported before a test wastes a minute proving
-it.
+Run all three before calling a change done. The order is cheapest-signal first, so an architecture
+breach is reported before a test wastes a minute proving it.
 
 1. **`pnpm exec tsc --noEmit`** — rule 18 (`[types]`). `DB_TO_UI_STAGE` in
    `modules/batches/data/batches.ts` is a *total* map, so a new DB enum variant fails compilation
@@ -100,12 +110,28 @@ Component or a route file, run it locally.
 
 ## What CI does and does not run
 
-[`.github/workflows/ci.yml`](/.github/workflows/ci.yml) is a real gate, added after a broken build
-and a broken component both reached `main` with every other check green. It fires on every
-`pull_request` and every push to `main`, cancels superseded runs per ref, and runs one `check` job:
-`pnpm install --frozen-lockfile` on Node 22, then **`pnpm lint`, `pnpm exec tsc --noEmit`,
-`pnpm test`** — in that order, so a boundary breach or an enum the mapper forgot cannot merge. It
-needs no secrets precisely because the unit suite makes no Supabase or Clerk call.
+[`.github/workflows/ci.yml`](/.github/workflows/ci.yml) is the only workflow that gates code, added
+after a broken build and a broken component both reached `main` with every other check green. It
+fires on every `pull_request` and every push to `main`, holds a `concurrency` group of
+`ci-${{ github.ref }}` with `cancel-in-progress: true` so superseded runs die with the old commit,
+and runs one `check` job under a 15-minute timeout with `permissions: contents: read`:
+
+1. `actions/checkout@v4`, then `pnpm/action-setup@v4` (version read from `packageManager`), then
+   `actions/setup-node@v4` with `node-version: 22` and `cache: pnpm`;
+2. `pnpm install --frozen-lockfile`;
+3. **`pnpm lint`** → **`pnpm exec tsc --noEmit`** → **`pnpm test`**, in that order, any of which
+   fails the job.
+
+The comment at the top of the file states the reason the job needs no secrets: the unit suite makes
+no Supabase or Clerk call. The order matters as much as the set — lint runs before typecheck, so a
+boundary breach is reported as the architecture violation it is rather than behind a type error in
+the same change.
+
+Everything else in `.github/workflows/` is noise for a code review. `openwiki-update.yml` commits
+regenerated wiki pages, `claude.yml`/`claude-code-review.yml` post agent commentary, `stale.yml`
+closes idle issues, and `qodana.yml` runs the JetBrains `qodana-js` starter profile — which reports
+findings but, because `qodana.yaml` leaves `failureConditions` commented out, has no severity
+threshold to fail a run. `ci.yml` is the only file whose red blocks a merge.
 
 Two things stay outside it, and both are deliberate local obligations rather than oversights:
 
@@ -114,15 +140,14 @@ Two things stay outside it, and both are deliberate local obligations rather tha
 - **`pnpm test:e2e` is not a CI step.** It boots a dev server and needs Clerk testing keys and
   Supabase env; nothing in the workflow provides them. It remains a permission-gated local run.
 
-So "CI is green" now means lint, types and units — a real claim, and a narrower one than "it works".
+So "CI is green" means lint, types and units — a real claim, and a narrower one than "it works".
 Log a red test's exact command and output in the PR rather than asserting it passed, and run the
 loop locally before you push: CI reports a breach, it does not replace the habit.
 
 ## Node 22 is a startup requirement, not a style preference
 
-`engines` pins `>=22`, [`.nvmrc`](/.nvmrc) holds `22`, and CI's `setup-node` sets `node-version: 22`
-from the same reason stated in a comment. Use that version; `nvm use` in the repo root reads the
-file.
+`engines` pins `>=22`, [`.nvmrc`](/.nvmrc) holds `22`, and the workflow's `setup-node` step is
+commented with the reason. Use that version; `nvm use` in the repo root reads the file.
 
 The mechanism matters because the failure is unrecognisable. Vitest 4's bundler, rolldown, calls
 `util.styleText` with an **array** argument while formatting its startup output. On Node 21 or
@@ -146,7 +171,8 @@ the spec that exercises it freezes time instead of accepting it:
 `vi.setSystemTime(new Date('2026-06-01T00:00:00.000Z'))` in `beforeEach` — with no
 `vi.useFakeTimers()`, which throws without fake timers already installed — and restores with
 `vi.useRealTimers()` in `afterEach`. Its assertion is a day count (`19`) derived from two fixed
-calendar dates, never from "about 19 days from whenever".
+calendar dates, never from "about 19 days from whenever". It is the only `setSystemTime` call in
+the whole suite, which is a measure of how much of the code takes its as-of date as input instead.
 
 Two habits follow. **Prefer the domain shape to the timer shape**: if a function can take the
 as-of date as input, fixtures become literals with no setup to forget. **Pin holiday and boundary
@@ -161,9 +187,10 @@ does not prove a call chain. `tests/unit/supabase-server.test.ts` mocks `createC
 [`lib/supabase/server.ts`](/lib/supabase/server.ts) chooses to call them — the `accessToken`
 callback receives no template argument, a missing token throws `NO_CLERK_TOKEN_MESSAGE` instead of
 degrading to `anon` — "not an integration test against real Supabase/Clerk". The same holds for
-`auth-provisioning` (service client mocked), `sign-in-verification` (Clerk widgets mocked), and
-`sidebar` (React hooks mocked). Read a green mock spec as "this branch is written correctly", never
-as "the chain works".
+`auth-provisioning` (service client mocked), `sign-in-verification` (Clerk widgets mocked),
+`rqm-action` (scope, role, activity and the whole batches data module mocked), and `sidebar` (React
+hooks mocked). Read a green mock spec as "this branch is written correctly", never as "the chain
+works".
 
 Some `data/` functions are only partly covered, and the uncovered half is exactly the I/O half: the
 write-path flow of `importLearnersCsv` has no test at all, while its `domain/` half and its pure
@@ -185,22 +212,27 @@ pathname into an `x-pathname` header; the redirect comes from `requireAuthentica
 first statement of [`app/(dashboard)/layout.tsx`](/app/(dashboard)/layout.tsx#L12-L13). A move back
 to middleware gating — or a route group accidentally placed outside `(dashboard)` — is exactly what
 this catches, and it is rule 1's standing proof. It is *not* a journey suite: no signed-in role
-variant, no upload, no modal focus trap.
+variant, no upload, no modal focus trap. `E2E_CLERK_USER_EMAIL`/`_PASSWORD` are documented in
+[`.env.example`](/.env.example) for the signed-in cases still to be written.
 
 It needs Supabase env plus a Clerk **test** instance, so it is permission-gated: establish the
 environment with the operator before running it. [`.env.example`](/.env.example) documents the
-`pk_test_*`/`sk_test_*` pair and `E2E_CLERK_USER_EMAIL`. **Never point it at production Clerk
+`pk_test_*`/`sk_test_*` pair and says to use nothing else. **Never point it at production Clerk
 keys** — the global setup registers real testing tokens, and dev-instance user IDs do not exist in
-the production instance ([ADR-005](/docs/adr/ADR-005-demo-account-tenant-scoping.md)). Because CI
-supplies neither secret, an e2e run is always a local, announced act, never something a PR check
+the production instance ([ADR-005](/docs/adr/ADR-005-demo-account-tenant-scoping.md)). Because no CI
+job supplies the secrets, an e2e run is always a local, announced act, never something a PR check
 will do for you.
 
 ## Two gaps to know before trusting green
 
 **RLS has no automated coverage at all.** Rule 35 requires real-Supabase RLS and tenant-isolation
 tests with **no mocks** — two tenants, two users, prove user A cannot read tenant B.
-`docs/IMPLEMENTATION_PLAN.md` reserves `tests/integration/` and `tests/security/` for them, but
-neither directory exists, so every authorization claim in the wiki rests on reading migrations.
+`docs/IMPLEMENTATION_PLAN.md` §5.3 reserves `tests/integration/` and `tests/security/` for them,
+but neither directory exists, so every authorization claim in the wiki rests on reading migrations.
+Green means domain and mapper correctness only; **a tenant leak ships green.**
+[`tests/unit/tenant-scope.test.ts`](/tests/unit/tenant-scope.test.ts) is the closest thing to a
+tenant test and it is pure — it pins the JS selection layer, not the policies underneath it.
+
 Two consequences:
 
 - Any test that does call the hosted project walks through rule 36 (`[deny]`): no statement against
@@ -232,6 +264,5 @@ same way — it does not tell you the real client behaves as the mock pretends.
 ## Where to go next
 
 Rules 7–10 in detail: [Module Boundaries and the Data Layer Pattern](/openwiki/architecture/module-boundaries-and-data-pattern.md).
-<!-- openwiki: broken internal link [/openwiki/concepts/error-snapshots-and-honest-empty-states.md] file "/openwiki/concepts/error-snapshots-and-honest-empty-states.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-Rule 19's guard ordering and honest empty states: [Error Snapshots and Honest Empty States](/openwiki/concepts/error-snapshots-and-honest-empty-states.md).
+Rule 19's guard ordering and honest empty states belong with the snapshot union there.
 Rule 36 and the hosted project: [Live Supabase and Migrations](/openwiki/operations/live-supabase-and-migrations.md).

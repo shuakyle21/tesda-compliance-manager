@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:dd4afe822a9aff3dd6248287dcc41cf3d1324abd1864cb8582bca7e2ce80a907",
+  "pageVersion": "sha256:67d363f5a14f0db06dc908453d06cdb8301a78e10c0c16e097aea71adefc555e",
   "claims": [
     {
       "id": "claim_1090f681b531453080e48d31ee2a12d2",
@@ -70,15 +70,11 @@
     },
     {
       "id": "claim_86460d5d25b94ba596df1ce099f9478e",
-      "statement": "A `-- Active: <connection string>` header is the marker a SQL editor writes when a buffer is executed against a live connection, so it flags hand-execution that recorded nothing; two migration files carry one, each with two header lines.",
+      "statement": "A `-- Active: <connection string>` header is the marker a SQL editor writes when a buffer is executed against a live connection, so it flags hand-execution that recorded nothing; only one checked-in migration (`20260906114735`, twice) still carries one, because the neighbouring files were pasted without it.",
       "evidence": [
         {
           "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L1-L2",
           "version": "repo-lines-v1:sha256:95ad35ea21260c07acd8ef60f747cf7bc3e301db1f61548a398ef37ad5d8796b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJhNTYzZmQyN2YwMzE3NzJiZTcyYWZlZDJiYTE0M2RjOTdmNGI2MWU2YzM5YTVmNzk3ZDg5YzgyZWM2ODRhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk3M2Y5YTQ5Yjk3MTNmNTEzNDIyZmEzMjE0MjEzYzRiNzkzMzY3YTM0ZGZjODM4ZDUyZTZlMWJhOWM5YzQ2MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODYwOTNlZDczYmNlNTFmNTFiNjFlZDY3MTYwMThhNGNmNjE5MDRjZmQ3OTkzNTM1NjA5NThiNDc0NTgwMjcyMCJ9"
-        },
-        {
-          "resource": "repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql#L1-L16",
-          "version": "repo-lines-v1:sha256:97f8d34bae42f588ae48fa43f76ccea0c63d0db68a823918a981ffcfe79de142:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlOTJjY2QzNDE0M2YyYTZiYzA5Y2QyZWE1MGI5M2JiY2U1YTQyMGVmNzk0YTM4MDRhMzA1MzIzZmMxMTE3MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1NWFiNGVkMTE4NjUyM2ZhMWE2Y2JmNmE4YmRmNjQ4NmI4MDFmY2E1MjMyNDE2ODViNzI3MDU2ODlkMzJiYTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2ODhlMTRhYzhiN2MzZmNhMzcwZWE5MzdkNTQxZjMzMmU4YWRiMzEzNTc0ZWQwMDM4ODAyNWM5NWU0NTI3NzMifQ"
         },
         {
           "resource": "repo://supabase/migrations/README.md#L21-L23",
@@ -88,7 +84,7 @@
     },
     {
       "id": "claim_7d72973f1129444c9280b4243aa15dfd",
-      "statement": "Repair-recording — verifying an already-hand-applied migration's objects live and then inserting its version rather than re-running the file — is the ledger's documented compromise for drift: it records that objects match, not that the file reproduces them from scratch, and `20261111120000` was recorded that way after its objects were found live and an idempotent script (re)created the policies, trigger and indexes.",
+      "statement": "Repair-recording — verifying an already-hand-applied migration's objects live and then inserting its version rather than re-running the file — is the ledger's documented compromise for drift: it records that objects match, not that the file reproduces them from scratch, and `20261111120000` was recorded that way after its objects were found live and an idempotent script (re)created the policies, trigger and indexes, with the piecemeal route written into the ledger block.",
       "evidence": [
         {
           "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L1-L6",
@@ -102,11 +98,11 @@
     },
     {
       "id": "claim_1ec0a0f722d448e0b71fda5c03b01b3a",
-      "statement": "`20261024110000_add_dashboard_operational_fields.sql` is recorded ❌ and only partly checked: its `batches.billing_deadline` column is live, but the column comment and the partial index `batches_tenant_billing_deadline_idx` in the same file were never checked and its own header still says NOT APPLIED — so a push tries to re-run it and its objects must be verified by name and the file recorded first.",
+      "statement": "`20261024110000_add_dashboard_operational_fields.sql` is the one standing live hazard, recorded ❌ and only partly checked: its `batches.billing_deadline` column is live, but the column comment and the partial index `batches_tenant_billing_deadline_idx` in the same file were never checked and its own header still says NOT APPLIED — so a push tries to re-run it and its objects must be verified by name and the file recorded first.",
       "evidence": [
         {
-          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L38-L47",
-          "version": "repo-lines-v1:sha256:ab07bda1167a6ce98b063ae64e8ed62492785c3fe311509b88b9d7bc05ef0ee6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2MTA1YjQxN2YxOTU4OTRiZjUxOWJkZWQ3ZmNjNDc4MjhiZGQ2ZDdiMjczMTQyOTcyZDY0ZDAwMzI4NjQ0YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlODNiYjVjYmQzMzA1MDI5YzkyYzYzZmYxYzU5YjlhZGFlMWMzZGY5Y2VhYzExZTU4NDQ5OWRjMjAwOTM3YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViYjI3ZGI2ODhjYTVmNjQ0NzA4OThmOTY4YjAwODNjM2JlMDBmMGNmYWQxMzdkY2Q2OGFkNjRjODIzY2ViYzIifQ"
+          "resource": "repo://docs/adr/ADR-008-recorded-batch-billing-deadline.md#L38-L53",
+          "version": "repo-lines-v1:sha256:f69b7d66d611a872c245706b67c8012b28ea6ad6ecb041b1445d37d7621aafde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2MTA1YjQxN2YxOTU4OTRiZjUxOWJkZWQ3ZmNjNDc4MjhiZGQ2ZDdiMjczMTQyOTcyZDY0ZDAwMzI4NjQ0YjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkMTBhODk4MTZlN2MwMTI3M2RhNGNlMDMxZmZkNGYzOThmZjNmNzY2NDIyY2FjYTNhOTE0NmY3YTI0ZGZmMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlODNiYjVjYmQzMzA1MDI5YzkyYzYzZmYxYzU5YjlhZGFlMWMzZGY5Y2VhYzExZTU4NDQ5OWRjMjAwOTM3YjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://supabase/migrations/20261024110000_add_dashboard_operational_fields.sql#L1-L18",
@@ -138,7 +134,7 @@
     },
     {
       "id": "claim_f73aebe9eabe4bb6a7bccd41033a1aaa",
-      "statement": "Guarding every statement so a re-run is a no-op is the other half of the additive rule: `20261024071359` uses `add column if not exists` / `drop column if exists` and survives a replay, whereas `20261111120000` creates a table, trigger and policies with two bare `add constraint`s and is not re-runnable — which is why its objects were (re)created from an idempotent script instead of re-running the file; `20260910120000` likewise declares itself single-shot.",
+      "statement": "Guarding every statement so a re-run is a no-op is the other half of the additive rule: `20261024071359` uses `add column if not exists` / `drop column if exists` and survives a replay, whereas `20261111120000` creates a table, trigger and policies with two bare `add constraint`s and is not re-runnable — which is why its objects were (re)created from an idempotent script instead of re-running the file; `20260910120000` likewise declares itself single-shot and depends on the CLI or `apply_migration` wrapping it in a transaction.",
       "evidence": [
         {
           "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L49-L62",
@@ -174,7 +170,7 @@
     },
     {
       "id": "claim_a72c34cfc0934476b371716d7821f1e1",
-      "statement": "Mappers tolerate schema that is not there yet in two mirrored ways, and only the read side is currently guarded: `orEmpty` (`?? ''`) makes an absent `learner_details` join and a legitimate null both render as blank cells, and `row.billing_deadline ?? null` stops an absent column (which `select('*')` yields as `undefined`, slipping past every `!== null` check) reading as a recorded value — while `writeDetails` in the importer upserts `learner_details` with no absence check.",
+      "statement": "Mappers tolerate schema that is not there yet in two mirrored ways, and only the read side is currently guarded: `orEmpty` (`?? ''`) makes an absent `learner_details` join and a legitimate null both render as blank cells, and `row.billing_deadline ?? null` stops an absent column (which `select('*')` yields as `undefined`, slipping past every `!== null` check) reading as a recorded value — while `writeDetails` in the importer upserts `learner_details` with no absence check, so the import fails at request time wherever that table is not deployed.",
       "evidence": [
         {
           "resource": "repo://modules/batches/data/batches.ts#L258-L262",
@@ -256,19 +252,19 @@
     },
     {
       "id": "claim_8de89237413d47488865948ef9d1cf3c",
-      "statement": "`supabase/seeds/` is deliberately outside `migrations/` and runs automatically from nowhere: the files hardcode Clerk user IDs that differ between a development and a production Clerk instance, so as migrations they would insert dead identities into `profile_tenant_memberships`, the table RLS trusts most (ADR-005); `config.toml` points `[db.seed]` at a placeholder `seed.sql` rather than globbing the directory.",
+      "statement": "`supabase/seeds/` is deliberately outside `migrations/` and runs automatically from nowhere: the files hardcode Clerk user IDs that differ between a development and a production Clerk instance, so as migrations they would insert dead identities into `profile_tenant_memberships`, the table RLS trusts most (ADR-005); `config.toml` keeps `[db.seed]` pointed at a placeholder `seed.sql` rather than globbing the directory.",
       "evidence": [
         {
           "resource": "repo://docs/adr/ADR-005-demo-account-tenant-scoping.md#L26-L31",
           "version": "repo-lines-v1:sha256:b4b43b087f0212ca74a9aa2865a897999d212ed8cca5b0b7b2fb9e4ecaeb855d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjRjZGRmOTA3MDE3YWU1MjEyMWQ3YTEzZDA0YTU4ZjkzYzFlMDVjZjQ1OGNjMmZmMzdjYWQ4ZjA1MWJiOTMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJmNWVlMDBmZDE2Y2QzMGIxMGNmNzVmYjk2MzE2Y2UzYTk1NTNlMzEwNGJhZjFlZTYwYTFlNTljMDdlNDQ3MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE1OGE5MjMxZmVhOGIwMjk5ODYwNDgxNGU5YjkxZWFjYjIwNTJiN2JjOTk3ODgzMjdkZjcyMDBiZTBmYmNjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGM2MWNiMmNkNmMwZDIzNWMwZTQwODhjNjM2YzVmMTVlZjg0ZjkzMjhlMDhmODk3YTE2OWNjNzViMjIyNjNiNyJ9"
         },
         {
-          "resource": "repo://supabase/seeds/README.md#L1-L15",
-          "version": "repo-lines-v1:sha256:eac140808843fa2d86fefe9b704fa86d944b16d041cd355b0ba90da8c079f7fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYTE5NzE4MjIwNTMwYTI5MGMxZjA2M2RmM2RmYWE1ODMzMzJkM2RlY2M2ZTU4MWZiNTRiYzNhMGRjMWVlZjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZGY4YzRmOGI1MzE1NjZjMDgxNGFjZWJhN2U3NWI3ODUyYTc0YTM1YTYxYzdkMjZmMzZjODRjY2M2Y2JjZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyZjRmMjFjYmZkNzlhMjVhNzAwY2RjYjllZjE2NTdkYmUzNjU5YjQ1NjU1NDcyNDU3ZDZhMjY4ZDA2NzllYzAifQ"
+          "resource": "repo://supabase/config.toml#L71-L76",
+          "version": "repo-lines-v1:sha256:563fa2f8e6bc7a637d2c7445d3d86c558fb22c62892128c9793f6062a3a3d55e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTE2MzdjOGRhZWY3YjNjOGQ0Y2YzOTU3NmJmMzk2NDFmMWQ5YzQyOGVjNTk1MzViYjhmZTliZDE0ZjkzOWQ5YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDM1NjVhOTY4Y2JiZmE3ZWI3NTQxMjE3NjZhYWI0ZDZlMjI1MTkxNDkxYWUwZTJiYzYxMWIxYjMwODJhZmI1NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGU0NGI0MDY1ZDQwOGRjNjhkNDM5OTFlNGUxZmE2Y2UxM2QxMGE3NzViYzIwZWFkMjdjNDRhMGY0MTkyODM2YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjc3Mzc3NzI0YWFiZTVlMjc2YjIxMTA0MGNkNTI5NzZlYzg2NjNhNzkwMTAzZTBjNDYxYjQwMDJlNzFkMzAzMSJ9"
         },
         {
-          "resource": "repo://supabase/seeds/dev_profile_memberships.sql#L1-L23",
-          "version": "repo-lines-v1:sha256:d9f746352a242cea2012ef83e7d31a0632e64f333596fdb49555b5b7b94dd43d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1NzliMzc2NmNlYjY4MTRhM2QxNTM4Mzg5MDgxYzcxYmQ3MTlkNjc2NzMxN2YwMjI4MDdiZWE4NTA2NGI2NjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyYzVlNzdiOTdlNzY5NTQ2ZDk4ODE1NjBjZmEzMjZlYzIxZGQyYTNkNmUwNjQ0ZTNlNjI5MTc0NjgxZjA3YTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2MmZmNGVhNDlhY2ZmNTY3ZWIzYTE3Yzk3NzUzNjllOWYxZmM5ZGQ4N2M4NjJkNDgxZDdiZDUxNGUxYjdmODEifQ"
+          "resource": "repo://supabase/seeds/README.md#L1-L15",
+          "version": "repo-lines-v1:sha256:eac140808843fa2d86fefe9b704fa86d944b16d041cd355b0ba90da8c079f7fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYTE5NzE4MjIwNTMwYTI5MGMxZjA2M2RmM2RmYWE1ODMzMzJkM2RlY2M2ZTU4MWZiNTRiYzNhMGRjMWVlZjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZGY4YzRmOGI1MzE1NjZjMDgxNGFjZWJhN2U3NWI3ODUyYTc0YTM1YTYxYzdkMjZmMzZjODRjY2M2Y2JjZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyZjRmMjFjYmZkNzlhMjVhNzAwY2RjYjllZjE2NTdkYmUzNjU5YjQ1NjU1NDcyNDU3ZDZhMjY4ZDA2NzllYzAifQ"
         }
       ]
     },
@@ -313,10 +309,74 @@
           "version": "repo-lines-v1:sha256:a1ff515a0d8b8531c792fa633cbc1c40726d26dc61fb90ea7767e2ac9bed4464:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhOGNhZWI4MzkxMGI0ZDVmM2Y5NzBiNGI2NzZlODk2MjM1OWMwYmY5YThmZjY5NzE5YzcxNTc2NDYzNWM4YTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhOGJmODU4YTVlMWM5YWZlZmFjNzhiZDQ0NTBjYjAwZDI1MzljNTllOWYwODhiOWJhYmM1YTk0M2FkZWM1YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1OTY0NTk4NTExMDFiZjA1NDc1MzJmNmMzZWJkODZjYzg2ZDkyNTRhMjk1MzRlZWMwN2E3ODVkM2E2NDI2YTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0MzE3NDdhYjQxYWYwMmQxN2Q3YjFmY2UxNGNlODhmZDYzYmEwNGRkNGQxNDhiNWRlZDMyOTQ2M2Q1Yzk2NjIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_8220fdb2ef5a4673a6f3f4a5ea412bbd",
+      "statement": "`20260528160300_create_tenant_scoped_schema.sql` is canonical for schema and RLS but is also history: it is recorded ✅ with objects ✅, so a body-only edit to it changes the repository and never the database, and every later change ships as a new additive file (RULES.md rule 20).",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L68-L70",
+          "version": "repo-lines-v1:sha256:e0c9b14cc5e8439ad84c0a2b31ba31e5878b14774a8bbc2836b169250b353626:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGQ3MWFiMmY0NzIwMDIwNmY5ZGQ5M2JiZDM4ODhmY2UzMDM1ZThlOTQxYWU5ZGI5ZmY3NzRhZmJlNDYyYjA0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzY2QyODFmNDhmMmVhYzc2NzJmZDcxMDcxNTJhMjE2NmM4MTJkOTMzMjFmZDQ5NjE2ZjY5ZWZkMTFkNTBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJkZGZhYWIxMTk1NzMwZmVlMjE5MTBlZjQ3NzUzZjdkNmI0ZjBkOTUxZWUxN2FjMDMxN2U0NjE3YWJkMTE3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMxMjNhMjViYzk1YWM3OTZhZjg5ZTlmNDBkYTU1MDllZDhkYzY5ZGJlN2Y3NWJkYTg2YTRhYTJmNWVjMzY3MCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L3-L6",
+          "version": "repo-lines-v1:sha256:800e1330f75ea14034f435a2098474d0f5c459d49f683080a512d87ff1e5ad8b:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmYwODJlN2RmOWYzNDIxOTIyMDY3ZDdiMTBhZTgzMjg0ZTg0YTMwMTM3YzYyYzU0MjA3ZmMwZDhkMmFjMWE3ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzEyZTc2YjYxZGRjYTc5MjI1MjMzYWJjNDNjODJiY2MwMzE2OGYwZDBlMDhiMDMyYjdkYWRiZWQ5MWViMjg4NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjg3NzExNWQ4MjkyNDgwM2EzNzFlYzI0MjViNmQyM2Y0ODA0NDFmZGVjOTFkNTU3MDIyNmIwYmZmOGY1ZTIxMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWEzMDEzMzMwMWQwZTZkMTMyMzFlN2JlOTEzYzNiYTAzZmI5YWJlY2U0ZjQ5MjM2MWRlZjk4NzA3ODFiNzkyZCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L54-L54",
+          "version": "repo-lines-v1:sha256:cb1382aab951601e1b31a2f0f39748dc904e9cb351bb46e680019048f4c98f5d:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2IxMzgyYWFiOTUxNjAxZTFiMzFhMmYwZjM5NzQ4ZGM5MDRlOWNiMzUxYmI0NmU2ODAwMTkwNDhmNGM5OGY1ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2IxMzgyYWFiOTUxNjAxZTFiMzFhMmYwZjM5NzQ4ZGM5MDRlOWNiMzUxYmI0NmU2ODAwMTkwNDhmNGM5OGY1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzdlOTU1OGRmMmQ4M2EzMzI4MjA5Mzc3ZTI5M2U4NDUwOTg3YmNiNzhjZTRlZDQ3NzRkODQ0YjE0MjNmMDU5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2U5NzRjZjdjZGNlNDg5ZjkzMzgzY2EyNTdjZmM2ZWE2YjE1NzJkZDMzMzQwNzEzNTZlNDJkMTRlMTRmYWZkZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f51fc34db6314a4a8481443616dbc634",
+      "statement": "Landing a migration is one ordered pipeline whose second-to-last step is the rule 20 reconciliation — regenerate the types, then fix mappers and domain types — and whose last step is the local gate `pnpm exec tsc --noEmit` then `pnpm lint`; a new enum variant must fail compilation until a total bridge (`DB_TO_UI_*`, rule 18) is updated.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L61-L70",
+          "version": "repo-lines-v1:sha256:124ed79284937d74596b9733ed0471707ad9123e6f975b7a4bccc9b0c88a8887:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1ZTlkNDJjYTAyYmZkZDkyMTkzMTdlYzNiZDE3NzEwNTdlNWM4M2QwZTM5MGRiN2Y5YmZlZTEyZDNjOGFjOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1M2NkMjgxZjQ4ZjJlYWM3NjcyZmQ3MTA3MTUyYTIxNjZjODEyZDkzMzIxZmQ0OTYxNmY2OWVmZDExZDUwZGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjOWM2ZTViMmU0ZDNkNjU5YjM1NjgxZjU1YTgwZjllNjFmZWE0OTQ2ZjdkOTQ4ZDdlYWE0Nzk0Nzc4ODc1MDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczMTIzYTI1YmM5NWFjNzk2YWY4OWU5ZjQwZGE1NTA5ZWQ4ZGM2OWRiZTdmNzViZGE4NmE0YWEyZjVlYzM2NzAifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/README.md#L4-L6",
+          "version": "repo-lines-v1:sha256:fdef18c10823bc9e49a06500597a97e04c1e7bc167a041dd84d183bc12363a84:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGU0NjZlZGZjZjgyYWRhNmQzMTQ1ZTYzNGUxMTUzODExZDA2NGQ1OTg1NzVjNGM5ZTYwNDNlYTMwYmNjZTIyNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzEyZTc2YjYxZGRjYTc5MjI1MjMzYWJjNDNjODJiY2MwMzE2OGYwZDBlMDhiMDMyYjdkYWRiZWQ5MWViMjg4NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2JkOTVkZWIyYTY4NzMzMjE2ZjA4ZjRmZTM2N2YyNTY3ZWE4ZjA1ZWQ1OWFjNzgwNDg5MDFiYTJmYmFlZjA0YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWEzMDEzMzMwMWQwZTZkMTMyMzFlN2JlOTEzYzNiYTAzZmI5YWJlY2U0ZjQ5MjM2MWRlZjk4NzA3ODFiNzkyZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_07d4146f7b4341b7b9045b14965ac913",
+      "statement": "All three Supabase client modules import the shared `Database` type, so regenerating `database.types.ts` is a whole-file replacement that reshapes every client at once — which is why the type file is the first and only generator output in the pipeline and the mapper is where DB↔UI differences are absorbed.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/client.ts#L1-L8",
+          "version": "repo-lines-v1:sha256:20b16f0cd1fc64d2704d35ecd8e30cd8f4dcc8753bd95138c82b8528e23ea867:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzQ0ZjkwODk5MzZiZTEzZjI0MTQ1M2NiNmE3ZmJkMDQ5OTRlOGIwMmE5MDk3NDczMzMzZDljODY3ZDUyMWRkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQ5ODdlMDg1MzM3NzljYTMxMGIxNDM1ZGVhOTMzNDdkMDI1ZTdkYTc0OWJjM2RhMDJlNTg0MDAxOTJmZGM0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzNkMjdjNjNkYjk3ZGZiM2JkZGZlNDFiOTliMDY1MjQ4MWNjMThlYjYxYmJhNTgxMjg3YTlhYzExODNmNmU4MyJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/server.ts#L1-L3",
+          "version": "repo-lines-v1:sha256:cb931c56cc76c5d7e3d5f8f06d1fd12fb052c9357f63b70cf66b22a9e137656e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzQ0ZjkwODk5MzZiZTEzZjI0MTQ1M2NiNmE3ZmJkMDQ5OTRlOGIwMmE5MDk3NDczMzMzZDljODY3ZDUyMWRkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ2MWFkYWQ5Yzc2MTNhMGVlZjZmMjVmMDM5ZDUwYmM4ZDI0ZWMxOTljYmMxYzlmODJhOGNjMDQ3YWU0OWQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjUwYmI2OWZhZjA1ZGM3MzE0MDFmZDZjZTk4ZDY1NDUyMTY2ZDA1NmExZWM0MTVmYmQyMWI1ZmZhYjkzYjg3YSJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/service.ts#L1-L3",
+          "version": "repo-lines-v1:sha256:c20da8b75195d22333dbfebe39d4eb6820c1ffcd5a5014812500053a574ed039:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzQ0ZjkwODk5MzZiZTEzZjI0MTQ1M2NiNmE3ZmJkMDQ5OTRlOGIwMmE5MDk3NDczMzMzZDljODY3ZDUyMWRkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmEyZjg4ZjYxNWZhN2NjNDBiYWMxMmYzOTcwNDIyNzliNmM1ZGFkMzc3MDJkMzIxM2Y1YTBiODMwNGE0ZjU1NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9ad54d577fd3409fa50720f47c27badb",
+      "statement": "Data preconditions for a migration are written into the file as comments beside the statement they guard, because the whole file is applied as one transaction and a failing guard rolls back everything — so the comment is the only place a reader meets the checking query before the failure.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L56-L62",
+          "version": "repo-lines-v1:sha256:68f2b7beff10b0c0ea0f604ddb54cebb3ebdfc962e89a2d94f2914d6d7a11515:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODkyNTc5YzQ0NmI0NTY4NGJhNGFjNjE5NDBmZTc2MDUyNTUxMDBlMjY3NjdiNjM3ZjRlOGMyZjVkZjdmMThjNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTUwYTA3ZTEzMWI2MmRmYThjY2NhZTdjMzUzODI0NzI4NGNlNDg0YTdmODA4NWI4YzJkNWY4NTg3MDE4MGJjZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjIzMjA5Y2YyYTFkN2Y0ZTkxZDY2NzkxZTE1MzRhOGMyOTdiN2Y4OGQwMjQyYTE2OGQ1ZTJmZGU3YzEyOTM0MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTY4NThlN2ZkZWYxODQ0YjY4NzkyZjkzNzQ1NzIyNGY0ZDVlOThjMTc2MWFhYTY4NWY0ODM3MWI4NzVhZDZkOCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L128-L135",
+          "version": "repo-lines-v1:sha256:f232d505d663e73e36b727f8c7fe458c52a3651320e23936f764240fb385ada6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGRhY2ZkYzgzZDlhNTE5ZGQyNGNhN2IwYThlZTM0NWJkZjBjYjY0YjI3NzE0MzlkOTNkNjA1OWMxZDBjYWRhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QzMWQ1ZmZmZDY2NTc0YTcwYzVhZGIzODYxOWVlZTRiYWU0MWU1Njg3YWYzNTE3ZmM1ZWUxYzYxNTI5MDA5ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGQ5MTlhZmUyZjE4NjQzNWJkYWYxMTgwMTA0YzBkOGVhODQzMDRhMmE3MDhjMTdiMzE0YTliMDhmYTNmZTNhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

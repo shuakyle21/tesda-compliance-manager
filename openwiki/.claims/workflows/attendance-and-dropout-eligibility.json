@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:6d07e7bd60bd7ff243e8f97850ea8f96bea08babb87c865260d86f008f2fc986",
+  "pageVersion": "sha256:cc3c3fa20d3eb1e52498399755caa7729f51a00152185039caa0973a3baf4422",
   "claims": [
     {
       "id": "claim_064644ff33bb49e58ae20d72de85efc0",
@@ -469,10 +469,170 @@
           "version": "repo-lines-v1:sha256:e8478dccba67d9ff6721e628e25a4d1b41c9b3c68216d9cbc2b0a8290d075f0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYThlMTNjYjJmY2E0MGFlZjNiNTA0NzUxZmRhZDMyZGMyNWQ3Mzg5ZGZkZGYxZGM3NjI2OWMxNWY1Nzk3OTIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_227c8ce53d734ec69eb65927cc7ba392",
+      "statement": "The ADR-007 dropout rule has two independent triggers — absences above floor(total_sessions × percent / 100), or three consecutive unexcused absences — so an evaluator must check the streak even when the scholar is far inside the percentage and return whichever fires first.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L50-L50",
+          "version": "repo-lines-v1:sha256:9066475239c0118d2d6ab429769fc716cef0891c51c2527c1ece9c351b2747f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmExZTdhMWMwZDAxOGUwNzliNGRlMDljZjdmMTcxNzQzMTVmZDlkOWQ3NGU1MTZlZDMxM2NhMjM2MWZhZWE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjYwYzQ1YjQwYzFmZWRiZDFlNjliYTQ2ZDM5MGQ5NmQ0YjczOWExYjRkNmYyMDg1YjQwMDkxNTczNmQyNGFkNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_18b0be49e9ec4ad49aa4e6d8b927b835",
+      "statement": "The unexcused streak is computed over recorded attendance rows ordered by attendance_date, breaking only on a recorded present (or excused-absent) row, so an unmarked date between two absences does not reset the run.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L52-L52",
+          "version": "repo-lines-v1:sha256:052c488fabc243e8847f618b9d48579a50c2c3090aa6deb88571dc123c198116:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDUyYzQ4OGZhYmMyNDNlODg0N2Y2MThiOWQ0ODU3OWE1MGMyYzMwOTBhYTZkZWI4ODU3MWRjMTIzYzE5ODExNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDUyYzQ4OGZhYmMyNDNlODg0N2Y2MThiOWQ0ODU3OWE1MGMyYzMwOTBhYTZkZWI4ODU3MWRjMTIzYzE5ODExNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGRkZDE4MThkN2VjZTczMWVjYjE1Y2ZjNjJkMTlmMjYxZmQ4MTAxYjBlOTM2MDM2MzBkMWNhMDVjMGMzZjBkYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQ0MmM5ZGI0YzBkMmQ2NmNmYWQ2N2JjNWQ1ODhjZTMwNWVlZDA1Y2ViMmY0NjM4NGE3YzM1NzM1NTQwZGI3YiJ9"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L110-L123",
+          "version": "repo-lines-v1:sha256:e8478dccba67d9ff6721e628e25a4d1b41c9b3c68216d9cbc2b0a8290d075f0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYThlMTNjYjJmY2E0MGFlZjNiNTA0NzUxZmRhZDMyZGMyNWQ3Mzg5ZGZkZGYxZGM3NjI2OWMxNWY1Nzk3OTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_91f3e48477f74eb8a168a046b1a8ab84",
+      "statement": "Because no session-calendar table exists, a date with no attendance row is unmarked rather than absent, which makes result-order at the fetch boundary — not fixture data — the site where streak logic silently breaks.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L52-L52",
+          "version": "repo-lines-v1:sha256:052c488fabc243e8847f618b9d48579a50c2c3090aa6deb88571dc123c198116:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDUyYzQ4OGZhYmMyNDNlODg0N2Y2MThiOWQ0ODU3OWE1MGMyYzMwOTBhYTZkZWI4ODU3MWRjMTIzYzE5ODExNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDUyYzQ4OGZhYmMyNDNlODg0N2Y2MThiOWQ0ODU3OWE1MGMyYzMwOTBhYTZkZWI4ODU3MWRjMTIzYzE5ODExNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGRkZDE4MThkN2VjZTczMWVjYjE1Y2ZjNjJkMTlmMjYxZmQ4MTAxYjBlOTM2MDM2MzBkMWNhMDVjMGMzZjBkYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQ0MmM5ZGI0YzBkMmQ2NmNmYWQ2N2JjNWQ1ODhjZTMwNWVlZDA1Y2ViMmY0NjM4NGE3YzM1NzM1NTQwZGI3YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_64aba7f4bd8c4be58476574b321b99f4",
+      "statement": "The as-of date caps the streak walk and must follow the repository's established Manila-calendar clock: todayInManila() formats an ISO date through Intl.DateTimeFormat in Asia/Manila precisely because a UTC date runs a day behind in the schools' timezone, and it must be injected into the pure domain rather than read inside it.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts#L188-L194",
+          "version": "repo-lines-v1:sha256:7510a4b0e4bed2a33e3a3188a455616863f14bc25942d7867ac5f71d44f1e2e7:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFkMzc5N2IwYmJhZGE2Y2Y3MTNlNmQyMzhlMTQ0ZjI5ZjQzNzgwMDZkZWEzYjljMTAxMTY3OWExMzRhNjNlMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDU1YjRjNjM0OGJmMDRiMmYzODU1NjY5MjExNmU0Y2IyZTE2MmFjZDQ4MmU5OWY1YjZkNTBmN2YxOWQxZGRjMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTUyNzJmMmUwYzVkMjdhZmZjYjAzZmU1NTUwZGMyOTg3OTNmZDE3MzhjZGQ3NmRiNjM2MGU1NGM3NzBjMGRiMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjBhNzVjZjE5ODIxNDNmNWY5MDIwYzE3ZDU0YmNhOTgzYzgyOWVlYTkxM2Y0NzE3NDBhYjg3NDgzYTI2YTQ0ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b0a17060584346bba7f1fe547b0551e6",
+      "statement": "attendance_records.excused defaults to false and only suppresses trigger (b); the percentage trigger counts absences whether excused or not, so the excused default never softens the threshold.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L51-L51",
+          "version": "repo-lines-v1:sha256:f717e135d12c0044f1424d1e3fd78a445ee1629aee45da767bca8c7412f3a1f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcxN2UxMzVkMTJjMDA0NGYxNDI0ZDFlM2ZkNzhhNDQ1ZWUxNjI5YWVlNDVkYTc2N2JjYThjNzQxMmYzYTFmMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcxN2UxMzVkMTJjMDA0NGYxNDI0ZDFlM2ZkNzhhNDQ1ZWUxNjI5YWVlNDVkYTc2N2JjYThjNzQxMmYzYTFmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI5ODg3NmI1NGI0MzlkOTkxYTA5MjQ2Y2U1MzYzNGVmYmUzYmRjNjkwMDFmZmNiZDkxOGU3YThiYmZjZjhkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWRjNTQ1YjJjNGEyODg3NDQzZTVkNzQzMjM1NzRkN2NiZGFlNzYyOGI4ZTJlYWNhMzY4MWJiN2MyMjhlNWZmNiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L31-L44",
+          "version": "repo-lines-v1:sha256:104e077ad884c878fcc1cfd0c010ccc291479406740ff29423bee19ca1e7bd92:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNzM2ZDIwN2I2YmE0NWJjYjljMzMyYjc2YTg4YTM3ODU4MjM5YzM0ZGYxZmM4MzIyNWI4NDkwMDdmNmU4ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExZDNhMzUzODc2ZDA3MWNmYTRkMjY4ZWViMjJjNzk5NjllYmY1YjI5M2ZkMWIxYzlmZThhY2JlYjI3OWMxYzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxM2Q0MzMyYzE3NzVjMjIwM2JkYTk0NmM5YWFmOWJjMWMzMDIxODYzNzQ2NTM3ZmI1OWMzNDNjNzY1NTEzOTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjNzdkODc0MTAwMGM0NTE1NmI0MWRjY2VjOTBkMDM2MzI5YjVkOWU5ZWE5ZTJhMDExZWQxZDRmMzJjNzY2OTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc318918a1d4427598db4b4782dfe048",
+      "statement": "The threshold is resolved tenant ?? program, with tenant_settings.max_absence_percent nullable and defaultless so null inherits program_billing_rules.max_absence_percent (default 20.00, CHECK > 0 and <= 100); no shipped code resolves either column, so the precedence is design rather than shipped behaviour.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L50-L50",
+          "version": "repo-lines-v1:sha256:9066475239c0118d2d6ab429769fc716cef0891c51c2527c1ece9c351b2747f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA2NjQ3NTIzOWMwMTE4ZDJkNmFiNDI5NzY5ZmM3MTZjZWYwODkxYzUxYzI1MjdjMWVjZTljMzUxYjI3NDdmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmExZTdhMWMwZDAxOGUwNzliNGRlMDljZjdmMTcxNzQzMTVmZDlkOWQ3NGU1MTZlZDMxM2NhMjM2MWZhZWE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjYwYzQ1YjQwYzFmZWRiZDFlNjliYTQ2ZDM5MGQ5NmQ0YjczOWExYjRkNmYyMDg1YjQwMDkxNTczNmQyNGFkNiJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261024071359_adr007_attendance_dropout_rule.sql#L60-L91",
+          "version": "repo-lines-v1:sha256:14065ea01b21a7f7ccd1a3c7584a89021c96442beced26db962546e8774e9a3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNWIwYThiOWYzYjAzYjhmN2YyMzQwMmY4NmViODkwZmE5NDYwYzU4OGViODU0OWQ4YzdiMDczOTIxMTQyY2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5OTcyNmRiODg1MTg5MWFjZGFjMTExYWE2MjdlNTliOThhZmE5Yjg5Y2I4MWUxNmE2NDk0NmUyNWE3MmUzZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3MjRkYTFkNzQ0ZjQzNGE5YjNiZGM3NGJiNWE5ZDc0ZjFkMzEyMDJjZWNmYmQ0NmIyMzFjZTA5NDg0YjNkMTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjYzA5YWJhMjYzN2MwZTJjMmQyYzMzMGMyZWJkNTM5NDUzY2E5NmIyMmEzZDE1YTFiNWU1NDNlYWRkY2EzNDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_19dd8afa243948efa865ed6eeb021318",
+      "statement": "The floor makes the percentage trigger vanish-friendly at small batch sizes: on a 1–4 session batch floor(total_sessions × percent / 100) is 0, so the first absence drops the scholar while the 3-consecutive trigger is still unreachable.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L56-L59",
+          "version": "repo-lines-v1:sha256:560cdd3b18203efb9623de09f69fda12b4be263c5a09a7ffa7fc23832555bc54:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmVkNWY2ZjQyN2Q3MDEzYmU2MjEyMWMwNjFhZmUwYTUxYTgwYjM1MmQ3ZTkyOTIwMjdjNzNhZTRjOGE3ZWZkZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjlhYzliYWQ0N2E2ZjFiZDBiMWFhMWI1OGFhZjRiZDZkNGNjMmZhNzBiMjM5MTc1ZDkzZjkyMzVhZjljYjZlMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWQ0MmM5ZGI0YzBkMmQ2NmNmYWQ2N2JjNWQ1ODhjZTMwNWVlZDA1Y2ViMmY0NjM4NGE3YzM1NzM1NTQwZGI3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2U3MDVmMzg5ZDRhYTgxMDU3YzYzYzQ3MzI2ZjM1ZTdkZWU4YWNmYzI1ZTA5MzYwNGU0NDFmYjgwYmU3YTNiMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cff0cb4b98a348b0822d7592e3f1b3c5",
+      "statement": "The migration shipped additively under a version string its filename did not originally carry, and the migrations README instructs renaming the file to the recorded version so db push cannot re-run it against a database that already has its objects.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/README.md#L70-L83",
+          "version": "repo-lines-v1:sha256:92758769f0ff84264ba44f7421efbebece6a1f5157e578ff9ae22a62f1326824:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZDcwYzI4MDQwOGIzN2UyNDJjOTRlYWM5MmMzMDhiNjdhMmUzMzZmZWRjNDM5YmIwMThmOGVmODVmMzZiMzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0NDI3NjlhNThjZTU0NWNjMzA2ODBlMTQ4MmFjMGZiMzdmYzUyZTlhOWQ1NmViMmM1NjhlN2QyOGVlOWNjYjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc3ZTk1NThkZjJkODNhMzMyODIwOTM3N2UyOTNlODQ1MDk4N2JjYjc4Y2U0ZWQ0Nzc0ZDg0NGIxNDIzZjA1OTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1YzcyZWY2MzI2ZDk3NWJkNmE2MTU5YjBiMDQzNGI1MmU0MDA3YjU0YTVjMDA1OTNlMTlhNjQ1M2E0YjM1N2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bcb471910815423aa3a8b93fbee3aec5",
+      "statement": "The ADR-007 migration's objects are recorded as verified present live by name — both max_absence_percent columns, attendance_records.excused, the absence of max_absences, and all three column comments.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/README.md#L85-L93",
+          "version": "repo-lines-v1:sha256:bdd0dc7e6990c87ec7672090b927faf8cf9570cda11f69df93bf45b7308d4273:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWNiNmJkNmYxNDE0YjI1MWE5ODIzNTY3YmJhZGU0NmQ1MzIxZmU3NTMzZTk4NTA2MzNkMjhjOWM2YzQ5OWYwZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQwZjRiOTI5NzM1ODJjNDY3ZGE4OTM5ZmQ5YWM4ODdmZDAyYThhODFmMjMwNGJkODMxMGQ3NDgzYTg5ZjhmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjIyZTczMmFkMDlhOTY2YzBjZWQ4ZWUwNTRlNTg3MWRkNDcwZTExNDM1ZmQzY2MyNmI3Y2ExMDExYzJhOTQ0OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGM2MzNhYjU2Y2Y3MTA4ZGUzMjdiZmY1ZDI3NThmZDY2ODBjNjMzZDk2ZjkzZjc3OTU3Nzg0MWE2Y2U5ZjI3NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_017a52b2f3df42bfa1d1f6bcf09e2be2",
+      "statement": "The existing attendance_records INSERT and UPDATE policies admit can_trainer_write_batch(batch_id) or can_manage_tenant(tenant_id) while DELETE is can_manage_tenant only, so a trainer corrects evidence by updating present/excused and recovery of a write path requires authoring its own activity_log event because no trigger writes one.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-007-attendance-based-dropout-rule.md#L54-L54",
+          "version": "repo-lines-v1:sha256:28ffd850a6ffb5c1ba996e769ac3634def466ef8981bbb1c7f44767c70a4bb33:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhmZmQ4NTBhNmZmYjVjMWJhOTk2ZTc2OWFjMzYzNGRlZjQ2NmVmODk4MWJiYjFjN2Y0NDc2N2M3MGE0YmIzMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhmZmQ4NTBhNmZmYjVjMWJhOTk2ZTc2OWFjMzYzNGRlZjQ2NmVmODk4MWJiYjFjN2Y0NDc2N2M3MGE0YmIzMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjYwYzQ1YjQwYzFmZWRiZDFlNjliYTQ2ZDM5MGQ5NmQ0YjczOWExYjRkNmYyMDg1YjQwMDkxNTczNmQyNGFkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWI1MDQxODU1NDc2MWIxZmY5NjBiODBkNzgzNGRlZTZlZDEzMWJkZjI4YTJhOWVmOWMyNGVhZDc5MmJkOGU3ZCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260910120000_add_adr001_billing_domain.sql#L474-L503",
+          "version": "repo-lines-v1:sha256:5339a628e1779094893ee2fcec8ecfc582fe4fbd4ab742bf4d612ac5fa32f882:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhNDE3MmM1N2MxNmY3OTUyNmNiZGZjM2ExZmJlY2U3N2Y1YTAzYTkzNTFkYzAyNzUyNWI2ZjJjNDY0OTRmNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlZjNlYjcxYzA1MzM1MjhmNWM4NGE5OWRiZGI3MjE2YzA3OGM2NDhlNDdhNTM0Mjc4ZGM1YzE5ODFjMDQ2YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkMjJhM2VlYTJiNDUyYTZmNmE1ZWU4NzA4YjYzZTUwNDcwOWUwOGQ2MWU2ZDA2ZDA3ZTZiMDcyMzU1MmMxYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4ZWQyNTc5MzE5OWE2NDVmYzM3ZWZmZDFiN2JiZDQwM2U2OTE2ZWVmMDQ2YjAwMmM3ZDg3ZmY1OWZmNGJjODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f9896edbc7444d749b8ff21c0eee2a03",
+      "statement": "The table's uniqueness on (tenant_id, batch_id, learner_id, attendance_date) forces a re-mark of one learner-date to be an UPSERT or merge rather than an INSERT.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql",
+          "version": "repo-file-v1:sha256:ac47eea2061988a695bdf7e4e09fbce960c19f14158cf711679f8520294fa12d"
+        }
+      ]
+    },
+    {
+      "id": "claim_ad9f478f08054f74817fbddea1f3f8ac",
+      "statement": "No test pins the eligibility side: tests/unit/batches.test.ts covers only distinct-date counting and its null cases and tests/unit/dashboard-domain.test.ts only the null/cap and KPI-average behaviour, so the ADR's 45-session worked example, an unmarked-gap case, an out-of-order row set and a post-as-of marking all need new fixtures.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L179-L244",
+          "version": "repo-lines-v1:sha256:b82d06f4bb08a56f5977fa05f93f79f5427e9e501479c284f972740a9d45c1b4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxMzRlNzRjNWJmZmY4YWE0YTVjZTRhODU2ZWE0MTI3YjNkZDYwMTg4ODc1Y2QxZjQ3ZTFmYjkyMDZiMTk3NTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3ZWFhY2NlNjc5ZTA2MWU0NTRlNDE0MDQ1YmM3YTJiMThkZjIwY2E4Njg2MjZmOWUwY2ZiZmM5YTMzNjM1YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzNWQzNGZiYWMzNDEyMDNlNmU0ZjNjYTNiMDlhY2Y2MTIzMjQ0NDIzMWE0MWZkYjc1N2M3Njg3ZTAxZGEzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5ZmNmZGUwODgzOTNmMmU3MDA3YTRjNGU2MGQxODgxNzljNmVjZDQ1ODNjNmVlZTQ1YmRhODdjNDI4ZjI2YzAifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L144-L202",
+          "version": "repo-lines-v1:sha256:a1c7281f3c07df151e1d566df3b567787966973c4ee7da7426209aed3999b7cb:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAwZWQ4ZjFiMjI2ZTU5YmYxN2ZlYzA0MDE3MDEwNmVmOTY5NjExZTE1ZTE1ZTRmM2FkZmUxZDBiYzkwNTBkMjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhY2VjYjQ1NTcyN2ZiMjYwODc3NzgzZGNmOGFjZjgxZTAzYWNlNDUwMmJjYjQzNjAyYzFjZGY4MzM4ZjVlYTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2ZTdlZTc1ODY2ODkzYTEyMjM2OGZjOTBmZDk3MjliN2FjZmE1YjczYzlkYmNhNjczNzgzZWU2NzFmZDgxNzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_85c034475a974271b1122eb7e7970395",
+      "statement": "The locked dropout fact sits in RULES.md's locked-domain-facts list, which is framed as constants code must not contradict rather than advice, so the ADR-007 wording supersedes the retired flat ≥5-absence rule in the same place.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L162-L167",
+          "version": "repo-lines-v1:sha256:faefc2c3d00d1e93f9459cf42c33086c7f700983e7b4f870ec4604d07f68b88e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ1ZGU3YzIxY2U5NzQzZjZjZWRjYjI0ZTg2ZTZjYWFkMDkxOWZlODRlNTAzZWNlMGU5ZjQzNTc4YTM5NmVmYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE2MDZiNWM4OGI0YmVjMDI1N2Y3YzU5NjQxZTM0YTM3YzI0ZGE3ZTYxMTg5NTZkYzJlMzVjOWQ0NDlmM2I3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzkyOWI1YjgxNjNlMTJkNjUyMmQxYjAyNGFjZDEzOWQzMGE0NzU2ODZkMmE4NWI5YjkyNmM4ZTI5NzliYjA2MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cd4deebdf8c440fab559c675f644ae71",
+      "statement": "learners.is_active is already typed in database.types.ts even though nothing reads it, so the type file carries the dropout output field while omitting both ADR-007 columns and the whole attendance_records table.",
+      "evidence": [
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L355-L370",
+          "version": "repo-lines-v1:sha256:c3b0ec536f44612595b8976076f54f9be7f4becb3576ee01c21dfefcb6e898c0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhYWNiODE3MjUxZTdiMzUwZTMxMzFkNTY0MzlmOGM4MDJjNWEzYmM4NmFjZDA3MzZjOGQ0MWZjNmY0MGYwMTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1Y2RlZjgwODVhZTc0YWI2MzZkNjQ1OWY1YzZkNWZiZmIwZGIyNjRmMWIwZDc1YmFjNTE5YzliM2Y2NzE3YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFjOTFlMzY2ZWQ3ZGU5YjhlYzZkN2I3NzliNTE5NGY4NjM5MTY5MGNkNTY0ZDI0NTgwMDhkMmYzZjIxYTAxOWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkMmUzNDVjNzU0NGE0ZTE1NzA4ZjU5NjY4NTc5YWM0NzgwNjk4MjY3NTIwZDg5OGM3MTQzNjdkZDJmMjE3ODEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

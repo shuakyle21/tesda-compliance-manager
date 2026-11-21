@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:c5f7f0cb1bbaa479f3cca026491867dbeb5afc3bb6a24ec38358d61a8e879c4d",
+  "pageVersion": "sha256:1589a371d4ae5833071db19fd35bf29fceee25e9c2009670245bb92885ad475a",
   "claims": [
     {
       "id": "claim_3dec0b941769449991349e1035245b1f",
@@ -176,15 +176,19 @@
     },
     {
       "id": "claim_b7f30a1f4d354a458d87c64f06278494",
-      "statement": "The admin path writes `is_default: false` because its client is RLS-scoped, so an empty membership list means 'none this admin can see' and trusting it would create a second default row; `mapProfileRow` falls back to `memberships[0]` when nothing is flagged.",
+      "statement": "The admin path always writes `is_default: false` because its client is RLS-scoped, so an empty membership list means 'none this admin can see' and trusting it would write a second default row, which the schema permits; `mapProfileRow` falls back to `memberships[0]` when nothing is flagged, so the only writer of `true` is the service-role webhook path, where an empty set is the whole truth.",
       "evidence": [
         {
-          "resource": "repo://modules/tenancy/data/tenancy.ts#L80-L96",
-          "version": "repo-lines-v1:sha256:b345bd00d7b3fbafbdd1010857e06e4cf7af2ac77d2fb89661f9a570078bb591:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYzY0NTk5ZGU1OWE2Mzg4MGQxMWY0N2JlZmEyYjdmMjYwZDYwMGZjNTVlMzAxZDI5NDNjYjA0NDYxODQ0MDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZjU2YjM3ZjEwMzkzOTQzOTc4OWZmNzRmZTAyNzVkNzhjOTA1Mjc1ZDJiZWRkNWI4YTJkMGRjYjE3ZjE1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkZDVlYTM0ZjQxNzIyMWI0MDM5NmViNTE0YmQzYjMwNDQ2OWUwZmYyMmUzNTNkNjNlYjI3MmJhMDAzYzQyYzcifQ"
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L80-L97",
+          "version": "repo-lines-v1:sha256:9d9b751d8443c8283226d39e778a729faccdf60570aa79ea23741d05bd835940:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYzY0NTk5ZGU1OWE2Mzg4MGQxMWY0N2JlZmEyYjdmMjYwZDYwMGZjNTVlMzAxZDI5NDNjYjA0NDYxODQ0MDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZjU2YjM3ZjEwMzkzOTQzOTc4OWZmNzRmZTAyNzVkNzhjOTA1Mjc1ZDJiZWRkNWI4YTJkMGRjYjE3ZjE1NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkZDVlYTM0ZjQxNzIyMWI0MDM5NmViNTE0YmQzYjMwNDQ2OWUwZmYyMmUzNTNkNjNlYjI3MmJhMDAzYzQyYzcifQ"
         },
         {
           "resource": "repo://modules/tenancy/data/users.ts#L279-L303",
           "version": "repo-lines-v1:sha256:04cf154f30a861d5f1e486802916d05f9749821440ade017645ed8d58a7d1c24:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkODQ3YzA1ZThiNWU3YTkxYTFiOGU1ZWQyMjU3NWNiODk0YzQyOTg2YTE3YWJmOTY2N2QxMzhhNGNlN2RhY2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4OGExNzc3YjZhN2EyN2IxZTI4N2IwOThmMjJkZmIzNWJkYzYwMTIwYjU1NTRjMDZjODY1MmZkMzEwNzMyYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkNTM4ODVhNmZhNWJiODExZWQ0MGEyOTgwYjVkODI2ZDc5ZWRiY2I2NmJkMjM4NDFkM2ZmZjIxOGZhNDk3NWYifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L83-L90",
+          "version": "repo-lines-v1:sha256:f2476b4f5834f3c90440515156da9c3894cd60ece69760c190d1ffb00f783775:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQ2YmIzYjllNDJkZGUxNTFmMTg1NjA3YTNjZTQxNDAyODBhNzViOTgyY2ZiMGU1YTc4ZWQ5MDM5MmYzMDA5NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDk5NjdlYzFlZDM4MzZmOGViMTdhZmYxNzJiNWJmZWY3ZGU2MDQ4NWE0MzljNmNhMTFjNTkxZTE3NTU3MzlhZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTE2NWRlYjEyNzZhNTMzNGNkMzczYWQzZGIxYmY1YWZiZDlmYThmODU1OWUzOTFmMjMwNjBjYmQzZDM2MDI5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWJkMmU1NWUwOGViODM5ZWYzYjU1MWQxN2VjMTI5OWQxYTFjYTRmN2IxMTIyNmI2YmNlNTBmNjFiMjM2OTBiNyJ9"
         }
       ]
     },
@@ -215,10 +219,66 @@
           "version": "repo-lines-v1:sha256:79a109dbe335ee807a2cef51558aa8b11e7e16fa30740f2d5fdc157e11b1db44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMTE0MzExODcyZjQwNDg0YzgzODc1M2M1ZWRjYTE3YzU0NDU4MDg4NmIyZTY4OTMzNmI5NmMyNGQ5YTNiMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMzQ2YjNlYzhlNDY1Zjc5MTMzZTQxYjU0NzdhNzRkZGNmNTc3YzE1YjNmNWUzZDczOTRhOTEyZDE5Zjc0ZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5YzU2Mjc0ZGRkZjc3ZGNlNzlmMjA0NWZhYTQ5ODUxZjBlMDNiMjNhNDRjYzNhOTU3Mjk0YzMxZGI1YTYyOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNjc2NGQzOTUxMDhiNDE4YmI3OTMzODQyNjYzYTc1MmUxZWU0MjlhYTRhNTNiODc1NDkwZjIzYzJiZGZmN2EifQ"
         }
       ]
+    },
+    {
+      "id": "claim_aa4b91e0e62746d9a621ba4e8b28959c",
+      "statement": "A self sign-up with no admin reach is left as a profile with role `viewer` and no membership; because every RLS-scoped read then answers with a successful empty set, the verdict must come from the profile, via `deriveTenantAccess`/`tenantAccessOf` and `withTenantAccess` (which rewrites only an `ok` snapshot) folded in at the route — never derived from the returned rows.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L46-L52",
+          "version": "repo-lines-v1:sha256:3bd54eb3ce3abd91968177633f92cd611ea4d7a60b06b84658d5fbd7b3b4fa3b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTIxYTM4NTdiMDI4OTgxODE1MzJmNmFiYTNhNDQ1ZGEzZDVlZTRhNTA3Yzk0NGE0N2Q4N2IzMDBmZTEwZjA0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWZiYjc5N2Q5NjU5NWE2ZjkwNTk0ZDNjNDFlOGRiNzk4OWRlNDU0NmI1NWQ5N2NlMzQ1MmY2NTNhMWRkMTQxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTM0N2I5NjIxZTRjZjE1OTI0OTE2YWFkMzBhNzNkMTgyN2M2OWI0ZjliNWFkZjAwNTRjZGE3NDE4MzMxYTNiYiJ9"
+        },
+        {
+          "resource": "repo://modules/tenancy/data/tenancy.ts#L158-L178",
+          "version": "repo-lines-v1:sha256:77b32c203405015811fb61213eb97b9505a46b1773a7effd55d39b7bf3c687eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2YjllYTg1MTUxOGMzZTA1ZTRiZjBhY2Q4YTJiZThkYzgwOWU2NzU5MTljOTIzYzM1NWRlNzBlNGIwMDUzNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://modules/tenancy/domain/access.ts#L53-L58",
+          "version": "repo-lines-v1:sha256:313c3475fa093d96a3eb97d6bba5c2321c1b950be7400caaa43fdc7eb8a4af50:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDFlODgxMzFjMTk4N2I0YTIzNTc5MmY5NzI4MmUxZmViYzVjNWU3YTkyZTVmODJjMTQxNTA0OTFkYThmYzliYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWFkYWU1YmZlNjQ3MmNmNzRhODJkZTRkNGI0ZmJiZTZkMGRjMGFiZmI5YjAxYWNhZDM2NDY1NTA5ZjUzN2IxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cdcf7c37fbe5465d9ce6bc4b397c5b4b",
+      "statement": "The tenantless verdict is operationalized by `resolveRouteScope`, which collapses a profile snapshot into `ok`/`not-a-member`/`no-tenant-access`/`unknown`; the `/t/[tenantCode]` segment layout renders every non-`ok` arm while the dashboard layout only passes a null role and empty tenant list to the shell, so the access verdict is never policed by the shell layout.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/layout.tsx#L24-L35",
+          "version": "repo-lines-v1:sha256:5da07ec8be2724f22021a86de98cce6e470654e2cd7bd6e4252b7ccd41391c03:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkMjg5MTAwNDlhZDQ5NDI3ZjNkMTMyNDQ3YWU2YjEyNGUzNWRjODUyOGQ0MzVlY2ZlNjYzMzlmOTA0NmI2MjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiNWFiMjIwZmU0YjdlNDQ4YmE0ZmI0M2FjYjQ4OTUwOTc3ZGJhZDU3Njg4ZGRhNTU3MDIyYjA0Y2ViYWY0ZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxYzAxMTlkZWFiODEwNzM1ZTYyMjM2ZmJiOTJmNzY0NzM0ZWY2OWMxYjZhYzI4ZmNmMzczZjExOGI2ZTAwMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViMmFlNTllNjZjNzExMDI0YzBhNjYwZjJkOGI0NzdmOGFjNTkzM2VkMjBlYTAwNmZmNTdlY2ZmZjQwMjFmMGYifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/t/%5BtenantCode%5D/layout.tsx#L26-L49",
+          "version": "repo-lines-v1:sha256:16a8ba3aacef1ccd9d2682589015ad5a86a1b753375609339eb2e9e123750f24:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhM2Y3NTIwNjVkN2Y4NTIzNWUwZmJiZjFmY2M5Nzc3MzY5NjcwM2U3YzBmMjBiNzk0NjE1ZDYzODdmYTRhZjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ZmEzZDNmZjc5OWM0MWE5MDVjYWJiOGZkYjNlZWNjN2U0OWMwMjQ3YzUzNGU0NDIxMDE3ZDYyZmQ1MmQxMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://app/(dashboard)/tenant-scope.ts#L46-L52",
+          "version": "repo-lines-v1:sha256:3bd54eb3ce3abd91968177633f92cd611ea4d7a60b06b84658d5fbd7b3b4fa3b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTIxYTM4NTdiMDI4OTgxODE1MzJmNmFiYTNhNDQ1ZGEzZDVlZTRhNTA3Yzk0NGE0N2Q4N2IzMDBmZTEwZjA0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWZiYjc5N2Q5NjU5NWE2ZjkwNTk0ZDNjNDFlOGRiNzk4OWRlNDU0NmI1NWQ5N2NlMzQ1MmY2NTNhMWRkMTQxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTM0N2I5NjIxZTRjZjE1OTI0OTE2YWFkMzBhNzNkMTgyN2M2OWI0ZjliNWFkZjAwNTRjZGE3NDE4MzMxYTNiYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c331983dd9c4e40bfd1452ccde204f5",
+      "statement": "`/users/new` renders a distinct empty state for every guard it cannot satisfy, including an admin who belongs to no school, so a denied operator never receives a form whose only possible outcome is a denial.",
+      "evidence": [
+        {
+          "resource": "repo://app/(dashboard)/users/new/page.tsx#L58-L131",
+          "version": "repo-lines-v1:sha256:078b081d7d62f6c72aec06208e369bcefd03e03a7a9e95363eeed4a65fdfc2f1:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzNzA3YzM4NzgyZjgzZTZkZTM0OGVhYWQwZTAyMTRiOWYyYmU0NjU5NGQ3NzE3MWNjYjU3MmU2Mzk1YzZmOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0ZTNiOGJlOTczMDM2OGNkZTFhMTMyZjc3ZmMyYTFkYzdiZTQ0NzgyYTBiZTQ1MGM1OTFjZjQ3MzEzM2M1MTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNDFmYmIzMGMyZjc0MmUwMDJkZDc3YjI3NmQyMzM3ZGExOWZkZWY1MGExYjE3YjAzYWQ0ZGRmYmVlZjdiNGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3203df48acc744f68b2e56b13f2a7941",
+      "statement": "The platform-admin first-member seat is guarded by a sibling SELECT policy: because guard 2's `not exists` subquery is itself RLS-filtered on `profile_tenant_memberships`, an operator who could not read an existing membership would read the tenant as empty and seat into it anyway, so narrowing that SELECT policy silently weakens the INSERT policy.",
+      "evidence": [
+        {
+          "resource": "repo://supabase/migrations/20260906114735_add_school_registry_and_platform_admin.sql#L329-L357",
+          "version": "repo-lines-v1:sha256:fe2c390a3936091ab428709f738aaf231bd656705d3701f83a6920189b78998f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzYThhYzRiYWFjOTU0ODM4MjExYzllZDUyMTA2OWY2OWRkN2MzNTE1ZTdhZTY4YWZlNjEwNzg2NGI3NTE5YWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkODg4YTMyNzdmOTkzOTU1ZWZlODI5MGE1MjAwOTAxMzljOTZlZjAxZGU0NzBlNWEwYTFmYjgxNmEzNDkzNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1MzkxZDU2YmQ4OTQ4ZjA1NGY1NWFjZjEwYTFlYjFmZTc5NWJkNmRjOTNkOWY2NGY5ZDJiOTVkNDZmNGY0Y2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlMjAzNWZlOWI1ZDllYTE1ZWQyMGNlNDI0NGI4ZTQ4ZjUwNmM1ZTRjYzdlZWJjZGJmMTEyOWIwZGEzMmQ4ODIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-17T04:33:34.390Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

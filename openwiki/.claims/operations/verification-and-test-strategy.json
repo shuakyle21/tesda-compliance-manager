@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:43d973b1376c5f4fc58327304c856cd63f6f3f20fc673c7894ac5091c0e16a0d",
+  "pageVersion": "sha256:517b0a24dad081d363653c45ac4c8bc384e34a5332d9fe2ff98eb58cbd605b23",
   "claims": [
     {
       "id": "claim_3161f57f9e3044309c9b4373865a42e2",
@@ -299,10 +299,102 @@
           "version": "repo-lines-v1:sha256:551b18c075a648752da7862776867b2d6a252455ee76944633fd500923b210b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUxYjE4YzA3NWE2NDg3NTJkYTc4NjI3NzY4NjdiMmQ2YTI1MjQ1NWVlNzY5NDQ2MzNmZDUwMDkyM2IyMTBiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUxYjE4YzA3NWE2NDg3NTJkYTc4NjI3NzY4NjdiMmQ2YTI1MjQ1NWVlNzY5NDQ2MzNmZDUwMDkyM2IyMTBiMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmE2MzRlNmE3OTFjNzcyYzE4MmEyMGEwMjUwNTIwZGIwZTdmNTBlYzA5YWY2NDVkODJmNWFiOGI2MTNkNzM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTg3ZTk3NjU1MTNjMWU3YmJlNzc5MDExMTI3Yjg4ZDNmNjUyZWY0MWM1YmE1MWRiNDAxODA5YTc4Mjc0OGM5MiJ9"
         }
       ]
+    },
+    {
+      "id": "claim_5ca46982d2484d2fa3afc9fee21f2eaa",
+      "statement": "CI's `ci.yml` is the repository's only merge-blocking gate: it runs a single `check` job on Node 22 (checkout, pnpm setup, setup-node, `pnpm install --frozen-lockfile`, then `pnpm lint` → `pnpm exec tsc --noEmit` → `pnpm test`), cancels superseded runs via a `concurrency` group on `github.ref`, holds a 15-minute timeout with `contents: read`, and needs no secrets because the unit suite makes no Supabase or Clerk call.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/ci.yml#L1-L43",
+          "version": "repo-lines-v1:sha256:344ac071ac6f32b5812eff267f1d05f8a1cf4c339d67299f771938eb0764ddfb:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2ZTFiMzJmYTA5MDc5YWUyZjAwMDFmZmYwZWNhMjdiNDk4NTk1N2Q0ZWI0ODU3OTI5YjNjZjA1OGZhYWU1NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhYjNhZDEyYjIyOWNmYWNiZWI5M2QwYjZjMjcxNzhhYjA2ZWRkYmEwM2EyN2IxMGE0OWIyMzczYmQ5ODE0ZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_30d135df229843bd8f93aaeb49fd6d0c",
+      "statement": "The other workflows do not gate code: `openwiki-update.yml` commits regenerated wiki pages, `claude.yml`/`claude-code-review.yml` post agent commentary, `stale.yml` closes idle issues, and `qodana.yml` runs the `qodana-js` starter profile whose `failureConditions` block is left commented out in `qodana.yaml`, so it reports findings without a severity threshold that can fail a run.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/qodana.yml#L1-L29",
+          "version": "repo-lines-v1:sha256:142d87354cf58b355977bb4eac4ad902e4f98e05f5c33427cab0df7d15f38c8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjM2QyMmU1YTJlYzZmOTU2N2MzMzlkMjk4NzJhYmUyNzBmN2QxM2FiNjY0ZjJjZTJhNjUxYzE1YjNiOGU4ODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxODY1OWQwNzUzZjk4MzQyZTNmMTJjMTYyZmZlZTdkZjJhNGZhMmQ3MGY0ZjAwOGZhYjkxNDQyM2YzOGU2NTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://qodana.yaml#L26-L43",
+          "version": "repo-lines-v1:sha256:29c6925de4c810248e1c081024016d390250a2d69320aab0067a446e213c23aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiYzM0ODNmNGJiZWFjNzUzYjA1NjVjYWFjZmRhNTMwNTc4OTdlYmM2NzExZGNhYjVjNGRiYzE5ZThlNTUxM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2MjQ0YWNjZGQ3OWY1N2E3OTY0YmI1ODQ2NWYzMzhmYTIxZTk0NTUwZTkwYjUwMDQwNTg5NGJmMzgwZDg2Y2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhNDgyNzZlZjczYWY5ZDlmY2Q3MGRjNTBmMDE0NjU0YjQzMzkwNWEwYTA0MTU4YjI1ODc0MDcyM2M2MzBiNmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0NWU4ZjczZTAwMzRlYThhZjI0ZDY3YjM3ZjYzZDg3ZGMyZjE1OTFmNjAyNjNjNjAxNjhmMTA4MmY3M2JlNjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1daba5ee72ab4c43b2d945fa5b790715",
+      "statement": "A green check says nothing about RLS: `tests/integration/` and `tests/security/` — the directories `docs/IMPLEMENTATION_PLAN.md` §5.3 reserves for real-Supabase isolation and security tests — do not exist, so green covers domain and mapper correctness only and a tenant leak ships green; the nearest thing, `tests/unit/tenant-scope.test.ts`, is a pure test of the JS selection layer.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L123-L128",
+          "version": "repo-lines-v1:sha256:53993c0c457e16701d630200c7a7fa76be2feafc73608bbd5bf44449fc159d77:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGQyYWE4ODYxZDUwMzdiOTIwZGU5MjMzZTE1NzE0MDNlN2FiMjZlNmUyODFlOTNiYjIyMGZjOTkwYmVkYmExOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWI0NGI2NTgzNzEyM2NlNTY0N2Y0M2QxZTAzY2ViZmIzMGRlOWUxOWIwMTMwMjk4OTViOWU2Y2E1ZjBiNjAwYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q1MDk4ODI2YjUwMjhkNjNhZTVlMTA5ZTVhMzNhZjg0NmZkZDNkNTg5ZTA1ZWIxZTE3YjYwZTJhZTE3ZGZjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgxNWEzOGU4ZDUwZDZkMjg0ZDk2NDFhYjgxZGNiY2FlYTAzYTFlMDE1N2RmN2QwOTRjNjMzNGNjNDAyZTNiMyJ9"
+        },
+        {
+          "resource": "repo://docs/IMPLEMENTATION_PLAN.md#L489-L497",
+          "version": "repo-lines-v1:sha256:7feb734727bc270a77e6a9d377de29afd43faa338487d3f30526222c284b31d0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDdjZDE5MDFjZTgwZjM2NDYxMjExNTk4ZWM2YmQ2ZmMyZWQ5NDkzODZkNjU2MTgwYjZhYTJjZmM0MmE5ODYyYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWNiODljOGU5M2M1YTIzMjljZmJiNWQ3ZTIzMzFlMGQ2MjZhYTZiMDYxYTAxMDA2Yjc5NjQ5M2I0ZWIxOGIyYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmYzNDA1OWZlZGJhOGY3MjhmNWMwZjRiMjgyZGNmYTBlMjc1MDNmNDliY2QzNThmYzNlYWI2NjMxNzQ4ODFjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQ5NTRmNTA5MTAzOGRhNzUwNWJjYmJlNGVjYzk3ZTQwMDJkMTliZDRmZTNlYTA5YTY3NGExZjhiMzgwMDEwZiJ9"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-scope.test.ts#L1-L28",
+          "version": "repo-lines-v1:sha256:01fa1c2e1c96824570c1915f1cbf91f9dac336b51f96b0aa1e961283ca18e888:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyZmM5NTFlOTljYWQwYTUyNmQ4YzNkMjdiZDc1ZTYxMWU3OWMwOTViZTRkOGEwYjk1ZjMzN2Y3NmU2N2E1NTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhmMjhhZDA3MjE4NTc1OGJlOGY5MGZjZjVjZWY0MjJhMDA3NzVjYzljNDdlZjhjMjc0MTM0OTkzYTRhYzMyZmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_abf4bbb672c94fa5b54ef82e212401a5",
+      "statement": "Each of the three loop steps defends a distinct rule level and ordering is cheapest-signal first: `tsc --noEmit` is the `[types]` force behind the total `DB_TO_UI_STAGE` bridge, `pnpm lint` is the `[lint]` force behind the `import/no-restricted-paths` layer zones, and `pnpm test` is the only place `[review]`-tagged behaviour such as rule 19's guard ordering gets a pinned check.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L12-L14",
+          "version": "repo-lines-v1:sha256:69abf87335d57549c3737d955f672b4a9d2b29d3173f426a2d9a73079e4ffb3a:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjlmMWU0MWQ4OGY0YWViZjhmYjY3MGE2MWM5ZTZhNjc4ZjRiYTYzOWZiYjIzMTIyODEyMjExZDg2Yzg0MTU0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI5NGIwNTgxZGI1ODc4OTg3N2IwOGY0NDk5ODM2ZTkxNDY4ZjFjNzY4OWU4NmFiODc5YjgyNmJhZmMzMjc2NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzE5MjFmYjg5YWVhYTA5ZmEyMDY1MGY2Mjc5NDMyMWNkMjIxYWFhODc5ZGUwZTE3YjE4ZTdiNzRjNWI1MWY3ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        },
+        {
+          "resource": "repo://eslint.config.mjs#L16-L48",
+          "version": "repo-lines-v1:sha256:7cf25b229c23bef6a0bf3f85f17bd1df54ac8237cc7afbd9d3ec30ca9abf0517:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmMDczMWQwNmMyNGRmZGM5ZjRjMTZlOTQ0MWI3OWFmZWMxZjQ5ZWVkOTAyNTA2ZTlmNGE5ZjJmOGUyZDc0MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhZWM4N2E0Mzg0NTMzODdmMDU1NGRiNzk3MjU0N2I0NjdmNGI3NmFhZmFiZDczMGE4YTE4OTRhOTc3OTA4OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmYjE4OWRjM2NhZjdmN2U4MTQ3YjEwMzYwZDNlNDMxMzUyZDVlMmVkNjIyMjgxNTc0OTc3NTYyOTI1NjVlNTUifQ"
+        },
+        {
+          "resource": "repo://modules/batches/data/batches.ts#L135-L178",
+          "version": "repo-lines-v1:sha256:38591bee68ed7562531a49f29b7e2c28eb50c8f1a0851dcbb65362edac8d66c6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjZDE5NTEzODhiYzc0NDhiYmVlZTk3ZWU1Y2NlOWE4MzIxNzBkNmJjNDc2NGIxMzVmZjFhNTY1MjVhYjFlMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmOGViNmViZWE4MDBiMzk4MTc1YWQyMjgwMGVhNDBmYTc0MjQ0OGZhYWQ0YTVmYTIzYWE3OTcxYTFhN2QyODgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhNTBlNGIwYWM5M2QzODY3N2E1NDgyMmQ5MGEyNDNjNWNhMTc4M2JmYTZjYzEwMmY0ZmU4NDQyMjJjNDNiZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlMmNhOWNiMTk2ZmVhZTZmMjJhYjI1NzM0ZWVhNjJmZGFlMDQ1YzdiZjFmMzY0NWFmNDZhMmY1NjA4NDkxYzIifQ"
+        },
+        {
+          "resource": "repo://tests/unit/tenant-access.test.ts#L92-L98",
+          "version": "repo-lines-v1:sha256:1169ad8be849100ddd2e73a9c437534e2d778c7ac35d07196753b71ceb9d06fd:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmFkOTlkYTgxNWU5YTNjMzg1ODc4MzAyMmZlNDRkNzc3NjJlMmMzMzQ2NzA5MTk2NDkxM2RiMjViNDczMjAzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmIyY2NmYTkzYmY5MGEyNDU0Y2E5MjNlNzQ4OTQ2MjZiN2ZiYTk0NzcwN2NjMzEzYmQ2ZjgxZDY5MjI0NTJiMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9cd59478cee844428e479b604210256d",
+      "statement": "`vi.setSystemTime` is called exactly once in the entire suite — in `batches.test.ts`'s days-to-billing block, hooked in `beforeEach` with `vi.useRealTimers()` in `afterEach` — because the production mapper is the only place a real clock is read; the rest of the suite takes its as-of date as input, which is the preferred shape.",
+      "evidence": [
+        {
+          "resource": "repo://tests/unit/batches.test.ts#L145-L159",
+          "version": "repo-lines-v1:sha256:c03c8d9ef7921b9b1e7739d2e8e6b953e2b7dec36282486ac8b09952a85e6f2c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzZTc4MGFlOWVmMDQxNGQ3MzQ0YzI1YTQwMjlhYzlhMDQxMzkzNWUwYjViYzJmYjUwMDJjMTUxYWIwMDVmNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3NmEzZDY4Y2E4MGEzMzJiODRlNWFhOWI4ZGFkMjk1MTI5NTgxN2M0MjBlZWZhYWQyYWVlOWYwODI1YjNmM2QifQ"
+        },
+        {
+          "resource": "repo://tests/unit/dashboard-domain.test.ts#L9-L43",
+          "version": "repo-lines-v1:sha256:827003718fe1c4d1dd4491ea747922864f4f5b8301dfc899561d5f1316b47fd9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzN2QwMjkzNjc1M2VlZWYzMGQ1YTcxNWI2NzY0YTUzN2VmMzRhYmIyYjViZmY2OTY2ZWI0OTJmMzE4MmVhNWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3OGZhZWZkM2ZlMmYxMzkwYTA5ZDgxNzU0YTllNDExNzdjODA0YjVmYjRjZWZmMmQyYTVmNDFlYzk4ZWU1NWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhNjZkMjQ3NTFhZDcwZDFhZTkxY2U2NmEyNGQwMWRmNmJkYmRkMWQ3ZWRlNGQ1NDJhNzg4ZWM0NTNjN2Q2NGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4ec125bf3e334358a66ad08f4ab51289",
+      "statement": "`E2E_CLERK_USER_EMAIL` and `E2E_CLERK_USER_PASSWORD` are declared in `.env.example` alongside a `pk_test_*`/`sk_test_*` pair with the instruction to use test keys only, while the single spec `e2e/auth.spec.ts` needs only the anonymous `/dashboard` → `/sign-in` redirect, so the signed-in e2e cases those variables serve are still unwritten.",
+      "evidence": [
+        {
+          "resource": "repo://.env.example#L1-L9",
+          "version": "repo-lines-v1:sha256:999832ddfbab819fea46e4a0fcadd71da941f150cf52d6b92707c54a9b70fc0e:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjFiN2ZlOWRkYWNkNGFiNzY4YTBlM2JhZDRjZjY3NTg4YTg0YmJjZjRlMGRmOTk1YmEwMWM5MjZjNjA1MmVmNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2FjYjBhMjg1MmQ0NmMyYzZhMmI2ODcyNzZkZWFhZTYxMmFiODhlOGU5Y2E4YTQzZWQ4MjliNDc0ZWYyNmE4MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://e2e/auth.spec.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:354cc9613971f6951b935075b765487af67f029e3f73f65347e21b273d60c53a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwN2QzNTAzNDY0YmQ4N2RlYzMxOTcwY2YxNWViNjk4ZDhjMmY5ZGJkZjFjMjBmMjkzOTJhYmMzZWEyMjA2NzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

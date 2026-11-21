@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:d447cd02b210e29bd275c92dfaa46f4d91c9aa9c5306183060ac2e676fbdb557",
+  "pageVersion": "sha256:81cb52e8fbb7dffedff25239e3339b45d0b8f648347230eda7669572b7f537e6",
   "claims": [
     {
       "id": "claim_6f9fd758088a42308e57f2fd9d391bc6",
@@ -205,20 +205,6 @@
       ]
     },
     {
-      "id": "claim_5e3b737b07d94fa594f9ff22790592e9",
-      "statement": "Migration `20261111120000` is APPLIED (its own header says so, 2026-11-11) and `database.types.ts` was hand-written from it and verified against the live generator, so the `learner_details` table and the partial ULI index are real schema, not a pending target.",
-      "evidence": [
-        {
-          "resource": "repo://lib/supabase/database.types.ts#L22-L28",
-          "version": "repo-lines-v1:sha256:e1708d9e1659aa283534f1762a6641bda3a402f7f0f6c61f99ef7c7bbe26c5a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2M1ZGQxZTBjYjc4NzkxMzJhMzE4YzEzYjg3YTliYWUzYWVlNWRmM2M5MDk5MzZmNjNhYzQ2Yjc1NzNlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIzODIzM2E5YzAzMjllZjllNGNmOWY2NGRhY2M4MDFhNTZiZGYwZGMwYWUyNmJiYTFkODM5ZTYwOTVjOThmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWE4Y2FiNzczYzI4MmEwYmRkMGNkZjY1ODc1NGRhZWRkOTNhNTdmNjAzNzgwOGYxM2JhNTk3MWQxOTBmODYxNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNThmMGRiNGZhODVmMDczZjFmNzVkMjliNjgyODE0ZDNlYzM4ZjcyMTYzNDk5NTQ5MDc2ZTVhODk0YjFmZWZhNiJ9"
-        },
-        {
-          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L1-L16",
-          "version": "repo-lines-v1:sha256:cf71a5ffc582fc0eabe273f976cdd66f0b15799f7d538b29d52261369fa9f397:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkY2E4ZTg2YjAyMTllNThjOGMyZjIzMjg4NGM5Yzg3NzczMWMwZWNiYWZiOTdjN2UwZjcxZWNkZWY3NTk4YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0MmFhYWVhZGE3MWVhZDRiMGZjZjlkZDhkYTAxMzk1ZjAxYjcyYzkxMDdkNzc3ZTk3ZGY4NDc3NTNlNTAyNzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2NjUwMDNhOTcxMmMxZDdhMDAyYzE1MDYwN2RlNzJmODQ5YmVhMTViNzdiZmQyZDcwYzRhOTE5NzJkYmQ4MjMifQ"
-        }
-      ]
-    },
-    {
       "id": "claim_e368842b7c354e038e3ff31e9c9ad5ac",
       "statement": "Coded T2MIS values are plain `text` with no `CHECK` on purpose because TESDA's value lists are unconfirmed and a wrong list would reject rows T2MIS accepts; `sex` is the sole constrained column, which is why the parser normalises it through an alias map and flags anything else.",
       "evidence": [
@@ -385,60 +371,6 @@
       ]
     },
     {
-      "id": "claim_a0c8a8a98b574a4b951b3b913e18d6ca",
-      "statement": "`modules/import-export/domain/csv.ts` is a hand-rolled RFC 4180 scanner (character loop with a quote-state flag, `\"\"` unescaped to `\"`, `\\r` swallowed, `\\n` ending the row, trailing unterminated cell flushed, all-empty rows filtered); there is no CSV dependency and new parsing must go through it rather than `split(',')`, because embedded commas and newlines inside quotes only survive the scanner.",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/domain/csv.ts#L1-L66",
-          "version": "repo-lines-v1:sha256:4740069fb27e96671fcd518cae3254e091038b0414e446ffd0a85ea8f43979ce:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4OGJiYjY5OTJlYzY0NzkxMTg0NGRjMWQwYTVhODA3NTY3Y2E3MjZiMzZiMGJlODc2NTUzZDNkODY5YTJiMjIifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_b25bb8aa2f6c47beb083e0484e4c374d",
-      "statement": "`rowsToRecords` keys each row by trimmed, lowercased header, so column lookup is case-insensitive and, where the T2MIS sheet repeats 'Municipality City' and 'Province' for provider and learner, the later learner cell overwrites the record key — the provider cells are lost to the import.",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/domain/csv.ts#L73-L84",
-          "version": "repo-lines-v1:sha256:2fb4fa1fe7b93369fd2a1375d884496848baa9749ea2fd549ad529e40f139173:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyMzI2YWE3Yjk3Yjc4Njc4YWE0NzA4YTc1ZmU3ZGI5YjA1YzcyNWMxMDYwMzE4ZjY0NTAyMjA1N2EyZDA1NDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5YWY1ZjU3MTAxZmJmMDI5ZTQzZDFkYmI1MjJkZjI1YmM1N2JlNmNhNDE5OGVlOTA4YjI2NTkwY2Y1Y2JmNDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        },
-        {
-          "resource": "repo://modules/import-export/domain/learnerImport.ts#L31-L34",
-          "version": "repo-lines-v1:sha256:bc7c2bdeb036a9fb4901968357f6075a730c3cad7bebce0d953bd1ea8a8d3fab:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzc1ZjE4NDNjOTJmM2ExZDc5Nzg2NjkwZGNkZTdmZjExNzVlODA5ZTgwYWRkODFiYjAzZDdmYjg4MmIzMjYzNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjJiYjRlZGEzN2QxNzc2OGQyOTFmZjE0MTNmNzIyNzg3YzI0MDg3ZGJiYTZlYzBjZWIyODVlMDU1ZDA0NzdiMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA2ODU4ZmE4OGNlZWM2YTdhMDBlOGI2MGY3MzkzZGRkZGQ4NTRmOTZlZTVjNWI3MDU3NWJmZjMwOTgyZDAyNiJ9"
-        }
-      ]
-    },
-    {
-      "id": "claim_0a3f5a042cd9476e9b891b403dabb1d5",
-      "statement": "`validateRows` rejects with the first matching reason per row, all of which are row-level `RowError`s (content, not file-level): missing last/first name, then `uli` outside the soft `/^[A-Za-z0-9-]{8,20}$/` shape check, then any `problems` carried out of parse (unreadable date, unrecognised sex, unrecognised assessment result), then a ULI already seen as valid earlier in the file — so only the later duplicate loses and the database index is never the failing element.",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/domain/learnerImport.ts#L224-L257",
-          "version": "repo-lines-v1:sha256:d55549d74fb530fa3c856c0db99c595d6f69deded0ce8fca800edd93088efc41:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxYWVmODA5MzgxY2QwMzQ2MzQxYzNjNTczMTAzY2YyYzgzNzMxMTcwZjEwYjExOGU3NTRmNDIwMzY1YTJhYzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NDMwODRiZGZmNDgyYTBkYzlkYTA4Y2I1MDA4MjBlYTQwYzMzMGYzNDRiMDMxNTQ5NWZlNGE5ZWNlNzY0YzMifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_040f3f4661fb499097f9fbc109dfa1d6",
-      "statement": "A file spanning more than one batch is refused outright as `multiple-batches`, naming the offending values: the first of `training calendar code` / `qualification program title` with more than one distinct value wins, because an import files every row under the single `batchId` it was given and a whole-school export would otherwise be mis-filed whole (no per-row batch routing).",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/domain/learnerImport.ts#L198-L203",
-          "version": "repo-lines-v1:sha256:6a8b306c11589ae24de4e0dcafc36ded7a9ce1d84c2a5392b31cd55c081b392a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGY0ZjMyMWM1YmI1YjIyMDJkMTNkODk2ZTRkNDI1ZTRkZjZiNTdiNjY1MjhmYTBjMGUwMTY0ODZlNjZlN2ViZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGU5OTQ2MzJkMzc3Nzg1YWU2YWE5MTdiZTNlMTE5NDcyMDQ5YjVhYzZhYTU1MjIxOTA1NDQ1YzIwM2VjMTk0NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzQ2ZWI3ZGEyMmI4NTVlMzc4MzExMDRlYzQ0YjRhMzgyNzM1MGI3MjI2Y2I2ZDYwNTNiM2JlZjg3OGM5ZTIwYiJ9"
-        }
-      ]
-    },
-    {
-      "id": "claim_af5129fc8ab0480abb720b3dac292e9e",
-      "statement": "`reconcileWithExisting` is a pure `Map` lookup on ULI returning `existingId: null` for inserts or an id for updates; matching on ULI rather than `learner_no` or row order is what makes a re-import an additive merge instead of a duplicating one.",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/domain/learnerImport.ts#L264-L278",
-          "version": "repo-lines-v1:sha256:701e96d08d61b0e515d72dc4237ec889903387044095b2f17eea35fc1be3660e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwODI1ZWY3M2ZlMTY1MGUxZDJhYTg5YjBmNzQxMzMzOWZkNTkxYmQ3MjlmNDg1NTJkMDFlNWY5MmRjMDM2NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3ZTRiMjViZTZkZGIxMjQzZGJjNDE5ODAzYjNjYThlM2U3MDZiODA1MWFhMzA3YTNhOWFkMGRiMGQ3Yzg3OGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
-        }
-      ]
-    },
-    {
       "id": "claim_267c221dc29048cebdf069319b048480",
       "statement": "`importLearnersCsv` runs `validation-failed` checks before any network call (each parse status maps to a distinct error string), then enters a try/catch in which a failure to read the batch's tenant or the batch's existing `(id, uli)` rows returns `sync-failed` with the raw database text, and any thrown error is caught into a `sync-failed` carrying the thrown message.",
       "evidence": [
@@ -455,30 +387,6 @@
         {
           "resource": "repo://modules/import-export/data/learnerImport.ts#L211-L212",
           "version": "repo-lines-v1:sha256:00f1ef859f0718ddcb9c8dc522b6231adda08a441f12f355ed54d52da46efb90:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDc4NjFmYWM5MjE4OTNjNjQ3YmI2ZjMxMjAzNTVkYmEwMzllOGU1YWZhZGIwYjA2NGRiZjZiOTVlOTE1ZTg2NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2VlOGJkYmE5YmRhZTkzMjUxYzY0NmZhMWVlNzM1MGY0NjFiMDQwM2JiYWU2YWUwOWMwYmFiM2M0NDdlZTUwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDQ5NzU1YmE5ZTk3YzRjMmU0OWNkODkyZmIxNDAyNmYwY2Q4N2RlY2I4MzI5YzQ4NTk4MWE4NTVhNzQzZmMwYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEwOTEzZGY5NDRlM2IyMjhiNzA5YzQ5OGMzZGMwMTc4MTU5Mzk2Nzg1MTU5NTI3NDVkNmRjYTBjMjJjY2JlZCJ9"
-        }
-      ]
-    },
-    {
-      "id": "claim_1f4c572be9cc493590cfd878ffab1a61",
-      "statement": "`writeDetails` returns before querying when `row.details` is empty, so a names-only CSV never touches `learner_details` at all.",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/data/learnerImport.ts#L83-L93",
-          "version": "repo-lines-v1:sha256:5ce2d0f9e40082bc125ebe0d56da7e91603148c8587c2c01d0d7edf6d5e2f458:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4ZjEzZmIwNmQ3MWIyNmFkYjIxMTRkNWU3MjRjYTZkZDZiY2MwNGM5NWRiZjkwYjI2ZDQwODU4M2Y1YzRjZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0ODBhZDc3YjU1ZTQyNzdmNzk0ZWU0OWVlYmFkMTlhMzVjZjJhNDE5MjVjYTE4MjM4ODBkYjMxZTQ3ZTFiMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZDNlNzkwNThmN2M1NjVlM2I2MGZmMjZhZDk0ZTRhOWEyY2Q4NWNhYTc1MTQxMjI0YTA5NWI0NDE2YmVmNGIifQ"
-        }
-      ]
-    },
-    {
-      "id": "claim_639e52c4e02e4af7a80944b15324ae62",
-      "statement": "`learner_details` is written as a single-object upsert per call with `onConflict: 'learner_id'` against its primary key, so only the columns a given re-import carried are overwritten and a sparser file cannot blank earlier details; a freshly inserted learner's id is recovered from the insert's `.select('id, uli')` keyed by ULI, and a missing link becomes 'the learner was saved but its details could not be linked'.",
-      "evidence": [
-        {
-          "resource": "repo://modules/import-export/data/learnerImport.ts#L120-L133",
-          "version": "repo-lines-v1:sha256:3c0ec87030617c7ebc191e501d3e3f1a47e68d08585ca923274c259b9378e365:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlMjMwMTgxY2M3YjQ3ZjRlMmY0N2FlOTMxMGE4Nzc1NTE3NDM5MmEyZGZiMGM5M2ZlYzU1YjdkMWQzNjNlMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2YjU5YWNmZTg5MGJiOGUwMWQ3M2Y2NTA1ODU5ODc2YWYxZDUyMmQxMWIwMzY5MGRkMjUwOGUzYjE2YWQ3MjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzYjhhNzcwYTVhZGMxMzY0ZWNjOTZjMGRlY2NlYWJlZWEwMTU4YjJhOWVkZjAxZmZjYTQyYjk4NWVkNGM5M2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4ZWE0YWVlYmUyMWE2YTk5NzBlZjMzMTBkOGEwMjlhNzEyZDlmYzE5ZDYyYzg3ZWJiMmYyZmQ4MDk5OGViZjUifQ"
-        },
-        {
-          "resource": "repo://modules/import-export/data/learnerImport.ts#L89-L93",
-          "version": "repo-lines-v1:sha256:230b3f4ef6836dba69254147463e79b77d3099bf0720d68bab00f52e167aea57:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTRiZTg1Yzc2Zjk4YTg5Y2YzZjA1OGQwZjAyZTA4YTljY2YwNmZmNjRkOTdhMDg5NjJjZjZkODkwMTM2ZjFkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTNlYjJkMzlkZjU0YTczNDhlNTAzMWU0OTc0Zjc2YTEzYTQxOTQwYjNlODFlZGYzZGEwNjIxODlhYTQ3YzNkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTNkM2U3OTA1OGY3YzU2NWUzYjYwZmYyNmFkOTRlNGE5YTJjZDg1Y2FhNzUxNDEyMjRhMDk1YjQ0MTZiZWY0YiJ9"
         }
       ]
     },
@@ -501,10 +409,212 @@
           "version": "repo-lines-v1:sha256:6e60f5c8eb54d906678670d80523cdcb49d0f72eb0a402d2507a5ee2ff8608d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjMDhlNDY5MWJhNjUzMTQ4OGJmZTEzMzk2M2UyY2MyNTk5MzBiNDFmMGY1NWFiNWU1Y2VhMmFkNjExZDg0MTg5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJmNmY1YjQwYjE1ODQ1N2QxNzg2NGYyMTc5MDc4NmRkNWEyZWNkYjY0YjY2YTY1MWY3ODhkNGUyNWNkMzMwM2QyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
+    },
+    {
+      "id": "claim_6b1cd90b0a074d88bd68809ea1a99d58",
+      "statement": "Module README and every file header still call the shipped modal a TES-49 blocker saying importing is unavailable, but `ImportCsvModal` is today a complete intake screen: a required file input restricted to `.csv` that reads `File.text()`, a result-panel state machine, an `unconfigured` notice and a client-side config probe — only the batch selector is missing, and the shell passes `tenant` but no `batchId`.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/README.md#L3-L9",
+          "version": "repo-lines-v1:sha256:1ed772492c27e35273b4e2c3e72dbf6a13bc14af4ef89516bfa9758c91bff8c8:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2IyYjYzNzAxNDU0MTFiNmE0NjBmYTUwYmZlMWQxYzIwMmI0MjZjY2M0Mzc0NTA1MzBlMDU4NzRjYWM3ZTk1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDBjMTYxOTFhM2VhNWE3NzJhZmZhNjExMDBhMGViNzk0MGY2NGVjZGY3YTQ2M2FjNDIwMTQ2MDQ2ZjQyMGVkYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWQxMTI0NjBhZTEyOTUxNjcwMDIxMDE3NDgwNzVkOWVmNTk0MTA2NTIyNTNjY2Y1ODhlNWRmZWFiMjUzMGM2MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDk0ZTgyODcxMDEwNGUwMTE5YjQ0NDhjY2QwZmQxNmFhYWRkZDRlYWI1ZGRiOGQ2OGFlMWNmMzJjYTJjN2VhYiJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/ui/ImportCsvModal.tsx#L1-L23",
+          "version": "repo-lines-v1:sha256:315a84401cc262581bd46373fcf6ddf91f5d0b4c80113df5cd5f48e75dd1b206:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmMzdkYjFiOGRiM2ZiZWEzNmE1ZDJhNmZmZDVmMzM5M2E1M2VmMDUwNDdlMGI1ZTZlMTRhNDM0ZTQwNmZkZmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0M2NhOWRkYzI1ZjhhNWY4YmE0ZDA1MWUzOWY0MzkzZTZlODZjZTY2YWIyZDE3YzhhNjNhNmYwOTlhODIwMTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3YzMzMDAwNmMyNmEwYjQ5NzczODZlNjM1Yjg4ZGNlNjcyMjViMTY1ODdiNGY0Yjg4MjhmZDBkY2I5ZTBhYjUifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/ui/ImportCsvModal.tsx#L38-L38",
+          "version": "repo-lines-v1:sha256:8e2efd0c231e52e8b4cc5b3c7ff892f4ecadbac684d5246fa726f11d4f9b98a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGUyZWZkMGMyMzFlNTJlOGI0Y2M1YjNjN2ZmODkyZjRlY2FkYmFjNjg0ZDUyNDZmYTcyNmYxMWQ0ZjliOThhNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGUyZWZkMGMyMzFlNTJlOGI0Y2M1YjNjN2ZmODkyZjRlY2FkYmFjNjg0ZDUyNDZmYTcyNmYxMWQ0ZjliOThhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2M4ZjM5MmY3MmJiNWE2ODE1ZmM5Mjk4OGE0Y2RlNTkyZTc1M2E1ZGM4NTYwODJjNjBlZjQwZDUzOWQ0ZTEzYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTlmZGZlYzRkNjE1ZmFkYjI5YjI2NGQ0MDQ5YzYzMDM2Yzk2MzU3ZWZhZjcxOWI4ZTUyYTNiYWEyODYwNDc5NSJ9"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx",
+          "version": "repo-file-v1:sha256:86940956940452cbcb9586700e218c8b5f812f0f971751acfcf3037709dead06"
+        }
+      ]
+    },
+    {
+      "id": "claim_2ad2ce37bd7749eea79f46cf85a28c60",
+      "statement": "`importLearnersCsv` is a Server Action driven from the client through `startTransition`, its result is kept in `result` state and rendered as a `role=\"status\"` panel, and `unconfigured` is handled by leaving the form mounted with the button disabled — so the browser really reaches the `data/` layer even though nothing in `app/` composes the modal.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L175-L177",
+          "version": "repo-lines-v1:sha256:edcdd4b2f0d206fd57f26c06098c52caf81386ca6054bedf01bd8207c58fbd37:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGM2MTVjNjkzYWFmNTYyZTM5ZTI4N2ZkMGEwMjY1OTE2MjAwMGQ4MDcwMTc3MTVjYjBjM2E0YmUzOGY0YmQ4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTQ4NmQ2OTZkYmY5NDcxZDUwN2I3MWE5NmU5Y2EwZmIyMzkzODJhZmQyNzU2ZWFmMjIzOWY0MDlkNzkyZmIxMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzMyZmM1ZDhkYmRlZmE5MjU1ZDAwZTQ5NmJkYzIzNGYyZTY4OWM1MGU1YzAxMmVkZjkzYTUzZmI5ZTg3ODhkYiJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/ui/ImportCsvModal.tsx",
+          "version": "repo-file-v1:sha256:59dcdae4b3a0ff53464f95761ab3ebdc0230431aaaa6ad1b6f2f7e5990f5b91e"
+        }
+      ]
+    },
+    {
+      "id": "claim_033cc9d2b6234431a1fd2c78a1613b1a",
+      "statement": "Because there is still no batch picker, the modal does not call `importLearnersCsv` until the caller starts passing a `batchId`; the action stores whatever id it was handed in `batchId`, so the picker is the one missing wiring seam.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/ui/ImportCsvModal.tsx",
+          "version": "repo-file-v1:sha256:59dcdae4b3a0ff53464f95761ab3ebdc0230431aaaa6ad1b6f2f7e5990f5b91e"
+        },
+        {
+          "resource": "repo://modules/shell/ui/Sidebar.tsx",
+          "version": "repo-file-v1:sha256:86940956940452cbcb9586700e218c8b5f812f0f971751acfcf3037709dead06"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c888fc0b53b4b7fb5609c0ef6fbb215",
+      "statement": "The result renderer gives every status a distinct panel: each `validation-failed` error is listed, `skipped` rows render as `Row N (ULI) — reason`, `partial` carries an explicit saved-vs-not statement plus the raw error, `sync-failed`/`unconfigured` say nothing was saved, and any result is fronted with 'not a TESDA submission' (rule 27) — so the raw driver text reaches the panel and the rule 6 mapping TODO is still open.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L12-L21",
+          "version": "repo-lines-v1:sha256:53add277e78878b30a8d328fcfacb974662634e2a1b67a8a9162bfce97db3b4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwZmQyYzAxMjkxY2M5NWM2NjVhOGRmMjY0MGE3MmZiMWUwMzIwNGE5NTZlZjY5NzBmMjNjZGEyZDkyNGMzM2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyNDA3MmYzMDRjODUzOTljOWMxODIxYWM1MzY3YmRkMTAwNjExNGI4M2M1Y2UxMThkMWU4NGM4Mjk4NWE5Y2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjZWQ3NTZmMGNlZWE2YTZkOWYxOTBhOTQ5Y2ZjMTI1NjYzMGI0YWQ3NTgyN2Q1YWUzN2ZiYzNmOWMyMzgzOGIifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L160-L168",
+          "version": "repo-lines-v1:sha256:0c8587831122c876bd1daf1d18da21d7d57b2811369ec1684de6cdf15e34f579:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzMwYTdiNWEyNzIwMzVlM2I0YzhlY2NkMDc4ZTkxY2IwZWMwYTY3NTJmZWY3YWQ2ZTBiOWY3M2Q3NDVmMDgyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjU2YWMzNDQzOTY2MTgwYjU3ZjU2OGMxNDI4NjU4ZTdiMDJkZTVkMDYwZmVmNGJiNWE5OGJiMmM2N2ZjZDBjYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWU2OGMyODhhNDBjYWQ5ZGZjOWM1M2RlNWIzNWZmZjNhODg3M2E2NmM4ZDIxNmZjZjQ4NmZmZTA3OTVjNGQyMCJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/ui/ImportCsvModal.tsx",
+          "version": "repo-file-v1:sha256:59dcdae4b3a0ff53464f95761ab3ebdc0230431aaaa6ad1b6f2f7e5990f5b91e"
+        }
+      ]
+    },
+    {
+      "id": "claim_a89075f0910340aea31bffd89f163f27",
+      "statement": "`validateRows` reports rejects rather than dropping them, and a matched ULI is updated rather than skipped: a surviving row becomes `toUpdate`, a rejected row becomes `skipped` whenever at least one row survives, and a blank assessment cell combined with an unmatched ULI is the only way to create a `pending` row — so a blank cell alone never clears an existing result.",
+      "evidence": [
+        {
+          "resource": "repo://docs/adr/ADR-001-billing-and-domain-model.md",
+          "version": "repo-file-v1:sha256:0e6eb710499fcecd2a1eed2d440fa65561c3944a261db8c13eae2f7b1a909b6f"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L140-L158",
+          "version": "repo-lines-v1:sha256:45ad6e805e5c2fa1fa158511ee4ce59a3a7ad9e47599d3a1904fa6a728b8a81a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3NDhhOTlmMjliMmE2MDgzMDgwYWU3YmY2NmM5M2Q4NjIzOWY3ZjFlNTY1N2RhMzUxZjcxZmUyZjQxNDgzNmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyMDA1Yjg0MWVjOThhYjdjZjU3ZmEyODE3M2I3YzcxZDhlNWFiYmM2MjdlZjEyZTMwZTNjYmY0MjJmNmZiMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzN2JkYmVkY2IzN2MwZWE0YmNmMDAyMDMxYjYxZDJhZjZmYjdjNGI3OTJkZjY0YmNmYjA5NDJkZTdhNjcyOWEifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L193-L214",
+          "version": "repo-lines-v1:sha256:7469e33134bdfb71d337d1b76ba21b43b395cd7dbab7beb65143e452be9e537e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkZDBkNTMyZDc4Nzk4NTVkNzM2MzU3YmVkZmM0MDE4NGZhZTlmZWQ5ZGM3ZmRjNGY0NWQ1Yjk4NzJjMjg5OGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMGRmMDE0OWUxYWMwZmJlYTMxYTczZmVkMjgyYTFmYzA3MGJiODc5MGNlZjIwN2U0ZWE2MWE0MGQwNjk0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlZWVmZGQ1MTEzZDk5MDU2ZjFlMTlkZTFiN2Q1YmVkZTZlMGEzMDFmOWU4ZjdiZTRlYWQzZjhmOGRhODY2YzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NGZmZTBkYWE5NDZkMzhmYmIxZWQ1YjU5YjVhOWQxNjdjZmQ1ZmU2YTVmMzAyZGZiMTExMWE5NjdhNjNmNjEifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L224-L257",
+          "version": "repo-lines-v1:sha256:d55549d74fb530fa3c856c0db99c595d6f69deded0ce8fca800edd93088efc41:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxYWVmODA5MzgxY2QwMzQ2MzQxYzNjNTczMTAzY2YyYzgzNzMxMTcwZjEwYjExOGU3NTRmNDIwMzY1YTJhYzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NDMwODRiZGZmNDgyYTBkYzlkYTA4Y2I1MDA4MjBlYTQwYzMzMGYzNDRiMDMxNTQ5NWZlNGE5ZWNlNzY0YzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_effe632b9bec41708bdf97c3486ba885",
+      "statement": "`parseT2misDate` is the single date reader for both directions and its laxness is load-bearing: a bare MM/DD/YYYY, a one-digit month or day and a five-digit Excel serial in 20000–80000 all yield a date and never an error, so `31/12/1990` imports as 31 December while the row is refused only for its unrecognised sex — and since `DD/MM/YYYY` passes the regex by accident it can silently swap month and day (02/04/1961 reads as 4 February).",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L153-L174",
+          "version": "repo-lines-v1:sha256:94935f1a0b3fe28e92ed3dfd038127e80fa89979ecc22ae3de0ce6e60aa975cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkNjdhZmU3Y2Q1YTZlZDM1NzA2NDdhNDc1YjBkNDllNDBkZjliNTFkMTcxZjRjYjQ3OTZhNjI3NDdmMzc5YjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzY2Q4YmE5YzIyZjVlMmJmZjEwYjg0OGJlNzIzYzg0YTFlOWE0MzdlOTZhM2M1ODZiZGY0MzBiNzZiNmEyZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyNzdlYmNkY2U1YTQxOTAyYTE2NGEwMDUxYzdmMmIzMjQ3ZGQ1ZmUxOWFiZjRiYjdhMzAwN2M4ZmM5MmM1NGIifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/t2mis.ts#L39-L63",
+          "version": "repo-lines-v1:sha256:33c7548245eee19956ba15fb69509af1ee94ee0a1553cae08eeb6abd246bc00c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiZDJmMjBhOWJhNzU0MjhhYzMwNTI4MmMxZGJmNDQ3NDM1ZTBiZGMwYmIwOGY2ODY4MWJmMDc2ZGE0M2MwZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyNzE3ZTViYzY2ZDAyNTFiODVmYjlkMjc3ZDQ4NDNmZTY1YmE0ZDlmY2RlYjE5OGZlN2M2NWQ3YWEwZWM1MTUifQ"
+        },
+        {
+          "resource": "repo://tests/unit/t2mis.test.ts#L158-L179",
+          "version": "repo-lines-v1:sha256:c39cc47052e332a3c0175519ba40b3b71fa1d292de6aa4435078a6f1d01832a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwN2E5ZmUyMmQyNDk0MTgzYzM1ZmFkYzYxZGJhYjIyZjM5MzMwZDRiZGIwNjMyNzRiMmIwYWRmMDQxOGU3NjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2ZWRjNTA1Nzk0YTdhNzc0NDVhMzAyNjJlNmEzOTcxYTIxMjRkOWQ2Yjg0NDEwNzk5ZmM4Y2MwYjQzNDhlY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlM2EyZTYzZTljMzM0MGFmYWMxNDYyZmFjZGNjNWQ4MTcyZWRhZGIzYjNjNzYyYzI1ZjIyMDBhZTU0NjBlYmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c608440f980479cac5ba03d964c2987",
+      "statement": "The ULI rule is stricter than the schema: `validateRows` rejects any ULI outside `/^[A-Za-z0-9-]{8,20}$/` (a soft shape check, not TESDA's algorithm) while `learners.uli` is nullable and the export writes a blank cell for a missing one, so a null-ULI learner can never be updated by a re-import and comes back as a new insert.",
+      "evidence": [
+        {
+          "resource": "repo://modules/batches/data/learners.ts",
+          "version": "repo-file-v1:sha256:5c828447c03e564a0ff5b5e9458a520afd10155a9749bab07fa6038295fbec6e"
+        },
+        {
+          "resource": "repo://modules/import-export/data/learnerImport.ts#L120-L133",
+          "version": "repo-lines-v1:sha256:3c0ec87030617c7ebc191e501d3e3f1a47e68d08585ca923274c259b9378e365:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlMjMwMTgxY2M3YjQ3ZjRlMmY0N2FlOTMxMGE4Nzc1NTE3NDM5MmEyZGZiMGM5M2ZlYzU1YjdkMWQzNjNlMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2YjU5YWNmZTg5MGJiOGUwMWQ3M2Y2NTA1ODU5ODc2YWYxZDUyMmQxMWIwMzY5MGRkMjUwOGUzYjE2YWQ3MjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzYjhhNzcwYTVhZGMxMzY0ZWNjOTZjMGRlY2NlYWJlZWEwMTU4YjJhOWVkZjAxZmZjYTQyYjk4NWVkNGM5M2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4ZWE0YWVlYmUyMWE2YTk5NzBlZjMzMTBkOGEwMjlhNzEyZDlmYzE5ZDYyYzg3ZWJiMmYyZmQ4MDk5OGViZjUifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L75-L97",
+          "version": "repo-lines-v1:sha256:14a8e7cfe0a41ec5008a336318bd9ce19538aa7b377a67539932891e63924bd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiMjMyZmY5ODNlZTVkMTU1MTE4YjMxZGM4MWJhODNhYmVmZTEzZjg4NWIwMGU1MzM3MDVlM2UyZmJhNDAyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjMTMzOWIzODYwNDAyZGY4YmExZTFiMzBmZjg1NTlhNzVjNjcwMThmZWI4YjYzOGNjZmViYTU4MWRjNTA0ZDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwY2MxOTk4NDFiNjYzODJkOTMyZDA0ZWM2ODlkMTY0YWVhMDc3M2VhOGI5ZDU2ZTk4OTQyZWY2NzA1YTA3OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkYzMzOWY1YzgwYWZlMzY1ODU4ZWMzNTY1MDljN2NlYjAzYjc2NzBlN2M2Nzk1YjhhZDEzMjBmOTkwZWVjMmEifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/t2mis.ts",
+          "version": "repo-file-v1:sha256:a3175c5af5f00cb87b5ee395706cbf65835880f1379602da9030ec8adadad4ef"
+        }
+      ]
+    },
+    {
+      "id": "claim_3126ef7f9af94c4bafa465d8e616a69f",
+      "statement": "A ULI-keyed import can write onto the wrong grader's batch id in a flat course: the export falls back to the batch's `start_date`/`end_date` and program name for cells the scholar has no value for, and `parseLearnerCsv` never reads those back, so the batch-level dates are lost and the poster decides.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L36-L60",
+          "version": "repo-lines-v1:sha256:15b627ccdb78520336214444e95ae031b60686ce24942b1788b80b8efe55f574:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNTk2ZTZiNDZlNGJhOTI0MzEyMzZjNzIyYWJhZjU2OTI5YWVlZmRlMGU0Zjc2MTc2MTcxNWQ0MTNkMDBkNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3NGVlOGE4ZDFhYTg0NTM5MWJjNjc5ZWI3MGNlN2Y0NmEzY2Q2ZmIyZDE2ZmNjYTY3ZmExNzhmNGY4YzFlMGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjM2YwMjEwNzYyOThiOThhODdkZTJkNGM3MDMyMDAzYWFmZTEwYTJlNDVlNGNiOGIyNTI1NjQxZTQ2YWIzY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlMGZjZDNmZjBmN2U4YTY2MjczYmUwYWE2NDAwMmM3NjExNGRiNTZlNjYxZDQwNWE3MTRlYTc2ODQxMDdhMTEifQ"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/t2mis.ts#L127-L131",
+          "version": "repo-lines-v1:sha256:a93ae6ce8352da15d9053574b95c21a00ff7d791c54caa84577e1405d586206d:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTY5MjczOTYwNmY5YzQ0Mjc2ZWFmMWNmZWVkNmY1NzZkMTQ5NmJlZWEyZGUyYjRlNzUzZDczZmZkYmE2MDM3OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2NjYWM3NGViYWQwYTQ1ODkxZTc2MWU2NzAzMTQzNjZkODkzYTNhZWNjN2E3NGNkM2VlZDVkMmFhZGU5MWQ1NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjhhZDcwNmE2Nzk5ZTYwOGYyNDA3MWUyZDAxZWY3MGJiZTI2MDlmZTNiMTRlMmRhNzU3NjdjODEzNGRlN2I1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjE5OTFmMDliMDFlMzYxZWFjNjA1N2U4MmNkOWZlZTg1MTk0NGQ3OGUzMzFhZjU4NmMxYjNhODc3OWJlOTAxOCJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L17-L18",
+          "version": "repo-lines-v1:sha256:a9a9690c6b9e9061f6b3a9ea6255644237ff027ca8a7df6cd43ed5da3ff0b95a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTViMjZkNzY0OGIyOGJkZDk2ZDJiNmFlMDMwYmIzMzExZWZmNjEwMzA0YzUwOGVhOTE3MTE4NDg3YTc1ODY1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmY0MzI3MDk3N2MyYjRlNDgxMjAxNGJlNjhlNmFmOTliOTliNjhjY2U4MmYyZGQ1NzljMjU2NmE1YzhmOWJmNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWQ1YTliOTBiYjA0MjYzODA2MjA3ZTM3ZDI3NmU4NmQzZTNlN2I0NjNiMTEwMjE4Y2E4ODlkZDVlMzFiYTcxYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzNmM2Q4MTVkMWUzYzQyOWViOTRlY2JlNmU2MjRkNTA5ZDQ2NDllY2NjN2I1NDAyNTNkZjc1MzI1ZWMwZmI1ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4f93b9e7e045470d8bbb910b05e82fbe",
+      "statement": "`learners_tenant_batch_uli_key` is unique only where `uli is not null`, so any number of null-ULI learners coexist in a batch (the reason the import's ULI column is optional and the export writes a blank cell) and the applied table holds no `(tenant_id, batch_id, learner_no)` constraint at all — the reconciler's “learner_no is only unique per batch” comment is stale.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L16-L16",
+          "version": "repo-lines-v1:sha256:18721a449dacff025fe8873d7dfd921ddbc12a49e4f51a93fd0fb4f25e220dd9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTg3MjFhNDQ5ZGFjZmYwMjVmZTg4NzNkN2RmZDkyMWRkYmMxMmE0OWU0ZjUxYTkzZmQwZmI0ZjI1ZTIyMGRkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTg3MjFhNDQ5ZGFjZmYwMjVmZTg4NzNkN2RmZDkyMWRkYmMxMmE0OWU0ZjUxYTkzZmQwZmI0ZjI1ZTIyMGRkOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGNkNTY3M2ZkZmNiMDY2NTViMTI4NjFjM2Q4MDhkZjk2MjNlMzRmZjg0MzgwNjJkOTI4MWFhMjMzNzBjMWZlMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzBhY2M0ZDQ0YzExYzMzZmE2N2FmZmZiYmM0NjAwMTlhMWUwNmZlNjFjYWYyZjFkYTJjYzhmMmJiZGEwNzYyMyJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L269-L274",
+          "version": "repo-lines-v1:sha256:af6fa6d49afc2edbd93d7a815c3b7ac1c67203815ab295c3285d30c8b2951ab4:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODI4ODgxZWY3YTYyMTAzYTA5NTQzM2E0NTgwZGRlZmEwYzY2Yjg0MjAxODg0YzQwOTk1N2ZiMjkzNjdjMTE4YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTE5NzdkMDczZDI3MmZkZjhhMzQwMjFkMjhhYmFmZWUyYTcyMmE3YWI1YTZmM2QyNTQ0MGM0YzFlOTgzYzI5NSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L128-L135",
+          "version": "repo-lines-v1:sha256:f232d505d663e73e36b727f8c7fe458c52a3651320e23936f764240fb385ada6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGRhY2ZkYzgzZDlhNTE5ZGQyNGNhN2IwYThlZTM0NWJkZjBjYjY0YjI3NzE0MzlkOTNkNjA1OWMxZDBjYWRhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QzMWQ1ZmZmZDY2NTc0YTcwYzVhZGIzODYxOWVlZTRiYWU0MWU1Njg3YWYzNTE3ZmM1ZWUxYzYxNTI5MDA5ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGQ5MTlhZmUyZjE4NjQzNWJkYWYxMTgwMTA0YzBkOGVhODQzMDRhMmE3MDhjMTdiMzE0YTliMDhmYTNmZTNhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_93e8d71030be4c41a5e3fd659d836de4",
+      "statement": "Import and export are one file format read in two directions, held together by design: the 48-cell export row is fed back through `parseLearnerCsv` and `validateRows` in a test and must produce no errors and the same learner columns, and the escape hatch is that the parser's header aliases accept both the export's 'Assessment Results' and a roster CSV.",
+      "evidence": [
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L79-L93",
+          "version": "repo-lines-v1:sha256:82c4b85e006a97bc5e41cc13522e2644308d6af5ea7abb01c84df395da43c504:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmYTUxNzRiZDk3NGE4YTYzNzQyODI2OWNhMmJkZWI2MzQxZTM0ZjZkMWI5ZDczYzdlMDUyZjgyMTgzNGMxMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyNDYwZGM5OTczNjRjOTFkZTZlMjE5MTY5MWM0MzMxN2Q3OTMxMzNhMWJiOTg5NDhhMWEzNTYxODMyNGU1YzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMzdmMzA2ZTZhYjYxZmRkNGQzNWE1ZWM3MmU2Y2EwMTVhOWU4NzgzMTkzNzcwYzA1ZTkwZjE1YzM5ZmVhYWEifQ"
+        },
+        {
+          "resource": "repo://tests/unit/t2mis.test.ts#L124-L139",
+          "version": "repo-lines-v1:sha256:2b9460440db4e08c247fe489acf888cfd8c60a2a0846ff69635f016dc48a6e31:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExNzc4YzUwMTFlZjYyZTc5NjEwZjFhZWNmMDdjZmFjMGU4OGU2MzFlY2VjMjRlMWYxMWVkZDU2ZjhiMTFmMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkODVmNDlmODQ3YTA0MDRkZTM3ZTRmNTBkMTYyZTFmOTRjY2IxOTM1Y2Q3YWEzMWJlYzZkZjY5MjZhZDYwYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyZDBhNDEzNWUxZjJmYTE3NjhjYWU5N2ZlOGE0NjBkNDc2NWE0NGQ3ZjY5NzM2NTM5NjE5NmUzZjM0MjQzYTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e96a5ec84df84956b3749c5be88ed38f",
+      "statement": "Adding a column means a migration first, then `database.types.ts`, then the parser map: switching the `DETAIL_COLUMNS` map is how a T2MIS column reaches `learner_details`, and coded values stay plain `text` so T2MIS's own value lists are never overruled by a `CHECK`.",
+      "evidence": [
+        {
+          "resource": "repo://RULES.md#L68-L70",
+          "version": "repo-lines-v1:sha256:e0c9b14cc5e8439ad84c0a2b31ba31e5878b14774a8bbc2836b169250b353626:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGQ3MWFiMmY0NzIwMDIwNmY5ZGQ5M2JiZDM4ODhmY2UzMDM1ZThlOTQxYWU5ZGI5ZmY3NzRhZmJlNDYyYjA0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUzY2QyODFmNDhmMmVhYzc2NzJmZDcxMDcxNTJhMjE2NmM4MTJkOTMzMjFmZDQ5NjE2ZjY5ZWZkMTFkNTBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJkZGZhYWIxMTk1NzMwZmVlMjE5MTBlZjQ3NzUzZjdkNmI0ZjBkOTUxZWUxN2FjMDMxN2U0NjE3YWJkMTE3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzMxMjNhMjViYzk1YWM3OTZhZjg5ZTlmNDBkYTU1MDllZDhkYzY5ZGJlN2Y3NWJkYTg2YTRhYTJmNWVjMzY3MCJ9"
+        },
+        {
+          "resource": "repo://lib/supabase/database.types.ts#L22-L28",
+          "version": "repo-lines-v1:sha256:e1708d9e1659aa283534f1762a6641bda3a402f7f0f6c61f99ef7c7bbe26c5a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGE3M2M1ZGQxZTBjYjc4NzkxMzJhMzE4YzEzYjg3YTliYWUzYWVlNWRmM2M5MDk5MzZmNjNhYzQ2Yjc1NzNlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIzODIzM2E5YzAzMjllZjllNGNmOWY2NGRhY2M4MDFhNTZiZGYwZGMwYWUyNmJiYTFkODM5ZTYwOTVjOThmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWE4Y2FiNzczYzI4MmEwYmRkMGNkZjY1ODc1NGRhZWRkOTNhNTdmNjAzNzgwOGYxM2JhNTk3MWQxOTBmODYxNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNThmMGRiNGZhODVmMDczZjFmNzVkMjliNjgyODE0ZDNlYzM4ZjcyMTYzNDk5NTQ5MDc2ZTVhODk0YjFmZWZhNiJ9"
+        },
+        {
+          "resource": "repo://modules/import-export/domain/learnerImport.ts#L36-L66",
+          "version": "repo-lines-v1:sha256:3a02bf1b3205cd470872842bffd3265fe5c91e4a03afaf0afdd9f4a3152e87a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNTk2ZTZiNDZlNGJhOTI0MzEyMzZjNzIyYWJhZjU2OTI5YWVlZmRlMGU0Zjc2MTc2MTcxNWQ0MTNkMDBkNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkZmU3M2I0ZTNjZWZmZTNkM2RjMjRmMTI0NmJjNWZhM2Q5OTRjMzY2ZjIxOGQ2ZDkyNTcyYzA5ZDZjYjYyYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjM2YwMjEwNzYyOThiOThhODdkZTJkNGM3MDMyMDAzYWFmZTEwYTJlNDVlNGNiOGIyNTI1NjQxZTQ2YWIzY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxZjg0YjhiMTYyZjUwNjZhYTdlMWM0MmQ2ZDkzZmJhOTcxYmQwZGFmODhiYmIwOTA3NDBhMzk3NWI0ZWUzY2IifQ"
+        },
+        {
+          "resource": "repo://supabase/migrations/20261111120000_add_t2mis_terminal_report_fields.sql#L12-L15",
+          "version": "repo-lines-v1:sha256:a5be04c1835a5e412ed2910d50940469fd185f94437642221dd1e30b8fb76f4d:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWEyMWE0ZjhhZTRiOGE5MmU3YTg2ZDJhY2E0NDViNWRjZDg5MWEwYWY3YjdlZDQxNTFhYTU3ZGViM2RkNjI1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQ5ZTgyMDhjZjk4NzNiMDY4M2E5NTdiNTVmZWZjYWExMzY2MjQ1ZTljZGQ1ODA0YjM0YzI3M2E3ODViMDdmMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTY2ZjliMGExYTYwN2ZhYjc5OTU0ZDU4ZjM5NDg2YjRhYTkyYzU4YjAzMjY1YWY1NDY4MmU0OWQ5NWY5ZTM2OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWM5ZGJmMzFmNDFhNTFlZGRlNDlhYjk2ODhmMmViNmQxNmI4NjZmNmZhNGY3NmM4MGRhZGQzNmVmZmMzNDg0YyJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }

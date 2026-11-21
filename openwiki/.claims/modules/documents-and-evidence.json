@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:64970ccb8350d97717dc693609fa0c50d7754569256a8d06ca060dbed7cbf3a5",
+  "pageVersion": "sha256:ff61b4dd4f01c3979af44601801d9aeee8d98877a06ed0b87c356fce36240a0c",
   "claims": [
     {
       "id": "claim_7e8daf7605864d5c808732ab13c33bfb",
@@ -144,19 +144,15 @@
     },
     {
       "id": "claim_721fe5be08c74496b5b04a253a515132",
-      "statement": "`blockingDocumentNames` returns configured display labels rather than requirement keys because FR-06 AC-1 forbids showing a raw `document_key`, and `blockingDocuments` partitions criticals first instead of sorting so an empty catalog yields an empty summary rather than a blocked batch.",
+      "statement": "`blockingDocumentNames` returns configured display labels rather than requirement keys because FR-06 AC-1 forbids showing a raw `document_key`; all three blocker helpers share the private `blockerReasonFor` decision point so `blockerCount` cannot drift from `blockingDocuments().count`, and an empty catalog yields an empty summary rather than a blocked batch.",
       "evidence": [
         {
-          "resource": "repo://modules/documents/domain/compliance.ts#L250-L310",
-          "version": "repo-lines-v1:sha256:b61c830bb68a04a2124f27537a56f83faf4c3d1db26f65218892837aa81c2d4c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlMDcyMmQ3OWVjMDg0MjlhZGFlNjFhNWEyNmMzOTM4NzZjNzZhMGQ2ZjQyNjUwZGQwOThlMzdiNTYzNzJlYTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3ODJhZDkyMjE3MDA5YmE4ZmYyYjA0YjA4MzNkZDJkODk4MGIxMTk0MTIxYTI0ZjkwNDc5MTJiMjQzZmIyZmUifQ"
+          "resource": "repo://modules/documents/domain/compliance.ts#L241-L320",
+          "version": "repo-lines-v1:sha256:7a75c92bc4a5e3c90affb3750b9b5649a6125873768674d8cd1bc5b244f58fc0:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmYTdkYzk1YjFmNDBiYWRmYjJhZTg4N2E5ZDE4YzFmODUwYmUyNTVkNmY1NjMzYmIwM2Y5ZWE3ZGQxNjBmZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmNjdkMjEwOWU0ZDU2MTI4NWNkYmVhY2M2NjlmYjBmNmE4OWNkM2IzZWNmZDdiMDY3MWZhOTM5YTNmYjhhNDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5N2E1ZjlhNTAyYjM1NzFjZjM3MWQxNGViOWIxYzcwMzJlMDQ2MDk4NGFjNjQ4ZGEzYmNlYjdkODQwYmJiMjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         },
         {
-          "resource": "repo://tests/unit/doc-blockers.test.ts#L145-L160",
-          "version": "repo-lines-v1:sha256:062e4d85907501fa4c7ad7480065c1da2e12d434b9074442fe3c1f37f4c13de7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MGEyNzg1NzExYzlkNDVlOTlhMDcyMTdiZDk0ZjFiNWQ3MjE5ODZiOTU4MzI5ZTcxZjgzMzVmMDQ5ZTVlZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViMmM5NTdmYzM1NTI5YjA3OGRlZjBlOTdjYzQzZTJmYTU1ODBlMjYxMTMyOGJlMGRmYjgwMWU4NGJiZGYzMzcifQ"
-        },
-        {
-          "resource": "repo://tests/unit/doc-blockers.test.ts#L82-L96",
-          "version": "repo-lines-v1:sha256:c08259815125bee820222c204fe47aa49a3a4192884ed8d9a32a6ccee5fbbcab:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNDgwNDdhMWQ1ZmEwNDI4NWQwZTk2YjliYmE0MDU1MWU2YTZhN2I1YmExNDQwNWRlM2U0MjgzMTdkZTA2MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNjQ4YmMyYWEyODlkNmM2YzcwZmQ2ZjIxMmY1OGQwMDU5YmYzMjUzMWU0YTQ1M2RlNzc2NjMyOTZmZDE1MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMzU2ODI4MmExNzExODg5Y2NiYWNkMDFlMjIwMTEyNGNlM2Y3Y2U4ZDc5OTE3Nzc1OGZmNDU0YTdkMTk3NDcifQ"
+          "resource": "repo://tests/unit/doc-blockers.test.ts#L82-L160",
+          "version": "repo-lines-v1:sha256:bdcf9fc4ba3779f596d1cc5e4419d314029c8d51c7f446796e566833b9cb494b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNDgwNDdhMWQ1ZmEwNDI4NWQwZTk2YjliYmE0MDU1MWU2YTZhN2I1YmExNDQwNWRlM2U0MjgzMTdkZTA2MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNjQ4YmMyYWEyODlkNmM2YzcwZmQ2ZjIxMmY1OGQwMDU5YmYzMjUzMWU0YTQ1M2RlNzc2NjMyOTZmZDE1MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViMmM5NTdmYzM1NTI5YjA3OGRlZjBlOTdjYzQzZTJmYTU1ODBlMjYxMTMyOGJlMGRmYjgwMWU4NGJiZGYzMzcifQ"
         }
       ]
     },
@@ -346,19 +342,15 @@
     },
     {
       "id": "claim_7462459f265349168b27e4c501c098dc",
-      "statement": "The evidence code is ungated ahead of the UI: `buildEvidencePath`, `uploadEvidence` and `getSignedEvidenceUrl` have no callers, so `FilePreviewModal` treats any non-null `file.url` as a real file, invents a `name.pdf` and renders a simulated page, while `mapDocumentRow` sets `url` to the bare `storage_path` object key (or the external URL).",
+      "statement": "The evidence code is unexercised: no component imports `buildEvidencePath`, `uploadEvidence`, `getSignedEvidenceUrl` or `validateEvidenceFile`, and `FilePreviewModal` treats any non-null `file.url` (plus a non-`missing` status) as a real file, appends `.pdf` and renders a simulated page — while `mapDocumentRow` puts the bare `storage_path` object key or the external URL in `url` and populates nothing unless a storage path is set and the row is not `missing`.",
       "evidence": [
         {
           "resource": "repo://modules/documents/data/documents.ts#L84-L95",
           "version": "repo-lines-v1:sha256:8bb34271e5d5ea1775fa8b04ad48519f3ee0ffbd5be7bac6f04b15003fe32186:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0OGFiNGEzNWFkZGMxOTVkYWRjY2JiZDQ1OTQyMTQyZjc1MjRkY2NiN2ZkNzdjYTdmY2ZiMDQ4MGYxZDlhMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1YjE2MWQwNTIxNGM0N2RiN2U0ODMzMzY0YTIzYWFjZGU1NTk4OWJlYzRkZjZhODBiZDQxYzE3ZWQ5NzI2YTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1YjEzOGIzYzYwZDJjNDE5Zjc2MDQ0ZTQ3OTBhYTk0NTI5ZDgwOTQxYzljOGU2ZjZmOGU1N2Q3MTNlYjJhMGYifQ"
         },
         {
-          "resource": "repo://shared/ui/FilePreviewModal.tsx#L72-L76",
-          "version": "repo-lines-v1:sha256:d78979bd603eb417de6c3dd731ea70f4385c4d86a34d9e30cd900fa2279dc95c:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI5ZjRmYTVlZTZkNmJlZDlhMTkzNTIxNDA1MGEyOTAyZTA3NjA4NzUxZjIyNGFhZjVmMTYzMjE3NzFhMjFiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDdjMzMwMDA2YzI2YTBiNDk3NzM4NmU2MzViODhkY2U2NzIyNWIxNjU4N2I0ZjRiODgyOGZkMGRjYjllMGFiNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGY3N2I4MDNmNTczMGFjZGM3OWYwNzY4NTUwMjM3M2ZkZmM4YmVkYTQyNjYzOWRkOTYxZTljNTFkNDEwZTc2MSJ9"
-        },
-        {
-          "resource": "repo://shared/ui/FilePreviewModal.tsx#L97-L108",
-          "version": "repo-lines-v1:sha256:36e82da22bfd1697c4b21d22f89f5df06ad6b95a2f71aae99efd836232853848:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ZTE3NTA4MDEwYzVkZWRkMTc2ZmM4NWNjYzk5N2E3YjY1MmRhZWJmMjliZDAwODY4ZGJlN2FhYWNiNTE0NjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlMDA2Mzk5NzZmYTc2MzFhNWRiZDI3ZTNlNGNjMjI3YmI0YzM3MWM3NTVlNjVlNzlkNDlkZDMwMGVkOGY0M2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4YWViOWUzODc5NzZhYjY0OGU3Njk0ZTFkZDgxY2VhNDMzNTNjNzEyNzY5YTE5ZTJkNDJjM2FmMzNjMjBkZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1Y2I1MTZiOGNkNjk1MmFkZDdmNTA4M2RmZTM0NmQzYWRhODNmZGI2MTcwMGM5ZTJiYmM4ZGY1MmIzMjk1ZGQifQ"
+          "resource": "repo://shared/ui/FilePreviewModal.tsx#L73-L100",
+          "version": "repo-lines-v1:sha256:dbb375570793518cb308ff774d0ab7f6950b12df3ab531ba41e5d73fae6fd1cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmFjYjg0MjE2NTc2OWM1ZTIwYTVjYmYxYzA0YTIwZjVhNDVlMDVmZDY3MTU5MWYzNTA3NmEzZjRkODA0ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlNjJiZmI1MDRlMTRlNjA0MjNiZDZhZTk1Mjc1NjI3NDlhNmFlNmFiOGQ1NGM4NDg4NTdiYTg1NzEzZWU3NTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4NDRjOTJmNmU0OGVmMDc1ZDRjN2RiNjRjMzJmYThmODNmNGVkMzVhZGQxNmQxMDJkNzczYTNlMmJlOTk2ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjMGNlOWU0ZjlkNDBlYTc1YzJkZTJiOTViYWQxZDk0NGYxNDlhYmIzNzQ2Y2RlMDdhZDc2Y2RlY2JlNDU1NTcifQ"
         }
       ]
     },
@@ -419,10 +411,38 @@
           "version": "repo-lines-v1:sha256:1fc12ae40d38bc1fda209586173e8d16f770932346fda25e56b7399f3073e367:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTMwMjRjYWY1NjEwYjNiOWQ3NDFiZDY4MzZiMTljYWM2NGY4Y2JkMzYxZjJmNDQ5MzdmY2M0NDY2ODBkNzZiOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDczZmQwMzMyYzdlOTk0MTQxNTYwMzU5MzcwOWQ0NGUyMGRmNTA1OWY5ZDZiNWFiMGFhMmY1MjE2NTNmYWE4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjMzZWVlODM1N2QwN2FjZDdiMGRjYTNjYjkyNjU4OGE2ODZjZGFlNWJlNmMwNmM4MjBiZDVkZWQwZGFiYzZmNSJ9"
         }
       ]
+    },
+    {
+      "id": "claim_93304ad57c414cdd952e9208216ec1d2",
+      "statement": "A document blocker is cleared in exactly two ways — a row reaching `submitted` or reaching `verified` — and who may do either is decided by the `documents` table's policies, not by the UI: admins and coordinators write through `can_manage_tenant` (precedent A, for all), a trainer only on a batch they are assigned to and only for `trainer`/`all` audience, and the storage bucket's own policies never consult role at all.",
+      "evidence": [
+        {
+          "resource": "repo://modules/documents/domain/compliance.ts#L42-L43",
+          "version": "repo-lines-v1:sha256:07eb52f2ae0391617962ee4966228a096a95bc7e8efee2a3a486dfd2cfee55ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2IxNDE0NmRmZmM2MjVjYTM1ZjA0NTdkN2ZmYzQ0NTIwZmYyMWQ4NDMxMDc5YTYyMmYzODA2NzZiZTA4OGVlNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQyYzc3OTlmMzA0YzUzNjU1ZTZmYjNkNDJhODZhNGUxYTdjNDE1MzA5ZmQ5YmNiNzJlYzIxYjI5ZDY2MTQ2NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjAyYzQzZDYzOWRmNTRhNTJhYmE5NDI1ZTRiN2Q1NmU3ZGQ4YzI1MjU3OWI3YTIzMmRlYTU2N2M1NjJlNTU0YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWNhZDQ0NDcxNTQ1ZjI1YzE0NDFlZTJlMDIxMjBiOGM0Nzk4OWI3MjEzMWEyOTk5ZWNlMTM4MGVhZTZmOGZlZSJ9"
+        },
+        {
+          "resource": "repo://supabase/migrations/20260528160300_create_tenant_scoped_schema.sql#L843-L872",
+          "version": "repo-lines-v1:sha256:a1df5d842e521eea7014fa0d438f4bb0dec1046f2ee1d0ade2d379c8aaac459c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MGJlOWUyMGMyNDFhOTgxYWJmZDNhODFkMDFhZjQyYzQ5OTQ2NzgxYjZjMjc5NGNkMjE0NTU1ZDNkZDllNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTY3ZWMxZWQzODM2ZjhlYjE3YWZmMTcyYjViZmVmN2RlNjA0ODVhNDM5YzZjYTExYzU5MWUxNzU1NzM5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNzYwOWZjYWEyZGM5YmM1NzY2ZWZiOTlkMmE0MzhlMjE3MzMxZTQ5NmZkNjk0MjI1Y2Q2ZDk3ZDNiODViMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_193add60f2af4268a1827ae4d056cff0",
+      "statement": "`deriveDocReadiness` counts `isDocOnFile` over critical supporting-stage requirements while keeping its denominator at the full supporting set, so an untracked batch reads 0 of n and the billing gate stays shut; `buildPacket` turns each unsatisfied pre-billing requirement into a named blocker line.",
+      "evidence": [
+        {
+          "resource": "repo://modules/billing/data/billing.ts#L52-L59",
+          "version": "repo-lines-v1:sha256:854e681b5be8d5c292f51820b1d8bbd7e9ee290ebf362640c6a9477dd17703ad:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDRlMmJmYTc2Mzg0ZDNhZmIyZmM4MzQ2OWNiMGM1NDI5Y2NiMDNmOTdiNjBlM2U5ZDFhMWZmZTQzOGU2NmQ3MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTA2NzE5NDI5MTQyYzY4OTljZjg3MGMwZGE5NTk1MzE2NzMyZjU0NDhjMDVlYTk2YTU2YzNiZjdjYTA1Nzg0OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjk3YzA0YThjYTZiZDY1NjU5OGRjN2I2NGZkMGQzOThlMzhkMTkwYmZiMGFiZDdkZjY5NTQ1ZTE5MzQ1YjJiYyJ9"
+        },
+        {
+          "resource": "repo://modules/billing/domain/packets.ts#L128-L162",
+          "version": "repo-lines-v1:sha256:ee60a2229736ec959de9f782716cf3d00d76653523ec1a0e5f2a67549d13844b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhMTEyOWUwM2NiOGYyZjczMjg5NWI1Y2NhYmQ4MTk1YmVhNWE1NzVmNDVlZWI0MjA4ZDc1ZTk1NmM1MTc1ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiOTY3MDc3YTJkYmFiNGFlMzZkNWFjYWFmZWEzNWQ0OGE2YjZmYTNiNWEzODQzNTNhZDE4MWI0ZDIwMDkxODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlN2QxYTI3NTU5NmI2ZDA2NWUyMjIxMjYxMGZkYWRhZTQxNTMwOGFhNjY1ODY0NDI4YzM0YjU1ZmM5ODc2MGIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-18T03:56:44.398Z"
+    "at": "2026-11-21T03:38:28.236Z"
   }
 }
