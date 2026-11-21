@@ -221,7 +221,7 @@ function SchoolIdentityFields({
           required
           aria-invalid={errors.name ? true : undefined}
           aria-describedby={errors.name ? `${nameId}-error` : undefined}
-          placeholder="J3ED Farm School"
+          placeholder="Full school name"
         />
         {errors.name && <FieldError id={`${nameId}-error`}>{errors.name}</FieldError>}
       </div>
@@ -239,7 +239,7 @@ function SchoolIdentityFields({
           required
           aria-invalid={errors.code ? true : undefined}
           aria-describedby={errors.code ? `${codeId}-error` : undefined}
-          placeholder="J3ED"
+          placeholder="Short code"
         />
         {errors.code && <FieldError id={`${codeId}-error`}>{errors.code}</FieldError>}
         <p className="user-form-hint">
@@ -259,28 +259,28 @@ function SchoolLocationFields({ idPrefix }: { idPrefix: string }) {
         id={`${idPrefix}-region`}
         name="region"
         label="Region"
-        placeholder="Region IV-A, Quezon"
+        placeholder="e.g. region and province"
         optional
       />
       <TextField
         id={`${idPrefix}-province`}
         name="province"
         label="Province"
-        placeholder="Quezon"
+        placeholder="Province"
         optional
       />
       <TextField
         id={`${idPrefix}-city`}
         name="cityMunicipality"
         label="City or municipality"
-        placeholder="Candelaria"
+        placeholder="City or municipality"
         optional
       />
       <TextField
         id={`${idPrefix}-street`}
         name="streetAddress"
         label="Street address"
-        placeholder="Purok 3, Barangay Malabanban Norte"
+        placeholder="e.g. street and barangay"
         optional
       />
     </>
@@ -299,7 +299,7 @@ function SchoolProviderFields({ idPrefix }: { idPrefix: string }) {
         id={`${idPrefix}-provider-code`}
         name="tesdaProviderCode"
         label="TESDA provider code"
-        placeholder="1263"
+        placeholder="Numbers only"
         optional
         hint="The number that appears inside the school's COPR numbers and batch RQM codes."
       />
@@ -307,7 +307,7 @@ function SchoolProviderFields({ idPrefix }: { idPrefix: string }) {
         id={`${idPrefix}-school-type`}
         name="schoolType"
         label="School type"
-        placeholder="Farm school"
+        placeholder="e.g. school type"
         optional
         suggestions={SCHOOL_TYPE_SUGGESTIONS}
       />
@@ -401,7 +401,7 @@ function ProgramRow({
         type="text"
         className="input"
         autoComplete="off"
-        placeholder="20221263AFFOAP212009-R"
+        placeholder="Certificate number"
       />
       <p className="user-form-hint">
         From the Certificate of Program Registration. Leave blank if the

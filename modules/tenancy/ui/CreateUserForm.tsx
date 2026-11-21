@@ -135,7 +135,7 @@ export function CreateUserForm({ action, tenants }: CreateUserFormProps) {
           type="text"
           className="input"
           autoComplete="off"
-          placeholder="Maria Santos"
+          placeholder="Full name"
         />
         <p className="user-form-hint">
           Used only until they set a name on their own account.
@@ -155,7 +155,7 @@ export function CreateUserForm({ action, tenants }: CreateUserFormProps) {
           required
           aria-invalid={errors.email ? true : undefined}
           aria-describedby={errors.email ? `${emailId}-error` : undefined}
-          placeholder="name@school.edu.ph"
+          placeholder="name@example.com"
         />
         {errors.email && <FieldError id={`${emailId}-error`}>{errors.email}</FieldError>}
         <p className="user-form-hint">

@@ -17,12 +17,12 @@
  */
 
 import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
-import { hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from './urgency';
+import { URGENCY_WARNING_DAYS, hasOpenBillingObligation, hasRecordedBillingDeadline, urgencyTier } from './urgency';
 import { displayBatchId } from './rqm';
 import type { Batch } from '@/shared/types';
 
 /** Deadlines inside this window enter the queue (the warning tier's outer edge). */
-export const BILLING_DUE_WINDOW_DAYS = 21;
+export const BILLING_DUE_WINDOW_DAYS = URGENCY_WARNING_DAYS;
 
 export type AttentionSeverity = 'urgent' | 'due';
 

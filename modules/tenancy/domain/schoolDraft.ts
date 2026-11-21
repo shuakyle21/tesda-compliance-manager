@@ -154,7 +154,7 @@ export function normalizeSchoolCode(value: string): string {
 /** Letters and digits only, 2–12 characters — it is a label, not a sentence. */
 const SCHOOL_CODE_SHAPE = /^[A-Z0-9]{2,12}$/;
 
-/** TESDA provider numbers are numeric, e.g. 1263. */
+/** TESDA provider numbers are numeric. */
 const PROVIDER_CODE_SHAPE = /^\d{1,10}$/;
 
 /**
@@ -262,7 +262,7 @@ export function validateSchoolDraft(
   }
 
   if (tesdaProviderCode && !PROVIDER_CODE_SHAPE.test(tesdaProviderCode)) {
-    errors.tesdaProviderCode = 'Enter numbers only, for example 1263.';
+    errors.tesdaProviderCode = 'Enter numbers only.';
   }
 
   const { rows, message, rowErrors } = validatePrograms(draft.programs, allowedQualificationIds);
