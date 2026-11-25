@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "pages": {
     "/openwiki/architecture/data-model-and-rls.md": {
-      "gitHead": "8e273d4ece53b113a2f99c704418d6886f1f75d9",
-      "sourceFingerprint": "sha256:c03cc327b1762d3225eeb20ede11bb7bcdc17a6be59d3e6218e62c54961234e5",
+      "gitHead": "14575a3376eb9a9c9b57028ef90dd050f4f8f6dc",
+      "sourceFingerprint": "sha256:dec375db900679241019717de9e4a7a62d670e1412692badfde56f937967a188",
       "pageVersion": "sha256:7ca2f86f9566e3b764bee14ae004102983c951c820624a67908c46bdae21d3b8",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "72f861e2-21aa-4d3e-a3d5-4c3d6c4943b7"
     },
     "/openwiki/architecture/module-boundaries-and-data-pattern.md": {
-      "gitHead": "8e273d4ece53b113a2f99c704418d6886f1f75d9",
-      "sourceFingerprint": "sha256:c03cc327b1762d3225eeb20ede11bb7bcdc17a6be59d3e6218e62c54961234e5",
+      "gitHead": "14575a3376eb9a9c9b57028ef90dd050f4f8f6dc",
+      "sourceFingerprint": "sha256:dec375db900679241019717de9e4a7a62d670e1412692badfde56f937967a188",
       "pageVersion": "sha256:a2712bde632ca327b370366537f37ebddc4b2d405fd824cca770d4f5fa060e45",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "72f861e2-21aa-4d3e-a3d5-4c3d6c4943b7"
@@ -19,8 +19,8 @@
       "pageVersion": "sha256:c9f95626618f80aeb4b6593ae79f570de5137b8bf55449a82eb7d0f95bda261c",
       "completedBy": "openwiki/0.5.0",
       "completedRunId": "72f861e2-21aa-4d3e-a3d5-4c3d6c4943b7",
-      "gitHead": "8e273d4ece53b113a2f99c704418d6886f1f75d9",
-      "sourceFingerprint": "sha256:c03cc327b1762d3225eeb20ede11bb7bcdc17a6be59d3e6218e62c54961234e5"
+      "gitHead": "14575a3376eb9a9c9b57028ef90dd050f4f8f6dc",
+      "sourceFingerprint": "sha256:dec375db900679241019717de9e4a7a62d670e1412692badfde56f937967a188"
     },
     "/openwiki/architecture/overview.md": {
       "gitHead": "310b16fe9205f15e4db3312783c00a4cb1f3833e",
