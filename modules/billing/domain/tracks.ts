@@ -7,6 +7,8 @@
  * PAFSE, out of scope) — so the applicable track set is program-aware.
  */
 
+import { ENTREPRENEURSHIP_BLOCK_DAYS, TRAINING_COST_SPLIT_DAYS, TSF_DAY_RATE, pesoLabel } from './rates';
+
 export type BillingTrackId = 'training_cost' | 'tsf_allowance' | 'entrepreneurship';
 
 export interface BillingTrack {
@@ -22,21 +24,21 @@ export interface BillingTrack {
 const TRAINING_COST: BillingTrack = {
   id: 'training_cost',
   label: 'Training Cost',
-  basis: '60 training-day split',
+  basis: `${TRAINING_COST_SPLIT_DAYS} training-day split`,
   docTitle: 'Full Training Cost',
 };
 
 const TSF_ALLOWANCE: BillingTrack = {
   id: 'tsf_allowance',
   label: 'TSF / Allowance',
-  basis: 'calendar-duration split · nets ₱160/absence',
+  basis: `calendar-duration split · nets ${pesoLabel(TSF_DAY_RATE)}/absence`,
   docTitle: 'TSF & New Normal Allowance',
 };
 
 const ENTREPRENEURSHIP: BillingTrack = {
   id: 'entrepreneurship',
   label: 'Entrepreneurship',
-  basis: 'single payment · 3-day block',
+  basis: `single payment · ${ENTREPRENEURSHIP_BLOCK_DAYS}-day block`,
   docTitle: 'Entrepreneurship Fee',
 };
 

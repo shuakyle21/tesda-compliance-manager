@@ -10,17 +10,16 @@
  * through the matrix and the preview via local override state. Client Component.
  */
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/shared/ui/Icon';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { InfoCallout } from '@/shared/ui/InfoCallout';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { Toast, type ToastData } from '@/shared/ui/Toast';
 import { FilePreviewModal, type PreviewFile } from '@/shared/ui/FilePreviewModal';
-import { criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
+import { DOC_TIER_ON_TRACK, DOC_TIER_WARNING, criticalRequirements, docRecordFor } from '@/modules/documents/domain/compliance';
 import { displayBatchId } from '@/modules/batches/domain/rqm';
 import { formatDate } from '@/shared/dates';
-import type { Batch, DocRecord, DocumentRequirement, UserRole } from '@/shared/types';
+import type { Batch, DocRecord, DocumentRequirement } from '@/shared/types';
 
 const STATUS_LABEL: Record<string, string> = {
   verified: 'Verified', submitted: 'Submitted', pending: 'Pending', missing: 'Missing', na: 'N/A',
@@ -83,8 +82,7 @@ export function DocumentsView({
   batches,
   documentRequirements,
   syncFailed,
-  currentUserName,
-  role,
+  canVerify,
 }: {
   batches: Batch[];
   // The matrix columns: every requirement any shown batch's program asks for
@@ -93,37 +91,22 @@ export function DocumentsView({
   // unavailable" state (ADR-004 "unknown"), never a fabricated figure.
   documentRequirements: DocumentRequirement[];
   syncFailed: boolean;
-  // The signed-in person's display name from the server; null when their profile has none.
-  currentUserName: string | null;
-  // Server-resolved office role (see the route). Gates write and verify controls;
-  // the database enforces the same rules through RLS.
-  role: UserRole;
+  // From the trusted role (`profiles.role`), never the `?role=` preview override.
+  canVerify: boolean;
 }) {
-  // Verification overrides keyed `${batchId}:${docKey}`.
-  const [overrides, setOverrides] = useState<Record<string, Partial<DocRecord>>>({});
   const [preview, setPreview] = useState<PreviewFile | null>(null);
-  const [toast, setToast] = useState<ToastData | null>(null);
-
-  const isWriter = role === 'admin' || role === 'coordinator';
-  const canVerify = role === 'admin';
 
   /**
    * The record for a cell, or `null` when this batch does not track the
    * requirement at all (ADR-004 — untracked is neither verified nor missing;
-   * the matrix renders it as its own muted "Not tracked" pill). An override
-   * can only refine a record that exists.
+   * the matrix renders it as its own muted "Not tracked" pill).
    *
    * The columns span every shown program, and the mapper keeps any document
    * row a batch has, so a requirement outside this batch's own catalog is
    * untracked even if an old record for it exists.
    */
-  const docOf = useCallback((b: Batch, key: string): DocRecord | null => {
-    if (!b.documentRequirements.some((r) => r.key === key)) return null;
-    const base = docRecordFor(b, key);
-    if (!base) return null;
-    const ov = overrides[b.id + ':' + key];
-    return ov ? { ...base, ...ov } : base;
-  }, [overrides]);
+  const docOf = (b: Batch, key: string): DocRecord | null =>
+    b.documentRequirements.some((r) => r.key === key) ? docRecordFor(b, key) : null;
 
   const completeness = useMemo(() => batches.map((b): CompletenessSummary => {
     // Counted over *tracked* critical requirements only; `pct` is null when a
@@ -139,9 +122,9 @@ export function DocumentsView({
     // Submitted or pending: on file but not yet verified, so neither done nor missing.
     const awaiting = tracked.filter((d) => d.status === 'submitted' || d.status === 'pending').length;
     const untracked = crit.length - tracked.length;
-    const tier: CompletenessTier = pct === null ? 'untracked' : pct >= 90 ? 'on-track' : pct >= 60 ? 'warning' : 'critical';
+    const tier: CompletenessTier = pct === null ? 'untracked' : pct >= DOC_TIER_ON_TRACK ? 'on-track' : pct >= DOC_TIER_WARNING ? 'warning' : 'critical';
     return { ok, total: tracked.length, untracked, pct, missing, awaiting, tier };
-  }), [batches, docOf]);
+  }), [batches]);
 
   if (!batches.length) {
     return (
@@ -174,38 +157,14 @@ export function DocumentsView({
   const buildPreview = (b: Batch, req: DocumentRequirement, doc: DocRecord): PreviewFile => ({
     name: req.label, batchId: b.id, batchLabel: displayBatchId(b), batchName: b.name, program: b.program,
     tenantId: b.tenantId, docKey: req.key, url: doc.url, status: doc.status,
-    updated: doc.updated, source: doc.source, critical: req.critical,
-    verifiedBy: doc.verifiedBy || null, verifiedDate: doc.verifiedDate || null,
+    updated: formatDate(doc.updated), source: doc.source, critical: req.critical,
+    verifiedDate: formatDate(doc.verifiedDate),
   });
 
   const onCellClick = (b: Batch, req: DocumentRequirement) => {
     const doc = docOf(b, req.key);
-    if (!doc) return; // untracked — nothing to preview and nothing to attach against
-    if (doc.status === 'verified' || doc.status === 'submitted') setPreview(buildPreview(b, req, doc));
-    else if (isWriter) setToast({ title: 'Attach document', message: `Open uploader ⇢ ${displayBatchId(b)} · ${req.label}` });
-  };
-
-  const handleVerify = (file: PreviewFile) => {
-    // Only admins verify. The button is hidden for everyone else; this guard covers the handler too.
-    if (!canVerify) return;
-    // Verification records carry the verifier's name, so refuse rather than attribute to nobody.
-    if (!currentUserName) {
-      setToast({ title: 'Name not set', message: 'Add your name in My Account before verifying documents.' });
-      return;
-    }
-    const verifierName = currentUserName;
-    // Same ISO shape as the DB's `verified_at`, so live and just-verified rows format alike.
-    const verifiedDate = new Date().toISOString();
-    setOverrides((prev) => ({
-      ...prev,
-      [file.batchId + ':' + file.docKey]: { status: 'verified', verifiedBy: verifierName, verifiedDate, updated: verifiedDate, source: file.source || 'Uploaded file' },
-    }));
-    setPreview((fp) => (fp ? { ...fp, status: 'verified', verifiedBy: verifierName, verifiedDate, updated: verifiedDate } : fp));
-    setToast({ title: 'Document verified', message: `${file.name} accepted by ${verifierName}.` });
-  };
-  const handleRequestChanges = (file: PreviewFile) => {
-    setToast({ title: 'Changes requested', message: `${file.name} returned to the uploader to re-submit.` });
-    setPreview(null);
+    // Only a recorded document has anything to preview; attaching one is not available yet.
+    if (doc && (doc.status === 'verified' || doc.status === 'submitted')) setPreview(buildPreview(b, req, doc));
   };
 
   const colCount = batches.length;
@@ -215,6 +174,9 @@ export function DocumentsView({
     <div>
       <Header />
       <SyncFailedCallout syncFailed={syncFailed} />
+      <InfoCallout variant="info">
+        Uploading documents isn&apos;t available yet.
+      </InfoCallout>
 
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${colCount}, 1fr)`, gap: 12, margin: '16px 0' }}>
         {batches.map((b, i) => {
@@ -295,7 +257,8 @@ export function DocumentsView({
                     type="button"
                     className={'doc-status ' + s}
                     onClick={() => onCellClick(b, req)}
-                    disabled={!doc}
+                    aria-disabled={!doc || (s !== 'verified' && s !== 'submitted') ? 'true' : undefined}
+                    aria-label={`${req.label}, ${displayBatchId(b)}: ${doc ? STATUS_LABEL[s] : UNTRACKED_LABEL}`}
                     title={cellTitle(doc, s)}
                   >
                     <Icon name={cellIcon(doc, s)} size={11} />
@@ -303,7 +266,7 @@ export function DocumentsView({
                   </button>
                   {/* No date beside "Missing": it reads as the day something arrived. */}
                   {doc?.updated && s !== 'missing' && (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{formatDate(doc.updated)}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>{formatDate(doc.updated) ?? '—'}</span>
                   )}
                 </div>
               );
@@ -316,13 +279,10 @@ export function DocumentsView({
         <FilePreviewModal
           file={preview}
           canVerify={canVerify}
-          adminName={currentUserName}
-          onVerify={handleVerify}
-          onRequestChanges={handleRequestChanges}
+          verifyUnavailable="Verification can't be saved yet."
           onClose={() => setPreview(null)}
         />
       )}
-      {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }

@@ -12,10 +12,9 @@
  */
 
 import { docRecordFor, isDocOnFile } from '@/modules/documents/domain/compliance';
+import { BILLING_READY_THRESHOLD } from './readiness';
+import { TSF_DAY_RATE, trainingCostFor, tsfDaysForBatch } from './rates';
 import type { Batch, DocRecord, DocStatus, DocumentRequirement } from '@/shared/types';
-
-/** ₱/day TSF rate — TESDA Circular 015 s.2026, recorded in ADR-001 §3. */
-export const TSF_DAY_RATE = 160;
 
 /**
  * Lifecycle stages whose documents must be settled before a packet can be
@@ -24,9 +23,6 @@ export const TSF_DAY_RATE = 160;
  * leave Generate permanently dead (the same gate scoping TES-70 landed on).
  */
 export const PRE_BILLING_STAGES = ['aou', 'ntp', 'tip', 'train'] as const;
-
-/** Progress threshold at which the final TSF tranche unlocks (ADR-001 §4.1). */
-export const PACKET_READY_THRESHOLD = 80;
 
 export type PacketState = 'draft' | 'ready' | 'generated' | 'submitted' | 'settled';
 
@@ -99,6 +95,8 @@ export function formatPesoCompact(amount: number): string {
  * Negative values show as "Nd past due", zero as "Due today", etc.
  */
 function dueLabelFor(daysToDue: number): string {
+  // Infinity is the mapper's "no deadline recorded" sentinel — never a countdown.
+  if (!Number.isFinite(daysToDue)) return 'No deadline recorded';
   if (daysToDue < 0) return `${Math.abs(daysToDue)}d past due`;
   if (daysToDue === 0) return 'Due today';
   if (daysToDue === 1) return 'Due tomorrow';
@@ -139,7 +137,7 @@ export function buildPacket(
     });
 
   const unsatisfied = docs.filter((d) => !d.satisfied);
-  const belowThreshold = batch.progressPct < PACKET_READY_THRESHOLD;
+  const belowThreshold = batch.progressPct < BILLING_READY_THRESHOLD;
   // An empty catalog means the requirement list couldn't be loaded, not that
   // nothing is required — an unevaluated checklist must never read as
   // satisfied (mirrors billingGate's `requiredTotal > 0` guard).
@@ -148,7 +146,7 @@ export function buildPacket(
   const blockers: string[] = [];
   if (belowThreshold) {
     blockers.push(
-      `Training progress is ${batch.progressPct}% — the final tranche unlocks at ${PACKET_READY_THRESHOLD}%.`,
+      `Training progress is ${batch.progressPct}% — the final tranche unlocks at ${BILLING_READY_THRESHOLD}%.`,
     );
   }
   if (requirementsUnavailable) {
@@ -159,6 +157,12 @@ export function buildPacket(
         .map((d) => d.label)
         .join(', ')}.`,
     );
+  }
+
+  // An unmapped qualification has no rate (never a made-up default), so the
+  // Training Cost document cannot be generated for it.
+  if (trainingCostFor(batch.qualification) === null || tsfDaysForBatch(batch) === null) {
+    blockers.push('No rate is set for this qualification.');
   }
 
   const state: PacketState =
@@ -186,7 +190,7 @@ export function buildPacket(
  * Settled packets are never overdue regardless of their due date.
  */
 export function isOverdue(packet: BillingPacket): boolean {
-  return packet.state !== 'settled' && packet.daysToDue < 0;
+  return packet.state !== 'settled' && Number.isFinite(packet.daysToDue) && packet.daysToDue < 0;
 }
 
 /**

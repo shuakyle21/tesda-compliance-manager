@@ -19,6 +19,13 @@ export type AlertTone = 'green' | 'amber' | 'red';
 export type AlertCategory = 'billing-ready' | 'bsrs-approved' | 'billing-critical' | 'doc-missing' | 'ntp-lag';
 export type AlertRow = { text: string; tone: AlertTone; category: AlertCategory };
 
+/**
+ * UNCONFIRMED: the threshold is not in an ADR; the analytics screen previously
+ * cited 15 days. Confirm with TESDA guidance before relying on this alert.
+ * It cannot fire today because ntpLag is never recorded.
+ */
+export const NTP_LAG_ALERT_DAYS = 7;
+
 export const ALERT_CATEGORY_LABEL: Record<AlertCategory, string> = {
   'billing-ready': 'Billing ready',
   'bsrs-approved': 'BSRS approved',
@@ -60,7 +67,7 @@ export function batchAlerts(b: Batch, criticalDocs: DocumentRequirement[]): Aler
       text: `${displayBatchId(b)} missing ${docCompliance.missing} critical document${docCompliance.missing > 1 ? 's' : ''}.`,
     });
   }
-  if (b.ntpLag !== null && b.ntpLag > 7) rows.push({ tone: 'red', category: 'ntp-lag', text: `${displayBatchId(b)} NTP-to-start lag exceeded 7 days.` });
+  if (b.ntpLag !== null && b.ntpLag > NTP_LAG_ALERT_DAYS) rows.push({ tone: 'red', category: 'ntp-lag', text: `${displayBatchId(b)} NTP-to-start lag exceeded ${NTP_LAG_ALERT_DAYS} days.` });
   return rows;
 }
 

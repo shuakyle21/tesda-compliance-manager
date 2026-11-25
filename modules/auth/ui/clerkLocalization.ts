@@ -26,5 +26,5 @@ export const clerkLocalization: Localization = {
     },
   },
   // Top-level key — matches the email field across sign-in and sign-up.
-  formFieldInputPlaceholder__emailAddress: 'you@school.ph',
+  formFieldInputPlaceholder__emailAddress: 'name@example.com',
 };

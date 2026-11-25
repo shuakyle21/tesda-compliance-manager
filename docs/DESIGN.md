@@ -1170,3 +1170,12 @@ A data panel resolves its state in this order: **access restricted → unable to
   - Readiness (green) is never a task.
 - **Dates always carry the year** (`shared/dates.ts`). A past deadline printed without a year reads as upcoming.
 - **"Data as of"** is the snapshot's fetch time. Edit recency is not staleness.
+
+### 18.5 Managed TVI overview (2026-11-13)
+
+- `/overview` is the admin cross-school view: filters → KPI row → Needs-attention queue across schools → one row per school → Batches by stage and Required documents.
+- A total across schools **states its population** on the card ("across 3 schools"). Comparison between schools stays in the Schools table.
+- Billing has no cross-school KPI card: batch codes are unique only within a school, so the next deadline is shown per school.
+- Filters (school, scholarship program, qualification) live in the URL and apply to every section. An unknown value reads as "All".
+- "Past training end date" counts batches still recorded as ongoing after their recorded end date. It is a recorded fact, not an inferred deadline.
+- Panels with no recorded source are omitted (§18.3): slot utilization, completion and dropout, assessment and certification, employment, trends.

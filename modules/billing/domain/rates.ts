@@ -39,9 +39,6 @@ export const NOMINAL_HOURS_BY_QUALIFICATION: Record<string, number> = {
   'Cookery NC II': 320,
 };
 
-/** Fallback nominal hours for an unmapped qualification. */
-export const DEFAULT_NOMINAL_HOURS = 360;
-
 /**
  * Full Training Cost per scholar, keyed by qualification (ADR-001: Training Cost
  * is billed per qualification). ₱15,390 is the verbatim source-docx value.
@@ -53,30 +50,54 @@ export const TRAINING_COST_BY_QUALIFICATION: Record<string, number> = {
   'Cookery NC II': 18_500,
 };
 
-/** Fallback per-scholar Training Cost for an unmapped qualification. */
-export const DEFAULT_TRAINING_COST = 15_000;
-
 /**
- * Returns the nominal training hours for a qualification. Looks up the value in
- * the reference table and falls back to the default (360) for unmapped qualifications.
+ * Nominal training hours for a qualification, or `null` when it is not in the
+ * reference table — never a guessed default.
  */
-export function nominalHoursFor(qualification: string): number {
-  return NOMINAL_HOURS_BY_QUALIFICATION[qualification] ?? DEFAULT_NOMINAL_HOURS;
+export function nominalHoursFor(qualification: string): number | null {
+  return NOMINAL_HOURS_BY_QUALIFICATION[qualification] ?? null;
 }
 
 /**
- * Calculates the billable TSF days for a qualification: nominal hours ÷ 8 (E2).
- * One TESDA session equals 8 nominal hours.
+ * Billable TSF days: nominal hours ÷ 8 (E2), or `null` for an unmapped
+ * qualification. One TESDA session equals 8 nominal hours.
  */
-export function tsfDaysFor(qualification: string): number {
-  return Math.round(nominalHoursFor(qualification) / NOMINAL_SESSION_HOURS);
+export function tsfDaysFor(qualification: string): number | null {
+  const hours = nominalHoursFor(qualification);
+  return hours === null ? null : Math.round(hours / NOMINAL_SESSION_HOURS);
 }
 
 /**
- * Returns the per-scholar Training Cost for a qualification. Looks up the value
- * in the reference table and falls back to the default (₱15,000) for unmapped
- * qualifications.
+ * TSF days for a batch: the batch's own snapshotted `total_sessions` (ADR-001 E2,
+ * nominal hours ÷ 8 fixed at creation) when positive, else the qualification
+ * table, else `null`.
  */
-export function trainingCostFor(qualification: string): number {
-  return TRAINING_COST_BY_QUALIFICATION[qualification] ?? DEFAULT_TRAINING_COST;
+export function tsfDaysForBatch(batch: { totalSessions: number | null; qualification: string }): number | null {
+  const own = batch.totalSessions;
+  return own !== null && Number.isFinite(own) && own > 0 ? own : tsfDaysFor(batch.qualification);
 }
+
+/**
+ * Per-scholar Training Cost for a qualification, or `null` when it is not in
+ * the reference table — the caller must show "Rate unavailable", not a default.
+ */
+export function trainingCostFor(qualification: string): number | null {
+  return TRAINING_COST_BY_QUALIFICATION[qualification] ?? null;
+}
+
+/** Training Cost is released in a split over this many training days (ADR-001 §BB1). */
+export const TRAINING_COST_SPLIT_DAYS = 60;
+
+/** Entrepreneurship is paid once, as a block of this many days (ADR-001 §BB1). */
+export const ENTREPRENEURSHIP_BLOCK_DAYS = 3;
+
+/** Peso amount for running text: whole amounts drop the decimals ("₱160"), others keep two ("₱100.80"). */
+export function pesoLabel(n: number): string {
+  const fixed = n.toLocaleString('en-PH', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
+  return `₱${fixed}`;
+}
+
+export const RATE_UNAVAILABLE = 'Rate unavailable for this qualification';
+
+/** Shown instead of any scholar-dependent amount when the roster was never attached. */
+export const ROSTER_NOT_LOADED = 'Scholar roster not loaded';
